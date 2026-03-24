@@ -41,7 +41,7 @@ const OrderRoutePreview = ({
     let cancelled = false;
     const init = async () => {
       const mb = (await import("mapbox-gl")).default;
-      await import("mapbox-gl/dist/mapbox-gl.css");
+      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
       if (cancelled || !mapContainer.current) return;
 
       try {

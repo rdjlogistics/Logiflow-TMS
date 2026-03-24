@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════════════════════════════
+   🎨 THEME PRESET: HORIZON — Neon Gradient / GoComet Style
+   Deep navy, electric blue, neon glows, gradient mesh
+   ═══════════════════════════════════════════════════════════════ */
+
+.theme-horizon {
+  --background: 230 45% 8%;
+  --foreground: 210 40% 96%;
+
+  --card: 230 40% 11%;
+  --card-foreground: 210 40% 96%;
+
+  --popover: 230 40% 11%;
+  --popover-foreground: 210 40% 96%;
+
+  --primary: 210 100% 60%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 210 100% 70%;
+  --primary-muted: 210 60% 15%;
+
+  --secondary: 230 35% 14%;
+  --secondary-foreground: 210 40% 96%;
+
+  --muted: 230 30% 16%;
+  --muted-foreground: 220 20% 55%;
+
+  --accent: 330 85% 60%;
+  --accent-foreground: 0 0% 100%;
+  --accent-glow: 330 90% 68%;
+
+  --gold: 330 85% 60%;
+  --gold-muted: 330 50% 40%;
+  --gold-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 160 80% 45%;
+  --success-foreground: 0 0% 100%;
+  --warning: 45 95% 55%;
+  --warning-foreground: 230 45% 8%;
+  --info: 195 100% 55%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 230 30% 20%;
+  --input: 230 30% 20%;
+  --ring: 210 100% 60%;
+
+  --radius: 1.25rem;
+
+  --sidebar-background: 230 48% 5%;
+  --sidebar-foreground: 210 40% 96%;
+  --sidebar-primary: 210 100% 62%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 230 40% 12%;
+  --sidebar-accent-foreground: 210 40% 96%;
+  --sidebar-border: 230 40% 14%;
+  --sidebar-ring: 210 100% 60%;
+  --sidebar-muted: 220 20% 50%;
+
+  --gradient-primary: linear-gradient(135deg, hsl(210 100% 60%), hsl(195 100% 55%));
+  --gradient-primary-subtle: linear-gradient(135deg, hsl(210 100% 60% / 0.12), hsl(195 100% 55% / 0.12));
+  --gradient-accent: linear-gradient(135deg, hsl(330 85% 60%), hsl(280 80% 55%));
+  --gradient-gold: linear-gradient(135deg, hsl(330 85% 60%), hsl(280 80% 55%));
+  --gradient-success: linear-gradient(135deg, hsl(160 80% 45%), hsl(175 85% 40%));
+  --gradient-warning: linear-gradient(135deg, hsl(45 95% 55%), hsl(35 95% 50%));
+  --gradient-dark: linear-gradient(160deg, hsl(230 45% 8%), hsl(230 48% 5%));
+  --gradient-sidebar: linear-gradient(180deg, hsl(230 48% 6%), hsl(230 50% 3%));
+  --gradient-glass: linear-gradient(155deg, rgba(20, 22, 38, 0.92), rgba(14, 16, 30, 0.88));
+  --gradient-crystal: linear-gradient(165deg, rgba(22, 25, 42, 0.95), rgba(16, 19, 35, 0.92));
+  --gradient-holographic: linear-gradient(125deg, 
+    hsl(210 100% 60% / 0.08) 0%, 
+    hsl(330 85% 60% / 0.06) 25%,
+    hsl(195 100% 55% / 0.07) 50%,
+    hsl(280 80% 55% / 0.05) 75%,
+    hsl(210 100% 60% / 0.08) 100%);
+  --gradient-mesh: radial-gradient(ellipse 100% 70% at 10% -10%, hsl(210 100% 60% / 0.1) 0%, transparent 60%),
+                   radial-gradient(ellipse 80% 60% at 90% 110%, hsl(330 85% 60% / 0.08) 0%, transparent 60%),
+                   radial-gradient(ellipse 50% 40% at 50% 50%, hsl(195 100% 55% / 0.05) 0%, transparent 50%);
+  --gradient-page: linear-gradient(180deg, hsl(230 45% 8%) 0%, hsl(230 48% 5%) 100%);
+  --gradient-shine: linear-gradient(120deg, transparent 30%, hsl(210 100% 60% / 0.15) 50%, transparent 70%);
+  --gradient-aurora: linear-gradient(135deg, 
+    hsl(210 100% 60% / 0.12) 0%,
+    hsl(330 85% 60% / 0.1) 50%,
+    hsl(195 100% 55% / 0.12) 100%);
+
+  --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.18);
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.22), 0 1px 2px hsl(0 0% 0% / 0.14);
+  --shadow-md: 0 4px 10px -2px hsl(0 0% 0% / 0.28), 0 2px 4px -2px hsl(0 0% 0% / 0.18);
+  --shadow-lg: 0 14px 24px -6px hsl(0 0% 0% / 0.32), 0 6px 10px -4px hsl(0 0% 0% / 0.2);
+  --shadow-xl: 0 28px 40px -8px hsl(0 0% 0% / 0.38), 0 12px 18px -8px hsl(0 0% 0% / 0.22);
+  --shadow-2xl: 0 40px 80px -20px hsl(0 0% 0% / 0.48);
+  --shadow-glow: 0 0 50px -10px hsl(210 100% 60% / 0.45);
+  --shadow-glow-accent: 0 0 50px -10px hsl(330 85% 60% / 0.4);
+  --shadow-glow-gold: 0 0 40px -8px hsl(330 85% 60% / 0.45);
+  --shadow-glow-intense: 0 0 80px -12px hsl(210 100% 60% / 0.55);
+  --shadow-glow-soft: 0 0 100px -20px hsl(210 100% 60% / 0.3);
+  --shadow-3d: 0 28px 60px -20px hsl(0 0% 0% / 0.42), 
+               0 14px 28px -14px hsl(0 0% 0% / 0.28),
+               0 0 0 1px hsl(0 0% 100% / 0.04);
+  --shadow-inset: inset 0 2px 4px hsl(0 0% 0% / 0.18);
+  --shadow-card: 0 2px 5px hsl(0 0% 0% / 0.22), 
+                 0 8px 20px hsl(0 0% 0% / 0.28);
+  --shadow-card-hover: 0 8px 20px hsl(0 0% 0% / 0.32), 
+                       0 16px 40px hsl(0 0% 0% / 0.38),
+                       0 0 30px -8px hsl(210 100% 60% / 0.2);
+  --shadow-float: 0 24px 50px -14px hsl(0 0% 0% / 0.42),
+                  0 10px 20px -10px hsl(0 0% 0% / 0.28);
+  --shadow-elevation: 0 32px 64px -18px hsl(0 0% 0% / 0.48),
+                      0 16px 32px -14px hsl(0 0% 0% / 0.3),
+                      0 4px 12px -4px hsl(0 0% 0% / 0.2);
+
+  --chart-1: 210 100% 60%;
+  --chart-2: 195 100% 55%;
+  --chart-3: 330 85% 60%;
+  --chart-4: 160 80% 45%;
+  --chart-5: 280 80% 55%;
+}
+
+/* Horizon — Light mode */
+.theme-horizon.light {
+  --background: 220 25% 97%;
+  --foreground: 230 45% 10%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 230 45% 10%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 230 45% 10%;
+
+  --primary: 210 95% 52%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 210 100% 60%;
+  --primary-muted: 210 80% 95%;
+
+  --secondary: 220 20% 94%;
+  --secondary-foreground: 230 45% 10%;
+
+  --muted: 220 18% 92%;
+  --muted-foreground: 220 12% 45%;
+
+  --accent: 330 80% 52%;
+  --accent-foreground: 0 0% 100%;
+  --accent-glow: 330 85% 60%;
+
+  --gold: 330 80% 52%;
+  --gold-muted: 330 45% 40%;
+  --gold-foreground: 0 0% 100%;
+
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 160 75% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 45 92% 50%;
+  --warning-foreground: 230 45% 8%;
+  --info: 195 95% 48%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 220 18% 88%;
+  --input: 220 18% 88%;
+  --ring: 210 95% 52%;
+
+  --sidebar-background: 230 45% 7%;
+  --sidebar-foreground: 210 40% 96%;
+  --sidebar-primary: 210 100% 58%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 230 40% 12%;
+  --sidebar-accent-foreground: 210 40% 96%;
+  --sidebar-border: 230 40% 15%;
+  --sidebar-ring: 210 95% 52%;
+  --sidebar-muted: 220 20% 55%;
+
+  --gradient-glass: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(240, 248, 255, 0.95));
+  --gradient-crystal: linear-gradient(165deg, rgba(255, 255, 255, 1), rgba(245, 250, 255, 0.97));
+  --gradient-page: linear-gradient(180deg, hsl(220 25% 97%) 0%, hsl(220 22% 95%) 100%);
+
+  --shadow-glow: 0 0 50px -10px hsl(210 95% 52% / 0.25);
+  --shadow-glow-accent: 0 0 50px -10px hsl(330 80% 52% / 0.28);
+  --shadow-glow-gold: 0 0 40px -8px hsl(330 80% 52% / 0.3);
+  --shadow-card: 0 2px 5px hsl(230 45% 10% / 0.04), 
+                 0 8px 20px hsl(230 45% 10% / 0.06);
+  --shadow-card-hover: 0 8px 20px hsl(230 45% 10% / 0.08), 
+                       0 16px 40px hsl(230 45% 10% / 0.1);
+}
+
+/* Horizon — Animated gradient border on hover */
+@keyframes hz-gradient-rotate {
+  0% { --hz-angle: 0deg; }
+  100% { --hz-angle: 360deg; }
+}
+
+@property --hz-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.theme-horizon .glass-card:hover,
+.theme-horizon .premium-card:hover {
+  border-color: transparent;
+  border-image: conic-gradient(
+    from var(--hz-angle, 0deg),
+    hsl(210 100% 60%) 0%,
+    hsl(195 100% 55%) 25%,
+    hsl(330 85% 60%) 50%,
+    hsl(280 80% 55%) 75%,
+    hsl(210 100% 60%) 100%
+  ) 1;
+  animation: hz-gradient-rotate 3s linear infinite;
+}
+
+/* Horizon — Neon pulse on active items */
+@keyframes hz-neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px hsl(210 100% 60% / 0.3); }
+  50% { box-shadow: 0 0 20px hsl(210 100% 60% / 0.5), 0 0 40px hsl(210 100% 60% / 0.2); }
+}
+
+.theme-horizon .badge-gradient {
+  animation: hz-neon-pulse 2s ease-in-out infinite;
+}
+
+/* Horizon — Gradient text headings */
+.theme-horizon h1,
+.theme-horizon h2 {
+  background: linear-gradient(135deg, hsl(210 100% 60%), hsl(195 100% 55%), hsl(330 85% 60%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Horizon light mode: don't use gradient text */
+.theme-horizon.light h1,
+.theme-horizon.light h2 {
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  color: hsl(var(--foreground));
+}
+
+/* Horizon — Focus ring with neon glow */
+.theme-horizon input:focus,
+.theme-horizon select:focus,
+.theme-horizon textarea:focus {
+  box-shadow: 0 0 0 2px hsl(210 100% 60% / 0.3), 0 0 20px -4px hsl(210 100% 60% / 0.25);
+}
+
+/* Horizon — Sidebar gradient accent line */
+.theme-horizon .sidebar-premium::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, hsl(210 100% 60%), hsl(330 85% 60%), hsl(195 100% 55%));
+  opacity: 0.6;
+}
