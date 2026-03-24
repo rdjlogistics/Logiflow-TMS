@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/loading-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   AlertTriangle, Search, FileCheck, Camera, MessageSquare,
-  Clock, CheckCircle2, XCircle, Euro, ChevronRight, Eye,
+  Clock, CheckCircle2, XCircle, ChevronRight, Eye,
   Download, Send, ShieldAlert, Hourglass, FileWarning,
   BadgeCheck, Banknote, TrendingUp
 } from "lucide-react";
@@ -50,7 +50,7 @@ const SettlementSection = ({
             <SelectValue placeholder="Aansprakelijk" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="carrier">Charter</SelectItem>
+            <SelectItem value="carrier">Vervoerder</SelectItem>
             <SelectItem value="customer">Klant</SelectItem>
             <SelectItem value="charter">Charter</SelectItem>
           </SelectContent>
@@ -85,65 +85,75 @@ const filterChips: FilterChip[] = [
 ];
 
 // ── Claim Card (mobile-first) ──
-const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -12 }}
-    whileTap={{ scale: 0.97 }}
-    onClick={() => onSelect(claim)}
-    className={cn(
-      "p-4 rounded-2xl cursor-pointer",
-      "bg-card/60 backdrop-blur-xl border border-border/30",
-      "hover:bg-card/80 hover:border-border/50 hover:shadow-lg",
-      "transition-colors duration-200",
-      "active:bg-muted/60"
-    )}
-  >
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-sm font-semibold">{claim.order_number || '—'}</span>
-          {getTypeBadge(claim.claim_type)}
+const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => {
+  const orderNumber = claim.order?.order_number || '—';
+  const customerName = claim.order?.customer?.company_name || 'Onbekend';
+  const ageDays = Math.floor((Date.now() - new Date(claim.created_at).getTime()) / (1000 * 60 * 60 * 24));
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={() => onSelect({ ...claim, order_number: orderNumber, customer: customerName, age_days: ageDays })}
+      className={cn(
+        "p-4 rounded-2xl cursor-pointer",
+        "bg-card/60 backdrop-blur-xl border border-border/30",
+        "hover:bg-card/80 hover:border-border/50 hover:shadow-lg",
+        "transition-colors duration-200",
+        "active:bg-muted/60"
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-semibold">{orderNumber}</span>
+            {getTypeBadge(claim.claim_type)}
+          </div>
+          <p className="text-sm text-muted-foreground truncate">{customerName}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {getStatusBadge(claim.status)}
+            {ageDays > 7 && (
+              <span className="text-xs text-amber-500 flex items-center gap-1">
+                <Clock className="h-3 w-3" />{ageDays}d
+              </span>
+            )}
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground truncate">{claim.customer || 'Onbekend'}</p>
-        <div className="flex items-center gap-2 flex-wrap">
-          {getStatusBadge(claim.status)}
-          {claim.age_days > 7 && (
-            <span className="text-xs text-amber-500 flex items-center gap-1">
-              <Clock className="h-3 w-3" />{claim.age_days}d
-            </span>
+        <div className="text-right shrink-0">
+          <p className="text-lg font-bold">€{(claim.claimed_amount || 0).toLocaleString()}</p>
+          {claim.approved_amount != null && claim.approved_amount > 0 && (
+            <p className="text-xs text-green-500">€{claim.approved_amount.toLocaleString()}</p>
           )}
+          <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-2" />
         </div>
       </div>
-      <div className="text-right shrink-0">
-        <p className="text-lg font-bold">€{(claim.claimed_amount || 0).toLocaleString()}</p>
-        {claim.approved_amount != null && claim.approved_amount > 0 && (
-          <p className="text-xs text-green-500">€{claim.approved_amount.toLocaleString()}</p>
-        )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-2" />
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 // ── POD Card (mobile-first) ──
-const PODCard = ({ pod }: any) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -12 }}
-    className={cn(
-      "p-4 rounded-2xl",
-      "bg-card/60 backdrop-blur-xl border border-border/30"
-    )}
-  >
-    <div className="flex items-center justify-between gap-3">
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <span className="font-mono text-sm font-semibold">{pod.order_number || '—'}</span>
-        <p className="text-sm text-muted-foreground truncate">{pod.customer || '—'}</p>
+const PODCard = ({ pod }: any) => {
+  const orderNumber = pod.order?.order_number || '—';
+  const customerName = pod.order?.customer?.company_name || '—';
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      className={cn(
+        "p-4 rounded-2xl",
+        "bg-card/60 backdrop-blur-xl border border-border/30"
+      )}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <span className="font-mono text-sm font-semibold">{orderNumber}</span>
+          <p className="text-sm text-muted-foreground truncate">{customerName}</p>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="rounded-lg text-xs">
             {pod.method === 'signature' ? 'Handtekening' :
@@ -161,7 +171,7 @@ const PODCard = ({ pod }: any) => (
         {pod.has_documents && <FileCheck className="h-4 w-4 text-green-500" />}
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={async (e) => {
           e.stopPropagation();
-          toast.info(`POD wordt geladen voor ${pod.order_number}`);
+          toast.info(`POD wordt geladen voor ${orderNumber}`);
           try {
             const { data, error } = await supabase.functions.invoke("generate-document-pdf", {
               body: { orderId: pod.id, documentType: "pod" }
@@ -177,7 +187,7 @@ const PODCard = ({ pod }: any) => (
         }}><Eye className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={async (e) => {
           e.stopPropagation();
-          toast.info(`POD download gestart voor ${pod.order_number}`);
+          toast.info(`POD download gestart voor ${orderNumber}`);
           try {
             const { data, error } = await supabase.functions.invoke("generate-document-pdf", {
               body: { orderId: pod.id, documentType: "pod" }
@@ -190,7 +200,7 @@ const PODCard = ({ pod }: any) => (
               const downloadUrl = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = downloadUrl;
-              a.download = `POD_${pod.order_number}.html`;
+              a.download = `POD_${orderNumber}.html`;
               a.click();
               URL.revokeObjectURL(downloadUrl);
               toast.success("POD gedownload");
@@ -200,7 +210,8 @@ const PODCard = ({ pod }: any) => (
       </div>
     </div>
   </motion.div>
-);
+  );
+};
 
 // ── Claim Detail Content (shared between Dialog & Sheet) ──
 const ClaimDetailContent = ({ claim, resolveClaim, onClose, getTypeBadge, getStatusBadge }: any) => (
@@ -339,8 +350,8 @@ const ClaimsInbox = () => {
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
       result = result.filter((c: any) =>
-        c.order_number?.toLowerCase().includes(q) ||
-        c.customer?.toLowerCase().includes(q)
+        c.order?.order_number?.toLowerCase().includes(q) ||
+        c.order?.customer?.company_name?.toLowerCase().includes(q)
       );
     }
     return result;
@@ -416,6 +427,11 @@ const ClaimsInbox = () => {
       </div>
 
       {/* ── Content ── */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Spinner size="lg" />
+        </div>
+      ) : (
       <AnimatePresence mode="wait">
         {activeTab === "claims" && (
           <motion.div
@@ -465,6 +481,7 @@ const ClaimsInbox = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      )}
 
       {/* ── Claim Detail: Sheet on mobile, Dialog on desktop ── */}
       {isMobile ? (

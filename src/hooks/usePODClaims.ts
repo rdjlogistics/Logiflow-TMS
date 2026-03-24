@@ -70,11 +70,11 @@ export const usePODClaims = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("proof_of_delivery")
-        .select("*")
+        .select("*, order:order_id(order_number, customer:customer_id(company_name))")
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
-      return data as ProofOfDelivery[];
+      return (data ?? []) as any[];
     },
     enabled: !!company?.id,
   });
@@ -85,10 +85,10 @@ export const usePODClaims = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("claim_cases")
-        .select("*")
+        .select("*, order:order_id(order_number, customer:customer_id(company_name))")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as ClaimCase[];
+      return (data ?? []) as any[];
     },
     enabled: !!company?.id,
   });
