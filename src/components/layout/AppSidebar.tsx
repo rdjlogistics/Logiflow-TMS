@@ -141,16 +141,18 @@ const operatieItems = [
   { title: "Auto Dispatch", icon: Zap, href: "/ai/dispatch" },
 ];
 
-// 2. VLOOT & PLANNING — Fleet + scheduling merged
-const vlootPlanningItems = [
+// 2a. VLOOT — Asset management (voertuigen, brandstof, onderhoud, uitstoot)
+const vlootItems = [
   { title: "Vlootbeheer", icon: Truck, href: "/fleet" },
-  { title: "Onderhoud", icon: Settings, href: "/maintenance/predictive" },
   { title: "CO₂ Rapportage", icon: Leaf, href: "/co2" },
   { title: "Tankstations", icon: Fuel, href: "/fuel-stations" },
+];
+
+// 2b. PLANNING — Personnel scheduling
+const planningItems = [
   { title: "Programma", icon: Calendar, href: "/planning/program" },
   { title: "Aanmeldingen", icon: Hand, href: "/planning/applications" },
   { title: "Beschikbaarheid", icon: CalendarCheck, href: "/planning/availability" },
-  { title: "Roosters", icon: Calendar, href: "/enterprise/rosters" },
 ];
 
 // 3. RELATIEBEHEER — Customers, address book, products, network
@@ -395,7 +397,8 @@ const AppSidebar = () => {
   // Beheer without WMS (WMS is now its own section)
   const allSections: (MenuSection & { visible: boolean })[] = [
     { title: "Operatie", items: operatieItems, defaultOpen: true, visible: permLoading || canAccessOperations },
-    { title: "Vloot & Planning", items: vlootPlanningItems, visible: permLoading || canAccessFleet || canAccessPlanning },
+    { title: "Vloot", items: vlootItems, visible: permLoading || canAccessFleet },
+    { title: "Planning", items: planningItems, visible: permLoading || canAccessPlanning },
     { title: "Relatiebeheer", items: relatiesItems, visible: permLoading || canAccessCRM || canAccessCustomerPortal },
     { title: "Chauffeurs & Partners", items: chauffeursItems, visible: permLoading || canAccessDriverPortal || canAccessCRM },
     { title: "Financieel", items: financieelItems, visible: permLoading || canAccessFinance || canAccessTendering },
