@@ -152,7 +152,7 @@ export function usePortalLabels() {
     setGenerating(true);
     
     try {
-      const blob = generateLabelPDF(shipments);
+      const blob = await generateLabelPDF(shipments);
       if (blob) {
         const url = URL.createObjectURL(blob);
         const iframe = document.createElement('iframe');
