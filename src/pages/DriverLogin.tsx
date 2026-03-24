@@ -117,8 +117,7 @@ const DriverLogin = () => {
   const handleResetSession = async () => {
     try {
       try { await supabase.auth.signOut(); } catch { /* ignore */ }
-      clearAuthStorage();
-      await clearServiceWorkerAndCaches();
+      await clearAuthCachesOnly();
       window.location.reload();
     } catch {
       window.location.reload();

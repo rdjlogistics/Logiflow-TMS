@@ -123,16 +123,8 @@ const Auth = () => {
         // ignore
       }
 
-      // Clear stored auth tokens
-      clearAuthStorage();
-
-      // Clear PWA caches that could keep serving an old build
-      await clearServiceWorkerAndCaches();
-
-      // Clear cookies (best-effort)
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
+      // Clear stored auth tokens + cookies (surgical, keeps SW alive)
+      await clearAuthCachesOnly();
           .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
 
