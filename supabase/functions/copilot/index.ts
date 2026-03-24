@@ -342,6 +342,8 @@ serve(async (req) => {
       p_model: model.includes("flash-lite") ? "gemini-2.5-flash-lite" : "gemini-3-flash",
     });
 
+    console.log(JSON.stringify({ event: "copilot_complete", model, complexity, tools_used: toolsUsed, tool_count: toolsUsed.length, credit_cost: creditCost, duration_ms: Date.now() - startTime }));
+
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
     });
