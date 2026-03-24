@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   AlertTriangle, Search, FileCheck, Camera, MessageSquare,
-  Clock, CheckCircle2, XCircle, Euro, ChevronRight, Eye,
+  Clock, CheckCircle2, XCircle, ChevronRight, Eye,
   Download, Send, ShieldAlert, Hourglass, FileWarning,
   BadgeCheck, Banknote, TrendingUp
 } from "lucide-react";
