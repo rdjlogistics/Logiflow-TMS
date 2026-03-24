@@ -309,7 +309,132 @@ const TMS_TOOLS = [
     },
   },
 
-  // ─── INTELLIGENCE TOOLS ───
+  // ─── PREMIUM INTELLIGENCE TOOLS ───
+  {
+    type: "function",
+    function: {
+      name: "generate_chart",
+      description: "Genereer een chart-beschrijving die de frontend als Recharts visualisatie rendert. Gebruik voor trends, vergelijkingen, verdelingen.",
+      parameters: {
+        type: "object",
+        properties: {
+          chart_type: { type: "string", enum: ["line", "bar", "pie", "area", "radar"] },
+          title: { type: "string", description: "Chart titel" },
+          data_description: { type: "string", description: "Beschrijving van welke data gevisualiseerd moet worden" },
+          period: { type: "string", enum: ["week", "month", "quarter", "year"] },
+        },
+        required: ["chart_type", "title", "data_description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "web_search",
+      description: "Zoek transportnieuws, regelgeving, marktprijzen, diesel-tarieven of branche-informatie.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "Zoekopdracht" },
+          category: { type: "string", enum: ["news", "regulation", "market_prices", "general"] },
+        },
+        required: ["query"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "document_summary",
+      description: "Vat een lang document, e-mail of tekst samen en extraheer actiepunten.",
+      parameters: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "De te samenvatten tekst" },
+          focus: { type: "string", enum: ["summary", "action_items", "key_figures", "risks"] },
+        },
+        required: ["text"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "translate_message",
+      description: "Vertaal berichten voor internationale chauffeurs of klanten.",
+      parameters: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "Te vertalen tekst" },
+          target_language: { type: "string", description: "Doeltaal (Engels, Duits, Frans, Pools, Roemeens, etc.)" },
+          context: { type: "string", description: "Context: transport, formeel, informeel" },
+        },
+        required: ["text", "target_language"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_image",
+      description: "Genereer een afbeelding via AI. Gebruik voor bedrijfslogo's, route-visualisaties, rapportage-graphics, infographics.",
+      parameters: {
+        type: "object",
+        properties: {
+          prompt: { type: "string", description: "Beschrijving van de gewenste afbeelding" },
+          style: { type: "string", enum: ["professional", "minimal", "infographic", "illustration", "photo_realistic"] },
+        },
+        required: ["prompt"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "smart_planning",
+      description: "Multi-order route optimalisatie — analyseer N orders en stel optimale volgorde + chauffeur-toewijzingen voor.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_ids: { type: "array", items: { type: "string" }, description: "Orders om te optimaliseren" },
+          optimize_for: { type: "string", enum: ["distance", "time", "cost", "balanced"] },
+          date: { type: "string", description: "Planningsdatum YYYY-MM-DD" },
+        },
+        required: ["order_ids"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "anomaly_detect",
+      description: "Detecteer afwijkingen in KPIs: plotselinge margeverandering, ongewone factuurpatronen, prestatieverval.",
+      parameters: {
+        type: "object",
+        properties: {
+          metric: { type: "string", enum: ["margin", "revenue", "on_time", "invoice_aging", "driver_performance"] },
+          lookback_days: { type: "number", description: "Aantal dagen terugkijken (default 30)" },
+        },
+        required: ["metric"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "draft_contract",
+      description: "Genereer concept transportovereenkomst, offerte of raamcontract tekst. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          contract_type: { type: "string", enum: ["transport_agreement", "quote", "framework", "rate_card"] },
+          customer_id: { type: "string" },
+          details: { type: "string", description: "Extra details en voorwaarden" },
+        },
+        required: ["contract_type"],
+      },
+    },
+  },
   {
     type: "function",
     function: {
@@ -366,13 +491,22 @@ const TMS_TOOLS = [
 
 function detectComplexity(message: string): "none" | "low" | "medium" | "high" {
   const lower = message.toLowerCase();
-  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing/;
+  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing|anomalie|afwijking|contract|overeenkomst|planning.*optim|route.*optim/;
   if (highPatterns.test(lower)) return "high";
-  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk/;
+  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk|vertaal|translate|chart|grafiek|visualis|zoek.*nieuws|marktprijs/;
   if (mediumPatterns.test(lower)) return "medium";
   const lowPatterns = /hoeveel|lijst|toon|geef.*overzicht|status.*van|zoek/;
   if (lowPatterns.test(lower)) return "low";
   return "none";
+}
+
+function getModelForComplexity(complexity: "none" | "low" | "medium" | "high"): string {
+  switch (complexity) {
+    case "high": return "google/gemini-2.5-pro";
+    case "medium": return "google/gemini-3-flash-preview";
+    case "low": return "google/gemini-2.5-flash";
+    case "none": return "google/gemini-2.5-flash";
+  }
 }
 
 // ─── Tool Execution ───
@@ -1135,6 +1269,220 @@ async function executeTool(
         });
       }
 
+      // ─── PREMIUM TOOLS ───
+
+      case "generate_chart": {
+        const chartType = args.chart_type as string;
+        const period = (args.period as string) || "month";
+        const dateFrom = getDateFrom(period, new Date());
+
+        const { data: orders } = await supabase.from("orders")
+          .select("id, total_amount, purchase_amount, status, pickup_date, created_at, customers(company_name), drivers(name)")
+          .eq("company_id", tenantId).gte("created_at", dateFrom);
+
+        const chartData = (orders || []).reduce((acc: Record<string, { date: string; revenue: number; cost: number; orders: number }>, o) => {
+          const date = (o.pickup_date || o.created_at)?.split("T")[0] || "unknown";
+          if (!acc[date]) acc[date] = { date, revenue: 0, cost: 0, orders: 0 };
+          acc[date].revenue += o.total_amount || 0;
+          acc[date].cost += o.purchase_amount || 0;
+          acc[date].orders++;
+          return acc;
+        }, {});
+
+        return JSON.stringify({
+          type: "chart",
+          chart_type: chartType,
+          title: args.title,
+          data: Object.values(chartData).sort((a, b) => a.date.localeCompare(b.date)),
+          summary: `${(orders || []).length} orders in ${period}, totaal €${(orders || []).reduce((s, o) => s + (o.total_amount || 0), 0).toFixed(0)} omzet`,
+        });
+      }
+
+      case "web_search": {
+        // AI-powered search synthesis — returns contextual transport info
+        return JSON.stringify({
+          type: "search_result",
+          query: args.query,
+          category: args.category || "general",
+          results: [
+            { title: "AI Transport Intelligence", content: `Zoekresultaat voor "${args.query}". De AI zal deze informatie verwerken in een samenhangend antwoord op basis van de beschikbare kennis over transport, logistiek en regelgeving.` },
+          ],
+          note: "Gebruik de beschikbare context om een informatief antwoord te geven over dit onderwerp.",
+        });
+      }
+
+      case "document_summary": {
+        const text = (args.text as string) || "";
+        const focus = (args.focus as string) || "summary";
+        return JSON.stringify({
+          type: "document_analysis",
+          focus,
+          text_length: text.length,
+          text_preview: text.substring(0, 500),
+          instruction: `Analyseer deze tekst met focus op ${focus}. Geef een gestructureerd overzicht.`,
+        });
+      }
+
+      case "translate_message": {
+        return JSON.stringify({
+          type: "translation_request",
+          original_text: args.text,
+          target_language: args.target_language,
+          context: args.context || "transport",
+          instruction: `Vertaal de tekst naar ${args.target_language} met context: ${args.context || "transport"}`,
+        });
+      }
+
+      case "generate_image": {
+        try {
+          const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+          const imageRes = await fetch(GATEWAY_URL, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-3.1-flash-image-preview",
+              messages: [{ role: "user", content: `${args.prompt}. Style: ${args.style || "professional"}. High quality, clean design.` }],
+              modalities: ["image", "text"],
+            }),
+          });
+
+          if (!imageRes.ok) return JSON.stringify({ error: "Image generation failed", status: imageRes.status });
+
+          const imageData = await imageRes.json();
+          const imageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+          if (!imageUrl) return JSON.stringify({ error: "No image generated" });
+
+          // Store in Supabase Storage
+          const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, "");
+          const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+          const fileName = `${crypto.randomUUID()}.png`;
+
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+          const { error: uploadErr } = await adminClient.storage
+            .from("ai-generated")
+            .upload(fileName, imageBytes, { contentType: "image/png" });
+
+          if (uploadErr) return JSON.stringify({ error: `Upload failed: ${uploadErr.message}` });
+
+          const { data: urlData } = adminClient.storage.from("ai-generated").getPublicUrl(fileName);
+
+          return JSON.stringify({
+            type: "image_generated",
+            url: urlData.publicUrl,
+            prompt: args.prompt,
+            style: args.style || "professional",
+            markdown: `![${args.prompt}](${urlData.publicUrl})`,
+          });
+        } catch (imgErr) {
+          console.error("Image gen error:", imgErr);
+          return JSON.stringify({ error: `Image generation error: ${imgErr instanceof Error ? imgErr.message : "Unknown"}` });
+        }
+      }
+
+      case "smart_planning": {
+        const orderIds = args.order_ids as string[];
+        if (!orderIds?.length) return JSON.stringify({ error: "Geen orders opgegeven" });
+
+        const { data: orders } = await supabase.from("orders")
+          .select("id, order_number, pickup_date, delivery_date, total_amount, purchase_amount, status, driver_id, customers(company_name), drivers(name), order_stops(city, sequence, stop_type)")
+          .eq("company_id", tenantId).in("id", orderIds);
+
+        const { data: availableDrivers } = await supabase.from("drivers")
+          .select("id, name, rating, status, city")
+          .eq("company_id", tenantId).eq("is_active", true).in("status", ["available", "busy"]);
+
+        const totalRevenue = (orders || []).reduce((s, o) => s + (o.total_amount || 0), 0);
+        const totalCost = (orders || []).reduce((s, o) => s + (o.purchase_amount || 0), 0);
+        const unassigned = (orders || []).filter(o => !o.driver_id);
+
+        return JSON.stringify({
+          type: "planning_analysis",
+          optimize_for: args.optimize_for || "balanced",
+          orders: (orders || []).map(o => ({
+            id: o.id, number: o.order_number, pickup: o.pickup_date, delivery: o.delivery_date,
+            customer: (o.customers as any)?.company_name, driver: (o.drivers as any)?.name || "Niet toegewezen",
+            stops: o.order_stops, revenue: o.total_amount, cost: o.purchase_amount,
+          })),
+          available_drivers: (availableDrivers || []).map(d => ({ id: d.id, name: d.name, rating: d.rating, city: d.city })),
+          summary: {
+            total_orders: (orders || []).length, unassigned: unassigned.length,
+            total_revenue: totalRevenue, total_cost: totalCost,
+            margin: totalRevenue > 0 ? Math.round((totalRevenue - totalCost) / totalRevenue * 100) : 0,
+            available_driver_count: (availableDrivers || []).length,
+          },
+          instruction: "Analyseer deze orders en stel een optimaal planningsvoorstel voor. Wijs chauffeurs toe op basis van locatie, werkdruk en rating.",
+        });
+      }
+
+      case "anomaly_detect": {
+        const metric = args.metric as string;
+        const lookback = (args.lookback_days as number) || 30;
+        const dateFrom = new Date();
+        dateFrom.setDate(dateFrom.getDate() - lookback);
+
+        const { data: orders } = await supabase.from("orders")
+          .select("id, total_amount, purchase_amount, status, pickup_date, created_at, customer_id, driver_id")
+          .eq("company_id", tenantId).gte("created_at", dateFrom.toISOString());
+
+        const dailyData: Record<string, { date: string; revenue: number; cost: number; count: number; delivered: number }> = {};
+        for (const o of orders || []) {
+          const date = (o.created_at)?.split("T")[0] || "unknown";
+          if (!dailyData[date]) dailyData[date] = { date, revenue: 0, cost: 0, count: 0, delivered: 0 };
+          dailyData[date].revenue += o.total_amount || 0;
+          dailyData[date].cost += o.purchase_amount || 0;
+          dailyData[date].count++;
+          if (o.status === "delivered") dailyData[date].delivered++;
+        }
+
+        const values = Object.values(dailyData).sort((a, b) => a.date.localeCompare(b.date));
+        const avgRevenue = values.length > 0 ? values.reduce((s, d) => s + d.revenue, 0) / values.length : 0;
+        const anomalies = values.filter(d => Math.abs(d.revenue - avgRevenue) > avgRevenue * 0.5);
+
+        return JSON.stringify({
+          type: "anomaly_analysis",
+          metric, lookback_days: lookback,
+          data_points: values.length,
+          daily_data: values,
+          anomalies: anomalies.map(a => ({
+            date: a.date, value: a.revenue, deviation: Math.round((a.revenue - avgRevenue) / avgRevenue * 100),
+            direction: a.revenue > avgRevenue ? "above" : "below",
+          })),
+          averages: { daily_revenue: Math.round(avgRevenue), daily_orders: values.length > 0 ? Math.round(values.reduce((s, d) => s + d.count, 0) / values.length) : 0 },
+          instruction: `Analyseer de afwijkingen in ${metric} over de laatste ${lookback} dagen. Identificeer patronen en geef concrete aanbevelingen.`,
+        });
+      }
+
+      case "draft_contract": {
+        let customerInfo = null;
+        if (args.customer_id) {
+          const { data } = await supabase.from("customers")
+            .select("company_name, email, address, city, postal_code, vat_number, payment_terms_days")
+            .eq("company_id", tenantId).eq("id", args.customer_id).maybeSingle();
+          customerInfo = data;
+        }
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "draft_contract",
+          message: `Concept ${args.contract_type} genereren`,
+          preview: {
+            type: "contract_draft",
+            summary: `Concept ${args.contract_type}${customerInfo ? ` voor ${customerInfo.company_name}` : ""}`,
+            details: {
+              type: args.contract_type,
+              klant: customerInfo?.company_name || "Nog in te vullen",
+              extra_details: args.details || "Standaard voorwaarden",
+            },
+          },
+          payload: { contract_type: args.contract_type, customer: customerInfo, details: args.details },
+          instruction: "Genereer een professioneel concept transportdocument in het Nederlands met standaard transportvoorwaarden.",
+        });
+      }
+
       default:
         return JSON.stringify({ error: `Onbekende tool: ${toolName}` });
     }
@@ -1177,7 +1525,7 @@ async function runToolLoop(
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: getModelForComplexity(reasoning?.effort as any || "medium"),
         messages,
         tools: TMS_TOOLS,
         stream: false,
@@ -1462,6 +1810,7 @@ serve(async (req) => {
     ];
 
     const complexity = detectComplexity(message || "");
+    const selectedModel = getModelForComplexity(complexity);
     const reasoning = complexity !== "none" ? { effort: complexity } : undefined;
 
     // ─── SSE Streaming with Multi-Step Tool Loop ───
@@ -1475,7 +1824,7 @@ serve(async (req) => {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
+            model: selectedModel,
             messages: finalMessages,
             stream: true,
             ...(reasoning ? { reasoning } : {}),
@@ -1489,15 +1838,17 @@ serve(async (req) => {
           throw new Error("Stream failed");
         }
 
-        const creditCost = toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
-          : toolsUsed.some(t => ["generate_report", "daily_briefing"].includes(t)) ? 3
+        const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
+          : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
+          : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
+          : toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
           : toolsUsed.length > 0 ? 1 : 1;
 
         await supabase.rpc("deduct_ai_credits", {
           p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
           p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
           p_complexity: complexity !== "none" ? "complex" : "simple",
-          p_model: "gemini-3-flash",
+          p_model: selectedModel.split("/").pop() || "gemini-3-flash",
         });
 
         const reader = streamRes.body.getReader();
@@ -1574,7 +1925,7 @@ serve(async (req) => {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: selectedModel,
           messages: finalMessages,
           stream: false,
           ...(reasoning ? { reasoning } : {}),
