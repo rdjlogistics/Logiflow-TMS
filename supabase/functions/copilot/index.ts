@@ -233,6 +233,7 @@ async function executeCopilotTool(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const startTime = Date.now();
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -267,6 +268,8 @@ serve(async (req) => {
     const complexity = detectComplexity(lastUserMsg);
     const model = complexity === "medium" ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash-lite";
     const reasoning = complexity === "medium" ? { effort: "medium" } : undefined;
+
+    console.log(JSON.stringify({ event: "copilot_request", model, complexity, user_id: userId, message_preview: lastUserMsg.slice(0, 80), timestamp: new Date().toISOString() }));
 
     // Tool-calling loop (max 3 iterations for copilot)
     let loopMessages: any[] = [
@@ -305,6 +308,7 @@ serve(async (req) => {
       loopMessages.push(choice.message);
       for (const tc of choice.message.tool_calls) {
         const toolArgs = typeof tc.function.arguments === "string" ? JSON.parse(tc.function.arguments) : tc.function.arguments;
+        console.log(JSON.stringify({ event: "copilot_tool_call", tool: tc.function.name, args: toolArgs, iteration: i + 1 }));
         const result = await executeCopilotTool(tc.function.name, toolArgs, supabase, tenantId);
         toolsUsed.push(tc.function.name);
         loopMessages.push({ role: "tool", tool_call_id: tc.id, content: result });
@@ -339,6 +343,8 @@ serve(async (req) => {
       p_complexity: complexity !== "none" ? "complex" : "simple",
       p_model: model.includes("flash-lite") ? "gemini-2.5-flash-lite" : "gemini-3-flash",
     });
+
+    console.log(JSON.stringify({ event: "copilot_complete", model, complexity, tools_used: toolsUsed, tool_count: toolsUsed.length, credit_cost: creditCost, duration_ms: Date.now() - startTime }));
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
