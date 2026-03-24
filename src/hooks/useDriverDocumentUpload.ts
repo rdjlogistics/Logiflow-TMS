@@ -77,7 +77,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
+        logger.error('Upload error:', uploadError);
         throw new Error(`Upload mislukt: ${uploadError.message}`);
       }
 
