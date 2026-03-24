@@ -393,6 +393,64 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
     batchInvoiceMutation.mutate();
   };
 
+  const toggleEmailInvoice = (invoiceId: string) => {
+    const next = new Set(selectedForEmail);
+    if (next.has(invoiceId)) next.delete(invoiceId);
+    else next.add(invoiceId);
+    setSelectedForEmail(next);
+  };
+
+  const toggleAllEmails = () => {
+    const withEmail = createdInvoices.filter(i => i.email);
+    if (selectedForEmail.size === withEmail.length) {
+      setSelectedForEmail(new Set());
+    } else {
+      setSelectedForEmail(new Set(withEmail.map(i => i.id)));
+    }
+  };
+
+  const handleSendEmails = async () => {
+    const toSend = createdInvoices.filter(i => selectedForEmail.has(i.id) && i.email);
+    if (toSend.length === 0) return;
+
+    setIsSendingEmails(true);
+    const statuses: Record<string, EmailStatus> = {};
+    toSend.forEach(i => { statuses[i.id] = "pending"; });
+    setEmailStatuses({ ...statuses });
+
+    let sent = 0;
+    let failed = 0;
+    for (const inv of toSend) {
+      statuses[inv.id] = "sending";
+      setEmailStatuses({ ...statuses });
+
+      try {
+        const result = await sendInvoiceEmail({
+          invoiceId: inv.id,
+          recipientEmails: [inv.email!],
+          includePdf: true,
+        });
+
+        if (result.success) {
+          statuses[inv.id] = "sent";
+          sent++;
+        } else {
+          statuses[inv.id] = "failed";
+          failed++;
+        }
+      } catch {
+        statuses[inv.id] = "failed";
+        failed++;
+      }
+      setEmailStatuses({ ...statuses });
+    }
+
+    setIsSendingEmails(false);
+    if (sent > 0) toast.success(`${sent} factu${sent === 1 ? 'ur' : 'ren'} per e-mail verzonden`);
+    if (failed > 0) toast.error(`${failed} factu${failed === 1 ? 'ur' : 'ren'} niet verzonden`);
+    setCurrentStep(5);
+  };
+
   const toggleCustomer = (customerId: string) => {
     const newSelection = new Set(selectedCustomers);
     if (newSelection.has(customerId)) {
