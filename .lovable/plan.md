@@ -1,183 +1,90 @@
 
-Doel: dit is niet “waarschijnlijk”, maar wat nu aantoonbaar uit code + database blijkt.
 
-1. Waar horen nieuwe accounts opgeslagen te worden?
-- Primair: `auth.users`
-- Gespiegeld voor app-data: `public.profiles`
-- Rollen: `public.user_roles`
+# Grondige Analyse: Error Toasts i.p.v. Werkende Knoppen
 
-Kort:
-- account bestaat = `auth.users`
-- app-profiel zichtbaar in database/UI = `public.profiles`
-- rechten = `public.user_roles`
+## Bewezen Bugs (met logs/bewijs)
 
-2. Exacte huidige code die de insert doet
+### BUG 1: Factuur PDF Genereren — CRASHT ALTIJD
+**Bewijs**: Edge function log:
+```
+ERROR: WinAnsi cannot encode "→" (0x2192)
+```
+**Root cause**: Invoice line descriptions bevatten het Unicode-teken `→`. De pdf-lib library kan dit niet encoden met standaard WinAnsi fonts.
 
-Frontend signup op `/auth`:
+**Bron van het `→` teken** (bewezen in code):
+- `src/components/orders/EnhancedBulkActionsBar.tsx` lijn 392:
+  ```ts
+  description: `Transport ${order.order_number} - ${order.pickup_city} → ${order.delivery_city}`
+  ```
+- 9 invoice_lines in de database bevatten dit teken.
+
+**Fix**:
+1. **Edge function `generate-invoice-pdf`**: Sanitize alle tekst die naar pdf-lib gaat — vervang `→` door `-` of `->` voordat het getekend wordt. Dit is een defensieve fix die ALLE Unicode-problemen vangt.
+2. **Broncode**: Vervang `→` door `-` in `EnhancedBulkActionsBar.tsx` lijn 392 zodat nieuwe factuurregels geen probleem meer veroorzaken.
+3. **Database fix**: Update bestaande 9 invoice_lines die `→` bevatten.
+
+### BUG 2: Bulk Verwijderen Chauffeurs — CRASHT
+**Bewijs**: Postgres log:
+```
+ERROR: column drivers.deleted_at does not exist
+```
+**Root cause**: `src/pages/Carriers.tsx` lijn 316:
 ```ts
-const { error } = await supabase.auth.signUp({
-  email,
-  password,
-  options: {
-    emailRedirectTo: `${window.location.origin}/`,
-    data: {
-      full_name: fullName,
-      ...(planSlug ? { selected_plan: planSlug } : {}),
-      ...(fingerprint ? { browser_fingerprint: fingerprint } : {}),
-    },
-  },
-});
+supabase.from("drivers").update({ deleted_at: new Date().toISOString() })
 ```
+De `drivers` tabel heeft geen `deleted_at` kolom (bewezen via schema query).
 
-Driver onboarding signup:
-```ts
-const { data: authData, error: signUpError } = await supabase.auth.signUp({
-  email: data.email.trim().toLowerCase(),
-  password: data.password,
-  options: {
-    emailRedirectTo: `${window.location.origin}/driver`,
-    data: {
-      full_name: data.name,
-      phone: data.phone,
-      date_of_birth: data.dateOfBirth?.toISOString(),
-      role: 'driver',
-    },
-  },
-});
+**Fix**: Twee opties:
+- A) Voeg `deleted_at` toe aan de `drivers` tabel (consistent met `customers`, `trips`, `carriers`)
+- B) Gebruik echte delete of status-change in plaats van soft-delete
+
+Optie A is consistenter met het bestaande patroon. Migratie: `ALTER TABLE drivers ADD COLUMN deleted_at timestamptz DEFAULT NULL;`
+
+### BUG 3: Portaalaccounts — Werkt Wél, Maar Error Handling Maskeert Succes
+**Bewijs**: Live test met echte customer ID retourneert HTTP 200:
+```json
+{"message":"Account aangemaakt","success":true,"userId":"7d11dbfd-..."}
 ```
+De functie werkt. Als de user errors ziet, is het waarschijnlijk:
+- Niet ingelogd (sessie verlopen) → 401 error
+- Of: `supabase.functions.invoke` retourneert een `FunctionsHttpError` object dat niet correct uitgelezen wordt
 
-Database trigger functie die profiel insert hoort te doen:
-```sql
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'public'
-AS $function$
-BEGIN
-  INSERT INTO public.profiles (user_id, full_name, email)
-  VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name', NEW.email);
+**Fix**: Verbeter de error handling in `CreateCustomerPortalDialog.tsx` en `CreateDriverPortalDialog.tsx` om de exacte error message uit het response te halen, inclusief sessie-verlopen detectie.
 
-  IF NOT (
-    COALESCE((NEW.raw_user_meta_data->>'is_driver')::boolean, false) OR
-    COALESCE((NEW.raw_user_meta_data->>'is_carrier_contact')::boolean, false) OR
-    COALESCE((NEW.raw_user_meta_data->>'is_customer')::boolean, false) OR
-    NEW.raw_user_meta_data->>'invited_by' IS NOT NULL
-  ) THEN
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (NEW.id, 'admin')
-    ON CONFLICT (user_id, role) DO NOTHING;
-  END IF;
+### BUG 4: Order Opslaan — RPC Werkt, Maar Potentieel Company-ID Issue
+**Bewijs**: `save_order_with_stops` RPC functie is correct. Geen recente postgres errors gevonden.
+Als het faalt, is de meest waarschijnlijke oorzaak: `user_companies` lookup retourneert NULL → error "Geen bedrijf gekoppeld aan gebruiker".
 
-  RETURN NEW;
-END;
-$function$
-```
+**Fix**: Verstevig de `ensure-user-company` flow en voeg betere error messaging toe.
 
-Migrationbestand dat de trigger hoort te maken:
-```sql
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user();
-```
+---
 
-3. Exacte logs van mislukte inserts van vandaag en gisteren
-Gevonden logs:
-```text
-auth_logs (laatste 7 dagen, signup/errors): []
-postgres_logs (laatste 7 dagen, handle_new_user/profiles/user_roles): []
-```
+## Implementatieplan
 
-Dus: er zijn geen “failed insert” logs, omdat er in de huidige omgeving geen actieve trigger-call plaatsvond.
+### Stap 1: Fix PDF Generator — Edge Function
+- Voeg een `sanitizeText()` helper toe die alle non-WinAnsi tekens vervangt
+- Pas toe op alle strings die naar `page.drawText()` en `wrapText()` gaan
 
-4. Bewezen root cause
-Bewezen met database-state, niet met gokwerk:
+### Stap 2: Fix `→` in Broncode
+- `EnhancedBulkActionsBar.tsx` lijn 392: `→` vervangen door `-`
 
-- `auth.users` heeft accounts van vandaag/gisteren:
-```text
-2026-03-24 10:01:33  info@miranze.com   id=004f8ed6-de3a-41f4-9380-7c33c36ba219
-2026-03-23 21:38:39  roberto@test.nl    id=7c9c664d-f8e7-41d6-ba76-33315c684768
-2026-03-23 18:26:46  rdjhomo@gay.nl     id=46b05913-cbb7-426d-ad63-6322677a12aa
-```
+### Stap 3: Fix Database — Bestaande Invoice Lines
+- SQL migration: `UPDATE invoice_lines SET description = REPLACE(description, '→', '-') WHERE description LIKE '%→%';`
 
-- `public.profiles` voor deze accounts zijn pas later in bulk aangemaakt:
-```text
-2026-03-24 19:27:07  info@miranze.com
-2026-03-24 19:27:07  roberto@test.nl
-2026-03-24 19:27:07  rdjhomo@gay.nl
-```
+### Stap 4: Fix Drivers Soft-Delete
+- Migratie: `ALTER TABLE drivers ADD COLUMN deleted_at timestamptz DEFAULT NULL;`
 
-- Actieve triggers op `auth.users` in huidige omgeving:
-```text
-[]
-```
+### Stap 5: Verbeter Error Handling Portal Dialogs
+- Sessie-check toevoegen voor edge function calls
+- Betere error message parsing uit FunctionsHttpError
 
-Conclusie:
-```text
-De root cause is NIET een mislukte profile insert.
-De root cause is dat de trigger op `auth.users` in de huidige omgeving ontbreekt.
-Daardoor werd `public.handle_new_user()` niet uitgevoerd bij signup.
-Gevolg: accounts kwamen wel in `auth.users`, maar niet automatisch in `public.profiles` / `public.user_roles`.
-De bulk backfill van 2026-03-24 19:27:07 heeft ze achteraf toegevoegd.
-```
+### Bestanden die gewijzigd worden
+| Bestand | Wijziging |
+|---|---|
+| `supabase/functions/generate-invoice-pdf/index.ts` | sanitizeText() toevoegen |
+| `src/components/orders/EnhancedBulkActionsBar.tsx` | `→` → `-` |
+| Database migratie | invoice_lines fix + drivers.deleted_at |
+| `src/pages/Carriers.tsx` | Geen wijziging nodig na migratie |
+| `src/components/customers/CreateCustomerPortalDialog.tsx` | Error handling verbeteren |
+| `src/components/drivers/CreateDriverPortalDialog.tsx` | Error handling verbeteren |
 
-5. Fix die ik ga doorvoeren
-Ik ga dit waterdicht maken met 1 gerichte database-fix:
-
-Stap A — trigger hard herstellen
-- `DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users`
-- trigger opnieuw aanmaken op `auth.users`
-
-Stap B — functie hardenen
-- `handle_new_user()` idempotent maken met `ON CONFLICT`
-- profiel altijd aanmaken/updaten op `user_id`
-- rolinsert veilig houden met `ON CONFLICT DO NOTHING`
-
-Stap C — ontbrekende accounts opnieuw synchroniseren
-- alle ontbrekende users uit `auth.users` backfillen naar `public.profiles`
-- ontbrekende rollen aanvullen waar nodig
-
-Veilige eindtoestand:
-```text
-signup -> auth.users insert
-      -> trigger fired
-      -> profiles upsert
-      -> user_roles insert/upsert
-```
-
-6. Live testaccount aanmaken
-Na goedkeuring voer ik dit uit in deze volgorde:
-1. database-fix toepassen
-2. nieuw testaccount aanmaken via de app
-3. direct queryen op:
-   - `auth.users`
-   - `public.profiles`
-   - `public.user_roles`
-
-7. Bewijs dat het in de database staat
-Ik lever daarna exact deze bewijzen op:
-```sql
-select id, email, created_at
-from auth.users
-where email = '<test-email>';
-
-select user_id, email, full_name, created_at
-from public.profiles
-where email = '<test-email>';
-
-select user_id, role
-from public.user_roles
-where user_id = '<same-user-id>';
-```
-
-Technische noot
-- De eerdere “fix” bestond wel als migrationbestand, maar is aantoonbaar niet actief in de huidige omgeving, omdat `information_schema.triggers` voor `auth.users` leeg terugkomt.
-- Daarom was de echte fout niet “de functie-inhoud”, maar “de trigger ontbreekt / draait niet in de huidige omgeving”.
-
-Implementatieplan
-1. Defensieve migration maken: trigger droppen + opnieuw aanmaken
-2. `handle_new_user()` idempotent maken
-3. Missing profiles + roles backfillen
-4. Nieuwe signup uitvoeren
-5. Bewijs leveren met exacte rows uit `auth.users`, `public.profiles`, `public.user_roles`
