@@ -1,58 +1,28 @@
 
 
-# Plan: Sidebar Herstructurering — Vloot & Planning Splitsen
+# Plan: POD Ontbreekt Knop Fixen
 
-## Analyse van het probleem
+## Probleem
+De "POD ontbreekt" knop op het dashboard linkt naar `/claims?filter=pod-missing`. De Claims pagina doet niets met die filter parameter — je ziet claims, geen ontbrekende PODs. Er bestaat al een dedicated **Digitale POD** pagina (`/operations/pod`) die een "In afwachting" tab heeft met precies de juiste data.
 
-De huidige "Vloot & Planning" sectie combineert twee fundamenteel verschillende domeinen:
+## Oplossing
 
-**Vloot-gerelateerd** (activa-beheer):
-- Vlootbeheer → `/fleet` (bevat al tabs voor voertuigen, brandstof, onderhoud)
-- Onderhoud → `/maintenance/predictive` (apart menu-item, maar vlootbeheer heeft al een onderhoud-tab)
-- CO₂ Rapportage → `/co2`
-- Tankstations → `/fuel-stations`
+### 1. Links aanpassen (2 bestanden)
+Verander de href van `/claims?filter=pod-missing` naar `/operations/pod?tab=pending`:
 
-**Planning-gerelateerd** (personeelsplanning):
-- Programma → `/planning/program`
-- Aanmeldingen → `/planning/applications`
-- Beschikbaarheid → `/planning/availability`
-- Roosters → `/enterprise/rosters`
+| Bestand | Regel | Wijziging |
+|---|---|---|
+| `src/pages/Dashboard.tsx` | ~490 | `Link to="/operations/pod?tab=pending"` |
+| `src/components/dashboard/OpsSnapshot.tsx` | ~93 | `href: "/operations/pod?tab=pending"` |
 
-### Dubbele items gevonden:
-1. **Onderhoud** — bestaat als apart menu-item `/maintenance/predictive` EN als tab in Vlootbeheer `/fleet` → verwijderen uit sidebar
-2. **Tankstations** — `/fuel-stations` is een losse pagina, maar Vlootbeheer heeft al een "Brandstof" tab → verwijderen uit sidebar, of integreren als sub-tab
-3. **Roosters** vs **Programma** — Roosters navigeert nu naar Planning/Programma (nep-knop was al gefixed), dus redundant
-
-## Nieuwe structuur
-
-Twee aparte, compacte secties:
-
-```text
-┌─────────────────────────┐
-│ Vloot                   │
-│  🚛 Vlootbeheer         │  → /fleet (voertuigen + brandstof + onderhoud tabs)
-│  🌿 CO₂ Rapportage      │  → /co2
-│  ⛽ Tankstations         │  → /fuel-stations
-│                         │
-│ Planning                │
-│  📅 Programma           │  → /planning/program
-│  ✋ Aanmeldingen         │  → /planning/applications
-│  ✅ Beschikbaarheid      │  → /planning/availability
-└─────────────────────────┘
-```
-
-### Verwijderd:
-- **Onderhoud** — zit al in Vlootbeheer als tab, dubbel menu-item is verwarrend
-- **Roosters** — navigeert al naar Programma, is redundant
-
-### Waarom deze split logisch is:
-- **Vloot** = "Wat heb ik?" — voertuigen, hun staat, kosten, uitstoot
-- **Planning** = "Wie werkt wanneer?" — diensten, beschikbaarheid, aanmeldingen
-- Een transportondernemer denkt in deze twee domeinen: materieel vs personeel
+### 2. DigitalPOD: lees `tab` query param (1 bestand)
+In `src/pages/operations/DigitalPOD.tsx`: gebruik `useSearchParams` om de `tab` query param te lezen als initiële waarde voor `activeTab`. Zo opent de pagina direct op de "pending" tab wanneer je vanuit het dashboard klikt.
 
 ## Bestanden die wijzigen
 
 | Bestand | Wijziging |
 |---|---|
-| `src/components/layout/AppSidebar.tsx` | Split `vlootPlanningItems` in `vlootItems` (3 items) en `planningItems` (3 items). Verwijder Onderhoud en Roosters. Update `allSections` array met 2 nieuwe secties. |
+| `src/pages/Dashboard.tsx` | Link href → `/operations/pod?tab=pending` |
+| `src/components/dashboard/OpsSnapshot.tsx` | href → `/operations/pod?tab=pending` |
+| `src/pages/operations/DigitalPOD.tsx` | Lees `?tab=` param voor initiële tab selectie |
 
