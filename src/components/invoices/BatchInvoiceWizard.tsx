@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { berekenBTW } from "@/lib/btw-calculator";
+import { useCompany } from "@/hooks/useCompany";
 import {
   startOfDay,
   endOfDay,
@@ -133,6 +134,7 @@ const steps = [
 
 export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardProps) {
   const navigate = useNavigate();
+  const { company } = useCompany();
   const [currentStep, setCurrentStep] = useState(1);
   const [successData, setSuccessData] = useState<{ invoices_created: number; total_amount: number } | null>(null);
   const [periodPreset, setPeriodPreset] = useState<PeriodPreset>("last_month");
@@ -172,7 +174,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
 
   // Fetch eligible trips
   const { data: eligibleTrips, isLoading: tripsLoading } = useQuery({
-    queryKey: ["eligible-trips", filters.period_from, filters.period_to, filters.customer_id, includeUnverified],
+    queryKey: ["eligible-trips", filters.period_from, filters.period_to, filters.customer_id, includeUnverified, company?.id],
     queryFn: async () => {
       const statuses: ("gecontroleerd" | "afgerond" | "afgeleverd")[] = includeUnverified 
         ? ["gecontroleerd", "afgerond", "afgeleverd"] 
@@ -191,6 +193,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           status,
           customers!inner(company_name, country, vat_number)
         `)
+        .eq("company_id", company!.id)
         .in("status", statuses)
         .is("invoice_id", null)
         .gte("trip_date", filters.period_from)
@@ -223,7 +226,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
         };
       }) as EligibleTrip[];
     },
-    enabled: currentStep >= 2,
+    enabled: currentStep >= 2 && !!company?.id,
   });
 
   // Fetch customers for filter
