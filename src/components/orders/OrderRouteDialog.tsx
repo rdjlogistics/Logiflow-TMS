@@ -124,7 +124,7 @@ const OrderRouteDialog = ({
     // Defer map creation — Radix Dialog portal hasn't mounted yet when open flips
     const setup = async () => {
       mb = (await import("mapbox-gl")).default;
-      await import("mapbox-gl/dist/mapbox-gl.css");
+      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
       if (cancelled) return;
       mb.accessToken = token;
 
