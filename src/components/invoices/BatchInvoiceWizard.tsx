@@ -226,7 +226,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
         };
       }) as EligibleTrip[];
     },
-    enabled: currentStep >= 2,
+    enabled: currentStep >= 2 && !!company?.id,
   });
 
   // Fetch customers for filter
