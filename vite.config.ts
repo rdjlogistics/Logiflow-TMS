@@ -107,21 +107,8 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("node_modules/mapbox-gl")) {
             return "vendor-map";
           }
-          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3") || id.includes("node_modules/victory")) {
-            return "vendor-charts";
-          }
-          if (id.includes("node_modules/framer-motion")) {
-            return "vendor-animation";
-          }
-          if (id.includes("node_modules/three") || id.includes("node_modules/@react-three")) {
-            return "vendor-3d";
-          }
-          if (id.includes("node_modules/jspdf") || id.includes("node_modules/jspdf-autotable")) {
-            return "vendor-pdf";
-          }
-          if (id.includes("node_modules/exceljs")) {
-            return "vendor-excel";
-          }
+          // 3d, pdf, excel, charts, animation: NOT chunked separately
+          // They stay inside their lazy-loaded page chunks for zero wasted preload
           if (id.includes("node_modules/date-fns")) {
             return "vendor-date";
           }

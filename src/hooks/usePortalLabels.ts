@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
+// jsPDF dynamically imported when needed
 
 interface Shipment {
   id: string;
@@ -16,9 +16,10 @@ interface Shipment {
 export function usePortalLabels() {
   const [generating, setGenerating] = useState(false);
 
-  const generateLabelPDF = (shipments: Shipment[]): Blob | null => {
+  const generateLabelPDF = async (shipments: Shipment[]): Promise<Blob | null> => {
     if (shipments.length === 0) return null;
 
+    const { default: jsPDF } = await import('jspdf');
     const doc = new jsPDF({ unit: 'mm', format: [100, 150] });
 
     shipments.forEach((shipment, index) => {
@@ -121,7 +122,7 @@ export function usePortalLabels() {
         URL.revokeObjectURL(url);
         toast.success(`${shipments.length} ZPL label(s) gedownload`);
       } else {
-        const blob = generateLabelPDF(shipments);
+        const blob = await generateLabelPDF(shipments);
         if (blob) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -151,7 +152,7 @@ export function usePortalLabels() {
     setGenerating(true);
     
     try {
-      const blob = generateLabelPDF(shipments);
+      const blob = await generateLabelPDF(shipments);
       if (blob) {
         const url = URL.createObjectURL(blob);
         const iframe = document.createElement('iframe');
