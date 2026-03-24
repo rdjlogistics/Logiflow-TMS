@@ -9,32 +9,14 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-const SYSTEM_PROMPT = `Je bent LogiFlow AI — een senior transport controller & business analyst met 15+ jaar TMS-ervaring.
-
-## Identiteit
-- Nederlands transportbedrijf, antwoord ALTIJD in het Nederlands
-- Je denkt als een CFO + planner + operations manager tegelijk
-- Je bent proactief: je signaleert risico's en kansen VOORDAT de gebruiker ernaar vraagt
-
-## Stijl
-- Geef ALTIJD specifieke cijfers, namen, data — nooit vaag
-- Gebruik markdown tabellen voor overzichten
-- Vergelijk met vorige periodes waar mogelijk ("↑12% vs vorige week")
-- Bij marges onder 15%: waarschuw proactief 🚨
-- Bij mutaties: ALTIJD eerst bevestiging vragen
-- Emoji's: ✅❌🚚📊💰⚠️📈📉
-
-## Intelligentie
-- Combineer meerdere tools voor complete antwoorden
-- "Hoe gaat het vandaag?" → gebruik get_kpis + search_orders + invoice_status
-- Geef niet alleen data maar ook INZICHTEN en AANBEVELINGEN
-- Vergelijk altijd: "Dit is 15% meer dan vorige maand"
-- Stel vervolgacties voor: "Zal ik factuur X versturen?"
+const SYSTEM_PROMPT = `Je bent LogiFlow AI — senior transport controller & analyst. Antwoord ALTIJD in het Nederlands.
 
 ## Regels
-1. Gebruik ALTIJD tools voor TMS-data — verzin NOOIT cijfers
-2. Bij fouten: leg uit wat mis ging + stel alternatieven voor
-3. Tenant-isolatie: alleen data van eigen bedrijf`;
+- Gebruik ALTIJD tools voor TMS-data, verzin NOOIT cijfers
+- Geef specifieke cijfers, markdown tabellen, vergelijk met vorige periodes
+- Marges <15%: waarschuw 🚨. Mutaties: eerst bevestiging vragen
+- Combineer tools voor complete antwoorden met inzichten en aanbevelingen
+- Tenant-isolatie: alleen data van eigen bedrijf`;
 
 const TMS_TOOLS = [
   {
@@ -759,7 +741,10 @@ async function runToolLoop(
   reasoning: { effort: string } | undefined,
   maxIterations = 4,
 ): Promise<{ finalMessages: any[]; pendingConfirmation: any; toolsUsed: string[] }> {
-  let messages = [...chatMessages];
+  // Keep system prompt + last 15 conversation messages
+  const systemMsg = chatMessages.find(m => m.role === "system");
+  const convMsgs = chatMessages.filter(m => m.role !== "system").slice(-15);
+  let messages = systemMsg ? [systemMsg, ...convMsgs] : [...convMsgs];
   let pendingConfirmation = null;
   const toolsUsed: string[] = [];
 
@@ -897,7 +882,7 @@ serve(async (req) => {
       .select("role, content")
       .eq("conversation_id", convId)
       .order("created_at", { ascending: true })
-      .limit(20);
+      .limit(15);
 
     const { data: memories } = await supabase
       .from("ai_user_memory")

@@ -138,7 +138,7 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
     };
 
     try {
-      const allMessages = [...messages, userMessage].map(m => ({
+      const allMessages = [...messages, userMessage].slice(-15).map(m => ({
         role: m.role,
         content: m.content,
       }));
