@@ -491,13 +491,22 @@ const TMS_TOOLS = [
 
 function detectComplexity(message: string): "none" | "low" | "medium" | "high" {
   const lower = message.toLowerCase();
-  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing/;
+  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing|anomalie|afwijking|contract|overeenkomst|planning.*optim|route.*optim/;
   if (highPatterns.test(lower)) return "high";
-  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk/;
+  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk|vertaal|translate|chart|grafiek|visualis|zoek.*nieuws|marktprijs/;
   if (mediumPatterns.test(lower)) return "medium";
   const lowPatterns = /hoeveel|lijst|toon|geef.*overzicht|status.*van|zoek/;
   if (lowPatterns.test(lower)) return "low";
   return "none";
+}
+
+function getModelForComplexity(complexity: "none" | "low" | "medium" | "high"): string {
+  switch (complexity) {
+    case "high": return "google/gemini-2.5-pro";
+    case "medium": return "google/gemini-3-flash-preview";
+    case "low": return "google/gemini-2.5-flash";
+    case "none": return "google/gemini-2.5-flash";
+  }
 }
 
 // ─── Tool Execution ───
