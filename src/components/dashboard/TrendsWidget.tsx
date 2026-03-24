@@ -38,34 +38,26 @@ interface TrendsWidgetProps {
   loading?: boolean;
 }
 
-const defaultData: TrendData[] = [
-  { period: 'Jan', revenue: 42000, costs: 28000, margin: 33, trips: 145 },
-  { period: 'Feb', revenue: 38500, costs: 25800, margin: 33, trips: 132 },
-  { period: 'Mar', revenue: 51200, costs: 33400, margin: 35, trips: 178 },
-  { period: 'Apr', revenue: 48700, costs: 31200, margin: 36, trips: 165 },
-  { period: 'Mei', revenue: 55300, costs: 34900, margin: 37, trips: 189 },
-  { period: 'Jun', revenue: 61800, costs: 38200, margin: 38, trips: 212 },
-];
-
-const TrendsWidget = ({ data = defaultData, loading }: TrendsWidgetProps) => {
-  const totalRevenue = useMemo(() => data.reduce((sum, d) => sum + d.revenue, 0), [data]);
-  const totalProfit = useMemo(() => data.reduce((sum, d) => sum + (d.revenue - d.costs), 0), [data]);
+const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
+  const safeData = data || [];
+  const totalRevenue = useMemo(() => safeData.reduce((sum, d) => sum + d.revenue, 0), [safeData]);
+  const totalProfit = useMemo(() => safeData.reduce((sum, d) => sum + (d.revenue - d.costs), 0), [safeData]);
   const avgMargin = useMemo(() => {
-    const totalMargin = data.reduce((sum, d) => sum + d.margin, 0);
-    return data.length > 0 ? totalMargin / data.length : 0;
-  }, [data]);
+    const totalMargin = safeData.reduce((sum, d) => sum + d.margin, 0);
+    return safeData.length > 0 ? totalMargin / safeData.length : 0;
+  }, [safeData]);
   
   const revenueTrend = useMemo(() => {
-    if (data.length < 2) return 0;
-    const lastTwo = data.slice(-2);
+    if (safeData.length < 2) return 0;
+    const lastTwo = safeData.slice(-2);
     return ((lastTwo[1].revenue - lastTwo[0].revenue) / lastTwo[0].revenue) * 100;
-  }, [data]);
+  }, [safeData]);
 
   const marginTrend = useMemo(() => {
-    if (data.length < 2) return 0;
-    const lastTwo = data.slice(-2);
+    if (safeData.length < 2) return 0;
+    const lastTwo = safeData.slice(-2);
     return lastTwo[1].margin - lastTwo[0].margin;
-  }, [data]);
+  }, [safeData]);
 
   if (loading) {
     return (
@@ -81,6 +73,30 @@ const TrendsWidget = ({ data = defaultData, loading }: TrendsWidgetProps) => {
         <CardContent className="p-4">
           <div className="h-[300px] flex items-center justify-center">
             <div className="animate-pulse bg-muted rounded-lg w-full h-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <CardHeader className="pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-success/15">
+              <TrendingUp className="h-5 w-5 text-success" />
+            </div>
+            <CardTitle className="text-lg font-bold">Omzet & Marge Trends</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="p-3 rounded-2xl bg-muted/20 mb-3">
+              <TrendingUp className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Nog geen omzetdata</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">Trends verschijnen zodra er factuurdata is</p>
           </div>
         </CardContent>
       </Card>

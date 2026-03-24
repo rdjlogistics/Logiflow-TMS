@@ -30,23 +30,15 @@ interface GeographicHeatmapWidgetProps {
   loading?: boolean;
 }
 
-const defaultRegions: RegionData[] = [
-  { id: 'nh', name: 'Noord-Holland', shortName: 'NH', trips: 342, revenue: 48500, trend: 12, topCities: ['Amsterdam', 'Haarlem', 'Zaandam'] },
-  { id: 'zh', name: 'Zuid-Holland', shortName: 'ZH', trips: 289, revenue: 41200, trend: 8, topCities: ['Rotterdam', 'Den Haag', 'Leiden'] },
-  { id: 'nb', name: 'Noord-Brabant', shortName: 'NB', trips: 198, revenue: 28400, trend: -3, topCities: ['Eindhoven', 'Tilburg', 'Breda'] },
-  { id: 'ge', name: 'Gelderland', shortName: 'GE', trips: 156, revenue: 22100, trend: 5, topCities: ['Arnhem', 'Nijmegen', 'Apeldoorn'] },
-  { id: 'ut', name: 'Utrecht', shortName: 'UT', trips: 134, revenue: 19800, trend: 15, topCities: ['Utrecht', 'Amersfoort', 'Nieuwegein'] },
-  { id: 'ov', name: 'Overijssel', shortName: 'OV', trips: 98, revenue: 14200, trend: 2, topCities: ['Zwolle', 'Enschede', 'Deventer'] },
-];
-
 const GeographicHeatmapWidget = ({ 
-  data = defaultRegions, 
+  data, 
   loading 
 }: GeographicHeatmapWidgetProps) => {
   const navigate = useNavigate();
-  const totalTrips = useMemo(() => data.reduce((sum, r) => sum + r.trips, 0), [data]);
-  const totalRevenue = useMemo(() => data.reduce((sum, r) => sum + r.revenue, 0), [data]);
-  const maxTrips = useMemo(() => Math.max(...data.map(r => r.trips)), [data]);
+  const safeData = data || [];
+  const totalTrips = useMemo(() => safeData.reduce((sum, r) => sum + r.trips, 0), [safeData]);
+  const totalRevenue = useMemo(() => safeData.reduce((sum, r) => sum + r.revenue, 0), [safeData]);
+  const maxTrips = useMemo(() => Math.max(...safeData.map(r => r.trips), 0), [safeData]);
 
   const handleRegionClick = (region: RegionData) => {
     // Navigate to trips filtered by region
@@ -99,6 +91,30 @@ const GeographicHeatmapWidget = ({
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-24 rounded-xl bg-muted/20 animate-pulse" />
             ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <CardHeader className="pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-primary/15">
+              <MapPinned className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-lg font-bold">Geografische Spreiding</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="p-3 rounded-2xl bg-muted/20 mb-3">
+              <MapPinned className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Nog geen ritten</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">Regiodata verschijnt zodra er ritten zijn</p>
           </div>
         </CardContent>
       </Card>
