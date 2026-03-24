@@ -741,7 +741,10 @@ async function runToolLoop(
   reasoning: { effort: string } | undefined,
   maxIterations = 4,
 ): Promise<{ finalMessages: any[]; pendingConfirmation: any; toolsUsed: string[] }> {
-  let messages = [...chatMessages];
+  // Keep system prompt + last 15 conversation messages
+  const systemMsg = chatMessages.find(m => m.role === "system");
+  const convMsgs = chatMessages.filter(m => m.role !== "system").slice(-15);
+  let messages = systemMsg ? [systemMsg, ...convMsgs] : [...convMsgs];
   let pendingConfirmation = null;
   const toolsUsed: string[] = [];
 

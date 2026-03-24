@@ -47,7 +47,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "No tenant" }), { status: 403, headers: corsHeaders });
     }
 
-    const { messages, context } = await req.json();
+    const { messages: rawMessages, context } = await req.json();
+    const messages = (rawMessages || []).slice(-15);
     const pageCtx = context?.currentPage ? `\nPagina: ${context.currentPage}` : "";
 
     // Detect complexity from last user message
