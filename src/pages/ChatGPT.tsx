@@ -45,7 +45,7 @@ const ChatGPT = () => {
           <p className="text-muted-foreground text-sm">
             Je moet ingelogd zijn om de AI assistent te gebruiken.
           </p>
-          <Button onClick={() => navigate('/demo')}>
+          <Button onClick={() => navigate('/auth')}>
             Inloggen
           </Button>
         </div>
