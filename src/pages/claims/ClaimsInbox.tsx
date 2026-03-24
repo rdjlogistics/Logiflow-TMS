@@ -427,6 +427,11 @@ const ClaimsInbox = () => {
       </div>
 
       {/* ── Content ── */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Spinner size="lg" />
+        </div>
+      ) : (
       <AnimatePresence mode="wait">
         {activeTab === "claims" && (
           <motion.div
