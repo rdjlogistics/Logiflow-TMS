@@ -276,7 +276,7 @@ export const usePushNotifications = () => {
   // realtime filters check the OLD value, not the NEW value for UPDATE events.
   // This means filter: `driver_id=eq.${driverId}` misses assignment updates.
   const subscribeToTripUpdates = useCallback((driverId: string) => {
-    console.log('[Push] Subscribing to trip updates for driver:', driverId);
+    logger.log('[Push] Subscribing to trip updates for driver:', driverId);
     
     const channel = supabase
       .channel(`driver-trips-realtime-${driverId}`)
