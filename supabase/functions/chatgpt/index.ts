@@ -1810,6 +1810,7 @@ serve(async (req) => {
     ];
 
     const complexity = detectComplexity(message || "");
+    const selectedModel = getModelForComplexity(complexity);
     const reasoning = complexity !== "none" ? { effort: complexity } : undefined;
 
     // ─── SSE Streaming with Multi-Step Tool Loop ───
