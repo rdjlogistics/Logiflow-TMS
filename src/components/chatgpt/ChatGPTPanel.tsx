@@ -93,12 +93,12 @@ export const ChatGPTPanel = ({ context, className }: ChatGPTPanelProps) => {
   const groupedConversations = groupConversationsByDate(conversations);
 
   const quickActions = [
-    { text: 'Orders zonder chauffeur', icon: '🚚' },
-    { text: 'KPIs van deze maand', icon: '📊' },
-    { text: 'Openstaande facturen', icon: '💰' },
-    { text: 'Planning voor morgen', icon: '🗓️' },
-    { text: 'Zoek order op nummer', icon: '🔍' },
-    { text: 'Beschikbare voertuigen', icon: '🚐' },
+    { text: 'Briefing van vandaag', icon: '📋' },
+    { text: 'Wijs chauffeurs toe aan open orders', icon: '🚚' },
+    { text: 'Genereer weekrapport', icon: '📊' },
+    { text: 'Factureer alle afgeleverde orders', icon: '💰' },
+    { text: 'Vlootoverzicht nu', icon: '🚐' },
+    { text: 'Openstaande facturen', icon: '📑' },
   ];
 
   return (
