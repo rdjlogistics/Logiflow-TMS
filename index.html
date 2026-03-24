@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- App Title & Description -->
+    <title>LogiFlow - Transport Management</title>
+    <meta name="description" content="Modern Transport Management System voor chauffeurs en planners. Real-time tracking, order management en communicatie." />
+    <meta name="author" content="LogiFlow" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0F172A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LogiFlow" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="LogiFlow" />
+    <meta name="msapplication-TileColor" content="#0F172A" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- DNS prefetch and preconnect for critical origins -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Preload critical fonts to avoid render-blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" /></noscript>
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/pwa-512x512.png" color="#0F172A" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="LogiFlow - Transport Management" />
+    <meta property="og:description" content="Modern Transport Management System voor chauffeurs en planners" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LogiFlow - Transport Management" />
+    <meta name="twitter:description" content="Modern Transport Management System voor chauffeurs en planners" />
+    <meta name="twitter:image" content="/pwa-512x512.png" />
+    
+    <!-- Critical CSS for FCP -->
+    <style>
+      /* Prevent zoom on input focus (iOS) */
+      input, select, textarea { font-size: 16px !important; }
+      /* Critical inline styles for faster FCP */
+      :root { --background: 222.2 84% 4.9%; --foreground: 210 40% 98%; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body { 
+        background-color: hsl(222.2 84% 4.9%); 
+        color: hsl(210 40% 98%);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      #root { min-height: 100%; display: flex; flex-direction: column; }
+    </style>
+  </head>
+
+  <body>
+    <div id="root">
+      <div id="boot-fallback" style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;">
+        <p style="color:hsl(210 40% 70%);font-size:14px;">LogiFlow wordt geladen…</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Boot-timeout: if React hasn't mounted after 12s, show recovery UI
+      setTimeout(function(){
+        var f=document.getElementById("boot-fallback");
+        if(!f)return;
+        f.innerHTML='<div style="text-align:center;max-width:400px;padding:24px;"><h2 style="color:#e2e8f0;font-size:18px;margin:0 0 8px;">LogiFlow kon niet laden</h2><p style="color:#94a3b8;font-size:13px;margin:0 0 16px;line-height:1.5;">De pagina reageert niet. Probeer te verversen of je sessie te resetten.</p><div style="display:flex;gap:10px;justify-content:center;"><button onclick="localStorage.clear();sessionStorage.clear();location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.1);color:#e2e8f0;border:1px solid rgba(255,255,255,0.15);cursor:pointer;font-size:13px;">Sessie resetten</button><button onclick="location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);cursor:pointer;font-size:13px;">Verversen</button></div></div>';
+      },12000);
+    </script>
+  </body>
+</html>
