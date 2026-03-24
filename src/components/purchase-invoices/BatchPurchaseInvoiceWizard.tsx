@@ -84,16 +84,18 @@ export const BatchPurchaseInvoiceWizard = () => {
 
   // Fetch carriers for dropdown
   const { data: carriers } = useQuery({
-    queryKey: ["carriers-active"],
+    queryKey: ["carriers-active", company?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("carriers")
         .select("id, company_name")
+        .eq("tenant_id", company!.id)
         .eq("is_active", true)
         .order("company_name");
       if (error) throw error;
       return data;
     },
+    enabled: !!company?.id,
   });
 
   // Fetch eligible trips for preview with rate details
