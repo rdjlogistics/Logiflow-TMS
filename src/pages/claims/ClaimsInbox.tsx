@@ -350,8 +350,8 @@ const ClaimsInbox = () => {
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
       result = result.filter((c: any) =>
-        c.order_number?.toLowerCase().includes(q) ||
-        c.customer?.toLowerCase().includes(q)
+        c.order?.order_number?.toLowerCase().includes(q) ||
+        c.order?.customer?.company_name?.toLowerCase().includes(q)
       );
     }
     return result;
