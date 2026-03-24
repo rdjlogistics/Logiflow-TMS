@@ -174,7 +174,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
 
   // Fetch eligible trips
   const { data: eligibleTrips, isLoading: tripsLoading } = useQuery({
-    queryKey: ["eligible-trips", filters.period_from, filters.period_to, filters.customer_id, includeUnverified],
+    queryKey: ["eligible-trips", filters.period_from, filters.period_to, filters.customer_id, includeUnverified, company?.id],
     queryFn: async () => {
       const statuses: ("gecontroleerd" | "afgerond" | "afgeleverd")[] = includeUnverified 
         ? ["gecontroleerd", "afgerond", "afgeleverd"] 
