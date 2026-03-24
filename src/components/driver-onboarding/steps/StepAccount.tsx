@@ -44,7 +44,7 @@ export const StepAccount = () => {
       });
 
       if (signUpError) {
-        console.error('SignUp error:', signUpError);
+        logger.error('SignUp error:', signUpError);
         if (signUpError.message.includes('already registered')) {
           setError('Dit e-mailadres is al in gebruik. Probeer in te loggen.');
         } else {
