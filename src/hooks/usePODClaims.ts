@@ -85,7 +85,7 @@ export const usePODClaims = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("claim_cases")
-        .select("*")
+        .select("*, order:order_id(order_number, customer:customer_id(company_name))")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as ClaimCase[];
