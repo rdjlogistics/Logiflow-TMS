@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, BellOff, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { logger } from '@/lib/logger';
 
 export const PushNotificationPrompt = () => {
   const { isSupported, isSubscribed, permission, loading, subscribe } = usePushNotifications();
