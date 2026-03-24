@@ -45,13 +45,17 @@ export function useCustomersData(filters: CustomerFilters = {}) {
 export function useCustomerStats() {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof fetchCustomerStats>> | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchCustomerStats()
       .then(setStats)
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        toast({ title: 'Statistieken laden mislukt', description: err instanceof Error ? err.message : 'Onbekende fout', variant: 'destructive' });
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { stats, loading };
 }

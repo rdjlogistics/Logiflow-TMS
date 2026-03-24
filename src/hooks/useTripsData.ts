@@ -41,13 +41,17 @@ export function useTripsData(filters: TripFilters = {}) {
 export function useTripStats(companyId?: string) {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof fetchTripStats>> | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchTripStats(companyId)
       .then(setStats)
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        toast({ title: 'Statistieken laden mislukt', description: err instanceof Error ? err.message : 'Onbekende fout', variant: 'destructive' });
+      })
       .finally(() => setLoading(false));
-  }, [companyId]);
+  }, [companyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { stats, loading };
 }
