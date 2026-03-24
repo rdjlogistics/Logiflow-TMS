@@ -159,7 +159,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
       };
 
     } catch (error) {
-      console.error('Document upload error:', error);
+      logger.error('Document upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Upload mislukt';
       toast.error('Upload mislukt', { description: errorMessage });
       return {

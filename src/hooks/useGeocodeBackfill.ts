@@ -67,7 +67,7 @@ export const useGeocodeBackfill = () => {
         }
       }
 
-      console.log("[Backfill] Geocoding backfill complete.");
+      logger.log("[Backfill] Geocoding backfill complete.");
     };
 
     runBackfill();

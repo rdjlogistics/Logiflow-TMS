@@ -370,7 +370,7 @@ export function useFuelStations() {
           setStations(localStations);
         }
       } catch (error) {
-        console.error('[useFuelStations] Error loading stations:', error);
+        logger.error('[useFuelStations] Error loading stations:', error);
         // Fallback to local mock data
         const localStations = generateLocalMockStations(centerLat, centerLng);
         setStations(localStations);

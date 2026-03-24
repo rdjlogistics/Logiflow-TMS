@@ -112,7 +112,7 @@ export const StepAccount = () => {
         }, 100);
       }
     } catch (err) {
-      console.error('Account creation error:', err);
+      logger.error('Account creation error:', err);
       setError('Er is iets misgegaan. Probeer het opnieuw.');
     } finally {
       setLoading(false);

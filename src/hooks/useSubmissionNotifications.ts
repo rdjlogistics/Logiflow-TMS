@@ -35,7 +35,7 @@ const playNotificationSound = () => {
     playTone(880, now + 0.15, 0.2); // A5
     
   } catch (error) {
-    console.log("Could not play notification sound:", error);
+    logger.warn("Could not play notification sound:", error);
   }
 };
 

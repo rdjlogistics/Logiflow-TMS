@@ -44,10 +44,10 @@ export const PushNotificationPrompt = () => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw-push.js')
         .then(registration => {
-          console.log('Push SW registered:', registration.scope);
+          logger.log('Push SW registered:', registration.scope);
         })
         .catch(error => {
-          console.error('Push SW registration failed:', error);
+          logger.error('Push SW registration failed:', error);
         });
     }
   }, []);

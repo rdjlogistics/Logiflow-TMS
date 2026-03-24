@@ -340,7 +340,7 @@ export const usePushNotifications = () => {
       });
 
     return () => {
-      console.log('[Push] Unsubscribing from trip updates');
+      logger.log('[Push] Unsubscribing from trip updates');
       supabase.removeChannel(channel);
     };
   }, [sendLocalNotification]);

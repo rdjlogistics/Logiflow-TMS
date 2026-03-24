@@ -99,9 +99,9 @@ export const useDeliveryProximity = (
             data: { trip_id: tripId, distance_km: state.distanceKm },
           },
         });
-        console.log("Proximity notification sent to customer");
+        logger.log("Proximity notification sent to customer");
       } catch (err) {
-        console.error("Failed to send proximity notification:", err);
+        logger.error("Failed to send proximity notification:", err);
       }
     };
 

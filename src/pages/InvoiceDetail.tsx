@@ -367,7 +367,24 @@ const InvoiceDetail = () => {
                   <Button
                     variant="outline"
                     className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 print:hidden"
-                    onClick={() => window.print()}
+                    onClick={() => {
+                      const printContent = document.getElementById('invoice-print-area');
+                      if (printContent) {
+                        const printWindow = window.open('', '_blank');
+                        if (printWindow) {
+                          printWindow.document.write(`
+                            <html><head><title>Factuur Afdrukken</title>
+                            <style>body{font-family:system-ui,sans-serif;padding:2rem;}</style>
+                            </head><body>${printContent.innerHTML}</body></html>
+                          `);
+                          printWindow.document.close();
+                          printWindow.print();
+                          printWindow.close();
+                        }
+                      } else {
+                        window.print();
+                      }
+                    }}
                   >
                     <Printer className="h-4 w-4" />
                     <span className="hidden sm:inline">Afdrukken</span>

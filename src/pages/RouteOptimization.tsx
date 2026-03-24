@@ -388,7 +388,7 @@ const RouteOptimization = () => {
     const missing = stops.filter(s => s.lat === 0 && s.lng === 0 && s.address && !geocodedIds.current.has(s.id));
     if (missing.length === 0) return;
     const timer = setTimeout(() => {
-      console.log(`[RouteOptimization] ${missing.length} stops need geocoding`);
+      logger.log(`[RouteOptimization] ${missing.length} stops need geocoding`);
       geocodeMissingStops(stops);
     }, 400);
     return () => clearTimeout(timer);
