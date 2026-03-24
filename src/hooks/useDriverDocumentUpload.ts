@@ -131,9 +131,9 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
           },
         }).then(({ data, error }) => {
           if (error) {
-            console.error('AI analysis error:', error);
+            logger.error('AI analysis error:', error);
           } else {
-            console.log('AI analysis triggered:', data);
+            logger.log('AI analysis triggered:', data);
             // Show toast when analysis completes
             if (data?.analysis?.isValid) {
               toast.success('Document geverifieerd', {
