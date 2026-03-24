@@ -12,6 +12,7 @@ import { nl } from "date-fns/locale";
 
 const Constraints = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data: blocks = [], isLoading } = useQuery({
     queryKey: ["planning-constraints", user?.id],
