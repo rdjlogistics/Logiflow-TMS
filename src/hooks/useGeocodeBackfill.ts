@@ -32,7 +32,7 @@ export const useGeocodeBackfill = () => {
       }
 
       if (!missingStops || missingStops.length === 0) {
-        console.log("[Backfill] No route_stops with missing coordinates found.");
+        logger.log("[Backfill] No route_stops with missing coordinates found.");
         return;
       }
 
