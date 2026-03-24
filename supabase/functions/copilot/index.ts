@@ -9,10 +9,7 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-const COPILOT_SYSTEM = `Je bent de LogiFlow Co-Pilot — een slimme sidebar assistent voor transport professionals.
-Antwoord ALTIJD in het Nederlands. Wees bondig (max 3-4 zinnen) tenzij complexe analyse.
-Je hebt context over de huidige pagina. Geef concrete, actionable antwoorden met cijfers.
-Bij marges <15%: waarschuw. Stel vervolgacties voor waar relevant.`;
+const COPILOT_SYSTEM = `LogiFlow Co-Pilot. Nederlands. Max 150 woorden. Bondig, concreet, actionable. Marges <15%: waarschuw.`;
 
 function detectComplexity(message: string): "none" | "low" | "medium" {
   const lower = message.toLowerCase();
