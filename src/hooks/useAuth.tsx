@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode, useCallback,
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAuthStorage } from "@/lib/authStorage";
+import { clearAllRoleCache } from "./useUserRole";
 
 interface AuthContextType {
   user: User | null;
@@ -104,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     clearAuthStorage();
+    clearAllRoleCache();
     ensuredCompanyRef.current = false;
     setSession(null);
     setUser(null);

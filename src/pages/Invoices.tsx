@@ -157,6 +157,17 @@ const Invoices = () => {
 
   useEffect(() => { fetchInvoices(); }, []);
 
+  // Realtime: auto-refresh when invoices table changes
+  useEffect(() => {
+    const channel = supabase
+      .channel(`admin-invoices-realtime-${Date.now()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => {
+        fetchInvoices();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   // Fetch tenant settings + customer doc override settings when invoices load
   useEffect(() => {
     const fetchDocSettings = async () => {
