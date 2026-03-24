@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -488,7 +489,8 @@ export default function DigitalPOD() {
   const { proofs: liveProofs, loading, stats: liveStats, getCachedSignedUrl, refetch } = useStopProofs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPod, setSelectedPod] = useState<StopProofRecord | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'all');
   const [searchFocused, setSearchFocused] = useState(false);
 
   const stats = useMemo(() => ({

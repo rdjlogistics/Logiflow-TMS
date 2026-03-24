@@ -487,7 +487,7 @@ const Dashboard = () => {
                   </Link>
                 )}
                 {opsStats.podMissing > 0 && (
-                  <Link to="/claims?filter=pod-missing" className="block">
+                  <Link to="/operations/pod?tab=pending" className="block">
                     <motion.div 
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20"

@@ -90,7 +90,7 @@ const OpsSnapshot = ({
   ];
 
   const riskChips = [
-    { label: "POD ontbreekt", count: podMissing, icon: FileX, href: "/claims?filter=pod-missing" },
+    { label: "POD ontbreekt", count: podMissing, icon: FileX, href: "/operations/pod?tab=pending" },
     { label: "Wachttijd loopt", count: waitingTime, icon: Clock, href: "/trips?filter=waiting" },
     { label: "GPS uit", count: gpsOff, icon: Navigation, href: "/trips?filter=gps-off" },
     { label: "ETA risico", count: etaRisk, icon: Timer, href: "/trips?filter=eta-risk" },
