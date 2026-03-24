@@ -1,29 +1,17 @@
 
 
-## Plan: Herstel database trigger & backfill profielen
+## Probleem
 
-### Stap 1: Database migratie — Trigger herstellen + profielen aanvullen
+De preview kan niet opstarten omdat het bestand `lovable.toml` ontbreekt. Dit bestand vertelt het build-systeem welk commando het moet gebruiken om de dev-server te starten. Zonder dit bestand krijg je de foutmelding "no command found for task dev".
 
-Eén migratie met twee onderdelen:
+## Oplossing
 
-1. **Trigger opnieuw aanmaken** op `auth.users` zodat nieuwe registraties automatisch een profiel krijgen
-2. **Backfill** van ontbrekende profielen voor bestaande gebruikers
+**1 bestand aanmaken: `lovable.toml`**
 
-```sql
--- 1. Trigger herstellen
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user();
-
--- 2. Ontbrekende profielen aanvullen
-INSERT INTO public.profiles (user_id, full_name, email)
-SELECT u.id, u.raw_user_meta_data->>'full_name', u.email
-FROM auth.users u
-LEFT JOIN public.profiles p ON p.user_id = u.id
-WHERE p.id IS NULL
-ON CONFLICT DO NOTHING;
+```toml
+[run]
+dev = "npx vite --host 0.0.0.0 --port 8080"
 ```
 
-Geen codewijzigingen nodig — alleen een database-fix.
+Dit is het enige wat nodig is om de preview weer werkend te krijgen. Het koppelt het `dev` commando aan Vite, de bundler die dit project gebruikt.
 
