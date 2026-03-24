@@ -1,57 +1,58 @@
 
 
-# Plan: Productie-Afwerking — Resterende Issues Fixen
+# Plan: Sidebar Herstructurering — Vloot & Planning Splitsen
 
-## Status van de Audit
+## Analyse van het probleem
 
-De meeste kritieke issues uit de audit zijn **al opgelost**:
-- ✅ Alle demo data/navigaties verwijderd (DEMO_CUSTOMER_ID, DEMO_ACCOUNTS, `/demo` routes, demoJobs/demoIncidents)
-- ✅ Nep-knoppen: RouteOptimization knoppen zijn `disabled` met tooltip, Rosters/Constraints navigeren naar echte pagina's
-- ✅ Auth.tsx console.logs opgeruimd
-- ✅ AIAutoDispatchPanel catch heeft `console.error` (niet leeg)
+De huidige "Vloot & Planning" sectie combineert twee fundamenteel verschillende domeinen:
 
-## Wat nog openstaat
+**Vloot-gerelateerd** (activa-beheer):
+- Vlootbeheer → `/fleet` (bevat al tabs voor voertuigen, brandstof, onderhoud)
+- Onderhoud → `/maintenance/predictive` (apart menu-item, maar vlootbeheer heeft al een onderhoud-tab)
+- CO₂ Rapportage → `/co2`
+- Tankstations → `/fuel-stations`
 
-### 1. Console.log opruimen (100+ statements)
-Vervang alle `console.log` in productie-code door `logger` uit `src/lib/logger.ts` (die alleen in DEV logt). Belangrijkste bestanden:
-- `useGeocodeBackfill.ts` (5x)
-- `usePushNotifications.ts` (6x)
-- `useFuelStations.ts` (3x)
-- `useDriverDocumentUpload.ts` (1x)
-- `useDeliveryProximity.ts` (1x)
-- `useSubmissionNotifications.ts` (1x)
-- `RouteOptimization.tsx` (1x)
-- `PushNotificationPrompt.tsx` (1x)
-- `StepAccount.tsx` (1x)
-- `FuelStationsMapbox.tsx` (1x — al in DEV check, maar inconsistent)
+**Planning-gerelateerd** (personeelsplanning):
+- Programma → `/planning/program`
+- Aanmeldingen → `/planning/applications`
+- Beschikbaarheid → `/planning/availability`
+- Roosters → `/enterprise/rosters`
 
-### 2. Empty catch-blokken voorzien van logging
-Acceptabele lege catches (JSON parse, localStorage, audio play) laten we staan — die zijn bedoeld als stille fallbacks. Maar deze krijgen `logger.warn`:
-- `NotificationCenter.tsx:48` — localStorage parse fail
-- `NotificationCenter.tsx:75` — audio play fail
+### Dubbele items gevonden:
+1. **Onderhoud** — bestaat als apart menu-item `/maintenance/predictive` EN als tab in Vlootbeheer `/fleet` → verwijderen uit sidebar
+2. **Tankstations** — `/fuel-stations` is een losse pagina, maar Vlootbeheer heeft al een "Brandstof" tab → verwijderen uit sidebar, of integreren als sub-tab
+3. **Roosters** vs **Programma** — Roosters navigeert nu naar Planning/Programma (nep-knop was al gefixed), dus redundant
 
-### 3. InvoiceDetail window.print() verbeteren
-Regel 370: `onClick={() => window.print()}` print de hele pagina inclusief sidebar. Fix: gebruik de bestaande `PrintButton` component met `targetSelector` zodat alleen het factuurgedeelte geprint wordt.
+## Nieuwe structuur
 
-### 4. useDriverPortalData stub-functies
-`markAlertRead` en `dismissAlert` zijn no-ops. Implementeer client-side state management zodat alerts daadwerkelijk als gelezen gemarkeerd/verborgen worden (in-memory, geen DB nodig).
+Twee aparte, compacte secties:
+
+```text
+┌─────────────────────────┐
+│ Vloot                   │
+│  🚛 Vlootbeheer         │  → /fleet (voertuigen + brandstof + onderhoud tabs)
+│  🌿 CO₂ Rapportage      │  → /co2
+│  ⛽ Tankstations         │  → /fuel-stations
+│                         │
+│ Planning                │
+│  📅 Programma           │  → /planning/program
+│  ✋ Aanmeldingen         │  → /planning/applications
+│  ✅ Beschikbaarheid      │  → /planning/availability
+└─────────────────────────┘
+```
+
+### Verwijderd:
+- **Onderhoud** — zit al in Vlootbeheer als tab, dubbel menu-item is verwarrend
+- **Roosters** — navigeert al naar Programma, is redundant
+
+### Waarom deze split logisch is:
+- **Vloot** = "Wat heb ik?" — voertuigen, hun staat, kosten, uitstoot
+- **Planning** = "Wie werkt wanneer?" — diensten, beschikbaarheid, aanmeldingen
+- Een transportondernemer denkt in deze twee domeinen: materieel vs personeel
 
 ## Bestanden die wijzigen
 
 | Bestand | Wijziging |
 |---|---|
-| `src/hooks/useGeocodeBackfill.ts` | `console.log` → `logger.log` |
-| `src/hooks/usePushNotifications.ts` | `console.log` → `logger.log` |
-| `src/hooks/useFuelStations.ts` | `console.log` → `logger.log` |
-| `src/hooks/useDriverDocumentUpload.ts` | `console.log` → `logger.log` |
-| `src/hooks/useDeliveryProximity.ts` | `console.log` → `logger.log` |
-| `src/hooks/useSubmissionNotifications.ts` | `console.log` → `logger.log` |
-| `src/hooks/useRouteOptimizationStops.ts` | `console.log` → `logger.log` |
-| `src/hooks/useDriverPortalData.ts` | Implementeer markAlertRead/dismissAlert |
-| `src/pages/RouteOptimization.tsx` | `console.log` → `logger.log` |
-| `src/pages/InvoiceDetail.tsx` | `window.print()` → `PrintButton` met selector |
-| `src/components/notifications/NotificationCenter.tsx` | Lege catches → `logger.warn` |
-| `src/components/driver-portal/PushNotificationPrompt.tsx` | `console.log` → `logger.log` |
-| `src/components/driver-onboarding/steps/StepAccount.tsx` | `console.log` → `logger.log` |
-| `src/components/fuel-stations/FuelStationsMapbox.tsx` | Consistent DEV check |
+| `src/components/layout/AppSidebar.tsx` | Split `vlootPlanningItems` in `vlootItems` (3 items) en `planningItems` (3 items). Verwijder Onderhoud en Roosters. Update `allSections` array met 2 nieuwe secties. |
 
