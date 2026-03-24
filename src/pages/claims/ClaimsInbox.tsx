@@ -135,21 +135,25 @@ const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => {
 };
 
 // ── POD Card (mobile-first) ──
-const PODCard = ({ pod }: any) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -12 }}
-    className={cn(
-      "p-4 rounded-2xl",
-      "bg-card/60 backdrop-blur-xl border border-border/30"
-    )}
-  >
-    <div className="flex items-center justify-between gap-3">
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <span className="font-mono text-sm font-semibold">{pod.order_number || '—'}</span>
-        <p className="text-sm text-muted-foreground truncate">{pod.customer || '—'}</p>
+const PODCard = ({ pod }: any) => {
+  const orderNumber = pod.order?.order_number || '—';
+  const customerName = pod.order?.customer?.company_name || '—';
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      className={cn(
+        "p-4 rounded-2xl",
+        "bg-card/60 backdrop-blur-xl border border-border/30"
+      )}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <span className="font-mono text-sm font-semibold">{orderNumber}</span>
+          <p className="text-sm text-muted-foreground truncate">{customerName}</p>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="rounded-lg text-xs">
             {pod.method === 'signature' ? 'Handtekening' :
