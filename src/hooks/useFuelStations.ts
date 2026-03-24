@@ -365,7 +365,7 @@ export function useFuelStations() {
           setStations(convertedStations);
         } else {
           // Fallback to local mock data around user
-          console.log('[useFuelStations] No real stations found, generating local mock data');
+          logger.log('[useFuelStations] No real stations found, generating local mock data');
           const localStations = generateLocalMockStations(centerLat, centerLng);
           setStations(localStations);
         }
