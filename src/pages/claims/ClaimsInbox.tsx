@@ -481,6 +481,7 @@ const ClaimsInbox = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      )}
 
       {/* ── Claim Detail: Sheet on mobile, Dialog on desktop ── */}
       {isMobile ? (
