@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
