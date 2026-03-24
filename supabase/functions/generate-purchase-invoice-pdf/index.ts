@@ -241,7 +241,11 @@ Deno.serve(async (req) => {
     // We'll encode the HTML as a data URI-style PDF wrapper
     const encoder = new TextEncoder();
     const htmlBytes = encoder.encode(html);
-    const base64Html = btoa(String.fromCharCode(...htmlBytes));
+    let binary = '';
+    for (let i = 0; i < htmlBytes.length; i++) {
+      binary += String.fromCharCode(htmlBytes[i]);
+    }
+    const base64Html = btoa(binary);
 
     return new Response(
       JSON.stringify({ pdf: base64Html, html: true }),
