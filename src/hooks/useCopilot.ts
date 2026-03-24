@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { edgeFunctionUrl, backendAnonKey } from '@/lib/backendConfig';
+import { edgeFunctionUrl } from '@/lib/backendConfig';
 
 export type AssistantType = 'dispatch_planner' | 'control_tower' | 'finance_autopilot' | 'knowledge_search';
 
@@ -138,6 +138,11 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
     };
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Je moet ingelogd zijn om Copilot te gebruiken.');
+      }
+
       const allMessages = [...messages, userMessage].slice(-15).map(m => ({
         role: m.role,
         content: m.content,
@@ -147,7 +152,7 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${backendAnonKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           messages: allMessages,
