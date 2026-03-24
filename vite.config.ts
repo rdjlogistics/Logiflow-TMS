@@ -5,15 +5,11 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // Hardcoded public fallbacks — these are publishable/anon values, safe in frontend code.
-// They ensure the live build works even when workspace build secrets are missing.
 const FALLBACK_SUPABASE_URL = "https://spycblsfcktsnepsdssv.supabase.co";
 const FALLBACK_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNweWNibHNmY2t0c25lcHNkc3N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk1MjcsImV4cCI6MjA4OTEwNTUyN30.OKjnyYH-JTyDQySFitR8j-jVc0yMBp-feCA3dzN-Jls";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Inject compile-time fallbacks so the auto-generated Supabase client
-  // (which reads import.meta.env.VITE_SUPABASE_*) always has valid values,
-  // even when workspace build secrets are missing during publish.
   define: {
     'import.meta.env.VITE_SUPABASE_URL':
       JSON.stringify(process.env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL),
@@ -23,7 +19,6 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Security headers only in production (dev preview runs in iframe — DENY would block it)
     headers: mode === "production" ? {
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "SAMEORIGIN",
@@ -72,7 +67,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
           {
@@ -82,7 +77,7 @@ export default defineConfig(({ mode }) => ({
               cacheName: "mapbox-cache",
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+                maxAgeSeconds: 60 * 60 * 24 * 7,
               },
             },
           },
