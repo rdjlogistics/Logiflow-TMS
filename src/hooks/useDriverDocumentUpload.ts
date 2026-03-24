@@ -112,7 +112,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         .single();
 
       if (docError) {
-        console.error('Document record error:', docError);
+        logger.error('Document record error:', docError);
         throw new Error(`Database error: ${docError.message}`);
       }
 
