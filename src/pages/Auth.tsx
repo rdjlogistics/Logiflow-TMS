@@ -188,53 +188,6 @@ const Auth = () => {
     }
   };
 
-  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setLoading(true);
-    setInlineError(null);
-    setDebugDetails(null);
-
-    try {
-      console.log('[Auth] Demo login attempt:', { email: demoEmail, timestamp: new Date().toISOString() });
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword,
-      });
-
-      console.log('[Auth] Demo login response:', { error: error?.message, success: !error });
-
-      if (error) {
-        const message = getErrorMessage(error);
-        setInlineError(message);
-        setDebugDetails(
-          `Demo login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${error.message}`
-        );
-        toast({
-          title: "Demo login mislukt",
-          description: message,
-          variant: "destructive",
-        });
-      } else {
-        setInlineError(null);
-        setDebugDetails(null);
-        // AuthProvider's onAuthStateChange will set user → triggers Navigate redirect
-      }
-    } catch (unexpectedError) {
-      const msg = unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError);
-      console.error('[Auth] Unexpected demo login error:', unexpectedError);
-      setInlineError("Onverwachte fout. Zie debug details hieronder.");
-      setDebugDetails(`Unexpected demo login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${msg}`);
-      toast({
-        title: "Onverwachte fout",
-        description: "Er is iets misgegaan. Vernieuw de pagina en probeer opnieuw.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
    // Already logged in → redirect to dashboard (DashboardLayout handles onboarding redirect)
   if (!authLoading && user) {
