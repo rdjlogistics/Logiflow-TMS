@@ -111,6 +111,7 @@ export const BatchPurchaseInvoiceWizard = () => {
           carrier_rate_type, carrier_hourly_rate, carrier_km_rate, carrier_worked_hours,
           carriers!inner(id, company_name)
         `)
+        .eq("company_id", company!.id)
         .in("status", ["afgerond", "gecontroleerd"])
         .is("purchase_invoice_id", null)
         .not("carrier_id", "is", null)

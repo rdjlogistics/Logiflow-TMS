@@ -231,15 +231,17 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
 
   // Fetch customers for filter
   const { data: customers } = useQuery({
-    queryKey: ["customers-for-invoicing"],
+    queryKey: ["customers-for-invoicing", company?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("customers")
         .select("id, company_name")
+        .eq("tenant_id", company!.id)
         .eq("is_active", true)
         .order("company_name");
       return data || [];
     },
+    enabled: !!company?.id,
   });
 
   // Group trips by customer
