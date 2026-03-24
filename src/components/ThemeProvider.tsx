@@ -89,12 +89,20 @@ export function ThemeProvider({
   // Mouse parallax — only active for vision-pro preset
   useMouseParallax(themePreset === "vision-pro");
 
-  // Apply theme preset class
+  // Apply theme preset class + dynamically load CSS
   useEffect(() => {
     const root = window.document.documentElement;
     PRESET_CLASSES.forEach((cls) => root.classList.remove(cls));
     if (themePreset !== "imperial") {
       root.classList.add(`theme-${themePreset}`);
+      // Dynamically load the theme CSS file
+      const themeImports: Record<string, () => Promise<unknown>> = {
+        "vision-pro": () => import("@/styles/theme-vision-pro.css"),
+        "horizon": () => import("@/styles/theme-horizon.css"),
+        "carbon": () => import("@/styles/theme-carbon.css"),
+        "aurora": () => import("@/styles/theme-aurora.css"),
+      };
+      themeImports[themePreset]?.();
     }
   }, [themePreset]);
 
