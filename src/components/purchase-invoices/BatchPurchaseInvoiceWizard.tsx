@@ -211,6 +211,10 @@ export const BatchPurchaseInvoiceWizard = () => {
         }
       }
 
+      if (results.length === 0) {
+        throw new Error("Geen facturen aangemaakt — controleer of er orders beschikbaar zijn");
+      }
+
       return results;
     },
     onSuccess: (invoices) => {
