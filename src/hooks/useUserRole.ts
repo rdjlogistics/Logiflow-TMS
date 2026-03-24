@@ -10,6 +10,11 @@ const ROLE_PRIORITY: AppRole[] = ["admin", "medewerker", "chauffeur", "klant"];
 const roleCache = new Map<string, { role: AppRole | null; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+/** Clear the entire role cache — call on signOut to prevent cross-user leaks. */
+export function clearAllRoleCache() {
+  roleCache.clear();
+}
+
 function pickBestRole(data: { role: string }[]): AppRole | null {
   const roles = (data || []).map(r => r.role as AppRole);
   return ROLE_PRIORITY.find(r => roles.includes(r)) || null;
