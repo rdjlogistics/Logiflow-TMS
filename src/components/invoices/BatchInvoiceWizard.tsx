@@ -193,6 +193,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           status,
           customers!inner(company_name, country, vat_number)
         `)
+        .eq("company_id", company!.id)
         .in("status", statuses)
         .is("invoice_id", null)
         .gte("trip_date", filters.period_from)
