@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { geocodeAddress } from "@/utils/geocoding";
 import { useCompany } from "@/hooks/useCompany";
+import { logger } from "@/lib/logger";
 
 /**
  * Standalone hook that geocodes ALL route_stops with NULL latitude/longitude.
