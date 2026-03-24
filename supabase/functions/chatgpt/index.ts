@@ -1525,7 +1525,7 @@ async function runToolLoop(
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: getModelForComplexity(reasoning?.effort as any || "medium"),
         messages,
         tools: TMS_TOOLS,
         stream: false,
