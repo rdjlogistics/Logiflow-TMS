@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
+// jsPDF dynamically imported when needed
 
 interface Shipment {
   id: string;
