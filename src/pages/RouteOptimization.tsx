@@ -73,6 +73,7 @@ import { geocodeAddress } from "@/utils/geocoding";
 import { useTollDetection, type TollDetectionResult } from "@/hooks/useTollDetection";
 import TollCostPanel from "@/components/route/TollCostPanel";
 import TollComparisonPanel, { type TollFreeAlternative } from "@/components/route/TollComparisonPanel";
+import { logger } from "@/lib/logger";
 
 // Safe time formatter that handles HH:MM, HH:MM:SS, ISO strings, and invalid values
 const safeFormatTime = (value: string | null | undefined): string | null => {
