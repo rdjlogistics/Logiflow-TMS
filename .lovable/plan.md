@@ -1,53 +1,35 @@
 
 
-# Plan: Model Routing Logging in Copilot Edge Function
+# Fix: Copilot 401 Unauthorized — Verkeerde Auth Token
 
-## Wat
-Voeg structured logging toe aan de copilot edge function zodat in de logs zichtbaar is welk model, complexity level, tools en latency per request worden gebruikt.
+## Probleem
+De copilot edge function (`supabase/functions/copilot/index.ts`) valideert het Bearer token als een **user JWT** via `supabase.auth.getClaims()`. Maar de frontend (`src/hooks/useCopilot.ts`) stuurt de **anon key** als Authorization header in plaats van het JWT token van de ingelogde gebruiker.
 
-## Bestand: `supabase/functions/copilot/index.ts`
+Dit veroorzaakt: `401 — {"error":"Invalid token"}` bij elke copilot request.
 
-### Wijzigingen
+## Oplossing
 
-1. **Request start log** (na complexity detection, ~regel 268):
+### Bestand: `src/hooks/useCopilot.ts`
+
+**Wijziging**: Haal het user session token op via `supabase.auth.getSession()` en gebruik dat als Bearer token in plaats van `backendAnonKey`.
+
+1. Vervang de `backendAnonKey` import door een import van de supabase client
+2. In `sendMessage`, haal de session token op vóór de fetch:
+   ```typescript
+   const { data: { session } } = await supabase.auth.getSession();
+   if (!session?.access_token) {
+     throw new Error('Je moet ingelogd zijn om Copilot te gebruiken.');
+   }
    ```
-   console.log(JSON.stringify({
-     event: "copilot_request",
-     model, complexity, user_id: userId,
-     message_preview: lastUserMsg.slice(0, 80),
-     timestamp: new Date().toISOString()
-   }));
-   ```
-
-2. **Tool execution log** (in tool loop, ~regel 309):
-   ```
-   console.log(JSON.stringify({
-     event: "copilot_tool_call",
-     tool: tc.function.name,
-     args: toolArgs,
-     iteration: i + 1
-   }));
+3. Gebruik `session.access_token` als Bearer token:
+   ```typescript
+   Authorization: `Bearer ${session.access_token}`,
    ```
 
-3. **Request complete log** (voor de return, ~regel 343):
-   ```
-   console.log(JSON.stringify({
-     event: "copilot_complete",
-     model, complexity,
-     tools_used: toolsUsed,
-     tool_count: toolsUsed.length,
-     credit_cost: creditCost,
-     duration_ms: Date.now() - startTime
-   }));
-   ```
+### Geen andere bestanden hoeven te wijzigen
+De edge function is correct — die verwacht al een user JWT. Het probleem zit puur in de frontend.
 
-4. **Timer** — Voeg `const startTime = Date.now();` toe aan het begin van de request handler (~regel 236).
-
-### Resultaat
-Elke copilot request produceert 2-3 gestructureerde JSON log regels die via de backend logs te inspecteren zijn:
-- Welk model werd gekozen en waarom (complexity)
-- Welke tools werden aangeroepen
-- Totale latency
-
-Geen frontend wijzigingen nodig.
+### Test na fix
+- "toon orders" → verwacht: `low` complexity, `gemini-2.5-flash-lite` model (zichtbaar in edge function logs)
+- "analyseer mijn marges" → verwacht: `medium` complexity, `gemini-3-flash-preview` model
 
