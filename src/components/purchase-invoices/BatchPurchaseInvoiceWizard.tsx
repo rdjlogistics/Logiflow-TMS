@@ -36,6 +36,7 @@ const wizardSteps = [
 
 export const BatchPurchaseInvoiceWizard = () => {
   const navigate = useNavigate();
+  const { company } = useCompany();
   const [step, setStep] = useState(1);
   const { isGenerating, downloadMultiplePdfs } = usePurchaseInvoicePdf();
   
