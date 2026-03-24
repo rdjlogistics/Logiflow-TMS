@@ -12,6 +12,7 @@ import { nl } from "date-fns/locale";
 
 const Rosters = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["rosters", user?.id],
