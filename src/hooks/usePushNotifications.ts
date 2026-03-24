@@ -292,7 +292,7 @@ export const usePushNotifications = () => {
           
           // Only notify if this trip is assigned to our driver
           if (trip.driver_id === driverId) {
-            console.log('[Push] New trip assigned via INSERT:', trip.id);
+            logger.log('[Push] New trip assigned via INSERT:', trip.id);
             sendLocalNotification({
               title: '🚚 Nieuwe rit toegewezen!',
               body: `${trip.pickup_city || 'Onbekend'} → ${trip.delivery_city || 'Onbekend'}`,
