@@ -84,6 +84,14 @@ interface EligibleTrip {
   trip_date: string;
 }
 
+interface CreatedInvoice {
+  id: string;
+  invoice_number: string;
+  customer_name: string;
+  total_amount: number;
+  email?: string;
+}
+
 interface CustomerGroup {
   customer_id: string;
   customer_name: string;
@@ -92,6 +100,8 @@ interface CustomerGroup {
   trips: EligibleTrip[];
   total_amount: number;
 }
+
+type EmailStatus = "pending" | "sending" | "sent" | "failed";
 
 type PeriodPreset = "today" | "this_week" | "this_month" | "last_month" | "this_quarter" | "last_quarter" | "this_year" | "custom";
 
