@@ -85,48 +85,54 @@ const filterChips: FilterChip[] = [
 ];
 
 // ── Claim Card (mobile-first) ──
-const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -12 }}
-    whileTap={{ scale: 0.97 }}
-    onClick={() => onSelect(claim)}
-    className={cn(
-      "p-4 rounded-2xl cursor-pointer",
-      "bg-card/60 backdrop-blur-xl border border-border/30",
-      "hover:bg-card/80 hover:border-border/50 hover:shadow-lg",
-      "transition-colors duration-200",
-      "active:bg-muted/60"
-    )}
-  >
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-sm font-semibold">{claim.order_number || '—'}</span>
-          {getTypeBadge(claim.claim_type)}
+const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => {
+  const orderNumber = claim.order?.order_number || '—';
+  const customerName = claim.order?.customer?.company_name || 'Onbekend';
+  const ageDays = Math.floor((Date.now() - new Date(claim.created_at).getTime()) / (1000 * 60 * 60 * 24));
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={() => onSelect({ ...claim, order_number: orderNumber, customer: customerName, age_days: ageDays })}
+      className={cn(
+        "p-4 rounded-2xl cursor-pointer",
+        "bg-card/60 backdrop-blur-xl border border-border/30",
+        "hover:bg-card/80 hover:border-border/50 hover:shadow-lg",
+        "transition-colors duration-200",
+        "active:bg-muted/60"
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-semibold">{orderNumber}</span>
+            {getTypeBadge(claim.claim_type)}
+          </div>
+          <p className="text-sm text-muted-foreground truncate">{customerName}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {getStatusBadge(claim.status)}
+            {ageDays > 7 && (
+              <span className="text-xs text-amber-500 flex items-center gap-1">
+                <Clock className="h-3 w-3" />{ageDays}d
+              </span>
+            )}
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground truncate">{claim.customer || 'Onbekend'}</p>
-        <div className="flex items-center gap-2 flex-wrap">
-          {getStatusBadge(claim.status)}
-          {claim.age_days > 7 && (
-            <span className="text-xs text-amber-500 flex items-center gap-1">
-              <Clock className="h-3 w-3" />{claim.age_days}d
-            </span>
+        <div className="text-right shrink-0">
+          <p className="text-lg font-bold">€{(claim.claimed_amount || 0).toLocaleString()}</p>
+          {claim.approved_amount != null && claim.approved_amount > 0 && (
+            <p className="text-xs text-green-500">€{claim.approved_amount.toLocaleString()}</p>
           )}
+          <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-2" />
         </div>
       </div>
-      <div className="text-right shrink-0">
-        <p className="text-lg font-bold">€{(claim.claimed_amount || 0).toLocaleString()}</p>
-        {claim.approved_amount != null && claim.approved_amount > 0 && (
-          <p className="text-xs text-green-500">€{claim.approved_amount.toLocaleString()}</p>
-        )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-2" />
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 // ── POD Card (mobile-first) ──
 const PODCard = ({ pod }: any) => (
