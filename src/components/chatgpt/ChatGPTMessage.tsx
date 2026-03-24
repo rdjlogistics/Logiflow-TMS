@@ -57,8 +57,21 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
               prose-pre:bg-muted prose-pre:rounded-xl prose-pre:border prose-pre:border-border/20
               prose-table:text-xs prose-th:px-3 prose-th:py-1.5 prose-td:px-3 prose-td:py-1.5
               prose-strong:text-foreground
+              prose-img:rounded-xl prose-img:shadow-lg prose-img:border prose-img:border-border/20 prose-img:max-w-full prose-img:my-3
             ">
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  img: ({ src, alt, ...props }) => (
+                    <img
+                      src={src}
+                      alt={alt || 'AI generated image'}
+                      className="rounded-xl shadow-lg border border-border/20 max-w-full my-3 transition-transform hover:scale-[1.02]"
+                      loading="lazy"
+                      {...props}
+                    />
+                  ),
+                }}
+              >{message.content}</ReactMarkdown>
               {message.isStreaming && (
                 <span className="inline-block w-2 h-4 bg-primary/60 animate-pulse rounded-sm ml-0.5 align-text-bottom" />
               )}

@@ -1838,15 +1838,17 @@ serve(async (req) => {
           throw new Error("Stream failed");
         }
 
-        const creditCost = toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
-          : toolsUsed.some(t => ["generate_report", "daily_briefing"].includes(t)) ? 3
+        const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
+          : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
+          : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
+          : toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
           : toolsUsed.length > 0 ? 1 : 1;
 
         await supabase.rpc("deduct_ai_credits", {
           p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
           p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
           p_complexity: complexity !== "none" ? "complex" : "simple",
-          p_model: "gemini-3-flash",
+          p_model: selectedModel.split("/").pop() || "gemini-3-flash",
         });
 
         const reader = streamRes.body.getReader();
