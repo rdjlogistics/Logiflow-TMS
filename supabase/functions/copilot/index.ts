@@ -269,6 +269,8 @@ serve(async (req) => {
     const model = complexity === "medium" ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash-lite";
     const reasoning = complexity === "medium" ? { effort: "medium" } : undefined;
 
+    console.log(JSON.stringify({ event: "copilot_request", model, complexity, user_id: userId, message_preview: lastUserMsg.slice(0, 80), timestamp: new Date().toISOString() }));
+
     // Tool-calling loop (max 3 iterations for copilot)
     let loopMessages: any[] = [
       { role: "system", content: COPILOT_SYSTEM + pageCtx },
