@@ -39,7 +39,13 @@ import {
   Users,
   Euro,
   Package,
+  Mail,
+  SkipForward,
+  CheckCheck,
+  XCircle,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { sendInvoiceEmail } from "@/lib/email";
 import { cn } from "@/lib/utils";
 import { berekenBTW } from "@/lib/btw-calculator";
 import { useCompany } from "@/hooks/useCompany";
@@ -78,6 +84,14 @@ interface EligibleTrip {
   trip_date: string;
 }
 
+interface CreatedInvoice {
+  id: string;
+  invoice_number: string;
+  customer_name: string;
+  total_amount: number;
+  email?: string;
+}
+
 interface CustomerGroup {
   customer_id: string;
   customer_name: string;
@@ -86,6 +100,8 @@ interface CustomerGroup {
   trips: EligibleTrip[];
   total_amount: number;
 }
+
+type EmailStatus = "pending" | "sending" | "sent" | "failed";
 
 type PeriodPreset = "today" | "this_week" | "this_month" | "last_month" | "this_quarter" | "last_quarter" | "this_year" | "custom";
 
@@ -130,6 +146,7 @@ const steps = [
   { id: 1, title: "Filters", icon: Calendar },
   { id: 2, title: "Preview", icon: Package },
   { id: 3, title: "Bevestigen", icon: Check },
+  { id: 4, title: "Verzenden", icon: Mail },
 ];
 
 export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardProps) {
@@ -137,6 +154,10 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
   const { company } = useCompany();
   const [currentStep, setCurrentStep] = useState(1);
   const [successData, setSuccessData] = useState<{ invoices_created: number; total_amount: number } | null>(null);
+  const [createdInvoices, setCreatedInvoices] = useState<CreatedInvoice[]>([]);
+  const [selectedForEmail, setSelectedForEmail] = useState<Set<string>>(new Set());
+  const [emailStatuses, setEmailStatuses] = useState<Record<string, EmailStatus>>({});
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
   const [periodPreset, setPeriodPreset] = useState<PeriodPreset>("last_month");
   const [includeUnverified, setIncludeUnverified] = useState(false);
   const initialDates = getPresetDates("last_month");
@@ -313,13 +334,39 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       setSuccessData(data);
-      setCurrentStep(4);
       const count = data?.invoices_created || 0;
       toast.success(`${count} factu${count === 1 ? 'ur' : 'ren'} succesvol aangemaakt`);
+
+      // Fetch customer emails for created invoices
+      const invoiceIds = (data?.invoices || []).map((inv: CreatedInvoice) => inv.id);
+      if (invoiceIds.length > 0) {
+        const { data: invoicesWithEmail } = await supabase
+          .from("invoices")
+          .select("id, customers(email)")
+          .in("id", invoiceIds);
+
+        const emailMap: Record<string, string> = {};
+        (invoicesWithEmail || []).forEach((inv: any) => {
+          if (inv.customers?.email) emailMap[inv.id] = inv.customers.email;
+        });
+
+        const enriched: CreatedInvoice[] = (data.invoices || []).map((inv: CreatedInvoice) => ({
+          ...inv,
+          email: emailMap[inv.id] || undefined,
+        }));
+        setCreatedInvoices(enriched);
+
+        // Pre-select invoices that have an email
+        const withEmail = new Set(enriched.filter(i => i.email).map(i => i.id));
+        setSelectedForEmail(withEmail);
+        setEmailStatuses({});
+      }
+
+      setCurrentStep(4);
     },
     onError: (error) => {
       console.error("Batch invoice error:", error);
@@ -344,6 +391,64 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
 
   const handleSubmit = () => {
     batchInvoiceMutation.mutate();
+  };
+
+  const toggleEmailInvoice = (invoiceId: string) => {
+    const next = new Set(selectedForEmail);
+    if (next.has(invoiceId)) next.delete(invoiceId);
+    else next.add(invoiceId);
+    setSelectedForEmail(next);
+  };
+
+  const toggleAllEmails = () => {
+    const withEmail = createdInvoices.filter(i => i.email);
+    if (selectedForEmail.size === withEmail.length) {
+      setSelectedForEmail(new Set());
+    } else {
+      setSelectedForEmail(new Set(withEmail.map(i => i.id)));
+    }
+  };
+
+  const handleSendEmails = async () => {
+    const toSend = createdInvoices.filter(i => selectedForEmail.has(i.id) && i.email);
+    if (toSend.length === 0) return;
+
+    setIsSendingEmails(true);
+    const statuses: Record<string, EmailStatus> = {};
+    toSend.forEach(i => { statuses[i.id] = "pending"; });
+    setEmailStatuses({ ...statuses });
+
+    let sent = 0;
+    let failed = 0;
+    for (const inv of toSend) {
+      statuses[inv.id] = "sending";
+      setEmailStatuses({ ...statuses });
+
+      try {
+        const result = await sendInvoiceEmail({
+          invoiceId: inv.id,
+          recipientEmails: [inv.email!],
+          includePdf: true,
+        });
+
+        if (result.success) {
+          statuses[inv.id] = "sent";
+          sent++;
+        } else {
+          statuses[inv.id] = "failed";
+          failed++;
+        }
+      } catch {
+        statuses[inv.id] = "failed";
+        failed++;
+      }
+      setEmailStatuses({ ...statuses });
+    }
+
+    setIsSendingEmails(false);
+    if (sent > 0) toast.success(`${sent} factu${sent === 1 ? 'ur' : 'ren'} per e-mail verzonden`);
+    if (failed > 0) toast.error(`${failed} factu${failed === 1 ? 'ur' : 'ren'} niet verzonden`);
+    setCurrentStep(5);
   };
 
   const toggleCustomer = (customerId: string) => {
@@ -741,10 +846,141 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
             </Card>
           </motion.div>
         )}
-        {/* Step 4: Success */}
-        {currentStep === 4 && successData && (
+        {/* Step 4: Email Sending */}
+        {currentStep === 4 && createdInvoices.length > 0 && (
           <motion.div
-            key="step4"
+            key="step4-email"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+          >
+            <Card className="glass-card border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-primary" />
+                  Facturen per e-mail verzenden
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Select all toggle */}
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={toggleAllEmails}
+                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                    disabled={isSendingEmails}
+                  >
+                    <CheckCheck className="h-4 w-4" />
+                    {selectedForEmail.size === createdInvoices.filter(i => i.email).length
+                      ? "Niets selecteren"
+                      : "Alles selecteren"}
+                  </button>
+                  <span className="text-sm text-muted-foreground">
+                    {selectedForEmail.size} van {createdInvoices.filter(i => i.email).length} geselecteerd
+                  </span>
+                </div>
+
+                {/* Invoice list */}
+                <div className="space-y-2 max-h-80 overflow-auto">
+                  {createdInvoices.map((inv) => {
+                    const status = emailStatuses[inv.id];
+                    return (
+                      <div
+                        key={inv.id}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                          !inv.email && "opacity-50",
+                          status === "sent" && "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10",
+                          status === "failed" && "border-destructive bg-destructive/5",
+                          !status && selectedForEmail.has(inv.id) && "border-primary/50 bg-primary/5",
+                          !status && !selectedForEmail.has(inv.id) && "border-border"
+                        )}
+                      >
+                        <Checkbox
+                          checked={selectedForEmail.has(inv.id)}
+                          onCheckedChange={() => toggleEmailInvoice(inv.id)}
+                          disabled={!inv.email || isSendingEmails || !!status}
+                          className="shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-sm truncate">
+                              {inv.invoice_number} — {inv.customer_name}
+                            </span>
+                            <span className="text-sm font-medium shrink-0">
+                              {formatCurrency(inv.total_amount)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {inv.email || "Geen e-mailadres beschikbaar"}
+                          </div>
+                        </div>
+                        <div className="shrink-0 w-6">
+                          {status === "sending" && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+                          {status === "sent" && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+                          {status === "failed" && <XCircle className="h-4 w-4 text-destructive" />}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Progress bar during sending */}
+                {isSendingEmails && (
+                  <div className="space-y-2">
+                    <Progress
+                      value={
+                        (Object.values(emailStatuses).filter(s => s === "sent" || s === "failed").length /
+                          Object.values(emailStatuses).length) *
+                        100
+                      }
+                    />
+                    <p className="text-sm text-muted-foreground text-center">
+                      {Object.values(emailStatuses).filter(s => s === "sent" || s === "failed").length} van{" "}
+                      {Object.values(emailStatuses).length} verwerkt...
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                  <Button
+                    onClick={() => setCurrentStep(5)}
+                    variant="outline"
+                    disabled={isSendingEmails}
+                    className="w-full sm:w-auto"
+                  >
+                    <SkipForward className="mr-2 h-4 w-4" />
+                    Overslaan
+                  </Button>
+                  <Button
+                    onClick={handleSendEmails}
+                    disabled={isSendingEmails || selectedForEmail.size === 0}
+                    className="w-full sm:w-auto flex-1"
+                    variant="premium"
+                  >
+                    {isSendingEmails ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Verzenden...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        {selectedForEmail.size} factu{selectedForEmail.size === 1 ? "ur" : "ren"} verzenden
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Step 5: Success */}
+        {currentStep === 5 && successData && (
+          <motion.div
+            key="step5"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -772,6 +1008,11 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                       {successData.invoices_created} {successData.invoices_created === 1 ? 'factuur' : 'facturen'} voor{' '}
                       {formatCurrency(successData.total_amount)}
                     </p>
+                    {Object.values(emailStatuses).some(s => s === "sent") && (
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                        ✉️ {Object.values(emailStatuses).filter(s => s === "sent").length} per e-mail verzonden
+                      </p>
+                    )}
                   </motion.div>
 
                   <motion.div
@@ -786,12 +1027,15 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                       size="lg"
                     >
                       <ArrowRight className="mr-2 h-4 w-4" />
-                      Bekijk & Verstuur Facturen
+                      Bekijk facturen
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
                         setSuccessData(null);
+                        setCreatedInvoices([]);
+                        setSelectedForEmail(new Set());
+                        setEmailStatuses({});
                         setCurrentStep(1);
                         setSelectedCustomers(new Set());
                         setIncludeUnverified(false);
@@ -809,7 +1053,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
         )}
       </AnimatePresence>
 
-      {/* Navigation Buttons - Mobile Optimized (hidden on success) */}
+      {/* Navigation Buttons - Mobile Optimized (hidden on email/success steps) */}
       {currentStep < 4 && (
         <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t">
           <Button 
