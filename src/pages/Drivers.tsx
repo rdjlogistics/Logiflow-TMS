@@ -147,6 +147,7 @@ const Drivers = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [activeTab, setActiveTab] = useState<"info" | "documenten">("info");
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
 
   const validateDriverField = (field: string, value: string) => {
     let error: string | undefined;
@@ -226,12 +227,18 @@ const Drivers = () => {
   };
 
   const handleDeleteDocument = async (docId: string) => {
-    const { error } = await supabase.from("driver_documents").delete().eq("id", docId);
-    if (error) {
-      toast({ title: "Verwijderen mislukt", variant: "destructive" });
-    } else {
-      toast({ title: "Document verwijderd" });
-      refetchDocs();
+    if (deletingDocId) return;
+    setDeletingDocId(docId);
+    try {
+      const { error } = await supabase.from("driver_documents").delete().eq("id", docId);
+      if (error) {
+        toast({ title: "Verwijderen mislukt", variant: "destructive" });
+      } else {
+        toast({ title: "Document verwijderd" });
+        refetchDocs();
+      }
+    } finally {
+      setDeletingDocId(null);
     }
   };
 
@@ -243,6 +250,7 @@ const Drivers = () => {
     if (error) {
       toast({ title: "Beschikbaarheid bijwerken mislukt", variant: "destructive" });
     } else {
+      toast({ title: "Beschikbaarheid bijgewerkt" });
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     }
   };
