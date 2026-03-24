@@ -27,7 +27,7 @@ export const useGeocodeBackfill = () => {
         .limit(50);
 
       if (error) {
-        console.error("[Backfill] Error fetching stops with missing coords:", error);
+        logger.error("[Backfill] Error fetching stops with missing coords:", error);
         return;
       }
 
