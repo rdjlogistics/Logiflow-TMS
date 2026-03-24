@@ -122,7 +122,7 @@ export function usePortalLabels() {
         URL.revokeObjectURL(url);
         toast.success(`${shipments.length} ZPL label(s) gedownload`);
       } else {
-        const blob = generateLabelPDF(shipments);
+        const blob = await generateLabelPDF(shipments);
         if (blob) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
