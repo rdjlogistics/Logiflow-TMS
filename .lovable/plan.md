@@ -1,41 +1,28 @@
 
 
-# Plan: E-mail Verzendstap in Batch Facturatie Wizard
+# Redesign: MobileBottomNav — iOS 26 Stijl
 
-## Wat
-Na het aanmaken van batch facturen (huidige stap 4 — succes) wordt een nieuwe stap toegevoegd waarmee de gebruiker alle aangemaakte facturen direct per e-mail kan versturen naar de bijbehorende klanten.
+## Probleem
+De huidige bottom nav heeft inconsistente sizing, te grote icon containers (w-10 h-10), de CTA-knop is niet verticaal gecentreerd t.o.v. de andere tabs, en het geheel voelt niet strak/professioneel genoeg voor de iOS 26 standaard.
 
-## Huidige flow
-Stap 1 (Filters) → Stap 2 (Preview) → Stap 3 (Bevestigen) → Stap 4 (Succes)
+## Oplossing
+Complete herwrite van de MobileBottomNav naar een strak, minimalistisch iOS 26 design:
 
-## Nieuwe flow
-Stap 1 (Filters) → Stap 2 (Preview) → Stap 3 (Bevestigen) → **Stap 4 (Verzenden)** → Stap 5 (Succes)
+**Bestand:** `src/components/layout/MobileBottomNav.tsx`
 
-## Technisch
+### Visuele wijzigingen:
+1. **Compactere layout** — Verwijder de oversized 10x10 icon containers; gebruik directe icons (20x20) zonder wrapper boxes
+2. **CTA knop** — Verklein van w-11 h-11 naar w-10 h-10, verhoog iets boven de bar met een negatieve margin-top voor een floating effect, voeg subtiele ring/glow toe
+3. **Actieve indicator** — Vervang de huidige bg-primary/15 box door een subtiele pill-indicator boven het icon (iOS 26 stijl dot/pill)
+4. **Typografie** — Labels naar text-[10px] met tracking-wide, consistente spacing
+5. **Centrering** — Alle items exact gelijk uitgelijnd via `place-items-center` op de grid, gelijke min-heights
+6. **Kleuren** — Inactief: `text-white/40`, actief: `text-white` met subtiele glow, geen border op actieve items
+7. **Path fix** — `/order/new` → `/orders/edit`
 
-### Bestand: `src/components/invoices/BatchInvoiceWizard.tsx`
-
-1. **Stap 4 — E-mail verzendscherm** (nieuw, tussen huidige stap 3 en succes):
-   - Na succesvolle aanmaak (`onSuccess`) ga naar stap 4 i.p.v. stap 5
-   - Toon lijst van aangemaakte facturen met checkbox (standaard aan)
-   - Per factuur: factuurnummer, klantnaam, bedrag, e-mailadres (opgehaald uit `customers.email`)
-   - "Alles selecteren / Niets selecteren" toggle
-   - **Verzend geselecteerde facturen** knop — roept `send-invoice-email` aan per factuur via een loop
-   - **Overslaan** knop — gaat direct naar stap 5 (succes) zonder te mailen
-   - Voortgangsindicator (X van Y verzonden) met live status per factuur (✓ verzonden, ✗ mislukt, ⏳ bezig)
-
-2. **Data ophalen** — Na invoice creation, fetch customer e-mailadressen:
-   - Query `invoices` joined met `customers(email, company_name)` voor de aangemaakte invoice IDs
-   - Facturen zonder klant e-mail worden gemarkeerd als "geen e-mail beschikbaar"
-
-3. **Verzendlogica**:
-   - Sequentieel per factuur `supabase.functions.invoke("send-invoice-email", { body: { invoice_id, recipient_emails, include_pdf: true } })`
-   - Standaard subject/body template: "Factuur {nummer} - {bedrijfsnaam}"
-   - Bij fout: markeer als mislukt, ga door met volgende factuur
-   - Na afloop: toon samenvatting (X verzonden, Y mislukt) en ga naar stap 5
-
-4. **Steps array updaten**: Voeg "Verzenden" stap toe met `Mail` icon
-
-### Geen backend wijzigingen
-De bestaande `send-invoice-email` edge function wordt hergebruikt. Geen nieuwe edge functions of database migraties nodig.
+### Technische details:
+- Grid blijft 5 kolommen maar met `place-items-center` voor perfecte centrering
+- Geen icon wrapper divs meer voor niet-CTA items — direct icon + label stack
+- CTA krijgt een `-mt-3` om boven de bar te floaten met een ring-2 ring-background border
+- Actieve pill indicator: 4px breed, 2px hoog, rounded-full, boven het icon
+- Spring physics behouden op tap (scale 0.9)
 
