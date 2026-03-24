@@ -1,5 +1,8 @@
 import { Suspense, ReactNode } from "react";
-import { LazyMotion, domAnimation } from "framer-motion";
+import { LazyMotion } from "framer-motion";
+
+const loadFramerFeatures = () =>
+  import("framer-motion").then((m) => m.domAnimation);
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
