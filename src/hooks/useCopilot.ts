@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { edgeFunctionUrl } from '@/lib/backendConfig';
-import { supabase } from '@/integrations/supabase/client';
 
 export type AssistantType = 'dispatch_planner' | 'control_tower' | 'finance_autopilot' | 'knowledge_search';
 
