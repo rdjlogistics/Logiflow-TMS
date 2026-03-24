@@ -270,7 +270,7 @@ const OrderMobileCard = ({
                           await supabase.from('trips').update({ status: 'gepland' satisfies TripStatus }).eq('id', trip.id);
                           notifyCustomerStatusChange(trip.customer_id, trip.id, 'gepland', trip.order_number);
                           // Log order event
-                          try { const uid = (await supabase.auth.getUser()).data.user?.id; await supabase.from('order_events').insert({ order_id: trip.id, event_type: 'STATUS_UPDATED', payload: { old_value: 'aanvraag', new_value: 'gepland', source: 'mobile_card_accept' }, actor_user_id: uid }); } catch {}
+                          try { const uid = (await supabase.auth.getUser()).data.user?.id; await supabase.from('order_events').insert({ order_id: trip.id, event_type: 'STATUS_UPDATED', payload: { old_value: 'aanvraag', new_value: 'gepland', source: 'mobile_card_accept' }, actor_user_id: uid }); } catch (e) { console.error('Order event log failed:', e); }
                           if (trip.customer_id) {
                             const { data: customer } = await supabase.from('customers').select('email, company_name, contact_name').eq('id', trip.customer_id).single();
                             if (customer?.email) {
@@ -436,7 +436,7 @@ const OrderMobileCard = ({
                 await supabase.from('trips').update({ status: 'geannuleerd' satisfies TripStatus }).eq('id', trip.id);
                 notifyCustomerStatusChange(trip.customer_id, trip.id, 'geannuleerd', trip.order_number);
                 // Log order event
-                try { const uid = (await supabase.auth.getUser()).data.user?.id; await supabase.from('order_events').insert({ order_id: trip.id, event_type: 'STATUS_UPDATED', payload: { old_value: 'aanvraag', new_value: 'geannuleerd', source: 'mobile_card_reject' }, actor_user_id: uid }); } catch {}
+                try { const uid = (await supabase.auth.getUser()).data.user?.id; await supabase.from('order_events').insert({ order_id: trip.id, event_type: 'STATUS_UPDATED', payload: { old_value: 'aanvraag', new_value: 'geannuleerd', source: 'mobile_card_reject' }, actor_user_id: uid }); } catch (e) { console.error('Order event log failed:', e); }
                 if (trip.customer_id) {
                   const { data: customer } = await supabase.from('customers').select('email, company_name, contact_name').eq('id', trip.customer_id).single();
                   if (customer?.email) {

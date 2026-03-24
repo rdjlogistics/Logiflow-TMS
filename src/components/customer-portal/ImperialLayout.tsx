@@ -56,7 +56,7 @@ export const ImperialLayout = ({
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/demo");
+    navigate("/auth");
   };
 
   return (

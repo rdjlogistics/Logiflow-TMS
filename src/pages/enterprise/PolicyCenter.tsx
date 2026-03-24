@@ -77,15 +77,7 @@ const PolicyCenter = () => {
     updatePolicies.mutate(formData);
   };
 
-  // Demo delegations
-  const demoDelegations: AuthorityDelegation[] = [
-    { id: '1', company_id: '', role: 'Admin', max_invoice_send_eur: undefined, max_payout_approve_eur: undefined, max_hold_resolve_eur: undefined, max_dispute_create_eur: undefined, can_publish_automations: true, can_modify_policies: true, can_export_audit: true, can_manage_legal_hold: true },
-    { id: '2', company_id: '', role: 'Finance Manager', max_invoice_send_eur: 25000, max_payout_approve_eur: 10000, max_hold_resolve_eur: 5000, max_dispute_create_eur: undefined, can_publish_automations: true, can_modify_policies: false, can_export_audit: true, can_manage_legal_hold: false },
-    { id: '3', company_id: '', role: 'Planner', max_invoice_send_eur: 5000, max_payout_approve_eur: 1000, max_hold_resolve_eur: undefined, max_dispute_create_eur: 2500, can_publish_automations: false, can_modify_policies: false, can_export_audit: false, can_manage_legal_hold: false },
-    { id: '4', company_id: '', role: 'Medewerker', max_invoice_send_eur: 1000, max_payout_approve_eur: undefined, max_hold_resolve_eur: undefined, max_dispute_create_eur: 500, can_publish_automations: false, can_modify_policies: false, can_export_audit: false, can_manage_legal_hold: false },
-  ];
-
-  const displayDelegations = delegations?.length ? delegations : demoDelegations;
+  const displayDelegations = delegations || [];
 
   return (
     <DashboardLayout 

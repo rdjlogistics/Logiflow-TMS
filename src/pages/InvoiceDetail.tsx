@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -229,9 +230,8 @@ const InvoiceDetail = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("PDF error — falling back to print:", error);
-      // Graceful degradation: open browser print dialog as fallback
-      window.print();
+      console.error("PDF error:", error);
+      toast({ title: "PDF genereren mislukt", description: "Probeer het opnieuw of neem contact op met support.", variant: "destructive" });
     } finally {
       setIsGenerating(false);
     }

@@ -23,8 +23,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Loader2, Sparkles, Zap, Shield, User, Users, LogIn, ChevronDown, ChevronUp, RefreshCw, WifiOff, AlertTriangle } from "lucide-react";
 
-// Demo accounts — credentials via environment only
-const DEMO_ACCOUNTS: { email: string; password: string; role: string; icon: typeof User; color: string }[] = [];
 
 // Detailed error message mapping
 const getErrorMessage = (error: { message: string }) => {
@@ -66,7 +64,7 @@ const Auth = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resettingSession, setResettingSession] = useState(false);
-  const [showDemoAccounts, setShowDemoAccounts] = useState(true);
+  
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [inlineError, setInlineError] = useState<string | null>(null);
   const [debugDetails, setDebugDetails] = useState<string | null>(null);
@@ -79,9 +77,6 @@ const Auth = () => {
 
   const location = useLocation();
   const { toast } = useToast();
-
-  // Check if we're on the demo page
-  const isDemoPage = location.pathname === "/demo";
 
   // ImperialShield has built-in bypasses for auth endpoints, no manual deactivation needed.
 
@@ -190,53 +185,6 @@ const Auth = () => {
     }
   };
 
-  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setLoading(true);
-    setInlineError(null);
-    setDebugDetails(null);
-
-    try {
-      console.log('[Auth] Demo login attempt:', { email: demoEmail, timestamp: new Date().toISOString() });
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword,
-      });
-
-      console.log('[Auth] Demo login response:', { error: error?.message, success: !error });
-
-      if (error) {
-        const message = getErrorMessage(error);
-        setInlineError(message);
-        setDebugDetails(
-          `Demo login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${error.message}`
-        );
-        toast({
-          title: "Demo login mislukt",
-          description: message,
-          variant: "destructive",
-        });
-      } else {
-        setInlineError(null);
-        setDebugDetails(null);
-        // AuthProvider's onAuthStateChange will set user → triggers Navigate redirect
-      }
-    } catch (unexpectedError) {
-      const msg = unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError);
-      console.error('[Auth] Unexpected demo login error:', unexpectedError);
-      setInlineError("Onverwachte fout. Zie debug details hieronder.");
-      setDebugDetails(`Unexpected demo login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${msg}`);
-      toast({
-        title: "Onverwachte fout",
-        description: "Er is iets misgegaan. Vernieuw de pagina en probeer opnieuw.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
    // Already logged in → redirect to dashboard (DashboardLayout handles onboarding redirect)
   if (!authLoading && user) {
@@ -261,14 +209,14 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      console.log('[Auth] Login attempt:', { email, timestamp: new Date().toISOString() });
+      
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('[Auth] Login response:', { error: error?.message, success: !error });
+      
 
       if (error) {
         const message = getErrorMessage(error);
@@ -690,66 +638,6 @@ const Auth = () => {
                     )}
                   </div>
 
-                  {/* Demo Accounts Section - Only on /demo route */}
-                  {isDemoPage && (
-                    <div className="pt-4 border-t border-border/50">
-                      <button
-                        type="button"
-                        onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-                        className="flex items-center justify-between w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Sparkles className="h-4 w-4 text-primary" />
-                          Demo Accounts
-                        </span>
-                        {showDemoAccounts ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </button>
-                      
-                      {showDemoAccounts && (
-                        <div className="mt-3 space-y-2">
-                          {DEMO_ACCOUNTS.map((account) => (
-                            <button
-                              key={account.email}
-                              type="button"
-                              onClick={() => handleDemoLogin(account.email, account.password)}
-                              disabled={loading || isOffline}
-                              className="flex items-center gap-3 w-full p-3 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <div className={`w-8 h-8 rounded-lg ${account.color} flex items-center justify-center`}>
-                                <account.icon className="h-4 w-4 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium truncate">{account.email}</span>
-                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                    {account.role}
-                                  </Badge>
-                                </div>
-                              </div>
-                              <LogIn className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Link to demo page from normal auth */}
-                  {!isDemoPage && (
-                    <div className="pt-4 border-t border-border/50">
-                      <Link 
-                        to="/demo"
-                        className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm"
-                      >
-                        <Sparkles className="h-4 w-4 text-primary" />
-                        <span>Demo bekijken</span>
-                      </Link>
-                    </div>
-                  )}
                 </form>
               </TabsContent>
 
