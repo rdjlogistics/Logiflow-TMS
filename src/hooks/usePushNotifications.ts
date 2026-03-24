@@ -237,7 +237,7 @@ export const usePushNotifications = () => {
       setLoading(false);
       return true;
     } catch (error) {
-      console.error('Error unsubscribing:', error);
+      logger.error('Error unsubscribing:', error);
       setLoading(false);
       return false;
     }
