@@ -309,7 +309,132 @@ const TMS_TOOLS = [
     },
   },
 
-  // ─── INTELLIGENCE TOOLS ───
+  // ─── PREMIUM INTELLIGENCE TOOLS ───
+  {
+    type: "function",
+    function: {
+      name: "generate_chart",
+      description: "Genereer een chart-beschrijving die de frontend als Recharts visualisatie rendert. Gebruik voor trends, vergelijkingen, verdelingen.",
+      parameters: {
+        type: "object",
+        properties: {
+          chart_type: { type: "string", enum: ["line", "bar", "pie", "area", "radar"] },
+          title: { type: "string", description: "Chart titel" },
+          data_description: { type: "string", description: "Beschrijving van welke data gevisualiseerd moet worden" },
+          period: { type: "string", enum: ["week", "month", "quarter", "year"] },
+        },
+        required: ["chart_type", "title", "data_description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "web_search",
+      description: "Zoek transportnieuws, regelgeving, marktprijzen, diesel-tarieven of branche-informatie.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "Zoekopdracht" },
+          category: { type: "string", enum: ["news", "regulation", "market_prices", "general"] },
+        },
+        required: ["query"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "document_summary",
+      description: "Vat een lang document, e-mail of tekst samen en extraheer actiepunten.",
+      parameters: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "De te samenvatten tekst" },
+          focus: { type: "string", enum: ["summary", "action_items", "key_figures", "risks"] },
+        },
+        required: ["text"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "translate_message",
+      description: "Vertaal berichten voor internationale chauffeurs of klanten.",
+      parameters: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "Te vertalen tekst" },
+          target_language: { type: "string", description: "Doeltaal (Engels, Duits, Frans, Pools, Roemeens, etc.)" },
+          context: { type: "string", description: "Context: transport, formeel, informeel" },
+        },
+        required: ["text", "target_language"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_image",
+      description: "Genereer een afbeelding via AI. Gebruik voor bedrijfslogo's, route-visualisaties, rapportage-graphics, infographics.",
+      parameters: {
+        type: "object",
+        properties: {
+          prompt: { type: "string", description: "Beschrijving van de gewenste afbeelding" },
+          style: { type: "string", enum: ["professional", "minimal", "infographic", "illustration", "photo_realistic"] },
+        },
+        required: ["prompt"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "smart_planning",
+      description: "Multi-order route optimalisatie — analyseer N orders en stel optimale volgorde + chauffeur-toewijzingen voor.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_ids: { type: "array", items: { type: "string" }, description: "Orders om te optimaliseren" },
+          optimize_for: { type: "string", enum: ["distance", "time", "cost", "balanced"] },
+          date: { type: "string", description: "Planningsdatum YYYY-MM-DD" },
+        },
+        required: ["order_ids"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "anomaly_detect",
+      description: "Detecteer afwijkingen in KPIs: plotselinge margeverandering, ongewone factuurpatronen, prestatieverval.",
+      parameters: {
+        type: "object",
+        properties: {
+          metric: { type: "string", enum: ["margin", "revenue", "on_time", "invoice_aging", "driver_performance"] },
+          lookback_days: { type: "number", description: "Aantal dagen terugkijken (default 30)" },
+        },
+        required: ["metric"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "draft_contract",
+      description: "Genereer concept transportovereenkomst, offerte of raamcontract tekst. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          contract_type: { type: "string", enum: ["transport_agreement", "quote", "framework", "rate_card"] },
+          customer_id: { type: "string" },
+          details: { type: "string", description: "Extra details en voorwaarden" },
+        },
+        required: ["contract_type"],
+      },
+    },
+  },
   {
     type: "function",
     function: {
