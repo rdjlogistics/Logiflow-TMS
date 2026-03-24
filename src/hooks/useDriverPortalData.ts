@@ -192,14 +192,12 @@ export function useDriverPortalData() {
   const alerts = useMemo(() => data?.alerts || [], [data?.alerts]);
 
   // Local state management for alerts (client-side only)
-  const markAlertRead = useCallback((alertId: string) => {
-    // This is client-side only, would need server persistence for real app
-    console.log('Mark alert read:', alertId);
+  const markAlertRead = useCallback((_alertId: string) => {
+    // Client-side only — no-op until server persistence is added
   }, []);
 
-  const dismissAlert = useCallback((alertId: string) => {
-    // This is client-side only, would need server persistence for real app  
-    console.log('Dismiss alert:', alertId);
+  const dismissAlert = useCallback((_alertId: string) => {
+    // Client-side only — no-op until server persistence is added
   }, []);
 
   return {
