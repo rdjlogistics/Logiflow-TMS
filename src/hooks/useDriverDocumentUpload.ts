@@ -146,7 +146,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
             }
           }
         }).catch(err => {
-          console.error('AI analysis invoke error:', err);
+          logger.error('AI analysis invoke error:', err);
         });
       }
 
