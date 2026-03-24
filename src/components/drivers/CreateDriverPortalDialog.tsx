@@ -43,13 +43,30 @@ export function CreateDriverPortalDialog({
       return;
     }
 
+    // Check active session first
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({ title: 'Sessie verlopen', description: 'Log opnieuw in en probeer het nogmaals.', variant: 'destructive' });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-driver-portal-account', {
         body: { driverId, email, sendEmail },
       });
 
-      if (error) throw error;
+      // Parse FunctionsHttpError properly
+      if (error) {
+        let msg = 'Kon portaalaccount niet aanmaken.';
+        try {
+          const body = await (error as any).context?.json?.();
+          if (body?.error) msg = body.error;
+          else if (body?.message) msg = body.message;
+        } catch { /* use default */ }
+        if ((error as any).message) msg = (error as any).message;
+        throw new Error(msg);
+      }
       if (data?.error) throw new Error(data.error);
 
       toast({

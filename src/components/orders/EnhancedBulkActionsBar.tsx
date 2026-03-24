@@ -389,7 +389,7 @@ export const EnhancedBulkActionsBar: React.FC<EnhancedBulkActionsBarProps> = ({
 
         const lines = customerOrders.map(order => ({
           invoice_id: invoice.id,
-          description: `Transport ${order.order_number || order.id.slice(0, 8)} - ${order.pickup_city || 'N/A'} → ${order.delivery_city || 'N/A'}`,
+          description: `Transport ${order.order_number || order.id.slice(0, 8)} - ${order.pickup_city || 'N/A'} - ${order.delivery_city || 'N/A'}`,
           quantity: 1,
           unit_price: order.sales_total || 0,
           total_price: order.sales_total || 0,

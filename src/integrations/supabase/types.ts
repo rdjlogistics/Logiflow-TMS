@@ -6497,6 +6497,7 @@ export type Database = {
           created_at: string
           current_city: string | null
           date_of_birth: string | null
+          deleted_at: string | null
           driver_category: string | null
           email: string | null
           emergency_contact_name: string | null
@@ -6526,6 +6527,7 @@ export type Database = {
           created_at?: string
           current_city?: string | null
           date_of_birth?: string | null
+          deleted_at?: string | null
           driver_category?: string | null
           email?: string | null
           emergency_contact_name?: string | null
@@ -6555,6 +6557,7 @@ export type Database = {
           created_at?: string
           current_city?: string | null
           date_of_birth?: string | null
+          deleted_at?: string | null
           driver_category?: string | null
           email?: string | null
           emergency_contact_name?: string | null
