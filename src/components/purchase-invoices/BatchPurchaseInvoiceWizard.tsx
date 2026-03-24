@@ -6,6 +6,7 @@ import { format, subMonths, startOfMonth, endOfMonth, subWeeks, startOfWeek, end
 import { toast } from "sonner";
 import { usePurchaseInvoicePdf } from "@/hooks/use-purchase-invoice-pdf";
 import { type TripWithRate } from "./TripRateBreakdown";
+import { useCompany } from "@/hooks/useCompany";
 import { WizardHeader } from "./wizard/WizardHeader";
 import { WizardProgress } from "./wizard/WizardProgress";
 import { Step1SelectionSection } from "./wizard/Step1SelectionSection";
@@ -35,6 +36,7 @@ const wizardSteps = [
 
 export const BatchPurchaseInvoiceWizard = () => {
   const navigate = useNavigate();
+  const { company } = useCompany();
   const [step, setStep] = useState(1);
   const { isGenerating, downloadMultiplePdfs } = usePurchaseInvoicePdf();
   
@@ -82,16 +84,18 @@ export const BatchPurchaseInvoiceWizard = () => {
 
   // Fetch carriers for dropdown
   const { data: carriers } = useQuery({
-    queryKey: ["carriers-active"],
+    queryKey: ["carriers-active", company?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("carriers")
         .select("id, company_name")
+        .eq("tenant_id", company!.id)
         .eq("is_active", true)
         .order("company_name");
       if (error) throw error;
       return data;
     },
+    enabled: !!company?.id,
   });
 
   // Fetch eligible trips for preview with rate details
@@ -107,6 +111,7 @@ export const BatchPurchaseInvoiceWizard = () => {
           carrier_rate_type, carrier_hourly_rate, carrier_km_rate, carrier_worked_hours,
           carriers!inner(id, company_name)
         `)
+        .eq("company_id", company!.id)
         .in("status", ["afgerond", "gecontroleerd"])
         .is("purchase_invoice_id", null)
         .not("carrier_id", "is", null)

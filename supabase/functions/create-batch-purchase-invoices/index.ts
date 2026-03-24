@@ -155,6 +155,36 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Create invoice lines per trip
+    const invoiceLines = trips.map((t) => {
+      const unitPrice = Number(t.purchase_total || 0);
+      const lineVat = Math.round(unitPrice * (vatPercentage / 100) * 100) / 100;
+      return {
+        purchase_invoice_id: invoice.id,
+        trip_id: t.id,
+        description: `Order ${t.order_number || t.id}`,
+        quantity: 1,
+        unit_price: unitPrice,
+        total_price: unitPrice,
+        vat_percentage: vatPercentage,
+        vat_amount: lineVat,
+        line_type: "transport",
+      };
+    });
+
+    const { error: linesError } = await supabase
+      .from("purchase_invoice_lines")
+      .insert(invoiceLines);
+
+    if (linesError) {
+      console.error("Error creating invoice lines:", linesError);
+      await supabase.from("purchase_invoices").delete().eq("id", invoice.id);
+      return new Response(JSON.stringify({ error: "Kon factuurregels niet aanmaken" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Link trips to invoice
     const tripIds = trips.map((t) => t.id);
     const { error: linkError } = await supabase
@@ -164,7 +194,7 @@ Deno.serve(async (req) => {
 
     if (linkError) {
       console.error("Error linking trips:", linkError);
-      // Rollback: delete the invoice
+      // Rollback: delete invoice (cascade deletes lines)
       await supabase.from("purchase_invoices").delete().eq("id", invoice.id);
       return new Response(JSON.stringify({ error: "Kon orders niet koppelen aan factuur" }), {
         status: 500,
