@@ -12,7 +12,10 @@ export async function loadMapboxGL(): Promise<typeof mapboxgl> {
   if (_mb) return _mb;
   if (_loading) return _loading;
   _loading = import('mapbox-gl').then(async (m) => {
-    await import('mapbox-gl/dist/mapbox-gl.css');
+    await Promise.all([
+      import('mapbox-gl/dist/mapbox-gl.css'),
+      import('@/styles/map-styles.css'),
+    ]);
     _mb = m.default;
     return _mb;
   });
