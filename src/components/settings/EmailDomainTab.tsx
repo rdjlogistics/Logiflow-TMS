@@ -73,7 +73,7 @@ export const EmailDomainTab = () => {
   const handleCreateDomain = async () => {
     if (!domain || !senderEmail) { toast({ title: 'Vul alle velden in', variant: 'destructive' }); return; }
     const emailDomainPart = senderEmail.split('@')[1];
-    if (emailDomainPart !== domain) { toast({ title: 'E-mailadres moet eindigen op @' + domain, variant: 'destructive' }); return; }
+    if (emailDomainPart?.toLowerCase() !== domain.toLowerCase()) { toast({ title: 'E-mailadres moet eindigen op @' + domain, variant: 'destructive' }); return; }
 
     setSaving(true);
     try {
