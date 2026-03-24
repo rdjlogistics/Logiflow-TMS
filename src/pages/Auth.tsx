@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useLocation, Link, Navigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clearAuthStorage, clearServiceWorkerAndCaches } from "@/lib/authStorage";
+import { clearAuthStorage, clearAuthCachesOnly } from "@/lib/authStorage";
 import { useAuth } from "@/hooks/useAuth";
 import { backendUrl, backendAnonKey } from "@/lib/backendConfig";
 import { isBusinessEmail, getBusinessEmailError } from "@/lib/email-validation";
@@ -123,18 +123,9 @@ const Auth = () => {
         // ignore
       }
 
-      // Clear stored auth tokens
-      clearAuthStorage();
+      // Clear stored auth tokens + cookies (surgical, keeps SW alive)
+      await clearAuthCachesOnly();
 
-      // Clear PWA caches that could keep serving an old build
-      await clearServiceWorkerAndCaches();
-
-      // Clear cookies (best-effort)
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
 
       toast({
         title: "Sessie gereset",

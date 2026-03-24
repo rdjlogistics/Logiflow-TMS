@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/integrations/supabase/client";
-import { clearAuthStorage, clearServiceWorkerAndCaches } from "@/lib/authStorage";
+import { clearAuthStorage, clearAuthCachesOnly } from "@/lib/authStorage";
 import { Loader2, AlertTriangle, RefreshCw, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -56,8 +56,7 @@ export const ProtectedRoute = ({ children, redirectTo = "/auth", allowedRoles }:
   const handleResetSession = async () => {
     try {
       try { await supabase.auth.signOut(); } catch { /* ignore */ }
-      clearAuthStorage();
-      await clearServiceWorkerAndCaches();
+      await clearAuthCachesOnly();
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
