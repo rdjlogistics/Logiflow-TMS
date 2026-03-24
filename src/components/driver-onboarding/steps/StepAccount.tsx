@@ -7,6 +7,7 @@ import { OfflineBanner } from '../OfflineBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { WifiOff } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const StepAccount = () => {
   const { data, updateData, setCurrentStep, currentStep, isOnline, pendingUploads } = useOnboarding();
