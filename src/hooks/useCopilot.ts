@@ -138,6 +138,11 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
     };
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Je moet ingelogd zijn om Copilot te gebruiken.');
+      }
+
       const allMessages = [...messages, userMessage].slice(-15).map(m => ({
         role: m.role,
         content: m.content,
@@ -147,7 +152,7 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${backendAnonKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           messages: allMessages,
