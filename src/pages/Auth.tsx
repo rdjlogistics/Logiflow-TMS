@@ -638,66 +638,6 @@ const Auth = () => {
                     )}
                   </div>
 
-                  {/* Demo Accounts Section - Only on /demo route */}
-                  {isDemoPage && (
-                    <div className="pt-4 border-t border-border/50">
-                      <button
-                        type="button"
-                        onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-                        className="flex items-center justify-between w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Sparkles className="h-4 w-4 text-primary" />
-                          Demo Accounts
-                        </span>
-                        {showDemoAccounts ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </button>
-                      
-                      {showDemoAccounts && (
-                        <div className="mt-3 space-y-2">
-                          {DEMO_ACCOUNTS.map((account) => (
-                            <button
-                              key={account.email}
-                              type="button"
-                              onClick={() => handleDemoLogin(account.email, account.password)}
-                              disabled={loading || isOffline}
-                              className="flex items-center gap-3 w-full p-3 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <div className={`w-8 h-8 rounded-lg ${account.color} flex items-center justify-center`}>
-                                <account.icon className="h-4 w-4 text-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium truncate">{account.email}</span>
-                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                    {account.role}
-                                  </Badge>
-                                </div>
-                              </div>
-                              <LogIn className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Link to demo page from normal auth */}
-                  {!isDemoPage && (
-                    <div className="pt-4 border-t border-border/50">
-                      <Link 
-                        to="/demo"
-                        className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm"
-                      >
-                        <Sparkles className="h-4 w-4 text-primary" />
-                        <span>Demo bekijken</span>
-                      </Link>
-                    </div>
-                  )}
                 </form>
               </TabsContent>
 
