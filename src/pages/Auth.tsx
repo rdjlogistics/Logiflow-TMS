@@ -23,8 +23,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Loader2, Sparkles, Zap, Shield, User, Users, LogIn, ChevronDown, ChevronUp, RefreshCw, WifiOff, AlertTriangle } from "lucide-react";
 
-// Demo accounts — credentials via environment only
-const DEMO_ACCOUNTS: { email: string; password: string; role: string; icon: typeof User; color: string }[] = [];
 
 // Detailed error message mapping
 const getErrorMessage = (error: { message: string }) => {
