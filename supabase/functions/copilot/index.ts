@@ -9,10 +9,17 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-const COPILOT_SYSTEM = `Je bent de LogiFlow Co-Pilot sidebar assistent.
-Je geeft snelle, beknopte antwoorden over de huidige pagina-context.
-Antwoord ALTIJD in het Nederlands. Wees super bondig (max 3-4 zinnen tenzij complexe vraag).
-Je hebt context over welke pagina de gebruiker bekijkt.`;
+const COPILOT_SYSTEM = `Je bent de LogiFlow Co-Pilot — een slimme sidebar assistent voor transport professionals.
+Antwoord ALTIJD in het Nederlands. Wees bondig (max 3-4 zinnen) tenzij complexe analyse.
+Je hebt context over de huidige pagina. Geef concrete, actionable antwoorden met cijfers.
+Bij marges <15%: waarschuw. Stel vervolgacties voor waar relevant.`;
+
+function detectComplexity(message: string): "none" | "low" | "medium" {
+  const lower = message.toLowerCase();
+  if (/waarom|analyseer|vergelijk|optimaliseer|advies|strategie/.test(lower)) return "medium";
+  if (/hoeveel|wat is|toon|lijst|status/.test(lower)) return "low";
+  return "none";
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -44,7 +51,12 @@ serve(async (req) => {
     }
 
     const { messages, context } = await req.json();
-    const pageCtx = context?.currentPage ? `\nDe gebruiker is op pagina: ${context.currentPage}` : "";
+    const pageCtx = context?.currentPage ? `\nPagina: ${context.currentPage}` : "";
+
+    // Detect complexity from last user message
+    const lastUserMsg = [...messages].reverse().find((m: any) => m.role === "user")?.content || "";
+    const complexity = detectComplexity(lastUserMsg);
+    const reasoning = complexity === "medium" ? { effort: "medium" } : undefined;
 
     const response = await fetch(GATEWAY_URL, {
       method: "POST",
@@ -56,6 +68,7 @@ serve(async (req) => {
           ...messages,
         ],
         stream: true,
+        ...(reasoning ? { reasoning } : {}),
       }),
     });
 
