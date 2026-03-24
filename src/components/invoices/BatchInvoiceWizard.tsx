@@ -334,13 +334,39 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       setSuccessData(data);
-      setCurrentStep(4);
       const count = data?.invoices_created || 0;
       toast.success(`${count} factu${count === 1 ? 'ur' : 'ren'} succesvol aangemaakt`);
+
+      // Fetch customer emails for created invoices
+      const invoiceIds = (data?.invoices || []).map((inv: CreatedInvoice) => inv.id);
+      if (invoiceIds.length > 0) {
+        const { data: invoicesWithEmail } = await supabase
+          .from("invoices")
+          .select("id, customers(email)")
+          .in("id", invoiceIds);
+
+        const emailMap: Record<string, string> = {};
+        (invoicesWithEmail || []).forEach((inv: any) => {
+          if (inv.customers?.email) emailMap[inv.id] = inv.customers.email;
+        });
+
+        const enriched: CreatedInvoice[] = (data.invoices || []).map((inv: CreatedInvoice) => ({
+          ...inv,
+          email: emailMap[inv.id] || undefined,
+        }));
+        setCreatedInvoices(enriched);
+
+        // Pre-select invoices that have an email
+        const withEmail = new Set(enriched.filter(i => i.email).map(i => i.id));
+        setSelectedForEmail(withEmail);
+        setEmailStatuses({});
+      }
+
+      setCurrentStep(4);
     },
     onError: (error) => {
       console.error("Batch invoice error:", error);
