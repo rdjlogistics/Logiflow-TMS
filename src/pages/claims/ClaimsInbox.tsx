@@ -50,7 +50,7 @@ const SettlementSection = ({
             <SelectValue placeholder="Aansprakelijk" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="carrier">Charter</SelectItem>
+            <SelectItem value="carrier">Vervoerder</SelectItem>
             <SelectItem value="customer">Klant</SelectItem>
             <SelectItem value="charter">Charter</SelectItem>
           </SelectContent>
