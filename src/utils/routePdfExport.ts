@@ -1,5 +1,4 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+// Dynamic imports — jsPDF + autoTable loaded only when user generates a PDF
 
 interface PdfStop {
   id: string;
