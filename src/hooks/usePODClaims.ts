@@ -88,7 +88,7 @@ export const usePODClaims = () => {
         .select("*, order:order_id(order_number, customer:customer_id(company_name))")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as ClaimCase[];
+      return (data ?? []) as any[];
     },
     enabled: !!company?.id,
   });
