@@ -62,7 +62,7 @@ export const useGeocodeBackfill = () => {
               logger.log(`[Backfill] ✓ Geocoded stop ${stop.id}: ${stop.address}, ${stop.city} → (${latitude}, ${longitude})`);
             }
           } else {
-            console.warn(`[Backfill] ✗ Could not geocode stop ${stop.id}: ${stop.address}, ${stop.city}`);
+            logger.warn(`[Backfill] ✗ Could not geocode stop ${stop.id}: ${stop.address}, ${stop.city}`);
           }
         }
       }
