@@ -489,7 +489,8 @@ export default function DigitalPOD() {
   const { proofs: liveProofs, loading, stats: liveStats, getCachedSignedUrl, refetch } = useStopProofs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPod, setSelectedPod] = useState<StopProofRecord | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'all');
   const [searchFocused, setSearchFocused] = useState(false);
 
   const stats = useMemo(() => ({
