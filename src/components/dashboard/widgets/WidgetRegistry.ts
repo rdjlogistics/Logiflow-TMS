@@ -177,6 +177,15 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
     category: 'operations',
     minHeight: 300,
   },
+  'ai-usage': {
+    id: 'ai-usage',
+    name: 'AI Verbruik',
+    description: 'Real-time credit verbruik en dagelijkse trends',
+    icon: Sparkles,
+    defaultSize: 'small',
+    category: 'analytics',
+    minHeight: 240,
+  },
 };
 
 export const DEFAULT_WIDGET_ORDER = [
