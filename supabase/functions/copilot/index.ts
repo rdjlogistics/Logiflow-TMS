@@ -306,6 +306,7 @@ serve(async (req) => {
       loopMessages.push(choice.message);
       for (const tc of choice.message.tool_calls) {
         const toolArgs = typeof tc.function.arguments === "string" ? JSON.parse(tc.function.arguments) : tc.function.arguments;
+        console.log(JSON.stringify({ event: "copilot_tool_call", tool: tc.function.name, args: toolArgs, iteration: i + 1 }));
         const result = await executeCopilotTool(tc.function.name, toolArgs, supabase, tenantId);
         toolsUsed.push(tc.function.name);
         loopMessages.push({ role: "tool", tool_call_id: tc.id, content: result });
