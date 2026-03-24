@@ -1,49 +1,34 @@
 
 
-# Onafgemaakte Batches — Fixes & Perfectie
+# Plan: AI Usage Dashboard Widget
 
-## Gevonden Problemen
-
-### 1. PDF generatie crasht bij grote facturen (KRITIEK)
-In `generate-purchase-invoice-pdf/index.ts` regel 244:
-```js
-const base64Html = btoa(String.fromCharCode(...htmlBytes));
-```
-De spread operator (`...`) op een grote Uint8Array overschrijdt de maximum call stack size. Bij facturen met 20+ ritten zal dit crashen.
-
-### 2. Edge functions mogelijk niet deployed
-Geen logs gevonden voor beide functies. Moeten (her)deployed worden.
-
-### 3. Preview totalen inconsistent met factuur
-Step 2 toont `group.subtotal * 1.21` als "Totaal incl. BTW", maar de echte BTW-berekening in de edge function rondt per factuur af. Kleine afrondingsverschillen mogelijk.
-
-### 4. Geen error handling bij lege resultaten na creatie
-Als `createInvoicesMutation` slaagt maar `results` leeg is (alle carriers faalden met `continue`), gaat de wizard toch naar Step 3 met een lege lijst.
+## Wat
+Een nieuwe dashboard widget `ai-usage` die real-time credit verbruik per dag toont als een compacte sparkline-achtige area chart, met credit status en snelle stats.
 
 ## Wijzigingen
 
-### 1. `supabase/functions/generate-purchase-invoice-pdf/index.ts`
-Fix base64 encoding met chunked approach:
-```js
-// Replace spread operator with chunked conversion
-let binary = '';
-for (let i = 0; i < htmlBytes.length; i++) {
-  binary += String.fromCharCode(htmlBytes[i]);
-}
-const base64Html = btoa(binary);
-```
+### 1. Nieuw bestand: `src/components/dashboard/AIUsageWidget.tsx`
+- Compacte widget met:
+  - Credit progressiebalk (remaining / total)
+  - 7-dagen area chart van dagelijks verbruik uit `ai_usage_daily_rollup`
+  - Vandaag's verbruik highlight
+  - Link naar volledige `/admin/ai-usage` pagina
+- Gebruikt `useAICredits` hook voor subscription data
+- Query `ai_usage_daily_rollup` voor laatste 7 dagen
 
-### 2. `src/components/purchase-invoices/BatchPurchaseInvoiceWizard.tsx`
-- Guard tegen lege resultaten: als `results.length === 0` na de loop, throw error
-- Wizard gaat alleen naar Step 3 als er daadwerkelijk facturen zijn aangemaakt
+### 2. Update: `src/components/dashboard/widgets/WidgetRegistry.ts`
+- Voeg `ai-usage` widget toe aan registry:
+  - Category: `analytics`, size: `small`, icon: `Sparkles`, minHeight: 240
 
-### 3. Deploy edge functions
-Beide functies deployen: `create-batch-purchase-invoices` en `generate-purchase-invoice-pdf`
+### 3. Update: `src/components/dashboard/DraggableWidgetGrid.tsx`
+- Import `AIUsageWidget` (lazy)
+- Voeg `case 'ai-usage'` toe aan `renderWidget` switch
 
 ## Bestanden
 
 | Bestand | Wijziging |
 |---|---|
-| `supabase/functions/generate-purchase-invoice-pdf/index.ts` | Fix btoa crash voor grote facturen |
-| `src/components/purchase-invoices/BatchPurchaseInvoiceWizard.tsx` | Guard tegen lege resultaten |
+| `src/components/dashboard/AIUsageWidget.tsx` | **Nieuw** — widget component |
+| `src/components/dashboard/widgets/WidgetRegistry.ts` | Registratie toevoegen |
+| `src/components/dashboard/DraggableWidgetGrid.tsx` | Render case toevoegen |
 
