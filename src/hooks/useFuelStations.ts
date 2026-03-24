@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchRealFuelStations, RealFuelStation } from '@/utils/fuelStationsAPI';
+import { logger } from '@/lib/logger';
 
 export interface FuelStation {
   id: string;
