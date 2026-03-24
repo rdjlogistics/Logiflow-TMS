@@ -56,6 +56,14 @@ export const StepAccount = () => {
       }
 
       if (authData.user) {
+        // Ensure profile exists (fallback for missing DB trigger)
+        try {
+          const { ensureProfileAfterSignup } = await import('@/lib/ensureProfileAfterSignup');
+          await ensureProfileAfterSignup(authData.user.id, data.email, data.name, { skipAdminRole: true });
+        } catch (e) {
+          console.error('[StepAccount] ensureProfileAfterSignup failed:', e);
+        }
+
         // Create driver record linked to the auth user
         const { error: driverError } = await supabase
           .from('drivers')

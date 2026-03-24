@@ -363,7 +363,7 @@ const Auth = () => {
     }
 
     const planSlug = searchParams.get('plan') || '';
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -389,6 +389,15 @@ const Auth = () => {
         variant: "destructive",
       });
     } else {
+      // Ensure profile + role exist (fallback for missing DB trigger)
+      if (signUpData?.user) {
+        try {
+          const { ensureProfileAfterSignup } = await import('@/lib/ensureProfileAfterSignup');
+          await ensureProfileAfterSignup(signUpData.user.id, email, fullName);
+        } catch (e) {
+          console.error('[Auth] ensureProfileAfterSignup failed:', e);
+        }
+      }
       setInlineError(null);
       toast({
         title: "Account aangemaakt!",
