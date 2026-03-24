@@ -35,9 +35,10 @@ const GeographicHeatmapWidget = ({
   loading 
 }: GeographicHeatmapWidgetProps) => {
   const navigate = useNavigate();
-  const totalTrips = useMemo(() => data.reduce((sum, r) => sum + r.trips, 0), [data]);
-  const totalRevenue = useMemo(() => data.reduce((sum, r) => sum + r.revenue, 0), [data]);
-  const maxTrips = useMemo(() => Math.max(...data.map(r => r.trips)), [data]);
+  const safeData = data || [];
+  const totalTrips = useMemo(() => safeData.reduce((sum, r) => sum + r.trips, 0), [safeData]);
+  const totalRevenue = useMemo(() => safeData.reduce((sum, r) => sum + r.revenue, 0), [safeData]);
+  const maxTrips = useMemo(() => Math.max(...safeData.map(r => r.trips), 0), [safeData]);
 
   const handleRegionClick = (region: RegionData) => {
     // Navigate to trips filtered by region
