@@ -1,38 +1,65 @@
 
 
-# Plan: Fix ai_usage_daily_rollup Cron Job
+# Plan: AI Functies Upgraden — Premium Skills & Image Generation
 
-## Probleem
+## Huidige Situatie
 
-De `ai_usage_daily_rollup` tabel bevat 0 rijen, terwijl er 14 `ai_credit_transactions` bestaan (18-23 maart). Er is geen cron job en geen database functie om de rollup te vullen.
+De `chatgpt` edge function heeft al 20+ tools (search_orders, margin_analysis, etc.) en tool-calling via Gemini 3 Flash. De `copilot` edge function is een simpele chat zonder tools. Geen image generation capabilities.
 
-## Oplossing
+## Upgrades
 
-### 1. Database migratie: rollup functie aanmaken
+### 1. Nieuwe Premium Tools toevoegen aan `chatgpt` edge function
 
-Nieuwe `public.refresh_ai_usage_daily_rollup()` functie die:
-- Alle transacties van gisteren aggregeert per tenant
-- `INSERT ... ON CONFLICT (tenant_id, date) DO UPDATE` zodat het idempotent is
-- Velden: `total_credits` (SUM), `total_tokens` (SUM), `total_requests` (COUNT), `unique_users` (COUNT DISTINCT), `cost_estimate_eur` (credits * 0.01 schatting)
-- Eerst een unique constraint op `(tenant_id, date)` toevoegen als die ontbreekt
+**Nieuwe tools in `TMS_TOOLS` array:**
 
-### 2. Cron job registreren
+| Tool | Beschrijving | Type |
+|---|---|---|
+| `generate_chart` | AI genereert een beschrijving voor een visuele chart (omzet trend, marge vergelijking) — frontend rendert met Recharts | Intelligence |
+| `web_search` | Zoek transportnieuws, regelgeving, marktprijzen via AI-samenvatting | Intelligence |
+| `document_summary` | Vat een lang document/e-mail samen en extraheer actiepunten | Intelligence |
+| `translate_message` | Vertaal berichten voor internationale chauffeurs/klanten | Intelligence |
+| `generate_image` | Genereer afbeeldingen via Nano Banana 2 (bedrijfslogo's, route visualisaties, rapportage graphics) | Premium |
+| `smart_planning` | Multi-order route optimalisatie — analyseer N orders en stel optimale volgorde + chauffeurs voor | Intelligence |
+| `anomaly_detect` | Detecteer afwijkingen in KPIs (plotselinge margeverandering, ongewone factuurpatronen) | Intelligence |
+| `draft_contract` | Genereer concept transportovereenkomst of offerte tekst | Mutation |
 
-Via insert tool een `cron.schedule` aanmaken die dagelijks om 00:05 de functie aanroept:
-```sql
-SELECT cron.schedule('refresh-ai-usage-rollup', '5 0 * * *', 'SELECT public.refresh_ai_usage_daily_rollup()');
-```
+### 2. Image Generation met Nano Banana 2
 
-### 3. Backfill bestaande data
+In de `chatgpt` edge function:
+- Tool `generate_image` roept de AI Gateway aan met model `google/gemini-3.1-flash-image-preview`
+- Slaat gegenereerde afbeelding op in Supabase Storage bucket `ai-generated`
+- Retourneert public URL die de frontend als inline image toont
 
-Eenmalige query via insert tool om de 14 bestaande transacties (18-23 maart) in de rollup te aggregeren zodat de widget direct data toont.
+### 3. Intelligent Model Routing upgraden
 
-## Bestanden / Acties
+Huidige `detectComplexity` is basic. Upgrade naar:
+- `"high"` complexity → `google/gemini-2.5-pro` (zwaar redeneren, rapportage, forecasts)
+- `"medium"` → `google/gemini-3-flash-preview` (standaard tool-calling)
+- `"low"` / `"none"` → `google/gemini-2.5-flash` (snelle lookups, simpele vragen)
 
-| Actie | Wat |
+Dit is hoe premium AI tools werken — intelligent routing per complexiteitsniveau.
+
+### 4. Copilot Edge Function upgraden met tools
+
+De `copilot` functie is nu een "domme" chat. Upgrade:
+- Voeg een subset van tools toe (search_orders, get_kpis, daily_briefing, route_suggest)
+- Tool-calling loop net als in chatgpt
+- Maakt de Cmd+K copilot echt bruikbaar
+
+### 5. Frontend: Image rendering in chat
+
+Update `ChatGPTMessage.tsx` om gegenereerde afbeeldingen inline te tonen wanneer de response een `![image](url)` markdown bevat (al handled door ReactMarkdown, maar expliciete styling toevoegen).
+
+### 6. Storage bucket aanmaken
+
+Database migratie om `ai-generated` storage bucket te creëren voor opgeslagen AI-afbeeldingen.
+
+## Bestanden
+
+| Bestand | Wijziging |
 |---|---|
-| DB migratie | Unique constraint + `refresh_ai_usage_daily_rollup()` functie |
-| Insert (data) | Cron job registreren + backfill bestaande transacties |
-
-Geen frontend wijzigingen nodig — de widget leest al uit `ai_usage_daily_rollup`.
+| `supabase/functions/chatgpt/index.ts` | 8 nieuwe tools, intelligent model routing, image generation |
+| `supabase/functions/copilot/index.ts` | Tool-calling loop + subset tools toevoegen |
+| `src/components/chatgpt/ChatGPTMessage.tsx` | Image rendering styling |
+| DB migratie | Storage bucket `ai-generated` aanmaken |
 
