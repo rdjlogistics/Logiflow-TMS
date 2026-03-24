@@ -35,8 +35,6 @@ const steps: { id: Step; label: string; icon: any }[] = [
   { id: 'confirm', label: 'Bevestig', icon: Check },
 ];
 
-// Demo customer ID for testing (replace with actual auth)
-const DEMO_CUSTOMER_ID = "00000000-0000-0000-0000-000000000001";
 
 export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardProps) => {
   const navigate = useNavigate();
