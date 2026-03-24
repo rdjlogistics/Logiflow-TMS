@@ -361,7 +361,7 @@ export function useFuelStations() {
         if (realStations.length > 0) {
           // Convert real stations to our format
           const convertedStations = realStations.map(convertToFuelStation);
-          console.log(`[useFuelStations] Loaded ${convertedStations.length} real stations from OpenStreetMap`);
+          logger.log(`[useFuelStations] Loaded ${convertedStations.length} real stations from OpenStreetMap`);
           setStations(convertedStations);
         } else {
           // Fallback to local mock data around user
