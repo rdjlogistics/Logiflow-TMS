@@ -70,7 +70,7 @@ export const usePODClaims = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("proof_of_delivery")
-        .select("*")
+        .select("*, order:order_id(order_number, customer:customer_id(company_name))")
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
