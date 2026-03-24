@@ -24,26 +24,43 @@ export const usePurchaseInvoicePdf = () => {
         throw new Error("Geen PDF data ontvangen");
       }
 
-      // Decode base64 and create download
-      const binaryString = atob(data.pdf);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
+      if (data.html) {
+        // HTML-based: decode and open print dialog
+        const binaryString = atob(data.pdf);
+        const htmlContent = new TextDecoder().decode(
+          new Uint8Array(Array.from(binaryString, c => c.charCodeAt(0)))
+        );
+        
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          printWindow.onload = () => {
+            printWindow.print();
+          };
+        }
+      } else {
+        // Binary PDF base64
+        const binaryString = atob(data.pdf);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Inkoopfactuur-${invoiceNumber}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
       }
       
-      const blob = new Blob([bytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `Inkoopfactuur-${invoiceNumber}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      URL.revokeObjectURL(url);
-      
-      toast.success("PDF gedownload");
+      toast.success("PDF gegenereerd");
     } catch (err: any) {
       console.error("PDF download failed:", err);
       toast.error(err.message || "Kon PDF niet genereren");
@@ -67,26 +84,37 @@ export const usePurchaseInvoicePdf = () => {
         });
 
         if (!error && data?.pdf) {
-          const binaryString = atob(data.pdf);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
+          if (data.html) {
+            const binaryString = atob(data.pdf);
+            const htmlContent = new TextDecoder().decode(
+              new Uint8Array(Array.from(binaryString, c => c.charCodeAt(0)))
+            );
+            const printWindow = window.open("", "_blank");
+            if (printWindow) {
+              printWindow.document.write(htmlContent);
+              printWindow.document.close();
+            }
+          } else {
+            const binaryString = atob(data.pdf);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            const blob = new Blob([bytes], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Inkoopfactuur-${invoice.invoice_number}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            URL.revokeObjectURL(url);
           }
-          
-          const blob = new Blob([bytes], { type: "application/pdf" });
-          const url = URL.createObjectURL(blob);
-          
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `Inkoopfactuur-${invoice.invoice_number}.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          URL.revokeObjectURL(url);
           successCount++;
           
-          // Small delay between downloads
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       } catch (err) {
@@ -97,11 +125,11 @@ export const usePurchaseInvoicePdf = () => {
     setIsGenerating(false);
     
     if (successCount === invoices.length) {
-      toast.success(`${successCount} PDFs gedownload`);
+      toast.success(`${successCount} PDFs gegenereerd`);
     } else if (successCount > 0) {
-      toast.warning(`${successCount} van ${invoices.length} PDFs gedownload`);
+      toast.warning(`${successCount} van ${invoices.length} PDFs gegenereerd`);
     } else {
-      toast.error("Kon geen PDFs downloaden");
+      toast.error("Kon geen PDFs genereren");
     }
   };
 
