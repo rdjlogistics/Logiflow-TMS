@@ -97,6 +97,30 @@ const GeographicHeatmapWidget = ({
     );
   }
 
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <CardHeader className="pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-primary/15">
+              <MapPinned className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-lg font-bold">Geografische Spreiding</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="p-3 rounded-2xl bg-muted/20 mb-3">
+              <MapPinned className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Nog geen ritten</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">Regiodata verschijnt zodra er ritten zijn</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden relative">
       {/* Background pattern */}
