@@ -315,7 +315,7 @@ export const usePushNotifications = () => {
           
           // Check if trip was just assigned to our driver (driver_id changed from null/other to ours)
           if (trip.driver_id === driverId && oldTrip.driver_id !== driverId) {
-            console.log('[Push] Trip assigned via UPDATE:', trip.id);
+            logger.log('[Push] Trip assigned via UPDATE:', trip.id);
             sendLocalNotification({
               title: '🚚 Nieuwe rit toegewezen!',
               body: `${trip.pickup_city || 'Onbekend'} → ${trip.delivery_city || 'Onbekend'}`,
