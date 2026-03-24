@@ -100,7 +100,7 @@ export const StepAccount = () => {
             }
           }
         } catch (roleErr) {
-          console.error('Role assignment failed:', roleErr);
+          logger.error('Role assignment failed:', roleErr);
         }
 
         toast.success('Account aangemaakt!', {
