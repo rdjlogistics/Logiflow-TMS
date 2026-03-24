@@ -119,15 +119,19 @@ export function ManualInvoiceForm({ onSuccess, onCancel }: ManualInvoiceFormProp
     try {
       const { subtotal, vatAmount, total } = calculateTotals();
 
-      // Generate invoice number with RDJ-YYYY-NNNN fallback
-      const { data: numberData } = await supabase.rpc("get_next_invoice_number", { p_company_id: company?.id ?? '' });
-      // Client-side fallback: RDJ-2026-NNNN format if RPC returns null or fails
-      const generateFallbackNumber = () => {
-        const year = new Date().getFullYear();
-        const random = Math.floor(Math.random() * 9000) + 1000;
-        return `RDJ-${year}-${random}`;
-      };
-      const invoiceNumber = numberData || generateFallbackNumber();
+      // Atomisch factuurnummer — geen fallback, faal hard bij RPC failure
+      const { data: numberData, error: numberError } = await supabase.rpc("get_next_invoice_number", { p_company_id: company?.id ?? '' });
+
+      if (numberError || !numberData) {
+        console.error('Invoice number generation failed:', numberError);
+        toast.error("Factuurnummer genereren mislukt", {
+          description: "Probeer het opnieuw of neem contact op met support",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const invoiceNumber = numberData;
 
       // Calculate BTW info
       const customer = customers.find(c => c.id === formData.customer_id);
