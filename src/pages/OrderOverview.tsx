@@ -382,8 +382,9 @@ const OrderOverview = () => {
         };
         setQuickStats(stats);
       }
-    } catch {
-      // Silent fail for stats - not critical
+    } catch (err) {
+      console.error('Quick stats failed:', err);
+      toast({ title: "Statistieken laden mislukt", variant: "destructive" });
     }
   };
 

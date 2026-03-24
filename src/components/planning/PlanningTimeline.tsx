@@ -105,7 +105,7 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
 
   // Assign trip to driver mutation
   const assignMutation = useMutation({
-    mutationFn: async ({ tripId, driverId }: { tripId: string; driverId: string }) => {
+    mutationFn: async ({ tripId, driverId }: { tripId: string; driverId: string | null }) => {
       const { error } = await supabase
         .from("trips")
         .update({ driver_id: driverId })
@@ -115,6 +115,9 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timeline-trips"] });
       toast({ title: "Chauffeur toegewezen", description: "Rit is bijgewerkt" });
+    },
+    onError: () => {
+      toast({ title: "Toewijzing mislukt", description: "Probeer het opnieuw", variant: "destructive" });
     },
   });
 
@@ -171,7 +174,10 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
 
   const handleDrop = (driverId: string) => {
     if (draggedTrip) {
-      assignMutation.mutate({ tripId: draggedTrip, driverId });
+      assignMutation.mutate({
+        tripId: draggedTrip,
+        driverId: driverId === "unassigned" ? null : driverId,
+      });
       setDraggedTrip(null);
     }
   };
