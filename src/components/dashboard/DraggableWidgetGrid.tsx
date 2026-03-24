@@ -144,6 +144,8 @@ const DraggableWidgetGrid = ({
           return <CreditHealthWidget />;
         case 'live-events':
           return <LiveEventStreamWidget />;
+        case 'ai-usage':
+          return <AIUsageWidget />;
         default:
           return null;
       }
