@@ -1,130 +1,78 @@
 
 
-# Productie-Audit: TMS Commercieel Gereed Maken
+# Plan: AI Assistent van Chatbot naar Echte Co-Pilot
 
-## Samenvatting
-Na grondige analyse van de volledige codebase (233+ bestanden met toast-calls, 55+ pagina's, edge functions, error handling) zijn er **6 categorieën** problemen gevonden die opgelost moeten worden voordat het product commercieel verkoopbaar is.
+## Kernprobleem
+De `supabase/functions/` directory is **leeg** — de `chatgpt` edge function die de frontend aanroept bestaat niet. Daarom krijg je geen echte antwoorden. De hele AI-infrastructuur (DB-tabellen, credit systeem, frontend UI) staat klaar, maar de backend ontbreekt.
 
----
+## Wat we bouwen
 
-## CATEGORIE 1: Nep-knoppen die niets doen (KRITIEK)
+### 1. `chatgpt` Edge Function — Het Brein
+Een edge function die Lovable AI (Gemini 3 Flash) aanspreekt met:
 
-Knoppen die een toast tonen in plaats van de actie uit te voeren — dit maakt het product onbetrouwbaar.
+**Tool Calling** — de AI kan daadwerkelijk data opvragen en acties uitvoeren:
+- `search_orders` — Orders zoeken/filteren op status, klant, datum, chauffeur
+- `list_drivers` — Beschikbare chauffeurs ophalen met scores en status
+- `get_kpis` — Real-time KPI's: omzet, marges, openstaande facturen, ritten vandaag
+- `explain_order` — Volledige order-timeline met alle events/stops
+- `smart_order_entry` — Natuurlijke taal → order aanmaken (met bevestiging)
+- `save_memory` — Gebruikersvoorkeuren onthouden (gebruikt `ai_user_memory` tabel)
 
-| Locatie | Knop | Probleem |
-|---|---|---|
-| `RouteOptimization.tsx:1507` | "Route Opslaan" | Toont alleen toast, slaat niets op in database |
-| `RouteOptimization.tsx:1599` | "Chauffeur toewijzen" | Toont alleen toast, geen toewijslogica |
-| `enterprise/Rosters.tsx:87` | "Dienst Toevoegen" | Toont toast "Ga naar Planning → Programma" |
-| `enterprise/Constraints.tsx:53` | "Nieuwe Regel" | Toont toast "Ga naar Planning → Beschikbaarheid" |
+**Intelligent Systeem Prompt** — specifiek voor transport/logistiek:
+- Kent de TMS-structuur (orders, trips, stops, facturen, chauffeurs)
+- Antwoordt in het Nederlands
+- Geeft concrete data, niet vage tips
+- Vraagt bevestiging voor mutaties (smart_order_entry)
 
-**Fix**: Implementeer de daadwerkelijke functionaliteit of verwijder de knoppen. Nep-knoppen zijn een commerciële dealbreaker.
+**Credit Systeem** — gebruikt bestaande `deduct_ai_credits` DB-functie
 
----
+**Conversation Persistence** — slaat berichten op in `chatgpt_messages` met tool_calls
 
-## CATEGORIE 2: Demo/Test Artefacten (KRITIEK voor verkoop)
+### 2. `copilot` Edge Function — SSE Streaming
+Dezelfde intelligentie maar met streaming (SSE) voor de Copilot sidebar. Ondersteunt dezelfde tools maar streamt tokens real-time.
 
-Restanten van development die een onprofessionele indruk maken.
+### 3. Frontend Streaming voor ChatGPT
+De huidige `useChatGPT` hook gebruikt `stream: false`. We upgraden naar SSE streaming zodat antwoorden token-voor-token verschijnen — professionelere UX.
 
-| Locatie | Probleem |
+## Bestanden
+
+| Actie | Bestand |
 |---|---|
-| `B2CBookingWizard.tsx:39` | Hardcoded `DEMO_CUSTOMER_ID = "00000000-..."` — boekingen gaan naar een niet-bestaande klant |
-| `portal/B2CAccount.tsx:44` | Logout navigeert naar `/demo` i.p.v. `/auth` |
-| `customer-portal/PortalLayout.tsx:73` | Logout navigeert naar `/demo` |
-| `customer-portal/ImperialLayout.tsx:59` | Logout navigeert naar `/demo` |
-| `DriverAvailableShifts.tsx:333` | Inlog-knop wijst naar `/demo` |
-| `enterprise/SystemHealth.tsx:40-55` | Hardcoded `demoJobs` en `demoIncidents` getoond als er geen echte data is |
-| `enterprise/PolicyCenter.tsx:81-88` | Hardcoded `demoDelegations` als fallback |
-| `Auth.tsx:27` | `DEMO_ACCOUNTS` array (leeg maar structuur aanwezig, incl. demo login flow op regel 195-230) |
-| `crm/RFQInbox.tsx:260` | Toast meldt "RFQ geparsed (demo)" |
+| Nieuw | `supabase/functions/chatgpt/index.ts` — Hoofd AI met tool calling |
+| Nieuw | `supabase/functions/copilot/index.ts` — SSE streaming copilot |
+| Wijzig | `src/hooks/useChatGPT.ts` — SSE streaming support toevoegen |
+| Wijzig | `src/components/chatgpt/ChatGPTPanel.tsx` — Streaming indicator |
 
-**Fix**: Vervang alle `/demo` navigaties door `/auth`. Verwijder hardcoded demo data. Gebruik lege states ("Nog geen data") in plaats van nep-data.
+## Technische Details
 
----
+### Tool Calling Flow
+```text
+User: "Hoeveel orders staan er open deze week?"
+    ↓
+Edge Function: AI kiest tool `search_orders` met filters
+    ↓
+Tool: Query op `orders` tabel met status/datum filters
+    ↓
+AI: "Er staan 14 orders open deze week. 
+     5 wachten op toewijzing, 9 zijn gepland.
+     De oudste is order #ORD-2024-0847 van 3 dagen geleden."
+```
 
-## CATEGORIE 3: Stille Error Swallowing (KRITIEK voor betrouwbaarheid)
+### System Prompt (kern)
+De AI krijgt een TMS-specifieke prompt die het volgende definieert:
+- Rol: "Je bent de LogiFlow AI Co-Pilot voor transport management"
+- Beschikbare tools en wanneer ze te gebruiken
+- Antwoordstijl: concreet, met data, actiegericht
+- Bevestigingsflow voor mutaties
+- Tenant-isolatie (alleen data van het eigen bedrijf)
 
-55 gevallen van lege `catch {}` blokken die fouten volledig negeren. De ergste:
+### Credit Deductie
+Gebruikt de bestaande `deduct_ai_credits` Postgres functie. Simpele verzoeken kosten 1 credit, tool-calls 2 credits.
 
-| Locatie | Impact |
-|---|---|
-| `AIAutoDispatchPanel.tsx:178` | Chauffeur-toewijzing faalt zonder melding — trip lijkt toegewezen maar is het niet |
-| `OrderMobileCard.tsx:273,439` | Order event logging faalt stil — audittrail incompleet |
-| `NotificationCenter.tsx:48,75` | Notificaties laden faalt zonder feedback |
-
-**Fix**: Voeg minimaal logging toe aan alle lege catch-blokken. Voor gebruikersacties: toon error toast.
-
----
-
-## CATEGORIE 4: `as any` Type-Bypasses (KWALITEIT)
-
-722 gevallen van `as any` in pagina-bestanden. De risicovolle:
-
-| Locatie | Risico |
-|---|---|
-| `Carriers.tsx:316` | `{ deleted_at: ... } as any` — eerder bewezen bug (kolom bestond niet) |
-| `Drivers.tsx:185,210,248,291` | 5x `as any` voor driver_documents en availability — kan runtime crashes veroorzaken |
-| `InvoiceDetail.tsx:258,565-568` | Customer en period casting — kan undefined properties tonen |
-| `GPSTracking.tsx:456` | Locations `as any` voor geofence alerts |
-
-**Fix**: Voeg juiste TypeScript interfaces toe in plaats van `as any`. Dit voorkomt runtime crashes.
-
----
-
-## CATEGORIE 5: Console.log in Productie (PROFESSIONEEL)
-
-151 `console.log` statements in productie-code. De meest problematische:
-
-| Locatie | Probleem |
-|---|---|
-| `Auth.tsx:201,208,264,271` | Logt login-pogingen incl. e-mailadres — privacy-risico (AVG) |
-| `useDriverPortalData.ts:197,202` | `markAlertRead` en `dismissAlert` zijn stub-functies die alleen loggen |
-
-**Fix**: Verwijder alle `console.log` statements uit productie-code. Gebruik de bestaande `logger.ts` die alleen in DEV mode logt. Auth-gerelateerde logs zijn een AVG-risico.
-
----
-
-## CATEGORIE 6: PDF Fallback naar window.print() (UX)
-
-Wanneer de PDF edge function faalt, wordt `window.print()` aangeroepen (Invoices.tsx:265, InvoiceDetail.tsx:234). Dit opent een browser print-dialog voor de **gehele pagina** — inclusief sidebar, navigatie, etc. Totaal onbruikbaar als factuur-PDF.
-
-**Fix**: Toon een duidelijke error toast met retry-knop in plaats van `window.print()`. Of: bouw een print-specifieke CSS layout als echte fallback.
-
----
-
-## Implementatie-Volgorde (Prioriteit)
-
-### Batch 1: Commerciële Dealbreakers (MUST)
-1. **Demo-artefacten verwijderen** — Alle `/demo` → `/auth`, DEMO_CUSTOMER_ID verwijderen, demo-data fallbacks vervangen door lege states
-2. **Nep-knoppen fixen of verwijderen** — RouteOptimization "Opslaan" + "Chauffeur toewijzen", Rosters, Constraints
-
-### Batch 2: Betrouwbaarheid (MUST)
-3. **Lege catch-blokken fixen** — Minimaal de 3 kritieke (AIAutoDispatch, OrderMobileCard, NotificationCenter)
-4. **PDF fallback verbeteren** — window.print() vervangen door error toast + retry
-
-### Batch 3: Kwaliteit & Compliance (SHOULD)
-5. **Console.log opruimen** — Auth.tsx privacy-logs verwijderen, stub-functies in useDriverPortalData implementeren
-6. **Type-safety verbeteren** — Top 10 risicovolle `as any` casts vervangen door echte types
-
-### Bestanden die wijzigen
-
-| Bestand | Wijziging |
-|---|---|
-| `src/pages/RouteOptimization.tsx` | Opslaan-knop fixen of disablen |
-| `src/pages/enterprise/Rosters.tsx` | Nep-knop verwijderen |
-| `src/pages/enterprise/Constraints.tsx` | Nep-knop verwijderen |
-| `src/components/portal/b2c/B2CBookingWizard.tsx` | DEMO_CUSTOMER_ID verwijderen |
-| `src/pages/portal/B2CAccount.tsx` | `/demo` → `/auth` |
-| `src/components/customer-portal/PortalLayout.tsx` | `/demo` → `/auth` |
-| `src/components/customer-portal/ImperialLayout.tsx` | `/demo` → `/auth` |
-| `src/pages/DriverAvailableShifts.tsx` | `/demo` → `/auth` |
-| `src/pages/enterprise/SystemHealth.tsx` | Demo data verwijderen |
-| `src/pages/enterprise/PolicyCenter.tsx` | Demo data verwijderen |
-| `src/pages/crm/RFQInbox.tsx` | "(demo)" uit toast |
-| `src/pages/Auth.tsx` | Demo login flow + console.logs verwijderen |
-| `src/components/dispatch/AIAutoDispatchPanel.tsx` | Lege catch fixen |
-| `src/components/orders/OrderMobileCard.tsx` | Lege catches fixen |
-| `src/pages/Invoices.tsx` | window.print() fallback vervangen |
-| `src/pages/InvoiceDetail.tsx` | window.print() fallback vervangen |
-| `src/hooks/useDriverPortalData.ts` | Stub-functies implementeren |
+## Impact
+- AI geeft **concrete antwoorden** met echte data uit de database
+- Gebruiker kan orders zoeken, KPI's opvragen, chauffeurs checken — allemaal via chat
+- Orders aanmaken via natuurlijke taal met bevestigingsstap
+- Streaming voor vloeiende, professionele UX
+- Memory voor gepersonaliseerde ervaring over sessies heen
 
