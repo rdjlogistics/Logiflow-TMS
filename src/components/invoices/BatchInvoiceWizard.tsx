@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { berekenBTW } from "@/lib/btw-calculator";
+import { useCompany } from "@/hooks/useCompany";
 import {
   startOfDay,
   endOfDay,
