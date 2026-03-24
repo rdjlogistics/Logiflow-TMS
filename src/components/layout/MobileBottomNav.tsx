@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Home, FileText, Plus, Bell, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
@@ -22,11 +22,9 @@ const tabs: NavTab[] = [
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  // Meldingen: only active when ?tab=notificaties is present
   if (pathname === "/admin/settings" && search.includes("tab=notificaties")) {
     return "meldingen";
   }
-  // Instellingen: /admin/settings without notificaties tab
   if (pathname.startsWith("/admin/settings")) {
     return "instellingen";
   }
@@ -47,125 +45,78 @@ export function MobileBottomNav() {
       role="navigation"
       aria-label="Hoofdnavigatie"
     >
-      {/* Gradient accent line */}
-      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-      {/* Glass bar */}
-      <div className="bg-background/60 backdrop-blur-3xl border-t border-border/20">
-        <div className="grid grid-cols-5 gap-0 px-1 py-1.5">
+      {/* Liquid Glass Bar */}
+      <div
+        className="bg-background/40 backdrop-blur-2xl border-t border-white/[0.08]"
+        style={{ backdropFilter: "blur(40px) saturate(180%)", WebkitBackdropFilter: "blur(40px) saturate(180%)" }}
+      >
+        <div className="grid grid-cols-5 gap-0 px-1 py-2">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
-
-            if (tab.isCta) {
-              return (
-                <div key={tab.id} className="flex items-center justify-center">
-                  <motion.button
-                    onClick={() => {
-                      haptic("medium");
-                      navigate(tab.path);
-                    }}
-                    whileTap={{ scale: 0.85 }}
-                    className="relative flex flex-col items-center justify-center touch-manipulation select-none"
-                    aria-label={tab.label}
-                  >
-                    {/* Pulse ring */}
-                    <motion.div
-                      className="absolute w-14 h-14 rounded-2xl border border-primary/30"
-                      animate={{
-                        scale: [1, 1.15, 1],
-                        opacity: [0.5, 0, 0.5],
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    />
-                    {/* Orb */}
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center -mt-3">
-                      <Plus className="h-6 w-6" strokeWidth={2.5} />
-                    </div>
-                    <span className="text-[10px] font-bold mt-0.5 text-primary">
-                      Nieuw
-                    </span>
-                  </motion.button>
-                </div>
-              );
-            }
 
             return (
               <motion.button
                 key={tab.id}
                 onClick={() => {
-                  haptic("selection");
+                  haptic(tab.isCta ? "medium" : "selection");
                   navigate(tab.path + (tab.search || ""));
                 }}
-                whileTap={{ scale: 0.85 }}
-                className={cn(
-                  "relative flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-colors min-w-0 touch-manipulation select-none"
-                )}
+                whileTap={{ scale: 0.92 }}
+                className="relative flex flex-col items-center justify-center py-1 px-1 min-w-0 min-h-[44px] touch-manipulation select-none"
                 aria-label={tab.label}
                 aria-current={isActive ? "page" : undefined}
               >
-                {/* Active pill background */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-pill"
-                      className="absolute inset-0 rounded-2xl bg-primary/8"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                    />
-                  )}
-                </AnimatePresence>
+                {/* Active top-line indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute -top-2 w-5 h-[2px] rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                  />
+                )}
 
-                <div className="relative z-10 flex flex-col items-center">
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
-                      isActive && "text-primary"
-                    )}
-                  >
+                <div className="flex flex-col items-center gap-0.5">
+                  {tab.isCta ? (
+                    <div className={cn(
+                      "w-11 h-11 rounded-full flex items-center justify-center",
+                      "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/20"
+                    )}>
+                      <motion.div
+                        animate={isActive ? { scale: 1.08 } : { scale: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      >
+                        <Plus className="h-5 w-5 text-primary-foreground" strokeWidth={2.2} />
+                      </motion.div>
+                    </div>
+                  ) : (
                     <motion.div
-                      animate={isActive ? { scale: 1.12 } : { scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      animate={isActive ? { scale: 1.08 } : { scale: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      className="w-10 h-10 flex items-center justify-center"
                     >
                       <tab.icon
                         className={cn(
                           "h-[22px] w-[22px] transition-colors duration-200",
-                          isActive ? "text-primary" : "text-muted-foreground"
+                          isActive ? "text-primary" : "text-muted-foreground/70"
                         )}
-                        strokeWidth={isActive ? 2.2 : 1.8}
+                        strokeWidth={isActive ? 2.2 : 1.5}
                       />
                     </motion.div>
-                  </div>
-                  <span
-                    className={cn(
-                      "text-[10px] mt-0 truncate transition-colors duration-200",
-                      isActive
-                        ? "font-bold text-primary"
-                        : "font-medium text-muted-foreground"
-                    )}
-                  >
-                    {tab.label}
-                  </span>
-                </div>
-
-                {/* Active dot */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-dot"
-                      className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-primary shadow-sm shadow-primary/50"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                    />
                   )}
-                </AnimatePresence>
+
+                  {!tab.isCta && (
+                    <span
+                      className={cn(
+                        "text-[11px] leading-none truncate transition-colors duration-200",
+                        isActive
+                          ? "font-semibold text-primary"
+                          : "font-normal text-muted-foreground/60"
+                      )}
+                    >
+                      {tab.label}
+                    </span>
+                  )}
+                </div>
               </motion.button>
             );
           })}
