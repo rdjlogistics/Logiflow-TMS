@@ -125,8 +125,7 @@ const Auth = () => {
 
       // Clear stored auth tokens + cookies (surgical, keeps SW alive)
       await clearAuthCachesOnly();
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
+
 
       toast({
         title: "Sessie gereset",
