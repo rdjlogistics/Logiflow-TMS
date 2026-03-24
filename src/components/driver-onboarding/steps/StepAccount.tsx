@@ -62,7 +62,7 @@ export const StepAccount = () => {
           const { ensureProfileAfterSignup } = await import('@/lib/ensureProfileAfterSignup');
           await ensureProfileAfterSignup(authData.user.id, data.email, data.name, { skipAdminRole: true });
         } catch (e) {
-          console.error('[StepAccount] ensureProfileAfterSignup failed:', e);
+          logger.error('[StepAccount] ensureProfileAfterSignup failed:', e);
         }
 
         // Create driver record linked to the auth user
