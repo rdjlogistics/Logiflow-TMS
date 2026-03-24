@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { clearAuthStorage, clearServiceWorkerAndCaches } from '@/lib/authStorage';
+import { clearAuthCachesOnly } from '@/lib/authStorage';
 import { FloatingTruckMini } from '@/components/driver/FloatingTruckMini';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
