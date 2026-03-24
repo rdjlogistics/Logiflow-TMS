@@ -1,25 +1,28 @@
 
 
-# Plan: Intelligent Model Routing in Copilot
+# Plan: iOS 26 Bottom Nav — Consistente Blue Vibes + Active Indicator Onderaan
 
-## Wat
-De copilot gebruikt nu altijd `google/gemini-3-flash-preview`. We voegen intelligent routing toe: simpele vragen gaan naar het goedkopere/snellere `google/gemini-2.5-flash-lite`, complexe vragen blijven op `gemini-3-flash-preview`.
+## Problemen
+1. **Kleur verandert** bij navigatie — de `bg-background/40` pakt de achtergrondkleur van de pagina op, waardoor de balk er anders uitziet per route
+2. **Active indicator staat bovenaan** (top-line) — moet **onderaan** de balk voor een clean iOS 26 look, zoals in de screenshot
+3. **Active state styling inconsistent** — bij Instellingen zie je een mooie rounded box, maar bij Home/Orders niet
 
-## Hoe
+## Oplossing
 
-**Bestand:** `supabase/functions/copilot/index.ts`
+**Bestand:** `src/components/layout/MobileBottomNav.tsx`
 
-De `detectComplexity` functie bestaat al en retourneert `"none"`, `"low"`, of `"medium"`. We gebruiken dit om het model te kiezen:
+### Wijzigingen:
+1. **Vaste blauwe achtergrond** — Vervang `bg-background/40` met een solide deep-blue gradient die consistent blijft ongeacht de pagina: `bg-[hsl(228,60%,12%)]/95 backdrop-blur-2xl`
+2. **Active indicator naar onder** — Verplaats de `layoutId="tab-indicator"` div van `-top-2` naar `bottom` positie, als een subtiele lijn onder het actieve item
+3. **Active state = rounded box** — Net als Instellingen in de screenshot: actief item krijgt een `rounded-xl bg-primary/15 border border-primary/20` container rondom icon + label
+4. **Consistente icon kleuren** — Alle icons in dezelfde blauwe tint (`text-blue-300/70` inactive, `text-white` active) voor die iOS 26 vibe
+5. **CTA knop** — + knop behoudt gradient maar past in de blauwe toon
 
-| Complexity | Model | Reden |
-|---|---|---|
-| `none` / `low` | `google/gemini-2.5-flash-lite` | Simpele vragen: status checks, lijsten, zoeken |
-| `medium` | `google/gemini-3-flash-preview` | Analyse, vergelijkingen, advies, briefings |
+### Visueel resultaat:
+- Vaste diep-blauwe balk die nooit van kleur verandert
+- Actief item heeft rounded box highlight (zoals screenshot bij Instellingen)
+- Subtiele glow-lijn **onder** het actieve item
+- Alles synchroon blauw — iOS 26 Liquid Glass vibes
 
-Wijzigingen:
-1. Model selectie op basis van `complexity` — één helper variabele `model` toevoegen
-2. Beide `fetch` calls (tool-loop + streaming) gebruiken de dynamische `model` variabele
-3. Credit deduction logt het juiste model naam
-
-Geen frontend wijzigingen nodig. Alleen de edge function + deploy.
+Één bestand, geen backend wijzigingen.
 
