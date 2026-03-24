@@ -433,9 +433,26 @@ const AdminSettings = () => {
     }
   };
 
-  const removeLogo = () => {
+  const removeLogo = async () => {
     if (!settings) return;
-    setSettings({ ...settings, company_logo_url: null });
+    try {
+      const { error } = await supabase
+        .from('tenant_settings')
+        .update({ company_logo_url: null } as any)
+        .eq('id', settings.id);
+      if (error) throw error;
+      if (settings.company_id) {
+        await supabase
+          .from('companies')
+          .update({ logo_url: null } as any)
+          .eq('id', settings.company_id);
+      }
+      setSettings({ ...settings, company_logo_url: null });
+      toast({ title: 'Logo verwijderd', description: 'Het logo is verwijderd.' });
+    } catch (error) {
+      console.error('Error removing logo:', error);
+      toast({ title: 'Fout', description: 'Kon logo niet verwijderen.', variant: 'destructive' });
+    }
   };
 
   const addEmailRecipient = () => {

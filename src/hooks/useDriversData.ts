@@ -44,13 +44,17 @@ export function useDriversData(filters: DriverFilters = {}) {
 export function useDriverStats() {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof fetchDriverStats>> | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchDriverStats()
       .then(setStats)
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        toast({ title: 'Statistieken laden mislukt', description: err instanceof Error ? err.message : 'Onbekende fout', variant: 'destructive' });
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { stats, loading };
 }

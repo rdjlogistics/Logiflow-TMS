@@ -7,131 +7,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { 
-  Plus, 
-  Euro, 
-  FileText, 
-  Calculator, 
-  TrendingUp,
-  Upload,
-  Download,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Edit,
-  Copy
+  Plus, Euro, FileText, Calculator, TrendingUp,
+  Download, Search, Filter, MoreHorizontal, Edit, Copy, Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { FuelIndexUpdateDialog } from "@/components/rates/FuelIndexUpdateDialog";
-
-// Mock data for rate cards
-const mockRateCards = [
-  {
-    id: "1",
-    name: "Standard NL",
-    customer: "Algemeen",
-    validFrom: "2024-01-01",
-    validTo: "2024-12-31",
-    status: "active",
-    lanes: 24,
-    currency: "EUR"
-  },
-  {
-    id: "2",
-    name: "Premium DE-NL",
-    customer: "DHL Express",
-    validFrom: "2024-03-01",
-    validTo: "2024-08-31",
-    status: "active",
-    lanes: 12,
-    currency: "EUR"
-  },
-  {
-    id: "3",
-    name: "Economy BE",
-    customer: "PostNL",
-    validFrom: "2024-01-01",
-    validTo: "2024-06-30",
-    status: "expired",
-    lanes: 8,
-    currency: "EUR"
-  }
-];
-
-const mockLaneRates = [
-  {
-    id: "1",
-    origin: "Amsterdam",
-    destination: "Rotterdam",
-    distance: 78,
-    baseRate: 125.00,
-    perKm: 1.15,
-    minCharge: 85.00,
-    fuelSurcharge: 12,
-  },
-  {
-    id: "2",
-    origin: "Utrecht",
-    destination: "Eindhoven",
-    distance: 92,
-    baseRate: 145.00,
-    perKm: 1.20,
-    minCharge: 95.00,
-    fuelSurcharge: 12,
-  },
-  {
-    id: "3",
-    origin: "Den Haag",
-    destination: "Maastricht",
-    distance: 210,
-    baseRate: 285.00,
-    perKm: 1.10,
-    minCharge: 150.00,
-    fuelSurcharge: 15,
-  }
-];
+import { useRateContractEngine, type RateContract } from "@/hooks/useRateContractEngine";
+import { FeatureGate } from "@/components/subscription/FeatureGate";
 
 const RateManagement = () => {
   const { toast } = useToast();
+  const {
+    contracts, contractsLoading,
+    accessorials, surchargeRules,
+    createContract, updateContract, updateContractStatus,
+  } = useRateContractEngine();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [editLaneDialogOpen, setEditLaneDialogOpen] = useState(false);
-  const [selectedLane, setSelectedLane] = useState<typeof mockLaneRates[0] | null>(null);
   const [editRateCardDialogOpen, setEditRateCardDialogOpen] = useState(false);
-  const [selectedRateCard, setSelectedRateCard] = useState<typeof mockRateCards[0] | null>(null);
+  const [selectedRateCard, setSelectedRateCard] = useState<RateContract | null>(null);
   const [fuelIndexDialogOpen, setFuelIndexDialogOpen] = useState(false);
-  const [newRateCard, setNewRateCard] = useState({
-    name: '',
-    customer: '',
-    validFrom: '',
-    validTo: '',
-    currency: 'EUR'
-  });
+
+  // New rate card form state
+  const [newName, setNewName] = useState('');
+  const [newValidFrom, setNewValidFrom] = useState('');
+  const [newValidTo, setNewValidTo] = useState('');
+  const [newCurrency, setNewCurrency] = useState('EUR');
+
+  // Edit form state
+  const [editName, setEditName] = useState('');
+  const [editValidFrom, setEditValidFrom] = useState('');
+  const [editValidTo, setEditValidTo] = useState('');
+  const [editStatus, setEditStatus] = useState('');
   
   // Calculator state
   const [calcOrigin, setCalcOrigin] = useState("");
@@ -139,42 +59,58 @@ const RateManagement = () => {
   const [calcDistance, setCalcDistance] = useState("");
   const [calcWeight, setCalcWeight] = useState("");
   const [calcResult, setCalcResult] = useState({
-    baseRate: 0,
-    kmRate: 0,
-    fuelSurcharge: 0,
-    total: 0
+    baseRate: 0, kmRate: 0, fuelSurcharge: 0, total: 0
   });
 
   const handleCreateRateCard = () => {
-    if (!newRateCard.name) {
-      toast({
-        title: "Vul een naam in",
-        variant: "destructive"
-      });
+    if (!newName) {
+      toast({ title: "Vul een naam in", variant: "destructive" });
       return;
     }
-    toast({
-      title: "Tariefkaart aangemaakt",
-      description: `${newRateCard.name} is succesvol opgeslagen.`,
+    createContract.mutate({
+      name: newName,
+      contract_type: 'customer',
+      counterparty_id: '',
+      effective_from: newValidFrom || new Date().toISOString(),
+      effective_to: newValidTo || null,
+      currency: newCurrency,
+    }, {
+      onSuccess: () => {
+        setNewName(''); setNewValidFrom(''); setNewValidTo(''); setNewCurrency('EUR');
+        setIsAddDialogOpen(false);
+      }
     });
-    setNewRateCard({ name: '', customer: '', validFrom: '', validTo: '', currency: 'EUR' });
-    setIsAddDialogOpen(false);
+  };
+
+  const handleEditRateCard = (card: RateContract) => {
+    setSelectedRateCard(card);
+    setEditName(card.name);
+    setEditValidFrom(card.effective_from?.split('T')[0] || '');
+    setEditValidTo(card.effective_to?.split('T')[0] || '');
+    setEditStatus(card.status);
+    setEditRateCardDialogOpen(true);
+  };
+
+  const handleSaveRateCard = () => {
+    if (!selectedRateCard) return;
+    updateContract.mutate({
+      id: selectedRateCard.id,
+      name: editName,
+      effective_from: editValidFrom,
+      effective_to: editValidTo || null,
+      status: editStatus as RateContract['status'],
+    }, {
+      onSuccess: () => {
+        setEditRateCardDialogOpen(false);
+        setSelectedRateCard(null);
+      }
+    });
   };
 
   const handleExport = () => {
-    const csvContent = `Tariefkaarten Export
-    
-Naam,Klant,Geldig vanaf,Geldig tot,Lanes,Status
-${mockRateCards.map(card => 
-  `${card.name},${card.customer},${card.validFrom},${card.validTo},${card.lanes},${card.status}`
-).join('\n')}
-
-Lane Tarieven:
-Origine,Bestemming,Afstand,Basistarief,Per km,Min. bedrag,Brandstof %
-${mockLaneRates.map(lane => 
-  `${lane.origin},${lane.destination},${lane.distance},€${lane.baseRate},€${lane.perKm},€${lane.minCharge},${lane.fuelSurcharge}%`
-).join('\n')}
-`;
+    const csvContent = `Tariefkaarten Export\n\nNaam,Type,Status,Geldig vanaf,Geldig tot,Valuta\n${filteredContracts.map(c => 
+      `${c.name},${c.contract_type},${c.status},${c.effective_from},${c.effective_to || ''},${c.currency}`
+    ).join('\n')}`;
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -183,87 +119,26 @@ ${mockLaneRates.map(lane =>
     a.download = `tarieven-export.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Export voltooid",
-      description: "Tarieven export is succesvol gedownload.",
-    });
-  };
-
-  const handleFilter = () => {
-    setIsFilterOpen(!isFilterOpen);
-  };
-
-  const handleEditLane = (laneId: string) => {
-    const lane = mockLaneRates.find(l => l.id === laneId);
-    if (lane) {
-      setSelectedLane(lane);
-      setEditLaneDialogOpen(true);
-    }
-  };
-
-  const handleCopyLane = (lane: typeof mockLaneRates[0]) => {
-    const laneText = `${lane.origin} → ${lane.destination}: €${lane.baseRate} + €${lane.perKm}/km`;
-    navigator.clipboard.writeText(laneText);
-    toast({
-      title: "Lane gekopieerd",
-      description: `${lane.origin} → ${lane.destination} is gekopieerd naar klembord.`,
-    });
-  };
-
-  const handleEditRateCard = (cardId: string) => {
-    const card = mockRateCards.find(c => c.id === cardId);
-    if (card) {
-      setSelectedRateCard(card);
-      setEditRateCardDialogOpen(true);
-    }
-  };
-
-  const handleSaveLane = () => {
-    toast({
-      title: "Lane opgeslagen",
-      description: `${selectedLane?.origin} → ${selectedLane?.destination} is bijgewerkt.`,
-    });
-    setEditLaneDialogOpen(false);
-    setSelectedLane(null);
-  };
-
-  const handleSaveRateCard = () => {
-    toast({
-      title: "Tariefkaart opgeslagen",
-      description: `${selectedRateCard?.name} is bijgewerkt.`,
-    });
-    setEditRateCardDialogOpen(false);
-    setSelectedRateCard(null);
+    toast({ title: "Export voltooid", description: "Tarieven export is succesvol gedownload." });
   };
 
   const handleCalculate = () => {
     const distance = parseFloat(calcDistance) || 0;
-    const baseRate = 85; // Minimum charge
-    const perKm = 1.18; // Average per km rate
+    const baseRate = 85;
+    const perKm = 1.18;
     const fuelSurchargePercent = 12.5;
-    
     const kmRate = distance * perKm;
     const subtotal = Math.max(baseRate, kmRate);
     const fuelSurcharge = subtotal * (fuelSurchargePercent / 100);
     const total = subtotal + fuelSurcharge;
-    
-    setCalcResult({
-      baseRate: baseRate,
-      kmRate: kmRate,
-      fuelSurcharge: fuelSurcharge,
-      total: total
-    });
-    
-    toast({
-      title: "Berekening voltooid",
-      description: `Geschat tarief: €${total.toFixed(2)}`,
-    });
+    setCalcResult({ baseRate, kmRate, fuelSurcharge, total });
+    toast({ title: "Berekening voltooid", description: `Geschat tarief: €${total.toFixed(2)}` });
   };
 
-  const filteredRateCards = mockRateCards.filter(card => {
-    const matchesSearch = card.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      card.customer.toLowerCase().includes(searchQuery.toLowerCase());
+  const activeContracts = contracts.filter(c => c.status === 'active');
+
+  const filteredContracts = contracts.filter(card => {
+    const matchesSearch = card.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || card.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -273,39 +148,40 @@ ${mockLaneRates.map(lane =>
       title="Tariefbeheer" 
       description="Beheer tariefkaarten, lane rates en prijscalculaties"
     >
+      <FeatureGate feature="rate_contracts">
       <div className="space-y-6">
         {/* Stats Overview */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Actieve Tariefkaarten</CardTitle>
+              <CardTitle className="text-sm font-medium">Actieve Contracten</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">+2 deze maand</p>
+              <div className="text-2xl font-bold">{activeContracts.length}</div>
+              <p className="text-xs text-muted-foreground">Totaal: {contracts.length}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Gemiddeld Tarief</CardTitle>
+              <CardTitle className="text-sm font-medium">Toeslagen</CardTitle>
               <Euro className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">€1.18/km</div>
-              <p className="text-xs text-muted-foreground">+5% vs vorig kwartaal</p>
+              <div className="text-2xl font-bold">{accessorials.length}</div>
+              <p className="text-xs text-muted-foreground">Geconfigureerd</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Lane Routes</CardTitle>
+              <CardTitle className="text-sm font-medium">Surcharge Regels</CardTitle>
               <Calculator className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">156</div>
-              <p className="text-xs text-muted-foreground">Actieve routes</p>
+              <div className="text-2xl font-bold">{surchargeRules.length}</div>
+              <p className="text-xs text-muted-foreground">Actieve regels</p>
             </CardContent>
           </Card>
 
@@ -326,7 +202,6 @@ ${mockLaneRates.map(lane =>
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <TabsList>
               <TabsTrigger value="rate-cards">Tariefkaarten</TabsTrigger>
-              <TabsTrigger value="lane-rates">Lane Tarieven</TabsTrigger>
               <TabsTrigger value="calculator">Calculator</TabsTrigger>
               <TabsTrigger value="surcharges">Toeslagen</TabsTrigger>
             </TabsList>
@@ -341,7 +216,7 @@ ${mockLaneRates.map(lane =>
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button variant="outline" size="icon" onClick={handleFilter} className={isFilterOpen ? "bg-accent" : ""}>
+              <Button variant="outline" size="icon" onClick={() => setIsFilterOpen(!isFilterOpen)} className={isFilterOpen ? "bg-accent" : ""}>
                 <Filter className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="icon" onClick={handleExport}>
@@ -351,47 +226,34 @@ ${mockLaneRates.map(lane =>
                 <DialogTrigger asChild>
                   <Button>
                     <Plus className="h-4 w-4 mr-2" />
-                    Nieuwe Tariefkaart
+                    Nieuw Contract
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle>Nieuwe Tariefkaart</DialogTitle>
+                    <DialogTitle>Nieuw Tariefcontract</DialogTitle>
                     <DialogDescription>
-                      Maak een nieuwe tariefkaart aan voor een klant of algemeen gebruik.
+                      Maak een nieuw tariefcontract aan.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
                       <Label htmlFor="name">Naam</Label>
-                      <Input id="name" placeholder="bijv. Standard NL 2024" />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="customer">Klant</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer klant" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="general">Algemeen</SelectItem>
-                          <SelectItem value="dhl">DHL Express</SelectItem>
-                          <SelectItem value="postnl">PostNL</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input id="name" placeholder="bijv. Standard NL 2024" value={newName} onChange={e => setNewName(e.target.value)} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="validFrom">Geldig vanaf</Label>
-                        <Input id="validFrom" type="date" />
+                        <Input id="validFrom" type="date" value={newValidFrom} onChange={e => setNewValidFrom(e.target.value)} />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="validTo">Geldig tot</Label>
-                        <Input id="validTo" type="date" />
+                        <Input id="validTo" type="date" value={newValidTo} onChange={e => setNewValidTo(e.target.value)} />
                       </div>
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="currency">Valuta</Label>
-                      <Select defaultValue="EUR">
+                      <Select value={newCurrency} onValueChange={setNewCurrency}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -404,10 +266,11 @@ ${mockLaneRates.map(lane =>
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                      Annuleren
+                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Annuleren</Button>
+                    <Button onClick={handleCreateRateCard} disabled={createContract.isPending}>
+                      {createContract.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      Aanmaken
                     </Button>
-                    <Button onClick={handleCreateRateCard}>Aanmaken</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -415,100 +278,88 @@ ${mockLaneRates.map(lane =>
           </div>
 
           <TabsContent value="rate-cards" className="space-y-4">
+            {isFilterOpen && (
+              <Card>
+                <CardContent className="pt-4">
+                  <div className="flex gap-4 items-center">
+                    <Label>Status:</Label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle</SelectItem>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="draft">Concept</SelectItem>
+                        <SelectItem value="expired">Verlopen</SelectItem>
+                        <SelectItem value="archived">Gearchiveerd</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             <Card>
               <CardHeader>
-                <CardTitle>Tariefkaarten Overzicht</CardTitle>
+                <CardTitle>Tariefcontracten</CardTitle>
                 <CardDescription>
-                  Beheer alle tariefkaarten en hun geldigheid
+                  Beheer alle tariefcontracten en hun geldigheid
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {contractsLoading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Naam</TableHead>
-                      <TableHead>Klant</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Geldig vanaf</TableHead>
                       <TableHead>Geldig tot</TableHead>
-                      <TableHead>Lanes</TableHead>
+                      <TableHead>Valuta</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRateCards.map((card) => (
+                    {filteredContracts.map((card) => (
                       <TableRow key={card.id}>
                         <TableCell className="font-medium">{card.name}</TableCell>
-                        <TableCell>{card.customer}</TableCell>
-                        <TableCell>{card.validFrom}</TableCell>
-                        <TableCell>{card.validTo}</TableCell>
-                        <TableCell>{card.lanes}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {card.contract_type === 'customer' ? 'Klant' : 'Vervoerder'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{card.effective_from?.split('T')[0]}</TableCell>
+                        <TableCell>{card.effective_to?.split('T')[0] || '—'}</TableCell>
+                        <TableCell>{card.currency}</TableCell>
                         <TableCell>
                           <Badge 
                             variant={card.status === "active" ? "default" : "secondary"}
                           >
-                            {card.status === "active" ? "Actief" : "Verlopen"}
+                            {card.status === "active" ? "Actief" : card.status === "draft" ? "Concept" : card.status === "expired" ? "Verlopen" : card.status}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="icon" onClick={() => handleEditRateCard(card.id)}>
+                          <Button variant="ghost" size="icon" onClick={() => handleEditRateCard(card)}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
                     ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="lane-rates" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Lane Tarieven</CardTitle>
-                <CardDescription>
-                  Route-specifieke tarieven en prijzen per kilometer
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Origine</TableHead>
-                      <TableHead>Bestemming</TableHead>
-                      <TableHead>Afstand (km)</TableHead>
-                      <TableHead>Basistarief</TableHead>
-                      <TableHead>Per km</TableHead>
-                      <TableHead>Min. bedrag</TableHead>
-                      <TableHead>Brandstof %</TableHead>
-                      <TableHead className="w-[100px]">Acties</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockLaneRates.map((lane) => (
-                      <TableRow key={lane.id}>
-                        <TableCell className="font-medium">{lane.origin}</TableCell>
-                        <TableCell>{lane.destination}</TableCell>
-                        <TableCell>{lane.distance}</TableCell>
-                        <TableCell>€{lane.baseRate.toFixed(2)}</TableCell>
-                        <TableCell>€{lane.perKm.toFixed(2)}</TableCell>
-                        <TableCell>€{lane.minCharge.toFixed(2)}</TableCell>
-                        <TableCell>{lane.fuelSurcharge}%</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleEditLane(lane.id)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleCopyLane(lane)}>
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </div>
+                    {filteredContracts.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                          Geen contracten gevonden
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -517,53 +368,32 @@ ${mockLaneRates.map(lane =>
             <Card>
               <CardHeader>
                 <CardTitle>Tarief Calculator</CardTitle>
-                <CardDescription>
-                  Bereken snel een prijs voor een specifieke route
-                </CardDescription>
+                <CardDescription>Bereken snel een prijs voor een specifieke route</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="grid gap-2">
                       <Label>Origine</Label>
-                      <Input 
-                        placeholder="bijv. Amsterdam" 
-                        value={calcOrigin}
-                        onChange={(e) => setCalcOrigin(e.target.value)}
-                      />
+                      <Input placeholder="bijv. Amsterdam" value={calcOrigin} onChange={(e) => setCalcOrigin(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Bestemming</Label>
-                      <Input 
-                        placeholder="bijv. Rotterdam" 
-                        value={calcDestination}
-                        onChange={(e) => setCalcDestination(e.target.value)}
-                      />
+                      <Input placeholder="bijv. Rotterdam" value={calcDestination} onChange={(e) => setCalcDestination(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Afstand (km)</Label>
-                      <Input 
-                        type="number" 
-                        placeholder="0" 
-                        value={calcDistance}
-                        onChange={(e) => setCalcDistance(e.target.value)}
-                      />
+                      <Input type="number" placeholder="0" value={calcDistance} onChange={(e) => setCalcDistance(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Gewicht (kg)</Label>
-                      <Input 
-                        type="number" 
-                        placeholder="0" 
-                        value={calcWeight}
-                        onChange={(e) => setCalcWeight(e.target.value)}
-                      />
+                      <Input type="number" placeholder="0" value={calcWeight} onChange={(e) => setCalcWeight(e.target.value)} />
                     </div>
                     <Button className="w-full" onClick={handleCalculate}>
                       <Calculator className="h-4 w-4 mr-2" />
                       Bereken Tarief
                     </Button>
                   </div>
-                  
                   <div className="bg-muted/50 rounded-lg p-6">
                     <h4 className="font-semibold mb-4">Resultaat</h4>
                     <div className="space-y-3">
@@ -595,9 +425,7 @@ ${mockLaneRates.map(lane =>
             <Card>
               <CardHeader>
                 <CardTitle>Toeslagen Configuratie</CardTitle>
-                <CardDescription>
-                  Beheer brandstoftoeslagen, seizoenstoeslagen en andere extra kosten
-                </CardDescription>
+                <CardDescription>Beheer brandstoftoeslagen, seizoenstoeslagen en andere extra kosten</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -612,30 +440,21 @@ ${mockLaneRates.map(lane =>
                       <Input type="number" defaultValue="1.45" step="0.01" />
                     </div>
                     <Button variant="outline" className="w-full" onClick={() => setFuelIndexDialogOpen(true)}>
-                      <Upload className="h-4 w-4 mr-2" />
                       Index bijwerken
                     </Button>
                   </div>
-                  
                   <div className="space-y-4">
-                    <h4 className="font-semibold">Andere Toeslagen</h4>
+                    <h4 className="font-semibold">Geconfigureerde Toeslagen ({accessorials.length})</h4>
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <span>Weekendtoeslag</span>
-                        <Badge>25%</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <span>Avondlevering (na 18:00)</span>
-                        <Badge>15%</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <span>ADR Toeslag</span>
-                        <Badge>€45.00</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <span>Lift vereist</span>
-                        <Badge>€35.00</Badge>
-                      </div>
+                      {accessorials.slice(0, 5).map(acc => (
+                        <div key={acc.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                          <span>{acc.name}</span>
+                          <Badge>{acc.calc_type === 'fixed' ? `€${acc.amount}` : acc.calc_type === 'percent' ? `${acc.amount}%` : `€${acc.amount}/${acc.calc_type.replace('per_', '')}`}</Badge>
+                        </div>
+                      ))}
+                      {accessorials.length === 0 && (
+                        <p className="text-sm text-muted-foreground">Geen toeslagen geconfigureerd</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -644,108 +463,54 @@ ${mockLaneRates.map(lane =>
           </TabsContent>
         </Tabs>
 
-        {/* Edit Lane Dialog */}
-        <Dialog open={editLaneDialogOpen} onOpenChange={setEditLaneDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Lane Bewerken</DialogTitle>
-              <DialogDescription>
-                {selectedLane?.origin} → {selectedLane?.destination}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Origine</Label>
-                  <Input defaultValue={selectedLane?.origin} />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Bestemming</Label>
-                  <Input defaultValue={selectedLane?.destination} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Basistarief (€)</Label>
-                  <Input type="number" step="0.01" defaultValue={selectedLane?.baseRate} />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Per km (€)</Label>
-                  <Input type="number" step="0.01" defaultValue={selectedLane?.perKm} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Minimum bedrag (€)</Label>
-                  <Input type="number" step="0.01" defaultValue={selectedLane?.minCharge} />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Brandstoftoeslag (%)</Label>
-                  <Input type="number" step="0.1" defaultValue={selectedLane?.fuelSurcharge} />
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setEditLaneDialogOpen(false)}>Annuleren</Button>
-              <Button onClick={handleSaveLane}>Opslaan</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
         {/* Edit Rate Card Dialog */}
         <Dialog open={editRateCardDialogOpen} onOpenChange={setEditRateCardDialogOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Tariefkaart Bewerken</DialogTitle>
-              <DialogDescription>
-                {selectedRateCard?.name}
-              </DialogDescription>
+              <DialogTitle>Contract Bewerken</DialogTitle>
+              <DialogDescription>{selectedRateCard?.name}</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label>Naam</Label>
-                <Input defaultValue={selectedRateCard?.name} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Klant</Label>
-                <Input defaultValue={selectedRateCard?.customer} />
+                <Input value={editName} onChange={e => setEditName(e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Geldig vanaf</Label>
-                  <Input type="date" defaultValue={selectedRateCard?.validFrom} />
+                  <Input type="date" value={editValidFrom} onChange={e => setEditValidFrom(e.target.value)} />
                 </div>
                 <div className="grid gap-2">
                   <Label>Geldig tot</Label>
-                  <Input type="date" defaultValue={selectedRateCard?.validTo} />
+                  <Input type="date" value={editValidTo} onChange={e => setEditValidTo(e.target.value)} />
                 </div>
               </div>
               <div className="grid gap-2">
                 <Label>Status</Label>
-                <Select defaultValue={selectedRateCard?.status}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                <Select value={editStatus} onValueChange={setEditStatus}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="draft">Concept</SelectItem>
                     <SelectItem value="active">Actief</SelectItem>
                     <SelectItem value="expired">Verlopen</SelectItem>
+                    <SelectItem value="archived">Gearchiveerd</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditRateCardDialogOpen(false)}>Annuleren</Button>
-              <Button onClick={handleSaveRateCard}>Opslaan</Button>
+              <Button onClick={handleSaveRateCard} disabled={updateContract.isPending}>
+                {updateContract.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Opslaan
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Fuel Index Update Dialog */}
-        <FuelIndexUpdateDialog
-          open={fuelIndexDialogOpen}
-          onOpenChange={setFuelIndexDialogOpen}
-        />
+        <FuelIndexUpdateDialog open={fuelIndexDialogOpen} onOpenChange={setFuelIndexDialogOpen} />
       </div>
+      </FeatureGate>
     </DashboardLayout>
   );
 };

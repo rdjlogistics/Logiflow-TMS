@@ -292,14 +292,11 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
   const handleBulkAction = async (action: 'activate' | 'deactivate') => {
     const ids = Array.from(selectedIds);
     try {
-      await Promise.all(ids.map(id =>
-        new Promise<void>((resolve, reject) => {
-          updateVehicle.mutate({ id, is_active: action === 'activate' }, {
-            onSuccess: () => resolve(),
-            onError: (e) => reject(e),
-          });
-        })
-      ));
+      const { error } = await supabase
+        .from('vehicles')
+        .update({ is_active: action === 'activate' })
+        .in('id', ids);
+      if (error) throw error;
       toast({ title: `${ids.length} voertuig(en) ${action === 'activate' ? 'geactiveerd' : 'gedeactiveerd'}` });
       setSelectedIds(new Set());
       setBulkConfirm({ open: false, action: null });
