@@ -1,52 +1,45 @@
 
 
-# Plan: Claims & POD Pagina — iOS 26 Redesign
+# Plan: Onafgemaakte Batches Vandaag — Fixes & Perfectie
 
-## Probleem
-1. De 6 stat cards bovenaan zijn niet klikbaar — ze doen niets bij aanraken
-2. Het design is ouderwets: gewone `Card` componenten, geen moderne iOS-stijl
-3. Op mobiel is de tabel onbruikbaar (horizontaal scrollen, kleine targets)
+## Analyse: Wat is er vandaag gedaan en wat mist er nog?
 
-## Oplossing
+### Batch 1: AI Upgrade (chatgpt + copilot) ✅ COMPLEET
+- Reasoning, 6 nieuwe tools, multi-step loop, expert prompt — alles correct geïmplementeerd
+- Geen problemen gevonden
 
-Volledige redesign van `src/pages/claims/ClaimsInbox.tsx` met iOS 26 / Elite Class esthetiek en klikbare stat cards die filteren.
+### Batch 2: Claims & POD iOS 26 Redesign ⚠️ PROBLEMEN GEVONDEN
 
-### 1. Klikbare Stat Cards als Filters
-Elke stat card wordt een klikbare filter-knop:
-- **Open** → filtert claims op `status: "open"`
-- **In behandeling** → `status: "in_review"`
-- **Wacht op info** → `status: "awaiting_info"`
-- **Afgehandeld** → `status: "approved"` + `"settled"` + `"rejected"`
-- **Geclaimd (€)** → toont alle claims gesorteerd op bedrag
-- **Goedgekeurd (€)** → filtert op `status: "approved"`
+**5 bugs/onvolledigheden:**
 
-Actieve card krijgt een visuele highlight (ring, scale, achtergrondkleur).
+1. **Dubbele Settlement optie**: Line 53-55 heeft twee keer "Charter" als label — `carrier` → "Charter" en `charter` → "Charter". Dit is verwarrend. Fix: `carrier` → "Vervoerder", `customer` → "Klant", `charter` → "Charter"
 
-### 2. iOS 26 Design Upgrade
-- Glassmorphism cards met `backdrop-blur-xl`, subtiele borders
-- Grotere touch targets (min 48px), afgeronde hoeken (2xl/3xl)
-- Framer Motion `whileTap={{ scale: 0.97 }}` op alle interactieve elementen
-- Spring-physics animaties bij tab-wisselingen en card-selectie
-- Clean typografie: grotere stat-nummers, subtielere labels
-- Stat cards in een compactere 3x2 grid op mobiel (i.p.v. 2x3 met grote gaps)
+2. **Claims missen order data**: De `usePODClaims` hook fetcht claims met `select("*")` maar de ClaimCard verwacht `claim.order_number` en `claim.customer`. Deze velden zitten NIET in de `claim_cases` tabel — ze moeten via een JOIN op `orders` en `customers` komen. **Hierdoor tonen alle claims "—" als ordernummer en "Onbekend" als klant.**
 
-### 3. Mobiele Kaartweergave
-Op mobiel: vervang de `<Table>` door kaart-items voor zowel Claims als POD:
-- Swipeable kaarten met status-badge, klant, bedrag
-- Tap om claim detail te openen (Sheet i.p.v. Dialog op mobiel)
-- Zoekbalk met glassmorphism styling
+3. **POD mist order data**: Zelfde probleem — `PODCard` verwacht `pod.order_number` en `pod.customer` maar de POD query fetcht alleen `select("*")` zonder JOIN.
 
-### 4. Business Logica Behouden
-Alle bestaande functionaliteit blijft:
-- Claim detail dialog met goedkeuren/afwijzen/doorsturen
-- POD bekijken/downloaden
-- Settlement sectie
-- Status updates naar database
-- Filter op status + zoeken
+4. **Ongebruikte imports**: `Card`, `CardContent`, `Euro` worden geïmporteerd maar niet gebruikt — cleanup nodig.
 
-## Bestand dat wijzigt
+5. **Geen loading state**: De pagina toont geen spinner/skeleton terwijl data laadt (`isLoading` wordt niet gebruikt in de component).
+
+## Concrete Fixes
+
+### 1. Fix `usePODClaims.ts` — JOINs toevoegen
+- Claims query: `select("*, orders(order_number, customers(company_name))")` zodat `claim.order?.order_number` en `claim.order?.customers?.company_name` beschikbaar zijn
+- PODs query: `select("*, orders:order_id(order_number, customers(company_name))")` zodat `pod.order?.order_number` beschikbaar is
+
+### 2. Fix `ClaimsInbox.tsx` — Data mapping + bugs
+- ClaimCard: map `claim.order?.order_number` i.p.v. `claim.order_number`, en `claim.order?.customers?.company_name` i.p.v. `claim.customer`
+- PODCard: zelfde mapping voor order_number en customer
+- Settlement: fix dubbele "Charter" labels
+- Voeg loading state toe (skeleton/spinner)
+- Verwijder ongebruikte imports
+- Voeg `age_days` berekening toe (nu undefined, wordt niet berekend)
+
+## Bestanden die wijzigen
 
 | Bestand | Wijziging |
 |---|---|
-| `src/pages/claims/ClaimsInbox.tsx` | Volledige UI redesign: klikbare stat cards, iOS 26 glassmorphism, mobiele kaartweergave, Framer Motion animaties. Alle business logica ongewijzigd. |
+| `src/hooks/usePODClaims.ts` | JOIN queries voor order_number + customer name bij claims en PODs |
+| `src/pages/claims/ClaimsInbox.tsx` | Fix data mapping, settlement labels, loading state, unused imports, age_days calc |
 
