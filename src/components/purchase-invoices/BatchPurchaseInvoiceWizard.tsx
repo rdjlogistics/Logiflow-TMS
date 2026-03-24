@@ -206,6 +206,8 @@ export const BatchPurchaseInvoiceWizard = () => {
 
         if (response.data?.invoices) {
           results.push(...response.data.invoices);
+        } else if (Array.isArray(response.data)) {
+          results.push(...response.data);
         }
       }
 
