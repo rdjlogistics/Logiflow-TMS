@@ -166,10 +166,6 @@ const AutomationSimulator = () => {
                         {auto.name} (v{auto.version})
                       </SelectItem>
                     ))}
-                    {/* Demo items */}
-                    <SelectItem value="demo-1">Auto-Invoice na Delivery (v3)</SelectItem>
-                    <SelectItem value="demo-2">Payment Reminder (v2)</SelectItem>
-                    <SelectItem value="demo-3">Payout bij Ontvangst (v1)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -37,21 +37,8 @@ interface PerformanceMetricsWidgetProps {
   loading?: boolean;
 }
 
-const defaultData: PerformanceData = {
-  otifRate: 94.5,
-  otifTrend: 2.3,
-  utilizationRate: 78,
-  utilizationTrend: -1.5,
-  onTimePickup: 96.2,
-  onTimeDelivery: 92.8,
-  avgDeliveryTime: 4.2,
-  avgDeliveryTrend: -0.3,
-  totalDeliveries: 1247,
-  successRate: 98.5,
-};
-
 const PerformanceMetricsWidget = ({ 
-  data = defaultData, 
+  data, 
   loading 
 }: PerformanceMetricsWidgetProps) => {
   const getTrendIcon = (trend: number) => {

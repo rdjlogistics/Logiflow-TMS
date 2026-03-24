@@ -38,16 +38,7 @@ interface TrendsWidgetProps {
   loading?: boolean;
 }
 
-const defaultData: TrendData[] = [
-  { period: 'Jan', revenue: 42000, costs: 28000, margin: 33, trips: 145 },
-  { period: 'Feb', revenue: 38500, costs: 25800, margin: 33, trips: 132 },
-  { period: 'Mar', revenue: 51200, costs: 33400, margin: 35, trips: 178 },
-  { period: 'Apr', revenue: 48700, costs: 31200, margin: 36, trips: 165 },
-  { period: 'Mei', revenue: 55300, costs: 34900, margin: 37, trips: 189 },
-  { period: 'Jun', revenue: 61800, costs: 38200, margin: 38, trips: 212 },
-];
-
-const TrendsWidget = ({ data = defaultData, loading }: TrendsWidgetProps) => {
+const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
   const totalRevenue = useMemo(() => data.reduce((sum, d) => sum + d.revenue, 0), [data]);
   const totalProfit = useMemo(() => data.reduce((sum, d) => sum + (d.revenue - d.costs), 0), [data]);
   const avgMargin = useMemo(() => {

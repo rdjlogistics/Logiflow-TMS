@@ -30,17 +30,8 @@ interface GeographicHeatmapWidgetProps {
   loading?: boolean;
 }
 
-const defaultRegions: RegionData[] = [
-  { id: 'nh', name: 'Noord-Holland', shortName: 'NH', trips: 342, revenue: 48500, trend: 12, topCities: ['Amsterdam', 'Haarlem', 'Zaandam'] },
-  { id: 'zh', name: 'Zuid-Holland', shortName: 'ZH', trips: 289, revenue: 41200, trend: 8, topCities: ['Rotterdam', 'Den Haag', 'Leiden'] },
-  { id: 'nb', name: 'Noord-Brabant', shortName: 'NB', trips: 198, revenue: 28400, trend: -3, topCities: ['Eindhoven', 'Tilburg', 'Breda'] },
-  { id: 'ge', name: 'Gelderland', shortName: 'GE', trips: 156, revenue: 22100, trend: 5, topCities: ['Arnhem', 'Nijmegen', 'Apeldoorn'] },
-  { id: 'ut', name: 'Utrecht', shortName: 'UT', trips: 134, revenue: 19800, trend: 15, topCities: ['Utrecht', 'Amersfoort', 'Nieuwegein'] },
-  { id: 'ov', name: 'Overijssel', shortName: 'OV', trips: 98, revenue: 14200, trend: 2, topCities: ['Zwolle', 'Enschede', 'Deventer'] },
-];
-
 const GeographicHeatmapWidget = ({ 
-  data = defaultRegions, 
+  data, 
   loading 
 }: GeographicHeatmapWidgetProps) => {
   const navigate = useNavigate();
