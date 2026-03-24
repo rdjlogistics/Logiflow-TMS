@@ -20117,6 +20117,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      refresh_ai_usage_daily_rollup: { Args: never; Returns: undefined }
       save_order_with_stops: {
         Args: {
           p_order_data: Json
