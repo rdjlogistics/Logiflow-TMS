@@ -397,7 +397,8 @@ const AppSidebar = () => {
   // Beheer without WMS (WMS is now its own section)
   const allSections: (MenuSection & { visible: boolean })[] = [
     { title: "Operatie", items: operatieItems, defaultOpen: true, visible: permLoading || canAccessOperations },
-    { title: "Vloot & Planning", items: vlootPlanningItems, visible: permLoading || canAccessFleet || canAccessPlanning },
+    { title: "Vloot", items: vlootItems, visible: permLoading || canAccessFleet },
+    { title: "Planning", items: planningItems, visible: permLoading || canAccessPlanning },
     { title: "Relatiebeheer", items: relatiesItems, visible: permLoading || canAccessCRM || canAccessCustomerPortal },
     { title: "Chauffeurs & Partners", items: chauffeursItems, visible: permLoading || canAccessDriverPortal || canAccessCRM },
     { title: "Financieel", items: financieelItems, visible: permLoading || canAccessFinance || canAccessTendering },
