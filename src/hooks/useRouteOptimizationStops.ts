@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
 import { geocodeAddress } from "@/utils/geocoding";
+import { logger } from "@/lib/logger";
 
 export interface OptimizationStop {
   id: string;
@@ -62,7 +63,7 @@ export const useRouteOptimizationStops = () => {
         .order("trip_date", { ascending: true });
 
       if (error) {
-        console.error("Error fetching stops for optimization:", error);
+        logger.error("Error fetching stops for optimization:", error);
         return [];
       }
 
@@ -149,8 +150,8 @@ export const useRouteOptimizationStops = () => {
                   .update({ latitude: result.value.latitude, longitude: result.value.longitude })
                   .eq("id", stopId)
                   .then(({ error: updateErr }) => {
-                    if (updateErr) console.error("[Backfill] Update failed for stop:", stopId, updateErr);
-                    else console.log("[Backfill] ✓ Backfilled coordinates for stop:", stopId);
+                    if (updateErr) logger.error("[Backfill] Update failed for stop:", stopId, updateErr);
+                    else logger.log("[Backfill] ✓ Backfilled coordinates for stop:", stopId);
                   });
               }
             }

@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 export interface Notification {
   id: string;
@@ -45,7 +46,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           timestamp: new Date(n.timestamp),
         }));
       }
-    } catch {}
+    } catch (e) {
+      logger.warn('Failed to parse stored notifications:', e);
+    }
     return [];
   });
 
@@ -72,7 +75,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const audio = new Audio('/notification.mp3');
         audio.volume = 0.3;
         audio.play().catch(() => {});
-      } catch {}
+      } catch (e) {
+        logger.warn('Failed to play notification sound:', e);
+      }
     }
   }, []);
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchRealFuelStations, RealFuelStation } from '@/utils/fuelStationsAPI';
+import { logger } from '@/lib/logger';
 
 export interface FuelStation {
   id: string;
@@ -275,7 +276,7 @@ export function useFuelStations() {
         setLocationStatus('granted');
       },
       (error) => {
-        console.log('Geolocation error:', error.message);
+        logger.log('Geolocation error:', error.message);
         setLocationStatus('denied');
         // Default to Netherlands center if location not available
         setUserLocation({ lat: 52.1326, lng: 5.2913 });
@@ -360,16 +361,16 @@ export function useFuelStations() {
         if (realStations.length > 0) {
           // Convert real stations to our format
           const convertedStations = realStations.map(convertToFuelStation);
-          console.log(`[useFuelStations] Loaded ${convertedStations.length} real stations from OpenStreetMap`);
+          logger.log(`[useFuelStations] Loaded ${convertedStations.length} real stations from OpenStreetMap`);
           setStations(convertedStations);
         } else {
           // Fallback to local mock data around user
-          console.log('[useFuelStations] No real stations found, generating local mock data');
+          logger.log('[useFuelStations] No real stations found, generating local mock data');
           const localStations = generateLocalMockStations(centerLat, centerLng);
           setStations(localStations);
         }
       } catch (error) {
-        console.error('[useFuelStations] Error loading stations:', error);
+        logger.error('[useFuelStations] Error loading stations:', error);
         // Fallback to local mock data
         const localStations = generateLocalMockStations(centerLat, centerLng);
         setStations(localStations);

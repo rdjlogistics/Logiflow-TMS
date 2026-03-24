@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { TripStatus } from "@/types/supabase-helpers";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 
 interface DriverAlert {
   id: string;
@@ -167,13 +167,15 @@ async function fetchDriverPortalData(userId: string) {
 
 export function useDriverPortalData() {
   const { user } = useAuth();
+  const [dismissedAlertIds, setDismissedAlertIds] = useState<Set<string>>(new Set());
+  const [readAlertIds, setReadAlertIds] = useState<Set<string>>(new Set());
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['driver-portal-data', user?.id],
     queryFn: () => fetchDriverPortalData(user!.id),
     enabled: !!user?.id,
-    staleTime: 30000, // 30 seconds - data stays fresh
-    gcTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -189,15 +191,20 @@ export function useDriverPortalData() {
     nextShift: null,
   }, [data?.stats]);
 
-  const alerts = useMemo(() => data?.alerts || [], [data?.alerts]);
+  // Filter out dismissed alerts and apply read state
+  const alerts = useMemo(() => {
+    const raw = data?.alerts || [];
+    return raw
+      .filter(a => !dismissedAlertIds.has(a.id))
+      .map(a => ({ ...a, isRead: readAlertIds.has(a.id) ? true : a.isRead }));
+  }, [data?.alerts, dismissedAlertIds, readAlertIds]);
 
-  // Local state management for alerts (client-side only)
-  const markAlertRead = useCallback((_alertId: string) => {
-    // Client-side only — no-op until server persistence is added
+  const markAlertRead = useCallback((alertId: string) => {
+    setReadAlertIds(prev => new Set(prev).add(alertId));
   }, []);
 
-  const dismissAlert = useCallback((_alertId: string) => {
-    // Client-side only — no-op until server persistence is added
+  const dismissAlert = useCallback((alertId: string) => {
+    setDismissedAlertIds(prev => new Set(prev).add(alertId));
   }, []);
 
   return {

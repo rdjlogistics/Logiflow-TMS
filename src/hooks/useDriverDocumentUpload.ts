@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export type DocumentType = 
   | 'drivers_license_front' 
@@ -76,7 +77,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
+        logger.error('Upload error:', uploadError);
         throw new Error(`Upload mislukt: ${uploadError.message}`);
       }
 
@@ -88,7 +89,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         .createSignedUrl(uploadData.path, 60 * 60 * 24 * 365);
 
       if (signedUrlError) {
-        console.error('Signed URL error:', signedUrlError);
+        logger.error('Signed URL error:', signedUrlError);
         throw new Error('Kon geen toegangslink genereren');
       }
 
@@ -111,7 +112,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         .single();
 
       if (docError) {
-        console.error('Document record error:', docError);
+        logger.error('Document record error:', docError);
         throw new Error(`Database error: ${docError.message}`);
       }
 
@@ -130,9 +131,9 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
           },
         }).then(({ data, error }) => {
           if (error) {
-            console.error('AI analysis error:', error);
+            logger.error('AI analysis error:', error);
           } else {
-            console.log('AI analysis triggered:', data);
+            logger.log('AI analysis triggered:', data);
             // Show toast when analysis completes
             if (data?.analysis?.isValid) {
               toast.success('Document geverifieerd', {
@@ -145,7 +146,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
             }
           }
         }).catch(err => {
-          console.error('AI analysis invoke error:', err);
+          logger.error('AI analysis invoke error:', err);
         });
       }
 
@@ -158,7 +159,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
       };
 
     } catch (error) {
-      console.error('Document upload error:', error);
+      logger.error('Document upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Upload mislukt';
       toast.error('Upload mislukt', { description: errorMessage });
       return {

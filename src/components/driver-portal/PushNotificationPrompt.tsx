@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, BellOff, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { logger } from '@/lib/logger';
 
 export const PushNotificationPrompt = () => {
   const { isSupported, isSubscribed, permission, loading, subscribe } = usePushNotifications();
@@ -43,10 +44,10 @@ export const PushNotificationPrompt = () => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw-push.js')
         .then(registration => {
-          console.log('Push SW registered:', registration.scope);
+          logger.log('Push SW registered:', registration.scope);
         })
         .catch(error => {
-          console.error('Push SW registration failed:', error);
+          logger.error('Push SW registration failed:', error);
         });
     }
   }, []);

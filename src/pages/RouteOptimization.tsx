@@ -73,6 +73,7 @@ import { geocodeAddress } from "@/utils/geocoding";
 import { useTollDetection, type TollDetectionResult } from "@/hooks/useTollDetection";
 import TollCostPanel from "@/components/route/TollCostPanel";
 import TollComparisonPanel, { type TollFreeAlternative } from "@/components/route/TollComparisonPanel";
+import { logger } from "@/lib/logger";
 
 // Safe time formatter that handles HH:MM, HH:MM:SS, ISO strings, and invalid values
 const safeFormatTime = (value: string | null | undefined): string | null => {
@@ -388,7 +389,7 @@ const RouteOptimization = () => {
     const missing = stops.filter(s => s.lat === 0 && s.lng === 0 && s.address && !geocodedIds.current.has(s.id));
     if (missing.length === 0) return;
     const timer = setTimeout(() => {
-      console.log(`[RouteOptimization] ${missing.length} stops need geocoding`);
+      logger.log(`[RouteOptimization] ${missing.length} stops need geocoding`);
       geocodeMissingStops(stops);
     }, 400);
     return () => clearTimeout(timer);

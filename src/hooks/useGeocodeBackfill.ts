@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { geocodeAddress } from "@/utils/geocoding";
 import { useCompany } from "@/hooks/useCompany";
+import { logger } from "@/lib/logger";
 
 /**
  * Standalone hook that geocodes ALL route_stops with NULL latitude/longitude.
@@ -26,16 +27,16 @@ export const useGeocodeBackfill = () => {
         .limit(50);
 
       if (error) {
-        console.error("[Backfill] Error fetching stops with missing coords:", error);
+        logger.error("[Backfill] Error fetching stops with missing coords:", error);
         return;
       }
 
       if (!missingStops || missingStops.length === 0) {
-        console.log("[Backfill] No route_stops with missing coordinates found.");
+        logger.log("[Backfill] No route_stops with missing coordinates found.");
         return;
       }
 
-      console.log(`[Backfill] Found ${missingStops.length} stops with missing coordinates. Starting geocoding...`);
+      logger.log(`[Backfill] Found ${missingStops.length} stops with missing coordinates. Starting geocoding...`);
 
       // Process in batches of 5
       for (let i = 0; i < missingStops.length; i += 5) {
@@ -56,17 +57,17 @@ export const useGeocodeBackfill = () => {
               .eq("id", stop.id);
 
             if (updateError) {
-              console.error(`[Backfill] Update failed for stop ${stop.id}:`, updateError);
+              logger.error(`[Backfill] Update failed for stop ${stop.id}:`, updateError);
             } else {
-              console.log(`[Backfill] ✓ Geocoded stop ${stop.id}: ${stop.address}, ${stop.city} → (${latitude}, ${longitude})`);
+              logger.log(`[Backfill] ✓ Geocoded stop ${stop.id}: ${stop.address}, ${stop.city} → (${latitude}, ${longitude})`);
             }
           } else {
-            console.warn(`[Backfill] ✗ Could not geocode stop ${stop.id}: ${stop.address}, ${stop.city}`);
+            logger.warn(`[Backfill] ✗ Could not geocode stop ${stop.id}: ${stop.address}, ${stop.city}`);
           }
         }
       }
 
-      console.log("[Backfill] Geocoding backfill complete.");
+      logger.log("[Backfill] Geocoding backfill complete.");
     };
 
     runBackfill();

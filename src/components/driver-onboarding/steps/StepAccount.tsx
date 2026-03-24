@@ -7,6 +7,7 @@ import { OfflineBanner } from '../OfflineBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { WifiOff } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const StepAccount = () => {
   const { data, updateData, setCurrentStep, currentStep, isOnline, pendingUploads } = useOnboarding();
@@ -43,7 +44,7 @@ export const StepAccount = () => {
       });
 
       if (signUpError) {
-        console.error('SignUp error:', signUpError);
+        logger.error('SignUp error:', signUpError);
         if (signUpError.message.includes('already registered')) {
           setError('Dit e-mailadres is al in gebruik. Probeer in te loggen.');
         } else {
@@ -61,7 +62,7 @@ export const StepAccount = () => {
           const { ensureProfileAfterSignup } = await import('@/lib/ensureProfileAfterSignup');
           await ensureProfileAfterSignup(authData.user.id, data.email, data.name, { skipAdminRole: true });
         } catch (e) {
-          console.error('[StepAccount] ensureProfileAfterSignup failed:', e);
+          logger.error('[StepAccount] ensureProfileAfterSignup failed:', e);
         }
 
         // Create driver record linked to the auth user
@@ -80,7 +81,7 @@ export const StepAccount = () => {
           });
 
         if (driverError) {
-          console.error('Driver record creation error:', driverError);
+          logger.error('Driver record creation error:', driverError);
         }
 
         // Assign chauffeur role, company link, and tenant_id via edge function
@@ -93,13 +94,13 @@ export const StepAccount = () => {
               },
             });
             if (response.error) {
-              console.error('assign-driver-role error:', response.error);
+              logger.error('assign-driver-role error:', response.error);
             } else {
-              console.log('Driver role assigned successfully:', response.data);
+              logger.log('Driver role assigned successfully:', response.data);
             }
           }
         } catch (roleErr) {
-          console.error('Role assignment failed:', roleErr);
+          logger.error('Role assignment failed:', roleErr);
         }
 
         toast.success('Account aangemaakt!', {
@@ -111,7 +112,7 @@ export const StepAccount = () => {
         }, 100);
       }
     } catch (err) {
-      console.error('Account creation error:', err);
+      logger.error('Account creation error:', err);
       setError('Er is iets misgegaan. Probeer het opnieuw.');
     } finally {
       setLoading(false);

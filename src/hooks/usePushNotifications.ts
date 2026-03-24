@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
+import { logger } from '@/lib/logger';
 
 // Fetch VAPID public key from server (single source of truth)
 const VAPID_KEY_CACHE_KEY = 'vapid_public_key';
@@ -93,7 +94,7 @@ export const usePushNotifications = () => {
             });
           }
         } catch (error) {
-          console.error('Error checking push subscription:', error);
+          logger.error('Error checking push subscription:', error);
         }
       }
       
@@ -195,7 +196,7 @@ export const usePushNotifications = () => {
       setLoading(false);
       return true;
     } catch (error) {
-      console.error('Error subscribing to push notifications:', error);
+      logger.error('Error subscribing to push notifications:', error);
       toast({
         title: 'Fout',
         description: 'Kon push notificaties niet inschakelen',
@@ -236,7 +237,7 @@ export const usePushNotifications = () => {
       setLoading(false);
       return true;
     } catch (error) {
-      console.error('Error unsubscribing:', error);
+      logger.error('Error unsubscribing:', error);
       setLoading(false);
       return false;
     }
@@ -275,7 +276,7 @@ export const usePushNotifications = () => {
   // realtime filters check the OLD value, not the NEW value for UPDATE events.
   // This means filter: `driver_id=eq.${driverId}` misses assignment updates.
   const subscribeToTripUpdates = useCallback((driverId: string) => {
-    console.log('[Push] Subscribing to trip updates for driver:', driverId);
+    logger.log('[Push] Subscribing to trip updates for driver:', driverId);
     
     const channel = supabase
       .channel(`driver-trips-realtime-${driverId}`)
@@ -291,7 +292,7 @@ export const usePushNotifications = () => {
           
           // Only notify if this trip is assigned to our driver
           if (trip.driver_id === driverId) {
-            console.log('[Push] New trip assigned via INSERT:', trip.id);
+            logger.log('[Push] New trip assigned via INSERT:', trip.id);
             sendLocalNotification({
               title: '🚚 Nieuwe rit toegewezen!',
               body: `${trip.pickup_city || 'Onbekend'} → ${trip.delivery_city || 'Onbekend'}`,
@@ -314,7 +315,7 @@ export const usePushNotifications = () => {
           
           // Check if trip was just assigned to our driver (driver_id changed from null/other to ours)
           if (trip.driver_id === driverId && oldTrip.driver_id !== driverId) {
-            console.log('[Push] Trip assigned via UPDATE:', trip.id);
+            logger.log('[Push] Trip assigned via UPDATE:', trip.id);
             sendLocalNotification({
               title: '🚚 Nieuwe rit toegewezen!',
               body: `${trip.pickup_city || 'Onbekend'} → ${trip.delivery_city || 'Onbekend'}`,
@@ -324,7 +325,7 @@ export const usePushNotifications = () => {
           }
           // Also notify on status changes for trips already assigned to us
           else if (trip.driver_id === driverId && trip.status !== oldTrip.status) {
-            console.log('[Push] Trip status changed:', trip.id, trip.status);
+            logger.log('[Push] Trip status changed:', trip.id, trip.status);
             sendLocalNotification({
               title: '📋 Rit update',
               body: `Status gewijzigd naar: ${trip.status}`,
@@ -335,11 +336,11 @@ export const usePushNotifications = () => {
         }
       )
       .subscribe((status) => {
-        console.log('[Push] Subscription status:', status);
+        logger.log('[Push] Subscription status:', status);
       });
 
     return () => {
-      console.log('[Push] Unsubscribing from trip updates');
+      logger.log('[Push] Unsubscribing from trip updates');
       supabase.removeChannel(channel);
     };
   }, [sendLocalNotification]);
