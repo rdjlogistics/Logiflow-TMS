@@ -171,7 +171,7 @@ const PODCard = ({ pod }: any) => {
         {pod.has_documents && <FileCheck className="h-4 w-4 text-green-500" />}
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={async (e) => {
           e.stopPropagation();
-          toast.info(`POD wordt geladen voor ${pod.order_number}`);
+          toast.info(`POD wordt geladen voor ${orderNumber}`);
           try {
             const { data, error } = await supabase.functions.invoke("generate-document-pdf", {
               body: { orderId: pod.id, documentType: "pod" }
