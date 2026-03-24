@@ -46,7 +46,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           timestamp: new Date(n.timestamp),
         }));
       }
-    } catch {}
+    } catch (e) {
+      logger.warn('Failed to parse stored notifications:', e);
+    }
     return [];
   });
 
