@@ -227,12 +227,18 @@ const Drivers = () => {
   };
 
   const handleDeleteDocument = async (docId: string) => {
-    const { error } = await supabase.from("driver_documents").delete().eq("id", docId);
-    if (error) {
-      toast({ title: "Verwijderen mislukt", variant: "destructive" });
-    } else {
-      toast({ title: "Document verwijderd" });
-      refetchDocs();
+    if (deletingDocId) return;
+    setDeletingDocId(docId);
+    try {
+      const { error } = await supabase.from("driver_documents").delete().eq("id", docId);
+      if (error) {
+        toast({ title: "Verwijderen mislukt", variant: "destructive" });
+      } else {
+        toast({ title: "Document verwijderd" });
+        refetchDocs();
+      }
+    } finally {
+      setDeletingDocId(null);
     }
   };
 

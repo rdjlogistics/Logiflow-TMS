@@ -253,7 +253,7 @@ const Customers = () => {
           .map(e => e.trim())
           .filter(e => e.length > 0);
 
-        await supabase
+        const { error: settingsError } = await supabase
           .from("customer_settings")
           .update({
             attach_documents_to_invoice: attachDocsOverride,
@@ -263,6 +263,15 @@ const Customers = () => {
             delivery_confirmation_recipients: recipientsList,
           } as any)
           .eq("customer_id", customerId);
+
+        if (settingsError) {
+          console.error('Customer settings save failed:', settingsError);
+          toast({
+            title: "Klantinstellingen opslaan mislukt",
+            description: settingsError.message,
+            variant: "destructive",
+          });
+        }
       }
 
       fetchCustomers();
