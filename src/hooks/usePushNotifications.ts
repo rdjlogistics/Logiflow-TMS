@@ -94,7 +94,7 @@ export const usePushNotifications = () => {
             });
           }
         } catch (error) {
-          console.error('Error checking push subscription:', error);
+          logger.error('Error checking push subscription:', error);
         }
       }
       
