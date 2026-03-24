@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
 import { geocodeAddress } from "@/utils/geocoding";
+import { logger } from "@/lib/logger";
 
 export interface OptimizationStop {
   id: string;
