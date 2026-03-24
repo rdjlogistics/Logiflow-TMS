@@ -36,23 +36,8 @@ const SystemHealth = () => {
   const { data: errorLogs, isLoading: loadingErrors } = useClientErrorLogs(100);
   const { data: errorSummary } = useClientErrorSummary();
 
-  // Demo data
-  const demoJobs = [
-    { id: '1', job_type: 'import', job_name: 'Bank Transaction Import', status: 'completed', started_at: new Date(Date.now() - 300000).toISOString(), completed_at: new Date().toISOString(), processed_count: 47, error_count: 0, duration_ms: 1250, created_at: new Date().toISOString() },
-    { id: '2', job_type: 'matching', job_name: 'Invoice Matching', status: 'running', started_at: new Date(Date.now() - 60000).toISOString(), processed_count: 23, error_count: 0, created_at: new Date().toISOString() },
-    { id: '3', job_type: 'forecast', job_name: 'Cashflow Forecast', status: 'completed', started_at: new Date(Date.now() - 3600000).toISOString(), completed_at: new Date(Date.now() - 3595000).toISOString(), processed_count: 1, error_count: 0, duration_ms: 5200, created_at: new Date().toISOString() },
-    { id: '4', job_type: 'reconciliation', job_name: 'Finance Reconciliation', status: 'completed', started_at: new Date(Date.now() - 7200000).toISOString(), completed_at: new Date(Date.now() - 7195000).toISOString(), processed_count: 156, error_count: 4, duration_ms: 8400, created_at: new Date().toISOString() },
-    { id: '5', job_type: 'automation', job_name: 'Auto-Invoice Run', status: 'failed', started_at: new Date(Date.now() - 14400000).toISOString(), completed_at: new Date(Date.now() - 14395000).toISOString(), processed_count: 8, error_count: 2, duration_ms: 3200, error_details: { message: 'Rate limit exceeded' }, created_at: new Date().toISOString() },
-  ];
-
-  const demoIncidents = [
-    { id: '1', incident_type: 'webhook_failure', severity: 'high', title: 'Webhook naar accounting systeem gefaald', description: '3 opeenvolgende pogingen gefaald', source: 'Webhook: exact-online', status: 'open', created_at: new Date(Date.now() - 1800000).toISOString() },
-    { id: '2', incident_type: 'rate_limit', severity: 'medium', title: 'API rate limit bereikt', description: 'Bank API rate limit voor 15 minuten', source: 'Integration: bank-import', status: 'acknowledged', acknowledged_at: new Date(Date.now() - 900000).toISOString(), created_at: new Date(Date.now() - 3600000).toISOString() },
-    { id: '3', incident_type: 'automation_error', severity: 'low', title: 'Automation skip: missing data', description: '2 orders overgeslagen wegens ontbrekende klantdata', source: 'Automation: auto-invoice', status: 'resolved', resolved_at: new Date(Date.now() - 7200000).toISOString(), created_at: new Date(Date.now() - 10800000).toISOString() },
-  ];
-
-  const displayJobs = jobs?.length ? jobs : demoJobs;
-  const displayIncidents = incidents?.length ? incidents : demoIncidents;
+  const displayJobs = jobs || [];
+  const displayIncidents = incidents || [];
 
   const getJobIcon = (type: string) => {
     switch (type) {

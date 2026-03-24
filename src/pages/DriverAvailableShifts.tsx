@@ -330,7 +330,7 @@ export default function DriverAvailableShifts() {
             <p className="text-muted-foreground mb-4">
               Log in om beschikbare ritten te bekijken
             </p>
-            <Button onClick={() => navigate("/demo")}>Inloggen</Button>
+            <Button onClick={() => navigate("/auth")}>Inloggen</Button>
           </CardContent>
         </Card>
       </div>

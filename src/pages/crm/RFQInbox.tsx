@@ -257,7 +257,7 @@ const RFQInbox = () => {
           requirements: ['Tautliner', 'Next-day delivery'],
         },
       });
-      toast({ title: 'RFQ geparsed (demo)' });
+      toast({ title: 'RFQ geparsed' });
     } finally {
       setIsParsing(false);
     }

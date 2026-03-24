@@ -70,7 +70,7 @@ export const PortalLayout = ({
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/demo");
+    navigate("/auth");
   };
 
   return (

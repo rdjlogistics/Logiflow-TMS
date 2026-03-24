@@ -219,7 +219,7 @@ const Auth = () => {
         password,
       });
 
-      console.log('[Auth] Login response:', { error: error?.message, success: !error });
+      
 
       if (error) {
         const message = getErrorMessage(error);

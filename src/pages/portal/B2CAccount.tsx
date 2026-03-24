@@ -41,7 +41,7 @@ const B2CAccount = () => {
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/demo");
+    navigate("/auth");
   };
 
   const handleNotificationChange = async (key: 'pushEnabled' | 'smsEnabled' | 'emailShipmentUpdates', value: boolean) => {

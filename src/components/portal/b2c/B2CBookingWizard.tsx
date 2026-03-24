@@ -105,7 +105,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
           productDescription: `${formData.size} pakket${formData.description ? ': ' + formData.description : ''}`,
           quantity: 1,
           serviceType: 'standard',
-        }, customerId || DEMO_CUSTOMER_ID);
+        }, customerId!);
 
         toast.success("Zending aangemaakt!", {
           description: `Ordernummer: ${submission.orderNumber}`,
