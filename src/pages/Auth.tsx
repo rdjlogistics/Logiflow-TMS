@@ -64,7 +64,7 @@ const Auth = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resettingSession, setResettingSession] = useState(false);
-  const [showDemoAccounts, setShowDemoAccounts] = useState(true);
+  
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [inlineError, setInlineError] = useState<string | null>(null);
   const [debugDetails, setDebugDetails] = useState<string | null>(null);
