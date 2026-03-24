@@ -336,7 +336,7 @@ export const usePushNotifications = () => {
         }
       )
       .subscribe((status) => {
-        console.log('[Push] Subscription status:', status);
+        logger.log('[Push] Subscription status:', status);
       });
 
     return () => {
