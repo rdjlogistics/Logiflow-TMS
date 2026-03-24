@@ -1,35 +1,85 @@
 
 
-# Fix: Copilot 401 Unauthorized — Verkeerde Auth Token
+# Apple Setup Experience — Onboarding Wizard Redesign
 
-## Probleem
-De copilot edge function (`supabase/functions/copilot/index.ts`) valideert het Bearer token als een **user JWT** via `supabase.auth.getClaims()`. Maar de frontend (`src/hooks/useCopilot.ts`) stuurt de **anon key** als Authorization header in plaats van het JWT token van de ingelogde gebruiker.
+## Concept
+Transformeer de huidige 6-stappen wizard naar een immersive Apple-device-setup ervaring. Net als wanneer je een nieuwe iPhone/Mac voor het eerst aanzet: elke stap heeft échte configuratie, validatie, en visuele feedback. Geen "doorklikkertje" maar een setup die je bedrijf daadwerkelijk klaarzet.
 
-Dit veroorzaakt: `401 — {"error":"Invalid token"}` bij elke copilot request.
+## Huidige situatie
+`src/pages/OnboardingWizard.tsx` — 6 stappen (Welkom, Bedrijf, TMS, AI, Dashboard, Start). Visueel al glassmorphism maar de stappen voelen als doorklikken: geen validatie, geen inline feedback, welkomscherm is statisch.
 
-## Oplossing
+## Nieuwe stappen & business logica
 
-### Bestand: `src/hooks/useCopilot.ts`
+### Stap 0: "Hallo" — Cinematic Intro
+- Geanimeerd "Hallo" scherm à la iPhone opstart (grote typografie, fade-in sequence)
+- Taal detectie badge, tijdstip-gebaseerde begroeting ("Goedemorgen/Goedemiddag")
+- Animated truck icon met 3D perspective tilt (Vision Pro depth effect)
+- Snelheidsoverzicht: "Dit duurt ~3 minuten" met animated timeline dots
 
-**Wijziging**: Haal het user session token op via `supabase.auth.getSession()` en gebruik dat als Bearer token in plaats van `backendAnonKey`.
+### Stap 1: Bedrijf verificatie (echte business logica)
+- **KvK-nummer live lookup**: Na invoer KvK, toon gevalideerde bedrijfsnaam + adres met groene checkmark animation
+- **BTW-nummer format validatie**: Inline NL-formaat check met real-time feedback
+- **IBAN validatie**: Mod97 check met bank-icoon dat verschijnt na geldige IBAN
+- Elk veld krijgt een ✓ animatie zodra valide — progress ring rond de stap-indicator vult
+- "Skip for now" optie met subtiele warning dat facturen nog niet mogelijk zijn
 
-1. Vervang de `backendAnonKey` import door een import van de supabase client
-2. In `sendMessage`, haal de session token op vóór de fetch:
-   ```typescript
-   const { data: { session } } = await supabase.auth.getSession();
-   if (!session?.access_token) {
-     throw new Error('Je moet ingelogd zijn om Copilot te gebruiken.');
-   }
-   ```
-3. Gebruik `session.access_token` als Bearer token:
-   ```typescript
-   Authorization: `Bearer ${session.access_token}`,
-   ```
+### Stap 2: TMS Plan (bestaande `TMSPlanSelector` behouden)
+- Toevoegen: interactieve vergelijkingswidget — tik op een feature om verschil tussen plannen te zien
+- 3D card tilt effect op hover (Vision Pro depth)
+- Selectie bevestiging met confetti-pulse ring
 
-### Geen andere bestanden hoeven te wijzigen
-De edge function is correct — die verwacht al een user JWT. Het probleem zit puur in de frontend.
+### Stap 3: AI Co-pilot (bestaande `AIPlanSelector` behouden)
+- Toevoegen: live demo preview — bij selectie van een plan verschijnt een mini-chat bubble met een voorbeeld AI-interactie
+- "Probeer nu" knop die een echte test-vraag stuurt naar de copilot
 
-### Test na fix
-- "toon orders" → verwacht: `low` complexity, `gemini-2.5-flash-lite` model (zichtbaar in edge function logs)
-- "analyseer mijn marges" → verwacht: `medium` complexity, `gemini-3-flash-preview` model
+### Stap 4: Dashboard personalisatie
+- Drag-and-drop widget preview met live rearrangement
+- Thema switcher met instant full-screen preview transition (viewTransition API)
+- Vision Pro-style depth cards die reageren op muis/touch positie
+
+### Stap 5: "Klaar" — Launch sequence
+- Animated checklist van alles wat geconfigureerd is (met groene vinkjes die sequentieel verschijnen)
+- Confetti/particle burst bij "Start met LogiFlow"
+- Redirect naar dashboard met crossfade transition
+
+## Technische wijzigingen
+
+### Bestanden
+
+1. **`src/pages/OnboardingWizard.tsx`** — Complete rewrite van de step rendering:
+   - Cinematic intro animatie sequence
+   - Per-field validatie state tracking
+   - KvK/BTW/IBAN inline validators
+   - ViewTransition API voor thema preview
+   - Mouse parallax voor Vision Pro depth effect
+
+2. **`src/components/onboarding/validators.ts`** (nieuw) — Business logica validators:
+   - `validateKvK(value)` — 8 cijfers check
+   - `validateBTW(value)` — NL + 9 cijfers + B + 2 cijfers format
+   - `validateIBAN(value)` — Mod97 algorithme
+   - `validatePhone(value)` — NL telefoon format
+
+3. **`src/components/onboarding/CinematicIntro.tsx`** (nieuw) — Animated "Hallo" welkomscherm:
+   - Staggered text reveal met spring physics
+   - Tijdstip-gebaseerde begroeting
+   - Animated timeline preview van alle stappen
+   - 3D truck icon met perspective transform
+
+4. **`src/components/onboarding/CompanyVerificationStep.tsx`** (nieuw) — Bedrijfsstap met validatie:
+   - Per-veld validatie indicators (✓/✗ icons)
+   - Progress ring die vult per valide veld
+   - Inline format hints
+   - Animated field transitions
+
+5. **`src/components/onboarding/LaunchSequence.tsx`** (nieuw) — Finale stap:
+   - Sequential checklist animation
+   - Particle/confetti effect
+   - Summary cards met slide-in
+
+### Geen database wijzigingen nodig
+Alle business logica is client-side validatie. De bestaande `handleComplete` save-logica blijft intact.
+
+### Responsive
+- **Mobile (iOS 26)**: Bottom-anchored navigation, 48px touch targets, safe-area insets, swipe between steps
+- **Desktop (macOS/Vision Pro)**: Centered content max-w-3xl, mouse parallax depth, hover 3D card tilts, keyboard navigation (←/→ arrows)
 
