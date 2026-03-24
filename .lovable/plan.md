@@ -1,90 +1,52 @@
 
 
-# Grondige Analyse: Error Toasts i.p.v. Werkende Knoppen
+# Plan: Bulletproof PWA Caching met Autonome Auto-Update
 
-## Bewezen Bugs (met logs/bewijs)
+## Probleem
+De Service Worker staat op `selfDestroying: true` — er is geen caching. Lighthouse rapporteert 887 KiB verspild bij elk bezoek. De app moet 100% autonoom draaien op web, iOS en macOS.
 
-### BUG 1: Factuur PDF Genereren — CRASHT ALTIJD
-**Bewijs**: Edge function log:
-```
-ERROR: WinAnsi cannot encode "→" (0x2192)
-```
-**Root cause**: Invoice line descriptions bevatten het Unicode-teken `→`. De pdf-lib library kan dit niet encoden met standaard WinAnsi fonts.
+## Risico van Service Worker
+Een actieve SW kan oude code serveren. De bestaande `clearServiceWorkerAndCaches()` in auth flows en error recovery vernietigt dan de cache. Dit conflicteert.
 
-**Bron van het `→` teken** (bewezen in code):
-- `src/components/orders/EnhancedBulkActionsBar.tsx` lijn 392:
-  ```ts
-  description: `Transport ${order.order_number} - ${order.pickup_city} → ${order.delivery_city}`
-  ```
-- 9 invoice_lines in de database bevatten dit teken.
+## Oplossing: 3 Wijzigingen
 
-**Fix**:
-1. **Edge function `generate-invoice-pdf`**: Sanitize alle tekst die naar pdf-lib gaat — vervang `→` door `-` of `->` voordat het getekend wordt. Dit is een defensieve fix die ALLE Unicode-problemen vangt.
-2. **Broncode**: Vervang `→` door `-` in `EnhancedBulkActionsBar.tsx` lijn 392 zodat nieuwe factuurregels geen probleem meer veroorzaken.
-3. **Database fix**: Update bestaande 9 invoice_lines die `→` bevatten.
+### 1. `vite.config.ts` — Service Worker Activeren
+- `selfDestroying: false`
+- `registerType: "autoUpdate"` — SW update automatisch op de achtergrond, geen gebruikersactie nodig
+- `navigateFallbackDenylist: [/^\/~oauth/]` — OAuth routes nooit cachen (vereist per Lovable docs)
+- `skipWaiting: true`, `clientsClaim: true` — nieuwe SW neemt direct over
+- `cleanupOutdatedCaches: true` — oude caches automatisch opruimen
+- Runtime caching toevoegen:
+  - Google Fonts: `CacheFirst`, 1 jaar TTL
+  - Supabase API: `NetworkFirst`, 5 min TTL (API data altijd vers, maar offline fallback)
+  - Mapbox: behouden zoals nu
 
-### BUG 2: Bulk Verwijderen Chauffeurs — CRASHT
-**Bewijs**: Postgres log:
-```
-ERROR: column drivers.deleted_at does not exist
-```
-**Root cause**: `src/pages/Carriers.tsx` lijn 316:
-```ts
-supabase.from("drivers").update({ deleted_at: new Date().toISOString() })
-```
-De `drivers` tabel heeft geen `deleted_at` kolom (bewezen via schema query).
+### 2. `src/lib/authStorage.ts` — `clearServiceWorkerAndCaches()` Aanpassen
+Het huidige gedrag (SW volledig deregistreren) is destructief bij een actieve SW. Aanpassen naar:
+- **Niet** de SW deregistreren — die moet blijven draaien voor caching
+- **Wel** auth-gerelateerde caches clearen (cookies, localStorage keys)
+- Cache Storage alleen clearen als het een echte error recovery is (niet bij normale logout)
+- Nieuwe functie `clearAuthCachesOnly()` voor logout flows
+- `clearServiceWorkerAndCaches()` behouden maar alleen aanroepen bij fatale chunk-errors (error recovery)
 
-**Fix**: Twee opties:
-- A) Voeg `deleted_at` toe aan de `drivers` tabel (consistent met `customers`, `trips`, `carriers`)
-- B) Gebruik echte delete of status-change in plaats van soft-delete
+### 3. Callers Updaten
+- `Auth.tsx`, `DriverLogin.tsx`, `ProtectedRoute.tsx`: vervang `clearServiceWorkerAndCaches()` door `clearAuthCachesOnly()` bij logout
+- `errorRecoverySystem.ts`: behoudt `clearServiceWorkerAndCaches()` — bij chunk-load errors is volledige reset correct
 
-Optie A is consistenter met het bestaande patroon. Migratie: `ALTER TABLE drivers ADD COLUMN deleted_at timestamptz DEFAULT NULL;`
+## Bestanden die wijzigen
 
-### BUG 3: Portaalaccounts — Werkt Wél, Maar Error Handling Maskeert Succes
-**Bewijs**: Live test met echte customer ID retourneert HTTP 200:
-```json
-{"message":"Account aangemaakt","success":true,"userId":"7d11dbfd-..."}
-```
-De functie werkt. Als de user errors ziet, is het waarschijnlijk:
-- Niet ingelogd (sessie verlopen) → 401 error
-- Of: `supabase.functions.invoke` retourneert een `FunctionsHttpError` object dat niet correct uitgelezen wordt
-
-**Fix**: Verbeter de error handling in `CreateCustomerPortalDialog.tsx` en `CreateDriverPortalDialog.tsx` om de exacte error message uit het response te halen, inclusief sessie-verlopen detectie.
-
-### BUG 4: Order Opslaan — RPC Werkt, Maar Potentieel Company-ID Issue
-**Bewijs**: `save_order_with_stops` RPC functie is correct. Geen recente postgres errors gevonden.
-Als het faalt, is de meest waarschijnlijke oorzaak: `user_companies` lookup retourneert NULL → error "Geen bedrijf gekoppeld aan gebruiker".
-
-**Fix**: Verstevig de `ensure-user-company` flow en voeg betere error messaging toe.
-
----
-
-## Implementatieplan
-
-### Stap 1: Fix PDF Generator — Edge Function
-- Voeg een `sanitizeText()` helper toe die alle non-WinAnsi tekens vervangt
-- Pas toe op alle strings die naar `page.drawText()` en `wrapText()` gaan
-
-### Stap 2: Fix `→` in Broncode
-- `EnhancedBulkActionsBar.tsx` lijn 392: `→` vervangen door `-`
-
-### Stap 3: Fix Database — Bestaande Invoice Lines
-- SQL migration: `UPDATE invoice_lines SET description = REPLACE(description, '→', '-') WHERE description LIKE '%→%';`
-
-### Stap 4: Fix Drivers Soft-Delete
-- Migratie: `ALTER TABLE drivers ADD COLUMN deleted_at timestamptz DEFAULT NULL;`
-
-### Stap 5: Verbeter Error Handling Portal Dialogs
-- Sessie-check toevoegen voor edge function calls
-- Betere error message parsing uit FunctionsHttpError
-
-### Bestanden die gewijzigd worden
 | Bestand | Wijziging |
 |---|---|
-| `supabase/functions/generate-invoice-pdf/index.ts` | sanitizeText() toevoegen |
-| `src/components/orders/EnhancedBulkActionsBar.tsx` | `→` → `-` |
-| Database migratie | invoice_lines fix + drivers.deleted_at |
-| `src/pages/Carriers.tsx` | Geen wijziging nodig na migratie |
-| `src/components/customers/CreateCustomerPortalDialog.tsx` | Error handling verbeteren |
-| `src/components/drivers/CreateDriverPortalDialog.tsx` | Error handling verbeteren |
+| `vite.config.ts` | PWA config: selfDestroying=false, autoUpdate, runtime caching |
+| `src/lib/authStorage.ts` | Nieuwe `clearAuthCachesOnly()`, bestaande functie behouden voor errors |
+| `src/pages/Auth.tsx` | Gebruik `clearAuthCachesOnly()` |
+| `src/pages/DriverLogin.tsx` | Gebruik `clearAuthCachesOnly()` |
+| `src/components/auth/ProtectedRoute.tsx` | Gebruik `clearAuthCachesOnly()` |
+
+## Impact
+- **887 KiB besparing** bij herhaalde bezoeken (assets uit lokale cache)
+- **Autonome updates**: SW update automatisch zonder refresh nodig
+- **iOS/macOS ready**: PWA manifest + SW werken native in Safari
+- **Geen functionaliteitsverlies**: alle bestaande features blijven identiek
+- **Veilig**: auth logout ruimt alleen auth-data op, niet de hele SW
 
