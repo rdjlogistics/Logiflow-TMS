@@ -27,6 +27,7 @@ const ExecutivePLWidget = lazyWithRetry(() => import("./ExecutivePLWidget"));
 const AIDispatchPanel = lazyWithRetry(() => import("../dispatch/AIDispatchPanel"));
 const CreditHealthWidget = lazyWithRetry(() => import("./CreditHealthWidget"));
 const LiveEventStreamWidget = lazyWithRetry(() => import("./LiveEventStreamWidget"));
+const AIUsageWidget = lazyWithRetry(() => import("./AIUsageWidget"));
 
 // Widget loading skeleton
 const WidgetSkeleton = () => (
