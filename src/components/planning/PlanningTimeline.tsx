@@ -174,7 +174,10 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
 
   const handleDrop = (driverId: string) => {
     if (draggedTrip) {
-      assignMutation.mutate({ tripId: draggedTrip, driverId });
+      assignMutation.mutate({
+        tripId: draggedTrip,
+        driverId: driverId === "unassigned" ? null : driverId,
+      });
       setDraggedTrip(null);
     }
   };
