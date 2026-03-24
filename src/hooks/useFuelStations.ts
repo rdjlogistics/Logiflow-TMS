@@ -276,7 +276,7 @@ export function useFuelStations() {
         setLocationStatus('granted');
       },
       (error) => {
-        console.log('Geolocation error:', error.message);
+        logger.log('Geolocation error:', error.message);
         setLocationStatus('denied');
         // Default to Netherlands center if location not available
         setUserLocation({ lat: 52.1326, lng: 5.2913 });
