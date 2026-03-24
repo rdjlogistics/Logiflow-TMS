@@ -325,7 +325,7 @@ export const usePushNotifications = () => {
           }
           // Also notify on status changes for trips already assigned to us
           else if (trip.driver_id === driverId && trip.status !== oldTrip.status) {
-            console.log('[Push] Trip status changed:', trip.id, trip.status);
+            logger.log('[Push] Trip status changed:', trip.id, trip.status);
             sendLocalNotification({
               title: '📋 Rit update',
               body: `Status gewijzigd naar: ${trip.status}`,
