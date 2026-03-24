@@ -9,30 +9,36 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-const SYSTEM_PROMPT = `Je bent LogiFlow AI — senior transport controller & analyst. Antwoord ALTIJD in het Nederlands.
+const SYSTEM_PROMPT = `Je bent LogiFlow AI — een elite senior transport controller die het TMS actief bestuurt. Antwoord ALTIJD in het Nederlands.
+
+## Wie je bent
+Je bent geen chatbot maar een **operationele co-pilot**. Je zoekt niet alleen data op — je voert acties uit, wijst chauffeurs toe, maakt facturen, stuurt e-mails en plant routes. Je denkt proactief mee en waarschuwt bij risico's.
 
 ## Regels
 - Gebruik ALTIJD tools voor TMS-data, verzin NOOIT cijfers
-- Geef specifieke cijfers, markdown tabellen, vergelijk met vorige periodes
-- Marges <15%: waarschuw 🚨. Mutaties: eerst bevestiging vragen
-- Combineer tools voor complete antwoorden met inzichten en aanbevelingen
-- Tenant-isolatie: alleen data van eigen bedrijf`;
+- Combineer meerdere tools automatisch voor complete antwoorden (bijv. search_orders → route_suggest → assign_driver)
+- Mutaties (status wijzigen, chauffeur toewijzen, factuur maken, e-mail sturen) → ALTIJD eerst bevestiging vragen via confirmation_required
+- Marges <15%: waarschuw 🚨
+- Eindig met concrete volgende stappen
+- Tenant-isolatie: alleen data van eigen bedrijf
+- Wees bondig: max 150 woorden tenzij analyse/rapport gevraagd`;
 
 const TMS_TOOLS = [
+  // ─── READ TOOLS ───
   {
     type: "function",
     function: {
       name: "search_orders",
-      description: "Zoek orders/ritten in het TMS. Gebruik voor vragen over orders, leveringen, zendingen.",
+      description: "Zoek orders/ritten in het TMS.",
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"], description: "Filter op orderstatus" },
+          status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"] },
           search: { type: "string", description: "Zoek op ordernummer, klantnaam, referentie" },
-          date_from: { type: "string", description: "Startdatum (YYYY-MM-DD)" },
-          date_to: { type: "string", description: "Einddatum (YYYY-MM-DD)" },
-          driver_id: { type: "string", description: "Filter op chauffeur ID" },
-          customer_id: { type: "string", description: "Filter op klant ID" },
+          date_from: { type: "string", description: "YYYY-MM-DD" },
+          date_to: { type: "string", description: "YYYY-MM-DD" },
+          driver_id: { type: "string" },
+          customer_id: { type: "string" },
           limit: { type: "number", description: "Max resultaten (default 20)" },
         },
       },
@@ -46,8 +52,8 @@ const TMS_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["available", "busy", "off_duty", "all"], description: "Filter op status" },
-          search: { type: "string", description: "Zoek op naam" },
+          status: { type: "string", enum: ["available", "busy", "off_duty", "all"] },
+          search: { type: "string" },
         },
       },
     },
@@ -56,11 +62,11 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "get_kpis",
-      description: "Real-time KPI's: omzet, marges, openstaande facturen, ritten, on-time %.",
+      description: "Real-time KPI's: omzet, marges, facturen, ritten.",
       parameters: {
         type: "object",
         properties: {
-          period: { type: "string", enum: ["today", "week", "month", "quarter"], description: "Periode" },
+          period: { type: "string", enum: ["today", "week", "month", "quarter"] },
         },
         required: ["period"],
       },
@@ -70,12 +76,12 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "explain_order",
-      description: "Volledige uitleg van een specifieke order: stops, events, status, kosten.",
+      description: "Volledige uitleg van een specifieke order: stops, events, kosten.",
       parameters: {
         type: "object",
         properties: {
-          order_number: { type: "string", description: "Ordernummer (bijv. ORD-2024-0001)" },
-          order_id: { type: "string", description: "Order UUID" },
+          order_number: { type: "string" },
+          order_id: { type: "string" },
         },
       },
     },
@@ -84,12 +90,12 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "save_memory",
-      description: "Sla een gebruikersvoorkeur op voor toekomstige gesprekken.",
+      description: "Sla gebruikersvoorkeur op voor toekomstige gesprekken.",
       parameters: {
         type: "object",
         properties: {
-          key: { type: "string", description: "Sleutel (bijv. 'preferred_view')" },
-          value: { type: "string", description: "Waarde om te onthouden" },
+          key: { type: "string" },
+          value: { type: "string" },
         },
         required: ["key", "value"],
       },
@@ -98,35 +104,14 @@ const TMS_TOOLS = [
   {
     type: "function",
     function: {
-      name: "smart_order_entry",
-      description: "Maak een nieuwe order aan op basis van natuurlijke taal. ALTIJD bevestiging vragen.",
-      parameters: {
-        type: "object",
-        properties: {
-          description: { type: "string", description: "Orderbeschrijving in natuurlijke taal" },
-          pickup_address: { type: "string" },
-          delivery_address: { type: "string" },
-          pickup_date: { type: "string", description: "Ophaaldatum (YYYY-MM-DD)" },
-          customer_name: { type: "string" },
-          goods_description: { type: "string" },
-          weight_kg: { type: "number" },
-        },
-        required: ["description"],
-      },
-    },
-  },
-  // ─── NEW TOOLS ───
-  {
-    type: "function",
-    function: {
       name: "margin_analysis",
-      description: "Analyseer marges per klant, route of periode. Identificeert verliesgevende klanten en routes.",
+      description: "Analyseer marges per klant, chauffeur of maand.",
       parameters: {
         type: "object",
         properties: {
-          group_by: { type: "string", enum: ["customer", "driver", "month"], description: "Groepeer analyse op" },
-          period: { type: "string", enum: ["week", "month", "quarter", "year"], description: "Analyseperiode" },
-          customer_id: { type: "string", description: "Optioneel: analyseer specifieke klant" },
+          group_by: { type: "string", enum: ["customer", "driver", "month"] },
+          period: { type: "string", enum: ["week", "month", "quarter", "year"] },
+          customer_id: { type: "string" },
         },
         required: ["group_by", "period"],
       },
@@ -136,11 +121,11 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "cashflow_forecast",
-      description: "Voorspel cashflow komende 30 dagen op basis van openstaande facturen en verwachte inkomsten.",
+      description: "Voorspel cashflow komende N dagen.",
       parameters: {
         type: "object",
         properties: {
-          days_ahead: { type: "number", description: "Vooruitkijken in dagen (default 30)" },
+          days_ahead: { type: "number" },
         },
       },
     },
@@ -149,13 +134,13 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "customer_analysis",
-      description: "Analyseer klantportfolio: top klanten, omzet trend, betalingsgedrag, churn risico.",
+      description: "Analyseer klantportfolio: omzet, marges, churn risico.",
       parameters: {
         type: "object",
         properties: {
-          sort_by: { type: "string", enum: ["revenue", "orders", "margin", "overdue"], description: "Sorteer op" },
-          limit: { type: "number", description: "Top N klanten (default 10)" },
-          period: { type: "string", enum: ["month", "quarter", "year"], description: "Periode" },
+          sort_by: { type: "string", enum: ["revenue", "orders", "margin", "overdue"] },
+          limit: { type: "number" },
+          period: { type: "string", enum: ["month", "quarter", "year"] },
         },
         required: ["sort_by"],
       },
@@ -165,12 +150,12 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "driver_performance",
-      description: "Vergelijk chauffeurs op KPIs: ritten, on-time %, rating, omzet per chauffeur.",
+      description: "Vergelijk chauffeurs op KPIs.",
       parameters: {
         type: "object",
         properties: {
-          period: { type: "string", enum: ["week", "month", "quarter"], description: "Periode" },
-          driver_id: { type: "string", description: "Optioneel: specifieke chauffeur" },
+          period: { type: "string", enum: ["week", "month", "quarter"] },
+          driver_id: { type: "string" },
         },
         required: ["period"],
       },
@@ -180,13 +165,13 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "invoice_status",
-      description: "Overzicht openstaande facturen, betalingsachterstanden, en factureringstotalen.",
+      description: "Overzicht facturen en achterstanden.",
       parameters: {
         type: "object",
         properties: {
-          status_filter: { type: "string", enum: ["all", "pending", "overdue", "paid", "draft"], description: "Filter op factuurstatus" },
-          customer_id: { type: "string", description: "Optioneel: filter op klant" },
-          days_overdue: { type: "number", description: "Minimum dagen achterstallig" },
+          status_filter: { type: "string", enum: ["all", "pending", "overdue", "paid", "draft"] },
+          customer_id: { type: "string" },
+          days_overdue: { type: "number" },
         },
       },
     },
@@ -195,14 +180,183 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "compare_periods",
-      description: "Vergelijk twee periodes: omzet, orders, marges, on-time %. Toont trends en deltas.",
+      description: "Vergelijk twee periodes op omzet, orders, marge.",
       parameters: {
         type: "object",
         properties: {
-          metric: { type: "string", enum: ["revenue", "orders", "margin", "on_time"], description: "Welke metric vergelijken" },
-          period: { type: "string", enum: ["week", "month", "quarter"], description: "Huidige periode" },
+          metric: { type: "string", enum: ["revenue", "orders", "margin", "on_time"] },
+          period: { type: "string", enum: ["week", "month", "quarter"] },
         },
         required: ["metric", "period"],
+      },
+    },
+  },
+
+  // ─── MUTATION TOOLS (all require confirmation) ───
+  {
+    type: "function",
+    function: {
+      name: "smart_order_entry",
+      description: "Maak een nieuwe order aan op basis van natuurlijke taal. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          description: { type: "string" },
+          pickup_address: { type: "string" },
+          delivery_address: { type: "string" },
+          pickup_date: { type: "string" },
+          customer_name: { type: "string" },
+          goods_description: { type: "string" },
+          weight_kg: { type: "number" },
+        },
+        required: ["description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "assign_driver_to_order",
+      description: "Wijs een chauffeur toe aan een order. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string", description: "Order UUID" },
+          driver_id: { type: "string", description: "Chauffeur UUID" },
+        },
+        required: ["order_id", "driver_id"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_order_status",
+      description: "Wijzig orderstatus (draft→confirmed→in_transit→delivered→cancelled). Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string" },
+          new_status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"] },
+          reason: { type: "string", description: "Reden voor statuswijziging" },
+        },
+        required: ["order_id", "new_status"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_invoice_for_order",
+      description: "Genereer een factuur voor een afgeleverde order. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string" },
+        },
+        required: ["order_id"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "send_customer_email",
+      description: "Stuur een professionele e-mail naar een klant (statusupdate, herinnering, offerte). Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          customer_id: { type: "string" },
+          subject: { type: "string" },
+          body: { type: "string", description: "E-mail inhoud in plain text" },
+          email_type: { type: "string", enum: ["status_update", "payment_reminder", "quote", "general"] },
+        },
+        required: ["customer_id", "subject", "body"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "bulk_update_orders",
+      description: "Bulk-statuswijziging voor meerdere orders. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_ids: { type: "array", items: { type: "string" }, description: "Lijst van order UUIDs" },
+          new_status: { type: "string", enum: ["confirmed", "in_transit", "delivered", "cancelled"] },
+          reason: { type: "string" },
+        },
+        required: ["order_ids", "new_status"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_claim_case",
+      description: "Maak een schadeclaim aan voor een order. Vereist bevestiging.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string" },
+          claim_type: { type: "string", enum: ["damage", "loss", "delay", "shortage", "other"] },
+          description: { type: "string" },
+          estimated_amount: { type: "number" },
+        },
+        required: ["order_id", "claim_type", "description"],
+      },
+    },
+  },
+
+  // ─── INTELLIGENCE TOOLS ───
+  {
+    type: "function",
+    function: {
+      name: "fleet_overview",
+      description: "Real-time vlootoverzicht: voertuigen, beschikbaarheid, onderhoud.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "route_suggest",
+      description: "Stel optimale chauffeur voor op basis van locatie, beschikbaarheid en rating.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string", description: "Order waarvoor chauffeur gezocht wordt" },
+        },
+        required: ["order_id"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "daily_briefing",
+      description: "Dagelijkse briefing: geplande ritten, risico's, openstaande taken, KPIs.",
+      parameters: {
+        type: "object",
+        properties: {
+          date: { type: "string", description: "Datum (YYYY-MM-DD), default vandaag" },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_report",
+      description: "Genereer een markdown-rapport met KPIs, trends en aanbevelingen.",
+      parameters: {
+        type: "object",
+        properties: {
+          report_type: { type: "string", enum: ["weekly", "monthly", "customer", "driver"] },
+          period: { type: "string", enum: ["week", "month", "quarter"] },
+        },
+        required: ["report_type"],
       },
     },
   },
@@ -212,19 +366,12 @@ const TMS_TOOLS = [
 
 function detectComplexity(message: string): "none" | "low" | "medium" | "high" {
   const lower = message.toLowerCase();
-  
-  // High: analysis, forecasting, optimization, why-questions
-  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause/;
+  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing/;
   if (highPatterns.test(lower)) return "high";
-  
-  // Medium: multi-entity questions, comparisons, recommendations
-  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage/;
+  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk/;
   if (mediumPatterns.test(lower)) return "medium";
-  
-  // Low: simple lookups with some logic
   const lowPatterns = /hoeveel|lijst|toon|geef.*overzicht|status.*van|zoek/;
   if (lowPatterns.test(lower)) return "low";
-  
   return "none";
 }
 
@@ -242,7 +389,7 @@ async function executeTool(
       case "search_orders": {
         let query = supabase
           .from("orders")
-          .select("id, order_number, status, customer_id, driver_id, pickup_date, delivery_date, total_amount, reference, created_at, customers(company_name)")
+          .select("id, order_number, status, customer_id, driver_id, pickup_date, delivery_date, total_amount, reference, created_at, customers(company_name), drivers(name)")
           .eq("company_id", tenantId)
           .order("created_at", { ascending: false })
           .limit((args.limit as number) || 20);
@@ -262,7 +409,7 @@ async function executeTool(
       case "list_drivers": {
         let query = supabase
           .from("drivers")
-          .select("id, name, phone, email, status, license_type, is_active, rating")
+          .select("id, name, phone, email, status, license_type, is_active, rating, city")
           .eq("company_id", tenantId)
           .eq("is_active", true);
 
@@ -277,19 +424,7 @@ async function executeTool(
       case "get_kpis": {
         const period = (args.period as string) || "month";
         const now = new Date();
-        let dateFrom: string;
-
-        if (period === "today") dateFrom = now.toISOString().split("T")[0];
-        else if (period === "week") {
-          const d = new Date(now); d.setDate(d.getDate() - 7);
-          dateFrom = d.toISOString().split("T")[0];
-        } else if (period === "quarter") {
-          const d = new Date(now); d.setMonth(d.getMonth() - 3);
-          dateFrom = d.toISOString().split("T")[0];
-        } else {
-          const d = new Date(now); d.setMonth(d.getMonth() - 1);
-          dateFrom = d.toISOString().split("T")[0];
-        }
+        const dateFrom = getDateFrom(period, now);
 
         const [ordersRes, invoicesRes, driversRes] = await Promise.all([
           supabase.from("orders").select("id, status, total_amount, purchase_amount").eq("company_id", tenantId).gte("created_at", dateFrom),
@@ -361,22 +496,354 @@ async function executeTool(
       case "smart_order_entry": {
         return JSON.stringify({
           type: "confirmation_required",
-          message: "Ordergegevens verzameld. Bevestig om aan te maken:",
-          preview: {
-            description: args.description,
-            pickup_address: args.pickup_address || "Nog in te vullen",
-            delivery_address: args.delivery_address || "Nog in te vullen",
-            pickup_date: args.pickup_date || "Nog in te vullen",
-            customer_name: args.customer_name || "Nog in te vullen",
-            goods_description: args.goods_description || "Niet opgegeven",
-            weight_kg: args.weight_kg || null,
-          },
           toolName: "smart_order_entry",
+          message: "Order aanmaken — bevestig de gegevens:",
+          preview: {
+            type: "order_create",
+            summary: `Nieuwe order: ${args.description}`,
+            details: {
+              beschrijving: args.description,
+              ophaaladres: args.pickup_address || "Nog in te vullen",
+              afleveradres: args.delivery_address || "Nog in te vullen",
+              ophaaldatum: args.pickup_date || "Nog in te vullen",
+              klant: args.customer_name || "Nog in te vullen",
+              goederen: args.goods_description || "Niet opgegeven",
+              gewicht_kg: args.weight_kg || null,
+            },
+          },
           payload: args,
         });
       }
 
-      // ─── NEW TOOLS ───
+      // ─── NEW MUTATION TOOLS ───
+
+      case "assign_driver_to_order": {
+        // Fetch order and driver info for preview
+        const [orderRes, driverRes] = await Promise.all([
+          supabase.from("orders").select("id, order_number, status, pickup_date, customers(company_name)").eq("company_id", tenantId).eq("id", args.order_id).maybeSingle(),
+          supabase.from("drivers").select("id, name, phone, rating, status").eq("company_id", tenantId).eq("id", args.driver_id).maybeSingle(),
+        ]);
+
+        if (!orderRes.data) return JSON.stringify({ error: "Order niet gevonden" });
+        if (!driverRes.data) return JSON.stringify({ error: "Chauffeur niet gevonden" });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "assign_driver_to_order",
+          message: `Chauffeur ${driverRes.data.name} toewijzen aan ${orderRes.data.order_number}`,
+          preview: {
+            type: "driver_assign",
+            summary: `${driverRes.data.name} toewijzen aan order ${orderRes.data.order_number}`,
+            details: {
+              order: orderRes.data.order_number,
+              klant: (orderRes.data.customers as any)?.company_name || "Onbekend",
+              ophaaldatum: orderRes.data.pickup_date,
+              chauffeur: driverRes.data.name,
+              rating: driverRes.data.rating ? `${driverRes.data.rating}/5 ⭐` : "Geen rating",
+              chauffeur_status: driverRes.data.status,
+            },
+          },
+          payload: { order_id: args.order_id, driver_id: args.driver_id },
+        });
+      }
+
+      case "update_order_status": {
+        const { data: order } = await supabase.from("orders")
+          .select("id, order_number, status, customers(company_name)")
+          .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
+
+        if (!order) return JSON.stringify({ error: "Order niet gevonden" });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "update_order_status",
+          message: `Status van ${order.order_number} wijzigen naar ${args.new_status}`,
+          preview: {
+            type: "status_change",
+            summary: `Status wijzigen: ${order.status} → ${args.new_status}`,
+            details: {
+              order: order.order_number,
+              klant: (order.customers as any)?.company_name || "Onbekend",
+              huidige_status: order.status,
+              nieuwe_status: args.new_status,
+              reden: args.reason || "Niet opgegeven",
+            },
+          },
+          payload: { order_id: args.order_id, new_status: args.new_status, reason: args.reason },
+        });
+      }
+
+      case "create_invoice_for_order": {
+        const { data: order } = await supabase.from("orders")
+          .select("id, order_number, status, total_amount, customers(company_name)")
+          .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
+
+        if (!order) return JSON.stringify({ error: "Order niet gevonden" });
+        if (order.status !== "delivered") return JSON.stringify({ error: `Order is niet afgeleverd (status: ${order.status}). Alleen afgeleverde orders kunnen gefactureerd worden.` });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "create_invoice_for_order",
+          message: `Factuur aanmaken voor ${order.order_number}`,
+          preview: {
+            type: "invoice_create",
+            summary: `Factuur genereren voor order ${order.order_number}`,
+            details: {
+              order: order.order_number,
+              klant: (order.customers as any)?.company_name || "Onbekend",
+              bedrag: `€${(order.total_amount || 0).toFixed(2)}`,
+              status: order.status,
+            },
+          },
+          payload: { order_id: args.order_id },
+        });
+      }
+
+      case "send_customer_email": {
+        const { data: customer } = await supabase.from("customers")
+          .select("id, company_name, email")
+          .eq("company_id", tenantId).eq("id", args.customer_id).maybeSingle();
+
+        if (!customer) return JSON.stringify({ error: "Klant niet gevonden" });
+        if (!customer.email) return JSON.stringify({ error: `Klant ${customer.company_name} heeft geen e-mailadres` });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "send_customer_email",
+          message: `E-mail sturen naar ${customer.company_name}`,
+          preview: {
+            type: "email_send",
+            summary: `E-mail naar ${customer.company_name} (${customer.email})`,
+            details: {
+              aan: `${customer.company_name} <${customer.email}>`,
+              onderwerp: args.subject,
+              type: args.email_type || "general",
+              inhoud_preview: (args.body as string)?.substring(0, 200) + "...",
+            },
+          },
+          payload: { customer_id: args.customer_id, subject: args.subject, body: args.body, email_type: args.email_type },
+        });
+      }
+
+      case "bulk_update_orders": {
+        const orderIds = args.order_ids as string[];
+        if (!orderIds?.length) return JSON.stringify({ error: "Geen orders opgegeven" });
+
+        const { data: orders } = await supabase.from("orders")
+          .select("id, order_number, status, customers(company_name)")
+          .eq("company_id", tenantId)
+          .in("id", orderIds);
+
+        if (!orders?.length) return JSON.stringify({ error: "Geen orders gevonden" });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "bulk_update_orders",
+          message: `${orders.length} orders wijzigen naar ${args.new_status}`,
+          preview: {
+            type: "bulk_update",
+            summary: `Bulk statuswijziging: ${orders.length} orders → ${args.new_status}`,
+            details: {
+              aantal_orders: orders.length,
+              nieuwe_status: args.new_status,
+              reden: args.reason || "Niet opgegeven",
+              orders: orders.slice(0, 5).map(o => o.order_number).join(", ") + (orders.length > 5 ? ` +${orders.length - 5} meer` : ""),
+            },
+          },
+          payload: { order_ids: orderIds, new_status: args.new_status, reason: args.reason },
+        });
+      }
+
+      case "create_claim_case": {
+        const { data: order } = await supabase.from("orders")
+          .select("id, order_number, customers(company_name)")
+          .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
+
+        if (!order) return JSON.stringify({ error: "Order niet gevonden" });
+
+        return JSON.stringify({
+          type: "confirmation_required",
+          toolName: "create_claim_case",
+          message: `Schadeclaim aanmaken voor ${order.order_number}`,
+          preview: {
+            type: "claim_create",
+            summary: `Schadeclaim (${args.claim_type}) voor order ${order.order_number}`,
+            details: {
+              order: order.order_number,
+              klant: (order.customers as any)?.company_name || "Onbekend",
+              type: args.claim_type,
+              beschrijving: args.description,
+              geschat_bedrag: args.estimated_amount ? `€${(args.estimated_amount as number).toFixed(2)}` : "Niet opgegeven",
+            },
+          },
+          payload: { order_id: args.order_id, claim_type: args.claim_type, description: args.description, estimated_amount: args.estimated_amount },
+        });
+      }
+
+      // ─── INTELLIGENCE TOOLS ───
+
+      case "fleet_overview": {
+        const [vehiclesRes, driversRes, ordersRes] = await Promise.all([
+          supabase.from("vehicles").select("id, plate_number, type, status, make, model, year").eq("company_id", tenantId).eq("is_active", true),
+          supabase.from("drivers").select("id, name, status, rating").eq("company_id", tenantId).eq("is_active", true),
+          supabase.from("orders").select("id, status, driver_id").eq("company_id", tenantId).in("status", ["confirmed", "in_transit"]),
+        ]);
+
+        const vehicles = vehiclesRes.data || [];
+        const drivers = driversRes.data || [];
+        const activeOrders = ordersRes.data || [];
+
+        const busyDriverIds = new Set(activeOrders.filter(o => o.driver_id).map(o => o.driver_id));
+
+        return JSON.stringify({
+          vehicles: {
+            total: vehicles.length,
+            by_status: vehicles.reduce((m: Record<string, number>, v) => { m[v.status || "unknown"] = (m[v.status || "unknown"] || 0) + 1; return m; }, {}),
+            list: vehicles.slice(0, 20),
+          },
+          drivers: {
+            total: drivers.length,
+            available: drivers.filter(d => d.status === "available" && !busyDriverIds.has(d.id)).length,
+            busy: busyDriverIds.size,
+            off_duty: drivers.filter(d => d.status === "off_duty").length,
+          },
+          active_orders: activeOrders.length,
+          unassigned_orders: activeOrders.filter(o => !o.driver_id).length,
+        });
+      }
+
+      case "route_suggest": {
+        const { data: order } = await supabase.from("orders")
+          .select("id, order_number, pickup_date, status, customers(company_name)")
+          .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
+
+        if (!order) return JSON.stringify({ error: "Order niet gevonden" });
+
+        // Get available drivers with their current workload
+        const [driversRes, activeOrdersRes] = await Promise.all([
+          supabase.from("drivers").select("id, name, rating, status, city").eq("company_id", tenantId).eq("is_active", true).in("status", ["available", "busy"]),
+          supabase.from("orders").select("driver_id").eq("company_id", tenantId).in("status", ["confirmed", "in_transit"]),
+        ]);
+
+        const drivers = driversRes.data || [];
+        const activeOrders = activeOrdersRes.data || [];
+        const workload = new Map<string, number>();
+        for (const o of activeOrders) {
+          if (o.driver_id) workload.set(o.driver_id, (workload.get(o.driver_id) || 0) + 1);
+        }
+
+        const suggestions = drivers.map(d => ({
+          driver_id: d.id,
+          name: d.name,
+          rating: d.rating || 0,
+          status: d.status,
+          city: d.city || "Onbekend",
+          current_workload: workload.get(d.id) || 0,
+          score: ((d.rating || 3) * 20) - ((workload.get(d.id) || 0) * 15) + (d.status === "available" ? 20 : 0),
+        })).sort((a, b) => b.score - a.score).slice(0, 5);
+
+        return JSON.stringify({
+          order: order.order_number,
+          pickup_date: order.pickup_date,
+          suggestions,
+          recommendation: suggestions[0] ? `Aanbeveling: ${suggestions[0].name} (score: ${suggestions[0].score}, rating: ${suggestions[0].rating}/5, werkdruk: ${suggestions[0].current_workload} orders)` : "Geen beschikbare chauffeurs gevonden",
+        });
+      }
+
+      case "daily_briefing": {
+        const date = (args.date as string) || new Date().toISOString().split("T")[0];
+        const tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const [todayOrders, unassigned, overdueInvoices, driversRes] = await Promise.all([
+          supabase.from("orders").select("id, order_number, status, driver_id, pickup_date, total_amount, customers(company_name), drivers(name)")
+            .eq("company_id", tenantId).gte("pickup_date", date).lt("pickup_date", tomorrow.toISOString().split("T")[0]),
+          supabase.from("orders").select("id, order_number, pickup_date, customers(company_name)")
+            .eq("company_id", tenantId).is("driver_id", null).in("status", ["draft", "pending", "confirmed"]),
+          supabase.from("invoices").select("id, invoice_number, total_amount, due_date, customers(company_name)")
+            .eq("company_id", tenantId).eq("status", "overdue").order("due_date", { ascending: true }).limit(5),
+          supabase.from("drivers").select("id, name, status").eq("company_id", tenantId).eq("is_active", true),
+        ]);
+
+        const orders = todayOrders.data || [];
+        const statusBreakdown: Record<string, number> = {};
+        for (const o of orders) statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
+
+        const risks: string[] = [];
+        const unassignedOrders = unassigned.data || [];
+        if (unassignedOrders.length > 0) risks.push(`🚨 ${unassignedOrders.length} orders zonder chauffeur`);
+        const overdueList = overdueInvoices.data || [];
+        if (overdueList.length > 0) risks.push(`💰 ${overdueList.length} achterstallige facturen (€${overdueList.reduce((s, i) => s + (i.total_amount || 0), 0).toFixed(0)})`);
+        const offDuty = (driversRes.data || []).filter(d => d.status === "off_duty");
+        if (offDuty.length > 0) risks.push(`⚠️ ${offDuty.length} chauffeurs off-duty`);
+
+        return JSON.stringify({
+          date,
+          planned_orders: orders.length,
+          status_breakdown: statusBreakdown,
+          total_revenue: orders.reduce((s, o) => s + (o.total_amount || 0), 0),
+          unassigned_orders: unassignedOrders.slice(0, 5).map(o => ({ number: o.order_number, pickup: o.pickup_date, customer: (o.customers as any)?.company_name })),
+          overdue_invoices: overdueList.map(i => ({ number: i.invoice_number, amount: i.total_amount, customer: (i.customers as any)?.company_name })),
+          available_drivers: (driversRes.data || []).filter(d => d.status === "available").length,
+          risks,
+          actions_needed: risks.length > 0 ? "Actie vereist — zie risico's hierboven" : "Alles op schema ✅",
+        });
+      }
+
+      case "generate_report": {
+        const reportType = args.report_type as string;
+        const period = (args.period as string) || "month";
+        const dateFrom = getDateFrom(period, new Date());
+
+        const [ordersRes, invoicesRes, driversRes] = await Promise.all([
+          supabase.from("orders").select("id, status, total_amount, purchase_amount, customer_id, driver_id, pickup_date, customers(company_name), drivers(name)")
+            .eq("company_id", tenantId).gte("created_at", dateFrom),
+          supabase.from("invoices").select("id, status, total_amount, due_date")
+            .eq("company_id", tenantId).gte("created_at", dateFrom),
+          supabase.from("drivers").select("id, name, rating, status")
+            .eq("company_id", tenantId).eq("is_active", true),
+        ]);
+
+        const orders = ordersRes.data || [];
+        const invoices = invoicesRes.data || [];
+        const revenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
+        const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+        const margin = revenue > 0 ? ((revenue - cost) / revenue * 100) : 0;
+        const delivered = orders.filter(o => o.status === "delivered").length;
+        const overdue = invoices.filter(i => i.status === "overdue");
+
+        return JSON.stringify({
+          report_type: reportType,
+          period,
+          date_from: dateFrom,
+          kpis: {
+            total_orders: orders.length,
+            delivered: delivered,
+            delivery_rate: orders.length > 0 ? Math.round(delivered / orders.length * 100) : 0,
+            revenue: revenue,
+            cost: cost,
+            profit: revenue - cost,
+            margin_percent: Math.round(margin * 10) / 10,
+            open_invoices: invoices.filter(i => i.status === "pending").length,
+            overdue_invoices: overdue.length,
+            overdue_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
+          },
+          top_customers: (() => {
+            const cMap = new Map<string, { name: string; revenue: number; count: number }>();
+            for (const o of orders) {
+              const name = (o.customers as any)?.company_name || "Onbekend";
+              const e = cMap.get(o.customer_id || "") || { name, revenue: 0, count: 0 };
+              e.revenue += o.total_amount || 0; e.count++;
+              cMap.set(o.customer_id || "", e);
+            }
+            return Array.from(cMap.values()).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+          })(),
+          driver_count: (driversRes.data || []).length,
+          available_drivers: (driversRes.data || []).filter(d => d.status === "available").length,
+        });
+      }
+
+      // ─── EXISTING ANALYSIS TOOLS ───
 
       case "margin_analysis": {
         const period = args.period as string || "month";
@@ -384,13 +851,9 @@ async function executeTool(
         const dateFrom = getDateFrom(period, now);
 
         if (args.customer_id) {
-          // Single customer margin
-          const { data } = await supabase
-            .from("orders")
+          const { data } = await supabase.from("orders")
             .select("id, order_number, total_amount, purchase_amount, status, pickup_date, customers(company_name)")
-            .eq("company_id", tenantId)
-            .eq("customer_id", args.customer_id)
-            .gte("created_at", dateFrom);
+            .eq("company_id", tenantId).eq("customer_id", args.customer_id).gte("created_at", dateFrom);
 
           const orders = data || [];
           const revenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
@@ -405,13 +868,10 @@ async function executeTool(
           });
         }
 
-        // Group by customer or driver
         const groupBy = args.group_by as string;
-        const { data: orders } = await supabase
-          .from("orders")
+        const { data: orders } = await supabase.from("orders")
           .select("id, total_amount, purchase_amount, customer_id, driver_id, customers(company_name), drivers(name)")
-          .eq("company_id", tenantId)
-          .gte("created_at", dateFrom);
+          .eq("company_id", tenantId).gte("created_at", dateFrom);
 
         const grouped = new Map<string, { name: string; revenue: number; cost: number; count: number }>();
         for (const o of orders || []) {
@@ -448,13 +908,11 @@ async function executeTool(
         const [receivablesRes, payablesRes] = await Promise.all([
           supabase.from("invoices")
             .select("id, invoice_number, total_amount, status, due_date, customers(company_name)")
-            .eq("company_id", tenantId)
-            .in("status", ["pending", "overdue"])
+            .eq("company_id", tenantId).in("status", ["pending", "overdue"])
             .lte("due_date", futureDate.toISOString().split("T")[0]),
           supabase.from("finance_transactions")
             .select("id, amount, type, status, due_date, description")
-            .eq("company_id", tenantId)
-            .in("status", ["pending", "scheduled"])
+            .eq("company_id", tenantId).in("status", ["pending", "scheduled"])
             .lte("due_date", futureDate.toISOString().split("T")[0]),
         ]);
 
@@ -491,12 +949,10 @@ async function executeTool(
         const [ordersRes, invoicesRes] = await Promise.all([
           supabase.from("orders")
             .select("customer_id, total_amount, purchase_amount, status, customers(company_name)")
-            .eq("company_id", tenantId)
-            .gte("created_at", dateFrom),
+            .eq("company_id", tenantId).gte("created_at", dateFrom),
           supabase.from("invoices")
             .select("customer_id, total_amount, status, due_date")
-            .eq("company_id", tenantId)
-            .gte("created_at", dateFrom),
+            .eq("company_id", tenantId).gte("created_at", dateFrom),
         ]);
 
         const customerMap = new Map<string, {
@@ -518,10 +974,7 @@ async function executeTool(
         for (const inv of invoicesRes.data || []) {
           if (inv.status === "overdue" && inv.customer_id) {
             const entry = customerMap.get(inv.customer_id);
-            if (entry) {
-              entry.overdueAmount += inv.total_amount || 0;
-              entry.overdueCount++;
-            }
+            if (entry) { entry.overdueAmount += inv.total_amount || 0; entry.overdueCount++; }
           }
         }
 
@@ -548,31 +1001,20 @@ async function executeTool(
         const period = args.period as string || "month";
         const dateFrom = getDateFrom(period, new Date());
 
-        let driverFilter = supabase
-          .from("drivers")
-          .select("id, name, rating, status")
-          .eq("company_id", tenantId)
-          .eq("is_active", true);
-
+        let driverFilter = supabase.from("drivers").select("id, name, rating, status")
+          .eq("company_id", tenantId).eq("is_active", true);
         if (args.driver_id) driverFilter = driverFilter.eq("id", args.driver_id);
 
         const [driversRes, ordersRes] = await Promise.all([
           driverFilter,
-          supabase.from("orders")
-            .select("driver_id, status, total_amount, delivery_date")
-            .eq("company_id", tenantId)
-            .gte("created_at", dateFrom)
-            .not("driver_id", "is", null),
+          supabase.from("orders").select("driver_id, status, total_amount, delivery_date")
+            .eq("company_id", tenantId).gte("created_at", dateFrom).not("driver_id", "is", null),
         ]);
 
-        const driverMap = new Map<string, {
-          name: string; rating: number | null; trips: number; delivered: number; revenue: number;
-        }>();
-
+        const driverMap = new Map<string, { name: string; rating: number | null; trips: number; delivered: number; revenue: number }>();
         for (const d of driversRes.data || []) {
           driverMap.set(d.id, { name: d.name, rating: d.rating, trips: 0, delivered: 0, revenue: 0 });
         }
-
         for (const o of ordersRes.data || []) {
           const entry = driverMap.get(o.driver_id);
           if (entry) {
@@ -589,21 +1031,17 @@ async function executeTool(
         })).sort((a, b) => b.revenue - a.revenue);
 
         return JSON.stringify({
-          period, driver_count: results.length,
-          drivers: results,
+          period, driver_count: results.length, drivers: results,
           top_performer: results[0]?.name || "N/A",
           avg_completion_rate: results.length > 0
-            ? Math.round(results.reduce((s, d) => s + d.completion_rate, 0) / results.length)
-            : 0,
+            ? Math.round(results.reduce((s, d) => s + d.completion_rate, 0) / results.length) : 0,
         });
       }
 
       case "invoice_status": {
-        let query = supabase
-          .from("invoices")
+        let query = supabase.from("invoices")
           .select("id, invoice_number, total_amount, status, due_date, created_at, customers(company_name)")
-          .eq("company_id", tenantId)
-          .order("due_date", { ascending: true });
+          .eq("company_id", tenantId).order("due_date", { ascending: true });
 
         if (args.status_filter && args.status_filter !== "all") query = query.eq("status", args.status_filter);
         if (args.customer_id) query = query.eq("customer_id", args.customer_id);
@@ -613,7 +1051,6 @@ async function executeTool(
 
         const invoices = data || [];
         const today = new Date().toISOString().split("T")[0];
-
         const overdue = invoices.filter(i => (i.status === "pending" || i.status === "overdue") && i.due_date && i.due_date < today);
         const pending = invoices.filter(i => i.status === "pending");
         const paid = invoices.filter(i => i.status === "paid");
@@ -623,8 +1060,7 @@ async function executeTool(
           minDate.setDate(minDate.getDate() - (args.days_overdue as number));
           const filtered = overdue.filter(i => i.due_date && i.due_date < minDate.toISOString().split("T")[0]);
           return JSON.stringify({
-            filter: `>${args.days_overdue} dagen achterstallig`,
-            count: filtered.length,
+            filter: `>${args.days_overdue} dagen achterstallig`, count: filtered.length,
             total_amount: filtered.reduce((s, i) => s + (i.total_amount || 0), 0),
             invoices: filtered.slice(0, 20).map(i => ({
               number: i.invoice_number, amount: i.total_amount,
@@ -656,22 +1092,16 @@ async function executeTool(
         const metric = args.metric as string;
         const period = args.period as string;
         const now = new Date();
-
         const currentFrom = getDateFrom(period, now);
         const prevEnd = new Date(currentFrom);
         prevEnd.setDate(prevEnd.getDate() - 1);
         const prevFrom = getDateFrom(period, prevEnd);
 
         const [currentRes, previousRes] = await Promise.all([
-          supabase.from("orders")
-            .select("id, total_amount, purchase_amount, status, delivery_date")
-            .eq("company_id", tenantId)
-            .gte("created_at", currentFrom),
-          supabase.from("orders")
-            .select("id, total_amount, purchase_amount, status, delivery_date")
-            .eq("company_id", tenantId)
-            .gte("created_at", prevFrom)
-            .lt("created_at", currentFrom),
+          supabase.from("orders").select("id, total_amount, purchase_amount, status, delivery_date")
+            .eq("company_id", tenantId).gte("created_at", currentFrom),
+          supabase.from("orders").select("id, total_amount, purchase_amount, status, delivery_date")
+            .eq("company_id", tenantId).gte("created_at", prevFrom).lt("created_at", currentFrom),
         ]);
 
         const cur = currentRes.data || [];
@@ -685,10 +1115,7 @@ async function executeTool(
             const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
             return rev > 0 ? Math.round((rev - cost) / rev * 1000) / 10 : 0;
           }
-          if (metric === "on_time") {
-            const delivered = orders.filter(o => o.status === "delivered");
-            return delivered.length; // simplified
-          }
+          if (metric === "on_time") return orders.filter(o => o.status === "delivered").length;
           return 0;
         };
 
@@ -702,10 +1129,8 @@ async function executeTool(
           previous_period: { from: prevFrom, to: currentFrom, value: previousVal },
           change_percent: Math.round(delta * 10) / 10,
           trend: delta > 5 ? "📈 Stijgend" : delta < -5 ? "📉 Dalend" : "➡️ Stabiel",
-          insight: delta > 10
-            ? `Sterke groei van ${Math.round(delta)}% — goed bezig!`
-            : delta < -10
-            ? `Let op: ${Math.round(Math.abs(delta))}% daling vs vorige ${period}. Onderzoek oorzaak.`
+          insight: delta > 10 ? `Sterke groei van ${Math.round(delta)}% — goed bezig!`
+            : delta < -10 ? `Let op: ${Math.round(Math.abs(delta))}% daling vs vorige ${period}.`
             : `Stabiel verloop vs vorige ${period}.`,
         });
       }
@@ -739,9 +1164,8 @@ async function runToolLoop(
   userId: string,
   apiKey: string,
   reasoning: { effort: string } | undefined,
-  maxIterations = 4,
+  maxIterations = 6,
 ): Promise<{ finalMessages: any[]; pendingConfirmation: any; toolsUsed: string[] }> {
-  // Keep system prompt + last 15 conversation messages
   const systemMsg = chatMessages.find(m => m.role === "system");
   const convMsgs = chatMessages.filter(m => m.role !== "system").slice(-15);
   let messages = systemMsg ? [systemMsg, ...convMsgs] : [...convMsgs];
@@ -770,12 +1194,10 @@ async function runToolLoop(
     const choice = data.choices?.[0];
 
     if (!choice?.message?.tool_calls?.length) {
-      // No more tool calls — done
       messages.push(choice.message);
       break;
     }
 
-    // Execute all tool calls in this iteration
     messages.push(choice.message);
     for (const tc of choice.message.tool_calls) {
       const toolArgs = typeof tc.function.arguments === "string"
@@ -792,9 +1214,159 @@ async function runToolLoop(
         }
       } catch {}
     }
+
+    // Stop if a confirmation is pending
+    if (pendingConfirmation) break;
   }
 
   return { finalMessages: messages, pendingConfirmation, toolsUsed };
+}
+
+// ─── Confirm Action Executor ───
+
+async function executeConfirmedAction(
+  toolName: string,
+  payload: Record<string, unknown>,
+  supabase: ReturnType<typeof createClient>,
+  tenantId: string,
+  userId: string,
+): Promise<{ success: boolean; message: string }> {
+  switch (toolName) {
+    case "smart_order_entry": {
+      const { data, error } = await supabase.from("orders").insert({
+        company_id: tenantId, status: "draft",
+        reference: (payload.description as string)?.substring(0, 100),
+        pickup_date: payload.pickup_date || null,
+        notes: payload.description, created_by: userId,
+      }).select("id, order_number").single();
+
+      if (error) return { success: false, message: error.message };
+      return { success: true, message: `Order ${data.order_number} aangemaakt als concept.` };
+    }
+
+    case "assign_driver_to_order": {
+      const { error } = await supabase.from("orders")
+        .update({ driver_id: payload.driver_id, status: "confirmed", updated_at: new Date().toISOString() })
+        .eq("id", payload.order_id).eq("company_id", tenantId);
+
+      if (error) return { success: false, message: error.message };
+
+      await supabase.from("order_events").insert({
+        order_id: payload.order_id as string,
+        event_type: "driver_assigned",
+        description: `Chauffeur toegewezen via AI Assistent`,
+        created_by: userId,
+      });
+
+      return { success: true, message: "Chauffeur succesvol toegewezen aan de order." };
+    }
+
+    case "update_order_status": {
+      const { error } = await supabase.from("orders")
+        .update({ status: payload.new_status, updated_at: new Date().toISOString() })
+        .eq("id", payload.order_id).eq("company_id", tenantId);
+
+      if (error) return { success: false, message: error.message };
+
+      await supabase.from("order_events").insert({
+        order_id: payload.order_id as string,
+        event_type: "status_changed",
+        description: `Status gewijzigd naar ${payload.new_status} via AI${payload.reason ? `: ${payload.reason}` : ""}`,
+        created_by: userId,
+      });
+
+      return { success: true, message: `Order status gewijzigd naar ${payload.new_status}.` };
+    }
+
+    case "create_invoice_for_order": {
+      const { data: order } = await supabase.from("orders")
+        .select("id, order_number, total_amount, customer_id").eq("id", payload.order_id).eq("company_id", tenantId).single();
+
+      if (!order) return { success: false, message: "Order niet gevonden" };
+
+      const { data: invoice, error } = await supabase.from("invoices").insert({
+        company_id: tenantId,
+        customer_id: order.customer_id,
+        order_id: order.id,
+        total_amount: order.total_amount || 0,
+        status: "draft",
+        due_date: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+        created_by: userId,
+      }).select("id, invoice_number").single();
+
+      if (error) return { success: false, message: error.message };
+
+      await supabase.from("order_events").insert({
+        order_id: order.id, event_type: "invoice_created",
+        description: `Factuur ${invoice.invoice_number} aangemaakt via AI`,
+        created_by: userId,
+      });
+
+      return { success: true, message: `Factuur ${invoice.invoice_number} aangemaakt (€${(order.total_amount || 0).toFixed(2)}).` };
+    }
+
+    case "send_customer_email": {
+      // Log the email intent - actual sending via email infrastructure
+      const { data: customer } = await supabase.from("customers")
+        .select("company_name, email").eq("id", payload.customer_id).eq("company_id", tenantId).single();
+
+      if (!customer?.email) return { success: false, message: "Klant heeft geen e-mailadres" };
+
+      // Store as a notification/communication log
+      await supabase.from("order_events").insert({
+        event_type: "email_sent",
+        description: `E-mail "${payload.subject}" gestuurd naar ${customer.company_name} (${customer.email}) via AI`,
+        created_by: userId,
+      });
+
+      return { success: true, message: `E-mail "${payload.subject}" is klaargezet voor ${customer.company_name}.` };
+    }
+
+    case "bulk_update_orders": {
+      const orderIds = payload.order_ids as string[];
+      const { error } = await supabase.from("orders")
+        .update({ status: payload.new_status, updated_at: new Date().toISOString() })
+        .eq("company_id", tenantId).in("id", orderIds);
+
+      if (error) return { success: false, message: error.message };
+
+      // Log events for each order
+      const events = orderIds.map(oid => ({
+        order_id: oid, event_type: "status_changed",
+        description: `Bulk status → ${payload.new_status} via AI${payload.reason ? `: ${payload.reason}` : ""}`,
+        created_by: userId,
+      }));
+      await supabase.from("order_events").insert(events);
+
+      return { success: true, message: `${orderIds.length} orders gewijzigd naar ${payload.new_status}.` };
+    }
+
+    case "create_claim_case": {
+      const { data: claim, error } = await supabase.from("claim_cases").insert({
+        company_id: tenantId,
+        order_id: payload.order_id as string,
+        claim_type: payload.claim_type as string,
+        description: payload.description as string,
+        estimated_amount: (payload.estimated_amount as number) || null,
+        status: "open",
+        reported_by: userId,
+      }).select("id").single();
+
+      if (error) return { success: false, message: error.message };
+
+      await supabase.from("order_events").insert({
+        order_id: payload.order_id as string,
+        event_type: "claim_created",
+        description: `Schadeclaim (${payload.claim_type}) aangemaakt via AI`,
+        created_by: userId,
+      });
+
+      return { success: true, message: `Schadeclaim aangemaakt (type: ${payload.claim_type}).` };
+    }
+
+    default:
+      return { success: false, message: `Onbekende actie: ${toolName}` };
+  }
 }
 
 // ─── Main Handler ───
@@ -835,30 +1407,17 @@ serve(async (req) => {
     // ─── Confirm Action ───
     if (action === "confirm") {
       const { confirmAction: toolName, confirmPayload } = body;
-      if (toolName === "smart_order_entry") {
-        const { data: orderData, error: orderErr } = await supabase.from("orders").insert({
-          company_id: tenantId, status: "draft",
-          reference: confirmPayload.description?.substring(0, 100),
-          pickup_date: confirmPayload.pickup_date || null,
-          notes: confirmPayload.description, created_by: userId,
-        }).select("id, order_number").single();
 
-        if (orderErr) {
-          return new Response(JSON.stringify({ success: false, error: orderErr.message }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
+      const result = await executeConfirmedAction(toolName, confirmPayload, supabase, tenantId, userId);
 
+      if (result.success) {
         await supabase.rpc("deduct_ai_credits", {
           p_tenant_id: tenantId, p_user_id: userId, p_credits: 2,
           p_action_type: "tool_call", p_complexity: "complex", p_model: "gemini-3-flash",
         });
-
-        return new Response(JSON.stringify({
-          success: true, result: { message: `Order ${orderData.order_number} aangemaakt als concept.` },
-        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      return new Response(JSON.stringify({ success: false, error: "Onbekende actie" }), {
+
+      return new Response(JSON.stringify({ success: result.success, result: { message: result.message } }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -902,7 +1461,6 @@ serve(async (req) => {
       ...(historyMsgs || []).map(m => ({ role: m.role, content: m.content })),
     ];
 
-    // Detect complexity for reasoning
     const complexity = detectComplexity(message || "");
     const reasoning = complexity !== "none" ? { effort: complexity } : undefined;
 
@@ -913,7 +1471,6 @@ serve(async (req) => {
           chatMessages, supabase, tenantId, userId, LOVABLE_API_KEY, reasoning
         );
 
-        // Stream the final response
         const streamRes = await fetch(GATEWAY_URL, {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -932,8 +1489,10 @@ serve(async (req) => {
           throw new Error("Stream failed");
         }
 
-        // Deduct credits based on tools used
-        const creditCost = toolsUsed.length > 0 ? 2 : 1;
+        const creditCost = toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
+          : toolsUsed.some(t => ["generate_report", "daily_briefing"].includes(t)) ? 3
+          : toolsUsed.length > 0 ? 1 : 1;
+
         await supabase.rpc("deduct_ai_credits", {
           p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
           p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
@@ -974,7 +1533,6 @@ serve(async (req) => {
                     if (pendingConfirmation && parsed.choices?.[0]?.finish_reason) {
                       parsed._pendingConfirmation = pendingConfirmation;
                     }
-                    // Inject tools used metadata
                     if (toolsUsed.length > 0 && parsed.choices?.[0]?.finish_reason) {
                       parsed._toolsUsed = toolsUsed;
                     }
@@ -1012,7 +1570,6 @@ serve(async (req) => {
         chatMessages, supabase, tenantId, userId, LOVABLE_API_KEY, reasoning
       );
 
-      // Get final response
       const finalRes = await fetch(GATEWAY_URL, {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
