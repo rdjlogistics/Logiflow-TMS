@@ -229,9 +229,8 @@ const InvoiceDetail = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("PDF error — falling back to print:", error);
-      // Graceful degradation: open browser print dialog as fallback
-      window.print();
+      console.error("PDF error:", error);
+      toast({ title: "PDF genereren mislukt", description: "Probeer het opnieuw of neem contact op met support.", variant: "destructive" });
     } finally {
       setIsGenerating(false);
     }

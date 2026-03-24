@@ -260,9 +260,8 @@ const Invoices = () => {
       URL.revokeObjectURL(url);
       toast({ title: "PDF gedownload" });
     } catch (error) {
-      console.error("PDF generation error — falling back to print:", error);
-      // Graceful degradation: browser print dialog as fallback when edge function unavailable
-      window.print();
+      console.error("PDF generation error:", error);
+      toast({ title: "PDF genereren mislukt", description: "Probeer het opnieuw of neem contact op met support.", variant: "destructive" });
     }
   };
 

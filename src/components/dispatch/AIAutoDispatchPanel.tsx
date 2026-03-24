@@ -175,7 +175,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
           .update({ status: 'gepland' satisfies TripStatus })
           .eq('id', result.tripId);
         if (!error) successCount++;
-      } catch {}
+      } catch (e) { console.error('Trip update failed:', e); }
     }
     
     toast({
