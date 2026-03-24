@@ -16,9 +16,10 @@ interface Shipment {
 export function usePortalLabels() {
   const [generating, setGenerating] = useState(false);
 
-  const generateLabelPDF = (shipments: Shipment[]): Blob | null => {
+  const generateLabelPDF = async (shipments: Shipment[]): Promise<Blob | null> => {
     if (shipments.length === 0) return null;
 
+    const { default: jsPDF } = await import('jspdf');
     const doc = new jsPDF({ unit: 'mm', format: [100, 150] });
 
     shipments.forEach((shipment, index) => {

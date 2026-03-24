@@ -47,6 +47,8 @@ export async function exportRoutePDF(
   vehicleType?: string,
   branding?: PdfBranding
 ) {
+  const { default: jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const now = new Date();
