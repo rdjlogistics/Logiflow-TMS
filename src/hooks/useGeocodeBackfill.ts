@@ -57,9 +57,9 @@ export const useGeocodeBackfill = () => {
               .eq("id", stop.id);
 
             if (updateError) {
-              console.error(`[Backfill] Update failed for stop ${stop.id}:`, updateError);
+              logger.error(`[Backfill] Update failed for stop ${stop.id}:`, updateError);
             } else {
-              console.log(`[Backfill] ✓ Geocoded stop ${stop.id}: ${stop.address}, ${stop.city} → (${latitude}, ${longitude})`);
+              logger.log(`[Backfill] ✓ Geocoded stop ${stop.id}: ${stop.address}, ${stop.city} → (${latitude}, ${longitude})`);
             }
           } else {
             console.warn(`[Backfill] ✗ Could not geocode stop ${stop.id}: ${stop.address}, ${stop.city}`);
