@@ -126,6 +126,7 @@ const FleetMap = memo(({
         const [mapboxModule] = await Promise.all([
           import("mapbox-gl"),
           import("mapbox-gl/dist/mapbox-gl.css"),
+          import("@/styles/map-styles.css"),
         ]);
 
         if (cancelled || !mapContainerRef.current) return;
