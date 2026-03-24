@@ -243,6 +243,7 @@ const Drivers = () => {
     if (error) {
       toast({ title: "Beschikbaarheid bijwerken mislukt", variant: "destructive" });
     } else {
+      toast({ title: "Beschikbaarheid bijgewerkt" });
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     }
   };
