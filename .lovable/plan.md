@@ -1,52 +1,53 @@
 
 
-# Plan: Bulletproof PWA Caching met Autonome Auto-Update
+# Plan: Reduce Unused CSS — 44 KiB Besparing
 
 ## Probleem
-De Service Worker staat op `selfDestroying: true` — er is geen caching. Lighthouse rapporteert 887 KiB verspild bij elk bezoek. De app moet 100% autonoom draaien op web, iOS en macOS.
+Lighthouse rapporteert dat 94.5% van `index.css` (44 KiB van 47 KiB) ongebruikt is op de initiële pagina (Auth). De oorzaak: het 2.746-regelige `src/index.css` bevat alles in één bestand — 5 thema-presets (~1.200 regels), Mapbox-styling (~250 regels), brandstofmarker-CSS (~200 regels), en tientallen animatie/shimmer utilities die alleen op specifieke pagina's nodig zijn.
 
-## Risico van Service Worker
-Een actieve SW kan oude code serveren. De bestaande `clearServiceWorkerAndCaches()` in auth flows en error recovery vernietigt dan de cache. Dit conflicteert.
+## Oplossing: CSS Code-Splitting
 
-## Oplossing: 3 Wijzigingen
+Verplaats niet-kritieke CSS naar aparte bestanden die alleen geladen worden wanneer nodig.
 
-### 1. `vite.config.ts` — Service Worker Activeren
-- `selfDestroying: false`
-- `registerType: "autoUpdate"` — SW update automatisch op de achtergrond, geen gebruikersactie nodig
-- `navigateFallbackDenylist: [/^\/~oauth/]` — OAuth routes nooit cachen (vereist per Lovable docs)
-- `skipWaiting: true`, `clientsClaim: true` — nieuwe SW neemt direct over
-- `cleanupOutdatedCaches: true` — oude caches automatisch opruimen
-- Runtime caching toevoegen:
-  - Google Fonts: `CacheFirst`, 1 jaar TTL
-  - Supabase API: `NetworkFirst`, 5 min TTL (API data altijd vers, maar offline fallback)
-  - Mapbox: behouden zoals nu
+### Stap 1: Thema-presets extraheren (~1.200 regels → aparte bestanden)
+Verplaats elke themapreset naar een eigen bestand:
+- `src/styles/theme-vision-pro.css` (regels 1846–2132)
+- `src/styles/theme-horizon.css` (regels 2134–2392) 
+- `src/styles/theme-carbon.css` (regels 2394–2605)
+- `src/styles/theme-aurora.css` (regels 2607–2746)
 
-### 2. `src/lib/authStorage.ts` — `clearServiceWorkerAndCaches()` Aanpassen
-Het huidige gedrag (SW volledig deregistreren) is destructief bij een actieve SW. Aanpassen naar:
-- **Niet** de SW deregistreren — die moet blijven draaien voor caching
-- **Wel** auth-gerelateerde caches clearen (cookies, localStorage keys)
-- Cache Storage alleen clearen als het een echte error recovery is (niet bij normale logout)
-- Nieuwe functie `clearAuthCachesOnly()` voor logout flows
-- `clearServiceWorkerAndCaches()` behouden maar alleen aanroepen bij fatale chunk-errors (error recovery)
+### Stap 2: Dynamisch laden van thema-CSS
+In `ThemeProvider.tsx`: gebruik `import()` om het thema-CSS-bestand alleen te laden wanneer een niet-standaard thema actief is. De standaard Imperial-thema variabelen blijven in `index.css`.
 
-### 3. Callers Updaten
-- `Auth.tsx`, `DriverLogin.tsx`, `ProtectedRoute.tsx`: vervang `clearServiceWorkerAndCaches()` door `clearAuthCachesOnly()` bij logout
-- `errorRecoverySystem.ts`: behoudt `clearServiceWorkerAndCaches()` — bij chunk-load errors is volledige reset correct
+### Stap 3: Map-gerelateerde CSS extraheren (~450 regels)
+Verplaats Mapbox controls, fuel-price markers, fuel-dot markers en user-marker styling naar `src/styles/map-styles.css`. Importeer dit alleen in de map-componenten die het gebruiken.
 
-## Bestanden die wijzigen
+### Stap 4: Opruimen `index.css`
+Na extractie blijft `index.css` over met:
+- CSS variabelen (Imperial + light mode): ~240 regels
+- Base styles: ~50 regels
+- Component classes (glass-card, premium-card, etc.): ~400 regels  
+- Utility classes: ~350 regels
+- Keyframes + animaties: ~100 regels
+- iOS/mobile optimalisatie: ~100 regels
 
-| Bestand | Wijziging |
+**Totaal na split**: ~1.240 regels i.p.v. 2.746 — meer dan 50% reductie.
+
+## Bestanden
+
+| Actie | Bestand |
 |---|---|
-| `vite.config.ts` | PWA config: selfDestroying=false, autoUpdate, runtime caching |
-| `src/lib/authStorage.ts` | Nieuwe `clearAuthCachesOnly()`, bestaande functie behouden voor errors |
-| `src/pages/Auth.tsx` | Gebruik `clearAuthCachesOnly()` |
-| `src/pages/DriverLogin.tsx` | Gebruik `clearAuthCachesOnly()` |
-| `src/components/auth/ProtectedRoute.tsx` | Gebruik `clearAuthCachesOnly()` |
+| Nieuw | `src/styles/theme-vision-pro.css` |
+| Nieuw | `src/styles/theme-horizon.css` |
+| Nieuw | `src/styles/theme-carbon.css` |
+| Nieuw | `src/styles/theme-aurora.css` |
+| Nieuw | `src/styles/map-styles.css` |
+| Wijzig | `src/index.css` — verwijder geëxtraheerde secties |
+| Wijzig | `src/components/ThemeProvider.tsx` — dynamisch CSS laden per thema |
+| Wijzig | Map-componenten — importeer `map-styles.css` daar |
 
 ## Impact
-- **887 KiB besparing** bij herhaalde bezoeken (assets uit lokale cache)
-- **Autonome updates**: SW update automatisch zonder refresh nodig
-- **iOS/macOS ready**: PWA manifest + SW werken native in Safari
-- **Geen functionaliteitsverlies**: alle bestaande features blijven identiek
-- **Veilig**: auth logout ruimt alleen auth-data op, niet de hele SW
+- **~44 KiB besparing** op initiële CSS-lading (Lighthouse "Reduce unused CSS" opgelost)
+- Geen visuele wijzigingen — thema's laden zodra ze nodig zijn
+- Snellere First Contentful Paint en Largest Contentful Paint
 
