@@ -265,6 +265,7 @@ serve(async (req) => {
     const pageCtx = context?.currentPage ? `\nPagina: ${context.currentPage}` : "";
     const lastUserMsg = [...messages].reverse().find((m: any) => m.role === "user")?.content || "";
     const complexity = detectComplexity(lastUserMsg);
+    const model = complexity === "medium" ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash-lite";
     const reasoning = complexity === "medium" ? { effort: "medium" } : undefined;
 
     // Tool-calling loop (max 3 iterations for copilot)
@@ -279,7 +280,7 @@ serve(async (req) => {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model,
           messages: loopMessages,
           tools: COPILOT_TOOLS,
           stream: false,
@@ -315,7 +316,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model,
         messages: loopMessages,
         stream: true,
         ...(reasoning ? { reasoning } : {}),
@@ -336,7 +337,7 @@ serve(async (req) => {
       p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
       p_action_type: toolsUsed.length > 0 ? "copilot_tool" : "copilot",
       p_complexity: complexity !== "none" ? "complex" : "simple",
-      p_model: "gemini-3-flash",
+      p_model: model.includes("flash-lite") ? "gemini-2.5-flash-lite" : "gemini-3-flash",
     });
 
     return new Response(response.body, {
