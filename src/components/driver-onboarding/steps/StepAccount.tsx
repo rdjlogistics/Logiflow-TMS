@@ -94,9 +94,9 @@ export const StepAccount = () => {
               },
             });
             if (response.error) {
-              console.error('assign-driver-role error:', response.error);
+              logger.error('assign-driver-role error:', response.error);
             } else {
-              console.log('Driver role assigned successfully:', response.data);
+              logger.log('Driver role assigned successfully:', response.data);
             }
           }
         } catch (roleErr) {
