@@ -81,7 +81,7 @@ export const StepAccount = () => {
           });
 
         if (driverError) {
-          console.error('Driver record creation error:', driverError);
+          logger.error('Driver record creation error:', driverError);
         }
 
         // Assign chauffeur role, company link, and tenant_id via edge function
