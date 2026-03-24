@@ -89,7 +89,7 @@ export const useDriverDocumentUpload = (): UseDriverDocumentUploadReturn => {
         .createSignedUrl(uploadData.path, 60 * 60 * 24 * 365);
 
       if (signedUrlError) {
-        console.error('Signed URL error:', signedUrlError);
+        logger.error('Signed URL error:', signedUrlError);
         throw new Error('Kon geen toegangslink genereren');
       }
 
