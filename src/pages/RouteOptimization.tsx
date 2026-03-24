@@ -1503,8 +1503,8 @@ const RouteOptimization = () => {
                             <RotateCcw className="h-3.5 w-3.5 mr-1" />
                             Reset
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" disabled={!optimizationResult}
-                            onClick={() => toast({ title: "Route opgeslagen", description: "De geoptimaliseerde route is opgeslagen" })}
+                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" disabled={true}
+                            title="Route opslaan wordt binnenkort beschikbaar"
                           >
                             <Save className="h-3.5 w-3.5 mr-1" />
                             Opslaan
