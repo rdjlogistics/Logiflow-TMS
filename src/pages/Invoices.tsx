@@ -199,8 +199,23 @@ const Invoices = () => {
   const handleDeleteConfirm = async () => {
     if (!invoiceToDelete) return;
     try {
+      // Server-side guard: alleen concept-facturen mogen verwijderd worden
+      const { data: inv } = await supabase
+        .from("invoices")
+        .select("status")
+        .eq("id", invoiceToDelete)
+        .single();
+
+      if (inv?.status !== "concept") {
+        toast({ title: "Alleen concept-facturen kunnen verwijderd worden", variant: "destructive" });
+        setDeleteDialogOpen(false);
+        setInvoiceToDelete(null);
+        return;
+      }
+
       await supabase.from("invoice_lines").delete().eq("invoice_id", invoiceToDelete);
-      await supabase.from("invoices").delete().eq("id", invoiceToDelete);
+      // Double guard: .eq("status", "concept") voorkomt race conditions
+      await supabase.from("invoices").delete().eq("id", invoiceToDelete).eq("status", "concept");
       toast({ title: "Factuur verwijderd" });
       fetchInvoices();
     } catch (error) {
