@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════════════════
+   🎨 THEME PRESET: VISION PRO — Spatial Computing Design
+   Deep space black, frosted glass, 3D perspective, mouse parallax
+   ═══════════════════════════════════════════════════════════════ */
+
+.theme-vision-pro {
+  --background: 240 6% 4%;
+  --foreground: 0 0% 95%;
+
+  --card: 240 6% 7%;
+  --card-foreground: 0 0% 95%;
+
+  --popover: 240 6% 7%;
+  --popover-foreground: 0 0% 95%;
+
+  --primary: 265 85% 65%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 265 90% 72%;
+  --primary-muted: 265 40% 15%;
+
+  --secondary: 240 8% 12%;
+  --secondary-foreground: 0 0% 90%;
+
+  --muted: 240 6% 14%;
+  --muted-foreground: 240 5% 55%;
+
+  --accent: 195 95% 60%;
+  --accent-foreground: 240 6% 4%;
+  --accent-glow: 195 100% 68%;
+
+  --gold: 195 95% 60%;
+  --gold-muted: 195 50% 40%;
+  --gold-foreground: 240 6% 4%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 76% 45%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 240 6% 4%;
+  --info: 210 95% 60%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 240 8% 20%;
+  --input: 240 8% 20%;
+  --ring: 265 85% 65%;
+
+  --radius: 1.75rem;
+
+  --sidebar-background: 240 8% 3%;
+  --sidebar-foreground: 0 0% 92%;
+  --sidebar-primary: 265 88% 68%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 8% 10%;
+  --sidebar-accent-foreground: 0 0% 92%;
+  --sidebar-border: 240 8% 14%;
+  --sidebar-ring: 265 85% 60%;
+  --sidebar-muted: 240 5% 50%;
+
+  --gradient-primary: linear-gradient(135deg, hsl(265 85% 65%), hsl(290 80% 60%));
+  --gradient-primary-subtle: linear-gradient(135deg, hsl(265 85% 65% / 0.12), hsl(290 80% 60% / 0.12));
+  --gradient-accent: linear-gradient(135deg, hsl(195 95% 60%), hsl(210 90% 55%));
+  --gradient-gold: linear-gradient(135deg, hsl(195 95% 60%), hsl(210 90% 55%));
+  --gradient-success: linear-gradient(135deg, hsl(152 76% 45%), hsl(168 80% 38%));
+  --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%), hsl(28 95% 48%));
+  --gradient-dark: linear-gradient(160deg, hsl(240 6% 4%), hsl(240 8% 2%));
+  --gradient-sidebar: linear-gradient(180deg, hsl(240 8% 4%), hsl(240 10% 2%));
+  --gradient-glass: linear-gradient(155deg, rgba(18, 18, 24, 0.85), rgba(12, 12, 18, 0.78));
+  --gradient-crystal: linear-gradient(165deg, rgba(20, 20, 28, 0.92), rgba(14, 14, 22, 0.88));
+  --gradient-holographic: linear-gradient(125deg, 
+    hsl(265 85% 65% / 0.08) 0%, 
+    hsl(195 95% 60% / 0.06) 25%,
+    hsl(290 80% 60% / 0.07) 50%,
+    hsl(210 90% 55% / 0.05) 75%,
+    hsl(265 85% 65% / 0.08) 100%);
+  --gradient-mesh: radial-gradient(ellipse 100% 70% at 10% -10%, hsl(265 85% 65% / 0.1) 0%, transparent 60%),
+                   radial-gradient(ellipse 80% 60% at 90% 110%, hsl(195 95% 60% / 0.08) 0%, transparent 60%),
+                   radial-gradient(ellipse 50% 40% at 50% 50%, hsl(290 80% 60% / 0.05) 0%, transparent 50%);
+  --gradient-page: linear-gradient(180deg, hsl(240 6% 4%) 0%, hsl(240 8% 2%) 100%);
+  --gradient-shine: linear-gradient(120deg, transparent 30%, hsl(265 85% 65% / 0.12) 50%, transparent 70%);
+  --gradient-aurora: linear-gradient(135deg, 
+    hsl(265 85% 65% / 0.12) 0%,
+    hsl(195 95% 60% / 0.1) 50%,
+    hsl(290 80% 60% / 0.12) 100%);
+
+  --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.25), 0 1px 2px hsl(0 0% 0% / 0.15);
+  --shadow-md: 0 4px 10px -2px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+  --shadow-lg: 0 14px 24px -6px hsl(0 0% 0% / 0.35), 0 6px 10px -4px hsl(0 0% 0% / 0.22);
+  --shadow-xl: 0 28px 40px -8px hsl(0 0% 0% / 0.4), 0 12px 18px -8px hsl(0 0% 0% / 0.25);
+  --shadow-2xl: 0 40px 80px -20px hsl(0 0% 0% / 0.5);
+  --shadow-glow: 0 0 60px -10px hsl(265 85% 65% / 0.45);
+  --shadow-glow-accent: 0 0 60px -10px hsl(195 95% 60% / 0.4);
+  --shadow-glow-gold: 0 0 50px -8px hsl(195 95% 60% / 0.45);
+  --shadow-glow-intense: 0 0 100px -12px hsl(265 85% 65% / 0.6);
+  --shadow-glow-soft: 0 0 120px -20px hsl(265 85% 65% / 0.3);
+  --shadow-3d: 0 28px 60px -20px hsl(0 0% 0% / 0.45), 
+               0 14px 28px -14px hsl(0 0% 0% / 0.3),
+               0 0 0 1px hsl(0 0% 100% / 0.05);
+  --shadow-inset: inset 0 2px 4px hsl(0 0% 0% / 0.2);
+  --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.25), 
+                 0 12px 28px hsl(0 0% 0% / 0.3),
+                 inset 0 1px 0 hsl(0 0% 100% / 0.06);
+  --shadow-card-hover: 0 8px 24px hsl(0 0% 0% / 0.35), 
+                       0 20px 50px hsl(0 0% 0% / 0.4),
+                       inset 0 1px 0 hsl(0 0% 100% / 0.1),
+                       0 0 40px -10px hsl(265 85% 65% / 0.2);
+  --shadow-float: 0 24px 50px -14px hsl(0 0% 0% / 0.45),
+                  0 10px 20px -10px hsl(0 0% 0% / 0.3),
+                  0 0 60px -15px hsl(265 85% 65% / 0.15);
+  --shadow-elevation: 0 32px 64px -18px hsl(0 0% 0% / 0.5),
+                      0 16px 32px -14px hsl(0 0% 0% / 0.32),
+                      0 4px 12px -4px hsl(0 0% 0% / 0.22);
+
+  --chart-1: 265 85% 65%;
+  --chart-2: 195 95% 60%;
+  --chart-3: 152 76% 45%;
+  --chart-4: 290 80% 60%;
+  --chart-5: 0 72% 51%;
+}
+
+/* Vision Pro — Light mode */
+.theme-vision-pro.light {
+  --background: 240 10% 97%;
+  --foreground: 240 6% 10%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 6% 10%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 6% 10%;
+
+  --primary: 265 80% 55%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 265 85% 62%;
+  --primary-muted: 265 60% 95%;
+
+  --secondary: 240 12% 94%;
+  --secondary-foreground: 240 6% 10%;
+
+  --muted: 240 10% 92%;
+  --muted-foreground: 240 5% 45%;
+
+  --accent: 195 90% 48%;
+  --accent-foreground: 0 0% 100%;
+  --accent-glow: 195 95% 55%;
+
+  --gold: 195 90% 48%;
+  --gold-muted: 195 50% 38%;
+  --gold-foreground: 0 0% 100%;
+
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 75% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 48%;
+  --warning-foreground: 240 6% 8%;
+  --info: 210 88% 52%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 240 10% 88%;
+  --input: 240 10% 88%;
+  --ring: 265 80% 55%;
+
+  --sidebar-background: 240 8% 7%;
+  --sidebar-foreground: 0 0% 92%;
+  --sidebar-primary: 265 85% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 8% 12%;
+  --sidebar-accent-foreground: 0 0% 92%;
+  --sidebar-border: 240 8% 15%;
+  --sidebar-ring: 265 80% 55%;
+  --sidebar-muted: 240 5% 50%;
+
+  --gradient-glass: linear-gradient(155deg, rgba(255, 255, 255, 0.95), rgba(245, 243, 255, 0.92));
+  --gradient-crystal: linear-gradient(165deg, rgba(255, 255, 255, 1), rgba(248, 245, 255, 0.97));
+  --gradient-page: linear-gradient(180deg, hsl(240 10% 97%) 0%, hsl(240 12% 95%) 100%);
+
+  --shadow-glow: 0 0 50px -10px hsl(265 80% 55% / 0.25);
+  --shadow-glow-accent: 0 0 50px -10px hsl(195 90% 48% / 0.28);
+  --shadow-glow-gold: 0 0 40px -8px hsl(195 90% 48% / 0.3);
+  --shadow-card: 0 2px 5px hsl(240 6% 10% / 0.04), 
+                 0 8px 20px hsl(240 6% 10% / 0.06);
+  --shadow-card-hover: 0 8px 20px hsl(240 6% 10% / 0.08), 
+                       0 16px 40px hsl(240 6% 10% / 0.1);
+}
+
+/* Vision Pro — 3D Spatial Effects */
+.theme-vision-pro .glass-card,
+.theme-vision-pro .premium-card,
+.theme-vision-pro .stat-card,
+.theme-vision-pro [class*="rounded-2xl"][class*="border"][class*="bg-card"] {
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  box-shadow: var(--shadow-card), inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  transform: translate3d(
+    calc(var(--mouse-x, 0) * 2px),
+    calc(var(--mouse-y, 0) * 2px),
+    0
+  );
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s ease,
+              border-color 0.3s ease;
+  will-change: transform;
+}
+
+.theme-vision-pro .glass-card:hover,
+.theme-vision-pro .premium-card:hover,
+.theme-vision-pro .stat-card:hover {
+  border-color: hsl(265 85% 65% / 0.25);
+  box-shadow: var(--shadow-card-hover), inset 0 1px 0 hsl(0 0% 100% / 0.12);
+  transform: translate3d(
+    calc(var(--mouse-x, 0) * 3px),
+    calc(var(--mouse-y, 0) * 3px - 4px),
+    0
+  ) scale(1.005);
+}
+
+/* Vision Pro — Holographic shimmer on hover */
+@keyframes vp-shimmer {
+  0% { background-position: -200% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.theme-vision-pro .glass-card::after,
+.theme-vision-pro .premium-card::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(265 85% 65% / 0.06) 25%,
+    hsl(195 95% 60% / 0.08) 50%,
+    hsl(290 80% 60% / 0.06) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+}
+
+.theme-vision-pro .glass-card:hover::after,
+.theme-vision-pro .premium-card:hover::after {
+  opacity: 1;
+  animation: vp-shimmer 2s ease-in-out infinite;
+}
+
+/* Vision Pro — Spatial icon containers */
+.theme-vision-pro .icon-badge,
+.theme-vision-pro .icon-badge-accent {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsl(0 0% 100% / 0.1);
+  border-radius: 1rem;
+}
+
+/* Vision Pro — Spatial pulse on active nav */
+@keyframes vp-spatial-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(265 85% 65% / 0.4); }
+  50% { box-shadow: 0 0 0 6px hsl(265 85% 65% / 0); }
+}
+
+.theme-vision-pro [data-active="true"],
+.theme-vision-pro .active {
+  animation: vp-spatial-pulse 2s ease-in-out infinite;
+}
+
+/* Vision Pro — Multi-layer glass border on premium elements */
+.theme-vision-pro .glass-card::before {
+  background: linear-gradient(90deg, 
+    transparent 5%, 
+    hsl(265 85% 65% / 0.3) 30%,
+    hsl(195 95% 60% / 0.3) 50%,
+    hsl(290 80% 60% / 0.3) 70%,
+    transparent 95%
+  );
+}
+
+/* Vision Pro — Floating depth for sidebar */
+.theme-vision-pro .sidebar-premium {
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-right: 1px solid hsl(0 0% 100% / 0.08);
+}
+
+/* Reduced motion: disable parallax */
+@media (prefers-reduced-motion: reduce) {
+  .theme-vision-pro .glass-card,
+  .theme-vision-pro .premium-card,
+  .theme-vision-pro .stat-card,
+  .theme-vision-pro [class*="rounded-2xl"][class*="border"][class*="bg-card"] {
+    transform: none !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+  }
+}

@@ -1,0 +1,212 @@
+/* ═══════════════════════════════════════════════════════════════
+   🎨 THEME PRESET: CARBON — Business / Data-First
+   Warm dark navy, amber accent, minimal glass, sharp corners
+   ═══════════════════════════════════════════════════════════════ */
+
+.theme-carbon {
+  --background: 220 40% 7%;
+  --foreground: 30 10% 93%;
+
+  --card: 220 35% 10%;
+  --card-foreground: 30 10% 93%;
+
+  --popover: 220 35% 10%;
+  --popover-foreground: 30 10% 93%;
+
+  --primary: 28 90% 55%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 28 95% 62%;
+  --primary-muted: 28 50% 15%;
+
+  --secondary: 220 30% 14%;
+  --secondary-foreground: 30 10% 93%;
+
+  --muted: 220 25% 16%;
+  --muted-foreground: 220 15% 55%;
+
+  --accent: 200 70% 50%;
+  --accent-foreground: 0 0% 100%;
+  --accent-glow: 200 80% 58%;
+
+  --gold: 28 90% 55%;
+  --gold-muted: 28 50% 38%;
+  --gold-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 70% 42%;
+  --success-foreground: 0 0% 100%;
+  --warning: 45 90% 52%;
+  --warning-foreground: 220 40% 7%;
+  --info: 210 85% 55%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 220 25% 20%;
+  --input: 220 25% 20%;
+  --ring: 28 90% 55%;
+
+  --radius: 0.75rem;
+
+  --sidebar-background: 220 42% 5%;
+  --sidebar-foreground: 30 10% 92%;
+  --sidebar-primary: 28 92% 58%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 35% 12%;
+  --sidebar-accent-foreground: 30 10% 92%;
+  --sidebar-border: 220 35% 15%;
+  --sidebar-ring: 28 90% 55%;
+  --sidebar-muted: 220 15% 50%;
+
+  --gradient-primary: linear-gradient(135deg, hsl(28 90% 55%), hsl(20 85% 50%));
+  --gradient-primary-subtle: linear-gradient(135deg, hsl(28 90% 55% / 0.12), hsl(20 85% 50% / 0.12));
+  --gradient-accent: linear-gradient(135deg, hsl(200 70% 50%), hsl(210 75% 48%));
+  --gradient-gold: linear-gradient(135deg, hsl(28 90% 55%), hsl(20 85% 50%));
+  --gradient-success: linear-gradient(135deg, hsl(152 70% 42%), hsl(165 75% 38%));
+  --gradient-warning: linear-gradient(135deg, hsl(45 90% 52%), hsl(38 92% 48%));
+  --gradient-dark: linear-gradient(160deg, hsl(220 40% 7%), hsl(220 42% 5%));
+  --gradient-sidebar: linear-gradient(180deg, hsl(220 42% 6%), hsl(220 44% 3%));
+  --gradient-glass: linear-gradient(155deg, rgba(18, 22, 32, 0.96), rgba(14, 18, 28, 0.94));
+  --gradient-crystal: linear-gradient(165deg, rgba(20, 24, 36, 0.98), rgba(16, 20, 32, 0.96));
+  --gradient-holographic: linear-gradient(125deg, 
+    hsl(28 90% 55% / 0.06) 0%, 
+    hsl(200 70% 50% / 0.04) 25%,
+    hsl(45 90% 52% / 0.05) 50%,
+    hsl(210 75% 48% / 0.04) 75%,
+    hsl(28 90% 55% / 0.06) 100%);
+  --gradient-mesh: radial-gradient(ellipse 100% 70% at 10% -10%, hsl(28 90% 55% / 0.08) 0%, transparent 60%),
+                   radial-gradient(ellipse 80% 60% at 90% 110%, hsl(200 70% 50% / 0.06) 0%, transparent 60%),
+                   radial-gradient(ellipse 50% 40% at 50% 50%, hsl(220 40% 7% / 0.04) 0%, transparent 50%);
+  --gradient-page: linear-gradient(180deg, hsl(220 40% 7%) 0%, hsl(220 42% 5%) 100%);
+  --gradient-shine: linear-gradient(120deg, transparent 30%, hsl(28 90% 55% / 0.12) 50%, transparent 70%);
+  --gradient-aurora: linear-gradient(135deg, 
+    hsl(28 90% 55% / 0.08) 0%,
+    hsl(200 70% 50% / 0.06) 50%,
+    hsl(45 90% 52% / 0.08) 100%);
+
+  --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.15);
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.2), 0 1px 2px hsl(0 0% 0% / 0.12);
+  --shadow-md: 0 4px 10px -2px hsl(0 0% 0% / 0.25), 0 2px 4px -2px hsl(0 0% 0% / 0.15);
+  --shadow-lg: 0 14px 24px -6px hsl(0 0% 0% / 0.3), 0 6px 10px -4px hsl(0 0% 0% / 0.18);
+  --shadow-xl: 0 28px 40px -8px hsl(0 0% 0% / 0.35), 0 12px 18px -8px hsl(0 0% 0% / 0.2);
+  --shadow-2xl: 0 40px 80px -20px hsl(0 0% 0% / 0.45);
+  --shadow-glow: 0 0 40px -10px hsl(28 90% 55% / 0.3);
+  --shadow-glow-accent: 0 0 40px -10px hsl(200 70% 50% / 0.3);
+  --shadow-glow-gold: 0 0 30px -8px hsl(28 90% 55% / 0.35);
+  --shadow-glow-intense: 0 0 60px -12px hsl(28 90% 55% / 0.4);
+  --shadow-glow-soft: 0 0 80px -20px hsl(28 90% 55% / 0.2);
+  --shadow-3d: 0 28px 60px -20px hsl(0 0% 0% / 0.4), 
+               0 14px 28px -14px hsl(0 0% 0% / 0.25),
+               0 0 0 1px hsl(0 0% 100% / 0.03);
+  --shadow-inset: inset 0 2px 4px hsl(0 0% 0% / 0.15);
+  --shadow-card: 0 2px 5px hsl(0 0% 0% / 0.2), 
+                 0 8px 20px hsl(0 0% 0% / 0.25);
+  --shadow-card-hover: 0 8px 20px hsl(0 0% 0% / 0.3), 
+                       0 16px 40px hsl(0 0% 0% / 0.35);
+  --shadow-float: 0 24px 50px -14px hsl(0 0% 0% / 0.4),
+                  0 10px 20px -10px hsl(0 0% 0% / 0.25);
+  --shadow-elevation: 0 32px 64px -18px hsl(0 0% 0% / 0.45),
+                      0 16px 32px -14px hsl(0 0% 0% / 0.28),
+                      0 4px 12px -4px hsl(0 0% 0% / 0.18);
+
+  --chart-1: 28 90% 55%;
+  --chart-2: 200 70% 50%;
+  --chart-3: 152 70% 42%;
+  --chart-4: 220 60% 55%;
+  --chart-5: 45 90% 52%;
+}
+
+/* Carbon — Light mode */
+.theme-carbon.light {
+  --background: 40 20% 97%;
+  --foreground: 220 40% 10%;
+
+  --card: 40 15% 100%;
+  --card-foreground: 220 40% 10%;
+
+  --popover: 40 15% 100%;
+  --popover-foreground: 220 40% 10%;
+
+  --primary: 28 85% 48%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 28 90% 55%;
+  --primary-muted: 28 60% 95%;
+
+  --secondary: 40 15% 94%;
+  --secondary-foreground: 220 40% 10%;
+
+  --muted: 40 12% 92%;
+  --muted-foreground: 220 12% 45%;
+
+  --accent: 200 65% 45%;
+  --accent-foreground: 0 0% 100%;
+  --accent-glow: 200 75% 52%;
+
+  --gold: 28 85% 48%;
+  --gold-muted: 28 45% 38%;
+  --gold-foreground: 0 0% 100%;
+
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 70% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 45 88% 48%;
+  --warning-foreground: 220 40% 8%;
+  --info: 210 82% 50%;
+  --info-foreground: 0 0% 100%;
+
+  --border: 40 15% 86%;
+  --input: 40 15% 86%;
+  --ring: 28 85% 48%;
+
+  --sidebar-background: 220 38% 6%;
+  --sidebar-foreground: 30 10% 92%;
+  --sidebar-primary: 28 88% 52%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 35% 12%;
+  --sidebar-accent-foreground: 30 10% 92%;
+  --sidebar-border: 220 35% 15%;
+  --sidebar-ring: 28 85% 48%;
+  --sidebar-muted: 220 15% 50%;
+
+  --gradient-glass: linear-gradient(155deg, rgba(255, 255, 252, 0.98), rgba(255, 250, 245, 0.95));
+  --gradient-crystal: linear-gradient(165deg, rgba(255, 255, 252, 1), rgba(255, 252, 248, 0.97));
+  --gradient-page: linear-gradient(180deg, hsl(40 20% 97%) 0%, hsl(40 18% 95%) 100%);
+
+  --shadow-glow: 0 0 40px -10px hsl(28 85% 48% / 0.2);
+  --shadow-glow-accent: 0 0 40px -10px hsl(200 65% 45% / 0.22);
+  --shadow-glow-gold: 0 0 30px -8px hsl(28 85% 48% / 0.25);
+  --shadow-card: 0 2px 5px hsl(220 40% 10% / 0.04), 
+                 0 8px 20px hsl(220 40% 10% / 0.06);
+  --shadow-card-hover: 0 8px 20px hsl(220 40% 10% / 0.08), 
+                       0 16px 40px hsl(220 40% 10% / 0.1);
+}
+
+/* Carbon — Minimal glass, solid surfaces */
+.theme-carbon .glass-card {
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+
+/* Carbon — KPI cards with solid top-border accent */
+.theme-carbon .stat-card::before {
+  width: 100%;
+  height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: auto;
+  border-radius: 0;
+  background: var(--gradient-primary);
+}
+
+/* Carbon — Clean flat badges */
+.theme-carbon .badge-gradient {
+  box-shadow: none;
+  border-radius: 0.5rem;
+}
+
+/* Carbon — Stronger table borders */
+.theme-carbon .table-premium {
+  border-width: 2px;
+  border-radius: 0.75rem;
+}

@@ -1,0 +1,134 @@
+/* ═══════════════════════════════════════════════════════════════
+   AURORA — Northern Lights Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+.theme-aurora {
+  --background: 190 40% 8%;
+  --foreground: 170 30% 93%;
+  --card: 190 35% 10%;
+  --card-foreground: 170 30% 93%;
+  --popover: 190 38% 9%;
+  --popover-foreground: 170 30% 93%;
+  --primary: 174 60% 40%;
+  --primary-foreground: 174 60% 98%;
+  --primary-glow: 160 60% 45%;
+  --secondary: 190 30% 14%;
+  --secondary-foreground: 170 20% 90%;
+  --muted: 190 25% 13%;
+  --muted-foreground: 170 15% 55%;
+  --accent: 160 60% 40%;
+  --accent-foreground: 160 60% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 185 30% 18%;
+  --input: 185 30% 18%;
+  --ring: 174 60% 40%;
+  --sidebar-background: 192 42% 6%;
+  --sidebar-foreground: 170 20% 90%;
+  --sidebar-border: 185 30% 15%;
+  --sidebar-primary: 174 60% 40%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 185 30% 12%;
+  --sidebar-accent-foreground: 170 20% 90%;
+  --chart-1: 174 60% 40%;
+  --chart-2: 187 70% 48%;
+  --chart-3: 160 60% 40%;
+  --chart-4: 200 65% 45%;
+  --chart-5: 145 55% 45%;
+  --radius: 1rem;
+}
+
+/* Aurora — Light mode */
+.theme-aurora.light {
+  --background: 170 30% 97%;
+  --foreground: 190 40% 10%;
+  --card: 170 25% 99%;
+  --card-foreground: 190 40% 10%;
+  --popover: 170 25% 99%;
+  --popover-foreground: 190 40% 10%;
+  --primary: 174 60% 35%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 160 60% 40%;
+  --secondary: 170 20% 94%;
+  --secondary-foreground: 190 30% 15%;
+  --muted: 170 15% 93%;
+  --muted-foreground: 190 20% 40%;
+  --accent: 160 50% 92%;
+  --accent-foreground: 160 60% 25%;
+  --border: 170 20% 88%;
+  --input: 170 20% 88%;
+  --ring: 174 60% 35%;
+  --sidebar-background: 170 20% 96%;
+  --sidebar-foreground: 190 30% 15%;
+  --sidebar-border: 170 15% 90%;
+  --sidebar-primary: 174 60% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 170 15% 93%;
+  --sidebar-accent-foreground: 190 30% 15%;
+}
+
+/* Aurora — Animated Northern Lights mesh background */
+@keyframes aurora-shift {
+  0% {
+    background-position: 0% 50%, 50% 0%, 100% 80%;
+  }
+  25% {
+    background-position: 30% 80%, 70% 30%, 20% 50%;
+  }
+  50% {
+    background-position: 80% 20%, 20% 80%, 60% 30%;
+  }
+  75% {
+    background-position: 50% 60%, 40% 50%, 80% 70%;
+  }
+  100% {
+    background-position: 0% 50%, 50% 0%, 100% 80%;
+  }
+}
+
+.theme-aurora body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.35;
+  background:
+    radial-gradient(ellipse 80% 60% at var(--aurora-pos1, 0% 50%), hsl(174 60% 40% / 0.4), transparent 70%),
+    radial-gradient(ellipse 60% 80% at var(--aurora-pos2, 50% 0%), hsl(187 70% 48% / 0.3), transparent 60%),
+    radial-gradient(ellipse 70% 50% at var(--aurora-pos3, 100% 80%), hsl(160 60% 40% / 0.35), transparent 65%);
+  background-size: 200% 200%, 200% 200%, 200% 200%;
+  animation: aurora-shift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.theme-aurora.light body::before {
+  opacity: 0.15;
+}
+
+/* Aurora — Glassmorphism with teal glow */
+.theme-aurora .glass-card {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 0 40px -15px hsl(174 60% 40% / 0.2), 0 8px 32px -12px hsl(0 0% 0% / 0.3);
+}
+
+.theme-aurora .premium-card {
+  box-shadow: 0 0 50px -15px hsl(174 60% 40% / 0.25), 0 8px 32px -12px hsl(0 0% 0% / 0.4);
+}
+
+/* Aurora — Gradient badge */
+.theme-aurora .badge-gradient {
+  background: linear-gradient(135deg, hsl(174 60% 40%), hsl(160 60% 40%));
+  box-shadow: 0 2px 12px hsl(174 60% 40% / 0.3);
+}
+
+/* Aurora — Stat card top accent */
+.theme-aurora .stat-card::before {
+  background: linear-gradient(90deg, hsl(174 60% 40%), hsl(187 70% 48%), hsl(160 60% 40%));
+  border-radius: 9999px;
+}
+
+/* Aurora — Sidebar glow */
+.theme-aurora .sidebar-glow {
+  background: linear-gradient(180deg, hsl(174 60% 40% / 0.08), transparent 60%);
+}
