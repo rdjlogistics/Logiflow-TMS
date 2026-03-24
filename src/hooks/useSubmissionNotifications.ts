@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "./useUserRole";
 import { useNotifications } from "@/components/notifications/NotificationCenter";
+import { logger } from "@/lib/logger";
 
 // Simple notification sound using Web Audio API
 const playNotificationSound = () => {
