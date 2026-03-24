@@ -58,23 +58,6 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
     const lastTwo = safeData.slice(-2);
     return lastTwo[1].margin - lastTwo[0].margin;
   }, [safeData]);
-  const totalProfit = useMemo(() => data.reduce((sum, d) => sum + (d.revenue - d.costs), 0), [data]);
-  const avgMargin = useMemo(() => {
-    const totalMargin = data.reduce((sum, d) => sum + d.margin, 0);
-    return data.length > 0 ? totalMargin / data.length : 0;
-  }, [data]);
-  
-  const revenueTrend = useMemo(() => {
-    if (data.length < 2) return 0;
-    const lastTwo = data.slice(-2);
-    return ((lastTwo[1].revenue - lastTwo[0].revenue) / lastTwo[0].revenue) * 100;
-  }, [data]);
-
-  const marginTrend = useMemo(() => {
-    if (data.length < 2) return 0;
-    const lastTwo = data.slice(-2);
-    return lastTwo[1].margin - lastTwo[0].margin;
-  }, [data]);
 
   if (loading) {
     return (
