@@ -210,7 +210,8 @@ const PODCard = ({ pod }: any) => {
       </div>
     </div>
   </motion.div>
-);
+  );
+};
 
 // ── Claim Detail Content (shared between Dialog & Sheet) ──
 const ClaimDetailContent = ({ claim, resolveClaim, onClose, getTypeBadge, getStatusBadge }: any) => (
