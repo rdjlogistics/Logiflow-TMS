@@ -63,7 +63,7 @@ export const useRouteOptimizationStops = () => {
         .order("trip_date", { ascending: true });
 
       if (error) {
-        console.error("Error fetching stops for optimization:", error);
+        logger.error("Error fetching stops for optimization:", error);
         return [];
       }
 
