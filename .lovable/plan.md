@@ -1,34 +1,38 @@
 
 
-# Plan: AI Usage Dashboard Widget
+# Plan: Fix ai_usage_daily_rollup Cron Job
 
-## Wat
-Een nieuwe dashboard widget `ai-usage` die real-time credit verbruik per dag toont als een compacte sparkline-achtige area chart, met credit status en snelle stats.
+## Probleem
 
-## Wijzigingen
+De `ai_usage_daily_rollup` tabel bevat 0 rijen, terwijl er 14 `ai_credit_transactions` bestaan (18-23 maart). Er is geen cron job en geen database functie om de rollup te vullen.
 
-### 1. Nieuw bestand: `src/components/dashboard/AIUsageWidget.tsx`
-- Compacte widget met:
-  - Credit progressiebalk (remaining / total)
-  - 7-dagen area chart van dagelijks verbruik uit `ai_usage_daily_rollup`
-  - Vandaag's verbruik highlight
-  - Link naar volledige `/admin/ai-usage` pagina
-- Gebruikt `useAICredits` hook voor subscription data
-- Query `ai_usage_daily_rollup` voor laatste 7 dagen
+## Oplossing
 
-### 2. Update: `src/components/dashboard/widgets/WidgetRegistry.ts`
-- Voeg `ai-usage` widget toe aan registry:
-  - Category: `analytics`, size: `small`, icon: `Sparkles`, minHeight: 240
+### 1. Database migratie: rollup functie aanmaken
 
-### 3. Update: `src/components/dashboard/DraggableWidgetGrid.tsx`
-- Import `AIUsageWidget` (lazy)
-- Voeg `case 'ai-usage'` toe aan `renderWidget` switch
+Nieuwe `public.refresh_ai_usage_daily_rollup()` functie die:
+- Alle transacties van gisteren aggregeert per tenant
+- `INSERT ... ON CONFLICT (tenant_id, date) DO UPDATE` zodat het idempotent is
+- Velden: `total_credits` (SUM), `total_tokens` (SUM), `total_requests` (COUNT), `unique_users` (COUNT DISTINCT), `cost_estimate_eur` (credits * 0.01 schatting)
+- Eerst een unique constraint op `(tenant_id, date)` toevoegen als die ontbreekt
 
-## Bestanden
+### 2. Cron job registreren
 
-| Bestand | Wijziging |
+Via insert tool een `cron.schedule` aanmaken die dagelijks om 00:05 de functie aanroept:
+```sql
+SELECT cron.schedule('refresh-ai-usage-rollup', '5 0 * * *', 'SELECT public.refresh_ai_usage_daily_rollup()');
+```
+
+### 3. Backfill bestaande data
+
+Eenmalige query via insert tool om de 14 bestaande transacties (18-23 maart) in de rollup te aggregeren zodat de widget direct data toont.
+
+## Bestanden / Acties
+
+| Actie | Wat |
 |---|---|
-| `src/components/dashboard/AIUsageWidget.tsx` | **Nieuw** — widget component |
-| `src/components/dashboard/widgets/WidgetRegistry.ts` | Registratie toevoegen |
-| `src/components/dashboard/DraggableWidgetGrid.tsx` | Render case toevoegen |
+| DB migratie | Unique constraint + `refresh_ai_usage_daily_rollup()` functie |
+| Insert (data) | Cron job registreren + backfill bestaande transacties |
+
+Geen frontend wijzigingen nodig — de widget leest al uit `ai_usage_daily_rollup`.
 
