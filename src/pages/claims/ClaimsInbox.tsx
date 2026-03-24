@@ -200,7 +200,7 @@ const PODCard = ({ pod }: any) => {
               const downloadUrl = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = downloadUrl;
-              a.download = `POD_${pod.order_number}.html`;
+              a.download = `POD_${orderNumber}.html`;
               a.click();
               URL.revokeObjectURL(downloadUrl);
               toast.success("POD gedownload");
