@@ -879,7 +879,7 @@ serve(async (req) => {
       .select("role, content")
       .eq("conversation_id", convId)
       .order("created_at", { ascending: true })
-      .limit(20);
+      .limit(15);
 
     const { data: memories } = await supabase
       .from("ai_user_memory")
