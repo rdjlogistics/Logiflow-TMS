@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
+import { logger } from '@/lib/logger';
 
 // Fetch VAPID public key from server (single source of truth)
 const VAPID_KEY_CACHE_KEY = 'vapid_public_key';
