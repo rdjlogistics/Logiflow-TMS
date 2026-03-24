@@ -212,7 +212,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      console.log('[Auth] Login attempt:', { email, timestamp: new Date().toISOString() });
+      
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
