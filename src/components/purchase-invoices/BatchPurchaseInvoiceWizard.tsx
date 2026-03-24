@@ -6,6 +6,7 @@ import { format, subMonths, startOfMonth, endOfMonth, subWeeks, startOfWeek, end
 import { toast } from "sonner";
 import { usePurchaseInvoicePdf } from "@/hooks/use-purchase-invoice-pdf";
 import { type TripWithRate } from "./TripRateBreakdown";
+import { useCompany } from "@/hooks/useCompany";
 import { WizardHeader } from "./wizard/WizardHeader";
 import { WizardProgress } from "./wizard/WizardProgress";
 import { Step1SelectionSection } from "./wizard/Step1SelectionSection";
