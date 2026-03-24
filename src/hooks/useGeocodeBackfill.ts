@@ -36,7 +36,7 @@ export const useGeocodeBackfill = () => {
         return;
       }
 
-      console.log(`[Backfill] Found ${missingStops.length} stops with missing coordinates. Starting geocoding...`);
+      logger.log(`[Backfill] Found ${missingStops.length} stops with missing coordinates. Starting geocoding...`);
 
       // Process in batches of 5
       for (let i = 0; i < missingStops.length; i += 5) {
