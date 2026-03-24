@@ -1,59 +1,69 @@
 
 
-# Optimalisatie: AI Prompts & History-Limiet
+# Plan: AI Assistent → Elite Class Logistics Command Center
 
-## Huidige Stand
+## Huidige Staat
+De AI heeft **13 tools** waarvan 12 read-only (zoeken, analyseren, vergelijken) en slechts **1 mutatie** (smart_order_entry). Geen echte actie-kracht — je kunt het TMS niet besturen via de AI.
 
-### chatgpt edge function (1091 regels)
-- **System prompt**: 37 regels, ~600 tokens — bevat redundante instructies en overlappende secties
-- **History limiet**: 20 berichten (regel 900) — meer dan nodig, kost extra tokens per request
-- **Tool loop**: stuurt volledige history + system prompt bij elke iteratie (max 4x)
+## Doel
+Transformeer de AI van een "vraag & antwoord bot" naar een **operationele command center** die daadwerkelijk taken uitvoert in het TMS — vergelijkbaar met hoe Claude Code een project bestuurt.
 
-### copilot edge function (99 regels)
-- **System prompt**: 4 regels, compact — al redelijk efficiënt
-- **History limiet**: GEEN — stuurt alles wat de client stuurt, onbeperkt
-- **Geen trimming**: client-side stuurt alle berichten zonder limiet
+## Nieuwe Tools (10 stuks)
 
-## Wijzigingen
+### Mutatie-Tools (acties uitvoeren)
+| Tool | Wat het doet | Bevestiging? |
+|---|---|---|
+| `assign_driver_to_order` | Wijs chauffeur toe aan een order | ✅ Ja |
+| `update_order_status` | Wijzig orderstatus (draft→confirmed→in_transit→delivered) | ✅ Ja |
+| `create_invoice_for_order` | Genereer factuur voor afgeleverde order | ✅ Ja |
+| `send_customer_email` | Stuur professionele e-mail naar klant (statusupdate, offerte, etc.) | ✅ Ja |
+| `bulk_update_orders` | Bulk-statuswijziging voor meerdere orders tegelijk | ✅ Ja |
+| `create_claim_case` | Maak een schadeclaim aan voor een order | ✅ Ja |
 
-### 1. `supabase/functions/chatgpt/index.ts`
-
-**System prompt inkorten** (van ~600 tokens naar ~300 tokens):
-- Verwijder dubbele instructies ("geef specifieke cijfers" staat 2x)
-- Combineer "Stijl" en "Intelligentie" secties
-- Verwijder expliciete emoji-lijst (model weet dit al)
-- Houd kernregels: Nederlands, tools gebruiken, tenant-isolatie, bevestiging bij mutaties
-
-**History limiet verlagen**: regel 900 `.limit(20)` → `.limit(15)`
-
-**Tool loop optimalisatie**: In `runToolLoop`, stuur alleen de laatste 15 berichten + system prompt naar het model i.p.v. de hele groeiende array
-
-### 2. `supabase/functions/copilot/index.ts`
-
-**History limiet toevoegen**: Beperk `messages` array tot laatste 15 berichten voordat ze naar het model gaan
-
-**System prompt iets aanscherpen**: Voeg "max 150 woorden" toe voor nog kortere antwoorden
-
-### 3. `src/hooks/useCopilot.ts`
-
-**Client-side trimming**: Beperk `allMessages` tot laatste 15 voordat ze naar de edge function worden gestuurd (regel ~140)
-
-## Token Besparing Schatting
-
-| Maatregel | Besparing per request |
+### Intelligente Analyse-Tools
+| Tool | Wat het doet |
 |---|---|
-| Kortere system prompt chatgpt | ~300 tokens |
-| History 20→15 berichten | ~500-1000 tokens (afhankelijk van gespreklengte) |
-| Copilot history limiet | ~200-800 tokens |
-| **Totaal** | **~1000-2100 tokens per request** |
+| `fleet_overview` | Real-time vlootoverzicht: voertuigen, locaties, beschikbaarheid, onderhoud |
+| `route_suggest` | Stel optimale chauffeur voor op basis van locatie, beschikbaarheid en rating |
+| `daily_briefing` | Automatische dagelijkse briefing: wat staat er vandaag gepland, risico's, openstaand |
+| `generate_report` | Genereer markdown-rapport (week/maand) met KPIs, trends en aanbevelingen |
 
-Bij gemiddeld 14 requests/dag = ~14.000-29.000 tokens/dag minder.
+## System Prompt Upgrade
+
+Nieuwe prompt die de AI instrueert als **Senior Transport Controller** met:
+- **Proactief gedrag**: Waarschuw bij risico's zonder dat de gebruiker vraagt
+- **Multi-step planning**: Combineer tools automatisch (bijv. "plan morgen" → daily_briefing + route_suggest + assign_driver)
+- **Actionable output**: Eindig altijd met concrete volgende stappen
+- **Confirmation UX**: Bij mutaties, toon een rich preview card met alle details vóór uitvoering
+
+## Tool Loop Upgrade
+
+- **Max iterations**: 4 → 6 (voor complexe multi-step workflows)
+- **Chain awareness**: System prompt instrueert het model om tools te combineren (bijv. search_orders → margin_analysis → generate_report)
+
+## Quick Actions Update
+
+Nieuwe quick actions die de kracht van de AI tonen:
+- "Briefing van vandaag" (daily_briefing)
+- "Wijs chauffeurs toe aan open orders" (route_suggest + assign)
+- "Genereer weekrapport" (generate_report)
+- "Factureer alle afgeleverde orders" (bulk)
+- "Vlootoverzicht nu" (fleet_overview)
+- "Stuur statusupdate naar klant X" (send_email)
 
 ## Bestanden die wijzigen
 
 | Bestand | Wijziging |
 |---|---|
-| `supabase/functions/chatgpt/index.ts` | Compactere system prompt, history limit 20→15, tool loop trimming |
-| `supabase/functions/copilot/index.ts` | History limiet 15, "max 150 woorden" in prompt |
-| `src/hooks/useCopilot.ts` | Client-side message trimming tot 15 |
+| `supabase/functions/chatgpt/index.ts` | +10 tools, upgraded system prompt, tool loop 6 iteraties, confirmation flow voor alle mutaties |
+| `src/components/chatgpt/ChatGPTPanel.tsx` | Nieuwe quick actions, verbeterde empty state met "capabilities" showcase |
+| `src/components/chatgpt/ChatGPTActionCard.tsx` | Rich confirmation cards voor alle mutatie-types (driver assign, status change, invoice, email) |
+| `src/hooks/useChatGPT.ts` | Uitgebreide confirmAction voor alle nieuwe tool types |
+
+## Veiligheid
+
+- **Alle mutaties vereisen bevestiging** — de AI kan nooit zelfstandig data wijzigen
+- **Tenant-isolatie** op elke query (company_id check)
+- **Audit trail** — elke AI-mutatie wordt gelogd in order_events
+- **Credit kosten**: Read-tools = 1 credit, Mutatie-tools = 2 credits, Rapporten = 3 credits
 
