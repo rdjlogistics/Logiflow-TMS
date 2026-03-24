@@ -78,9 +78,6 @@ const Auth = () => {
   const location = useLocation();
   const { toast } = useToast();
 
-  // Check if we're on the demo page
-  const isDemoPage = location.pathname === "/demo";
-
   // ImperialShield has built-in bypasses for auth endpoints, no manual deactivation needed.
 
   useEffect(() => {
