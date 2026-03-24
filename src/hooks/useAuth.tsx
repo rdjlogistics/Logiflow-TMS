@@ -105,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     clearAuthStorage();
+    clearAllRoleCache();
     ensuredCompanyRef.current = false;
     setSession(null);
     setUser(null);

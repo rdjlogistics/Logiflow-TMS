@@ -334,6 +334,18 @@ const OrderOverview = () => {
     fetchQuickStats();
   }, [statusFilter, productFilter, carrierFilter, customerFilter, vehicleFilter, dateFrom, dateTo, debouncedSearchTerm, currentPage, itemsPerPage, sortColumn, sortDirection, unassignedFilter]);
 
+  // Realtime: auto-refresh when trips table changes
+  useEffect(() => {
+    const channel = supabase
+      .channel(`admin-orders-realtime-${Date.now()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => {
+        fetchOrders();
+        fetchQuickStats();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const fetchFilterOptions = async () => {
     const [customersRes, carriersRes, vehiclesRes, productsRes] = await Promise.all([
       supabase.from("customers").select("id, company_name").order("company_name"),
