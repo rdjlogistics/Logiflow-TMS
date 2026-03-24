@@ -45,10 +45,13 @@ export function MobileBottomNav() {
       role="navigation"
       aria-label="Hoofdnavigatie"
     >
-      {/* Liquid Glass Bar */}
       <div
-        className="bg-background/40 backdrop-blur-2xl border-t border-white/[0.08]"
-        style={{ backdropFilter: "blur(40px) saturate(180%)", WebkitBackdropFilter: "blur(40px) saturate(180%)" }}
+        className="border-t border-white/[0.08]"
+        style={{
+          background: "linear-gradient(180deg, hsl(228 60% 10% / 0.95), hsl(228 60% 8% / 0.98))",
+          backdropFilter: "blur(40px) saturate(180%)",
+          WebkitBackdropFilter: "blur(40px) saturate(180%)",
+        }}
       >
         <div className="grid grid-cols-5 gap-0 px-1 py-2">
           {tabs.map((tab) => {
@@ -66,15 +69,6 @@ export function MobileBottomNav() {
                 aria-label={tab.label}
                 aria-current={isActive ? "page" : undefined}
               >
-                {/* Active top-line indicator */}
-                {isActive && (
-                  <motion.div
-                    layoutId="tab-indicator"
-                    className="absolute -top-2 w-5 h-[2px] rounded-full bg-primary"
-                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
-                  />
-                )}
-
                 <div className="flex flex-col items-center gap-0.5">
                   {tab.isCta ? (
                     <div className={cn(
@@ -90,14 +84,17 @@ export function MobileBottomNav() {
                     </div>
                   ) : (
                     <motion.div
-                      animate={isActive ? { scale: 1.08 } : { scale: 1 }}
+                      animate={isActive ? { scale: 1.05 } : { scale: 1 }}
                       transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                      className="w-10 h-10 flex items-center justify-center"
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200",
+                        isActive && "bg-primary/15 border border-primary/20"
+                      )}
                     >
                       <tab.icon
                         className={cn(
                           "h-[22px] w-[22px] transition-colors duration-200",
-                          isActive ? "text-primary" : "text-muted-foreground/70"
+                          isActive ? "text-white" : "text-blue-300/70"
                         )}
                         strokeWidth={isActive ? 2.2 : 1.5}
                       />
@@ -109,14 +106,23 @@ export function MobileBottomNav() {
                       className={cn(
                         "text-[11px] leading-none truncate transition-colors duration-200",
                         isActive
-                          ? "font-semibold text-primary"
-                          : "font-normal text-muted-foreground/60"
+                          ? "font-semibold text-white"
+                          : "font-normal text-blue-300/60"
                       )}
                     >
                       {tab.label}
                     </span>
                   )}
                 </div>
+
+                {/* Bottom glow indicator */}
+                {isActive && !tab.isCta && (
+                  <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute -bottom-2 w-5 h-[2px] rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.6)]"
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                  />
+                )}
               </motion.button>
             );
           })}
