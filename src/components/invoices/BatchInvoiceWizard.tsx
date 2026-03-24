@@ -146,6 +146,7 @@ const steps = [
   { id: 1, title: "Filters", icon: Calendar },
   { id: 2, title: "Preview", icon: Package },
   { id: 3, title: "Bevestigen", icon: Check },
+  { id: 4, title: "Verzenden", icon: Mail },
 ];
 
 export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardProps) {
