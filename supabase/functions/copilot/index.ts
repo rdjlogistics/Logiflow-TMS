@@ -337,7 +337,7 @@ serve(async (req) => {
       p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
       p_action_type: toolsUsed.length > 0 ? "copilot_tool" : "copilot",
       p_complexity: complexity !== "none" ? "complex" : "simple",
-      p_model: "gemini-3-flash",
+      p_model: model.includes("flash-lite") ? "gemini-2.5-flash-lite" : "gemini-3-flash",
     });
 
     return new Response(response.body, {
