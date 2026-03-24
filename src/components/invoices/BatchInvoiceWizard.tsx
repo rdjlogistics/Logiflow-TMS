@@ -154,6 +154,10 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
   const { company } = useCompany();
   const [currentStep, setCurrentStep] = useState(1);
   const [successData, setSuccessData] = useState<{ invoices_created: number; total_amount: number } | null>(null);
+  const [createdInvoices, setCreatedInvoices] = useState<CreatedInvoice[]>([]);
+  const [selectedForEmail, setSelectedForEmail] = useState<Set<string>>(new Set());
+  const [emailStatuses, setEmailStatuses] = useState<Record<string, EmailStatus>>({});
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
   const [periodPreset, setPeriodPreset] = useState<PeriodPreset>("last_month");
   const [includeUnverified, setIncludeUnverified] = useState(false);
   const initialDates = getPresetDates("last_month");
