@@ -248,7 +248,7 @@ export const ChatGPTPanel = ({ context, className }: ChatGPTPanelProps) => {
                   </div>
                 )}
 
-                {isLoading && !pendingConfirmation && (
+                {isLoading && !pendingConfirmation && !messages.some(m => m.isStreaming) && (
                   <div className="flex items-center gap-3 ml-11">
                     <div className="flex gap-1">
                       <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />

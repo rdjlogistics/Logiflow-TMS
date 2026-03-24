@@ -59,6 +59,9 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
               prose-strong:text-foreground
             ">
               <ReactMarkdown>{message.content}</ReactMarkdown>
+              {message.isStreaming && (
+                <span className="inline-block w-2 h-4 bg-primary/60 animate-pulse rounded-sm ml-0.5 align-text-bottom" />
+              )}
             </div>
           )}
 
