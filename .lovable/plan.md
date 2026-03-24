@@ -1,51 +1,28 @@
 
 
-# Plan: Onafgemaakte Batches — Fixes & Perfectie
+# Plan: Batch Invoices — Deploy & Sync
 
-## Gevonden Problemen
+## Probleem
 
-### Kritiek
-1. **Sales batch edge function niet gedeployed** — `create-batch-invoices` is aangemaakt maar nooit gedeployed (0 logs). De wizard faalt altijd.
-2. **Purchase batch: geen factuurregels** — `create-batch-purchase-invoices` maakt wél de factuur en koppelt trips, maar **maakt GEEN `purchase_invoice_lines` records aan**. Hierdoor is de factuur leeg (geen regels, geen PDF inhoud).
+Beide edge functions (`create-batch-invoices` en `create-batch-purchase-invoices`) hebben **0 logs** — ze zijn nooit gedeployed. De code is compleet en correct (schema-match geverifieerd), maar de wizards falen altijd omdat de functions niet bereikbaar zijn.
 
-### Multi-tenant hardening
-3. **Purchase wizard trips query** mist `company_id` filter (RLS beschermt, maar expliciet is beter)
-4. **Purchase wizard carriers query** mist `tenant_id` filter
-5. **Sales wizard customers query** mist `tenant_id` filter
+## Analyse
 
-## Oplossing
+Na grondige review:
+- **Sales edge function** (`create-batch-invoices`): Code is 100% correct. BTW-logica, invoice_lines, trip linking, rollback — alles klopt met het DB schema.
+- **Purchase edge function** (`create-batch-purchase-invoices`): Code is compleet met invoice lines, rollback, en trip linking.
+- **DB functions** `get_next_invoice_number` en `get_next_purchase_invoice_number` bestaan.
+- **Frontend wizards**: Beide zijn volledig en correct. Sales wizard heeft `company_id` + `tenant_id` filters. Purchase wizard heeft `company_id` + `tenant_id` filters.
+- **Schema match**: Alle insert-kolommen matchen exact met `invoices`, `invoice_lines`, `purchase_invoices`, `purchase_invoice_lines`.
 
-### 1. Deploy `create-batch-invoices` edge function
-De code is compleet en correct — alleen deployen.
+Er zijn **geen codewijzigingen nodig**. Alleen deployment.
 
-### 2. Fix `create-batch-purchase-invoices`: factuurregels toevoegen
-Na het aanmaken van de purchase invoice, per trip een `purchase_invoice_lines` record inserteren:
+## Actie
 
-```
-{
-  purchase_invoice_id: invoice.id,
-  trip_id: trip.id,
-  description: `Order ${trip.order_number || trip.id}`,
-  quantity: 1,
-  unit_price: trip.purchase_total,
-  total_price: trip.purchase_total,
-  vat_percentage: 21,
-  vat_amount: Math.round(purchase_total * 0.21 * 100) / 100,
-  line_type: 'transport'
-}
-```
-Met rollback bij fout (delete invoice als lines falen).
-
-### 3. Multi-tenant filters toevoegen
-- `BatchPurchaseInvoiceWizard.tsx`: `useCompany` hook importeren, `company_id` filter op trips query, `tenant_id` filter op carriers query
-- `BatchInvoiceWizard.tsx`: `tenant_id` filter op customers query
-
-## Bestanden
-
-| Bestand | Wijziging |
+| Stap | Wat |
 |---|---|
-| `supabase/functions/create-batch-purchase-invoices/index.ts` | Invoice lines toevoegen na invoice insert + rollback |
-| `src/components/purchase-invoices/BatchPurchaseInvoiceWizard.tsx` | `company_id` op trips, `tenant_id` op carriers |
-| `src/components/invoices/BatchInvoiceWizard.tsx` | `tenant_id` op customers query |
-| Deploy | `create-batch-invoices` deployen |
+| 1 | Deploy `create-batch-invoices` edge function |
+| 2 | Deploy `create-batch-purchase-invoices` edge function |
+
+Geen bestandswijzigingen. Alleen deploy-actie.
 
