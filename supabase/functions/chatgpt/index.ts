@@ -1824,7 +1824,7 @@ serve(async (req) => {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
+            model: selectedModel,
             messages: finalMessages,
             stream: true,
             ...(reasoning ? { reasoning } : {}),
