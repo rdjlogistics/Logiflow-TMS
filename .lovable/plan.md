@@ -1,28 +1,38 @@
 
 
-# Plan: iOS 26 Bottom Nav — Consistente Blue Vibes + Active Indicator Onderaan
+# Plan: Verkoopfactuur PDF Generatie — Edge Function
 
-## Problemen
-1. **Kleur verandert** bij navigatie — de `bg-background/40` pakt de achtergrondkleur van de pagina op, waardoor de balk er anders uitziet per route
-2. **Active indicator staat bovenaan** (top-line) — moet **onderaan** de balk voor een clean iOS 26 look, zoals in de screenshot
-3. **Active state styling inconsistent** — bij Instellingen zie je een mooie rounded box, maar bij Home/Orders niet
+## Probleem
+De frontend roept `generate-invoice-pdf` aan op meerdere plekken (InvoiceDetail, Invoices, Portals), maar de edge function bestaat niet. Downloads falen altijd.
 
 ## Oplossing
+Maak een nieuwe edge function `generate-invoice-pdf` die de verkoopfactuur als HTML-based PDF genereert, gemodelleerd naar de bestaande `generate-purchase-invoice-pdf`.
 
-**Bestand:** `src/components/layout/MobileBottomNav.tsx`
+## Technisch
 
-### Wijzigingen:
-1. **Vaste blauwe achtergrond** — Vervang `bg-background/40` met een solide deep-blue gradient die consistent blijft ongeacht de pagina: `bg-[hsl(228,60%,12%)]/95 backdrop-blur-2xl`
-2. **Active indicator naar onder** — Verplaats de `layoutId="tab-indicator"` div van `-top-2` naar `bottom` positie, als een subtiele lijn onder het actieve item
-3. **Active state = rounded box** — Net als Instellingen in de screenshot: actief item krijgt een `rounded-xl bg-primary/15 border border-primary/20` container rondom icon + label
-4. **Consistente icon kleuren** — Alle icons in dezelfde blauwe tint (`text-blue-300/70` inactive, `text-white` active) voor die iOS 26 vibe
-5. **CTA knop** — + knop behoudt gradient maar past in de blauwe toon
+**Nieuw bestand:** `supabase/functions/generate-invoice-pdf/index.ts`
 
-### Visueel resultaat:
-- Vaste diep-blauwe balk die nooit van kleur verandert
-- Actief item heeft rounded box highlight (zoals screenshot bij Instellingen)
-- Subtiele glow-lijn **onder** het actieve item
-- Alles synchroon blauw — iOS 26 Liquid Glass vibes
+De function:
+1. Authenticatie via Authorization header
+2. Haalt `invoices` op met `customers(*)` join
+3. Haalt `invoice_lines` op voor de factuur
+4. Haalt `companies` info (tenant) op via `company_id`
+5. Genereert professionele HTML met dezelfde styling als purchase variant:
+   - Header met factuurnummer + bedrijfsnaam
+   - Van/Aan partijen (bedrijf → klant) met BTW/KvK
+   - Metadata: factuurdatum, vervaldatum, betalingstermijn
+   - Tabel met invoice_lines (omschrijving, aantal, eenheidsprijs, bedrag)
+   - Totalen: subtotaal, BTW%, totaal
+   - Voetnoot + betalingsgegevens (IBAN)
+   - Footer met bedrijfsgegevens
+6. Retourneert `{ pdf: base64Html, html: true }` — zelfde formaat als purchase variant
 
-Één bestand, geen backend wijzigingen.
+De bestaande frontend code (InvoiceDetail, Invoices, Portals) hoeft **niet** te worden aangepast — die roepen al `generate-invoice-pdf` aan met het juiste response-formaat.
+
+| Stap | Wat |
+|---|---|
+| 1 | Maak `supabase/functions/generate-invoice-pdf/index.ts` |
+| 2 | Deploy edge function |
+
+Geen database- of frontend-wijzigingen nodig.
 
