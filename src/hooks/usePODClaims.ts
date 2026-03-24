@@ -74,7 +74,7 @@ export const usePODClaims = () => {
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
-      return data as ProofOfDelivery[];
+      return (data ?? []) as any[];
     },
     enabled: !!company?.id,
   });
