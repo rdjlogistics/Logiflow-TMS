@@ -196,7 +196,7 @@ export const usePushNotifications = () => {
       setLoading(false);
       return true;
     } catch (error) {
-      console.error('Error subscribing to push notifications:', error);
+      logger.error('Error subscribing to push notifications:', error);
       toast({
         title: 'Fout',
         description: 'Kon push notificaties niet inschakelen',
