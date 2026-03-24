@@ -56,8 +56,7 @@ export const ProtectedRoute = ({ children, redirectTo = "/auth", allowedRoles }:
   const handleResetSession = async () => {
     try {
       try { await supabase.auth.signOut(); } catch { /* ignore */ }
-      clearAuthStorage();
-      await clearServiceWorkerAndCaches();
+      await clearAuthCachesOnly();
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")

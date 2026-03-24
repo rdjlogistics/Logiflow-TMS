@@ -38,15 +38,35 @@ export function clearAuthStorage(): void {
   }
 }
 
+/**
+ * Surgical cache clear for logout flows.
+ * Does NOT destroy the Service Worker — it stays active for asset caching.
+ * Only clears auth-related storage (cookies, tokens).
+ */
+export async function clearAuthCachesOnly(): Promise<void> {
+  try {
+    clearAuthStorage();
+    // Clear cookies (best-effort)
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  } catch {
+    // no-op
+  }
+}
+
+/**
+ * Nuclear option: fully deregister SW and wipe all caches.
+ * Only used for fatal error recovery (e.g. chunk-load failures).
+ */
 export async function clearServiceWorkerAndCaches(): Promise<void> {
   try {
-    // Unregister service workers (PWA) that could be serving an old bundle
     if ('serviceWorker' in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map((r) => r.unregister()));
     }
-
-    // Clear Cache Storage
     if ('caches' in window) {
       const keys = await caches.keys();
       await Promise.all(keys.map((k) => caches.delete(k)));
