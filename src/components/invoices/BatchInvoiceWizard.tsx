@@ -134,6 +134,7 @@ const steps = [
 
 export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardProps) {
   const navigate = useNavigate();
+  const { company } = useCompany();
   const [currentStep, setCurrentStep] = useState(1);
   const [successData, setSuccessData] = useState<{ invoices_created: number; total_amount: number } | null>(null);
   const [periodPreset, setPeriodPreset] = useState<PeriodPreset>("last_month");
