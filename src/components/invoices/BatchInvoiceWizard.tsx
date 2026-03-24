@@ -39,7 +39,13 @@ import {
   Users,
   Euro,
   Package,
+  Mail,
+  SkipForward,
+  CheckCheck,
+  XCircle,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { sendInvoiceEmail } from "@/lib/email";
 import { cn } from "@/lib/utils";
 import { berekenBTW } from "@/lib/btw-calculator";
 import { useCompany } from "@/hooks/useCompany";
