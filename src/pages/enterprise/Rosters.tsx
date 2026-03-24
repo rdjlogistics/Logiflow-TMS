@@ -85,7 +85,7 @@ const Rosters = () => {
                 <CardTitle>Weekrooster</CardTitle>
                 <Badge variant="outline">Week {getISOWeek(now)}, {now.getFullYear()}</Badge>
               </div>
-              <Button size="sm" onClick={() => toast({ title: "Dienst toevoegen", description: "Ga naar Planning → Programma om diensten aan te maken." })}>
+              <Button size="sm" onClick={() => navigate("/planning/program")}>
                 <Plus className="h-4 w-4 mr-2" /> Dienst Toevoegen
               </Button>
             </div>

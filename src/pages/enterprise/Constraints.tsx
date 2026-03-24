@@ -51,7 +51,7 @@ const Constraints = () => {
                 <Lock className="h-5 w-5 text-primary" />
                 <CardTitle>Planning Constraints</CardTitle>
               </div>
-              <Button size="sm" onClick={() => toast({ title: "Nieuwe constraint", description: "Ga naar Planning → Beschikbaarheid om blokkades toe te voegen." })}>
+              <Button size="sm" onClick={() => navigate("/planning/availability")}>
                 <Plus className="h-4 w-4 mr-2" /> Nieuwe Regel
               </Button>
             </div>
