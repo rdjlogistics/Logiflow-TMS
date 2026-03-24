@@ -33,6 +33,74 @@ export interface CreditInfo {
   warning: string | null;
 }
 
+// ─── SSE stream parser ───
+async function parseSSEStream(
+  response: Response,
+  onDelta: (text: string) => void,
+  onConfirmation?: (data: any) => void
+): Promise<string> {
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullContent = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let nlIdx: number;
+    while ((nlIdx = buffer.indexOf('\n')) !== -1) {
+      let line = buffer.slice(0, nlIdx);
+      buffer = buffer.slice(nlIdx + 1);
+      if (line.endsWith('\r')) line = line.slice(0, -1);
+      if (line.startsWith(':') || line.trim() === '') continue;
+      if (!line.startsWith('data: ')) continue;
+
+      const jsonStr = line.slice(6).trim();
+      if (jsonStr === '[DONE]') return fullContent;
+
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const content = parsed.choices?.[0]?.delta?.content;
+        if (content) {
+          fullContent += content;
+          onDelta(content);
+        }
+        // Check for pending confirmation injected by backend
+        if (parsed._pendingConfirmation && onConfirmation) {
+          onConfirmation(parsed._pendingConfirmation);
+        }
+      } catch {
+        // Partial JSON — put back and wait
+        buffer = line + '\n' + buffer;
+        break;
+      }
+    }
+  }
+
+  // Flush remaining
+  if (buffer.trim()) {
+    for (let raw of buffer.split('\n')) {
+      if (!raw) continue;
+      if (raw.endsWith('\r')) raw = raw.slice(0, -1);
+      if (!raw.startsWith('data: ')) continue;
+      const jsonStr = raw.slice(6).trim();
+      if (jsonStr === '[DONE]') continue;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const content = parsed.choices?.[0]?.delta?.content;
+        if (content) {
+          fullContent += content;
+          onDelta(content);
+        }
+      } catch {}
+    }
+  }
+
+  return fullContent;
+}
+
 export const useChatGPT = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -106,73 +174,83 @@ export const useChatGPT = () => {
           conversationId,
           message,
           context,
-          stream: false // Non-streaming for now (tool calls need it)
+          stream: true,
         })
       });
 
       if (response.status === 402) {
-        const errData = await response.json();
-        toast({
-          title: 'Credits op',
-          description: errData.message || 'Onvoldoende credits. Upgrade je plan.',
-          variant: 'destructive'
-        });
+        toast({ title: 'Credits op', description: 'Onvoldoende credits. Upgrade je plan.', variant: 'destructive' });
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         return;
       }
-
       if (response.status === 429) {
-        toast({
-          title: 'Rate limit',
-          description: 'Te veel verzoeken, probeer het later opnieuw.',
-          variant: 'destructive'
-        });
+        toast({ title: 'Rate limit', description: 'Te veel verzoeken, probeer het later opnieuw.', variant: 'destructive' });
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         return;
       }
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
 
-      if (!data.success) {
-        throw new Error(data.error || 'Er ging iets mis');
-      }
+      if (contentType.includes('text/event-stream') && response.body) {
+        // ─── SSE Streaming ───
+        const assistantId = crypto.randomUUID();
+        let assistantContent = '';
 
-      if (data.conversationId && !conversationId) {
-        setConversationId(data.conversationId);
-      }
+        // Add empty assistant message
+        setMessages(prev => [...prev, {
+          id: assistantId, role: 'assistant', content: '', createdAt: new Date().toISOString(), isStreaming: true,
+        }]);
 
-      const messageContent = data.message || (data.success ? 'Ik kon geen antwoord genereren. Probeer het opnieuw.' : null);
-      if (messageContent) {
-        const assistantMessage: ChatMessage = {
+        await parseSSEStream(
+          response,
+          (delta) => {
+            assistantContent += delta;
+            setMessages(prev => prev.map(m =>
+              m.id === assistantId ? { ...m, content: assistantContent } : m
+            ));
+          },
+          (confirmation) => {
+            setPendingConfirmation(confirmation);
+          }
+        );
+
+        // Mark streaming done
+        setMessages(prev => prev.map(m =>
+          m.id === assistantId ? { ...m, isStreaming: false } : m
+        ));
+
+        // Extract conversationId from first SSE chunk or rely on backend
+        // The backend saves the message, so we just need to refresh conversations
+
+      } else {
+        // ─── Non-streaming fallback ───
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || 'Er ging iets mis');
+
+        if (data.conversationId && !conversationId) {
+          setConversationId(data.conversationId);
+        }
+
+        const messageContent = data.message || 'Ik kon geen antwoord genereren.';
+        setMessages(prev => [...prev, {
           id: crypto.randomUUID(),
           role: 'assistant',
           content: messageContent,
           createdAt: new Date().toISOString(),
           pendingConfirmation: !!data.pendingConfirmation,
-          confirmationPayload: data.pendingConfirmation
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      }
+          confirmationPayload: data.pendingConfirmation,
+        }]);
 
-      if (data.pendingConfirmation) {
-        setPendingConfirmation(data.pendingConfirmation);
-      }
-
-      // Update credit info
-      if (data.credits) {
-        setCreditInfo(data.credits);
-        if (data.credits.warning) {
-          toast({ title: 'Credits waarschuwing', description: data.credits.warning });
+        if (data.pendingConfirmation) setPendingConfirmation(data.pendingConfirmation);
+        if (data.credits) {
+          setCreditInfo(data.credits);
+          if (data.credits.warning) toast({ title: 'Credits waarschuwing', description: data.credits.warning });
         }
       }
 
     } catch (error: any) {
       console.error('ChatGPT error:', error);
-      toast({
-        title: 'Fout',
-        description: error.message || 'Er ging iets mis met de AI Assistent',
-        variant: 'destructive'
-      });
+      toast({ title: 'Fout', description: error.message || 'Er ging iets mis', variant: 'destructive' });
       setMessages(prev => prev.filter(m => m.id !== userMessage.id));
     } finally {
       setIsLoading(false);
@@ -195,16 +273,12 @@ export const useChatGPT = () => {
       });
       const data = await response.json();
       if (!data.success) throw new Error(data.error || 'Actie mislukt');
-      const resultMessage: ChatMessage = {
+      setMessages(prev => [...prev, {
         id: crypto.randomUUID(), role: 'assistant',
         content: `✅ ${data.result?.message || 'Actie succesvol uitgevoerd'}`,
         createdAt: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, resultMessage]);
+      }]);
       setPendingConfirmation(null);
-      if (data.credits_remaining !== undefined) {
-        setCreditInfo(prev => prev ? { ...prev, remaining: data.credits_remaining } : null);
-      }
       toast({ title: 'Succes', description: data.result?.message || 'Actie uitgevoerd' });
     } catch (error: any) {
       console.error('Confirm action error:', error);
