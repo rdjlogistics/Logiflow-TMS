@@ -147,6 +147,7 @@ const Drivers = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [activeTab, setActiveTab] = useState<"info" | "documenten">("info");
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
 
   const validateDriverField = (field: string, value: string) => {
     let error: string | undefined;
