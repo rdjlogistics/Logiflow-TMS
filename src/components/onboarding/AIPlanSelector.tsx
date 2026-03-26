@@ -83,25 +83,37 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-72 rounded-2xl bg-white/[0.03] animate-pulse" />
-        ))}
+      <div className="max-w-3xl mx-auto py-6 sm:py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-72 rounded-2xl bg-white/[0.03] animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Refined header — no badge, no sparkle pill */}
+    <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
+      {/* Apple-style header */}
       <div className="text-center space-y-3">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
         >
-          Optioneel add-on
+          Stap 4 van 6 · Optioneel
         </motion.p>
+
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/20"
+        >
+          <Sparkles className="h-7 w-7 text-white" />
+        </motion.div>
+
         <motion.h2
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -121,7 +133,7 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
         </motion.p>
       </div>
 
-      {/* Spatial plan cards */}
+      {/* Plan cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {plans?.map((plan, index) => {
           const meta = AI_PLAN_META[plan.slug];
@@ -136,10 +148,11 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
               type="button"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + index * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -4, scale: 1.01 }}
+              transition={{ delay: 0.12 + index * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -4, scale: 1.01, rotateY: 2, rotateX: -1 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onSelect(plan.id, plan.slug)}
+              style={{ perspective: 800, transformStyle: 'preserve-3d' }}
               className={cn(
                 'relative text-left rounded-2xl p-5 transition-all duration-300',
                 'backdrop-blur-2xl bg-white/[0.03] border',
@@ -149,7 +162,7 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
                   : 'border-white/[0.07] hover:border-white/[0.12] hover:bg-white/[0.05]',
               )}
             >
-              {/* Static subtle corner glow */}
+              {/* Subtle corner glow */}
               <div
                 className="absolute top-0 right-0 w-32 h-32 pointer-events-none opacity-20"
                 style={{
@@ -165,14 +178,24 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
                 </div>
               )}
 
-              {/* Selection ring */}
+              {/* Selection ring with pulse */}
               <div className={cn(
                 'absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 z-10',
                 isSelected
                   ? 'border-primary bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.4)]'
                   : 'border-white/[0.12]'
               )}>
-                {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                {isSelected && (
+                  <>
+                    <Check className="h-3 w-3 text-primary-foreground" />
+                    <motion.div
+                      initial={{ scale: 1, opacity: 0.5 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ duration: 0.6 }}
+                      className="absolute inset-0 rounded-full border-2 border-primary"
+                    />
+                  </>
+                )}
               </div>
 
               <div className="relative z-10 space-y-4">
@@ -224,7 +247,7 @@ export const AIPlanSelector = ({ selectedPlanId, onSelect, showSkip = true }: AI
         })}
       </div>
 
-      {/* Skip as elegant text link */}
+      {/* Skip link */}
       {showSkip && (
         <motion.div
           initial={{ opacity: 0 }}
