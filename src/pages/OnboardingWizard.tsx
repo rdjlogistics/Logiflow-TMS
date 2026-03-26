@@ -376,43 +376,65 @@ const OnboardingWizard = () => {
 
             {/* Step 4: Dashboard Setup */}
             {step === 4 && (
-              <div className="max-w-2xl mx-auto py-6 sm:py-10 space-y-8">
-                <div className="text-center space-y-2">
+              <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
+                {/* Apple-style header */}
+                <div className="text-center space-y-3">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
+                  >
+                    Stap 5 van 6
+                  </motion.p>
+
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                    className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg shadow-amber-500/20 mb-2"
+                    className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg shadow-amber-500/20"
                   >
                     <LayoutDashboard className="h-7 w-7 text-white" />
                   </motion.div>
-                  <h2 className="text-2xl sm:text-3xl font-display font-light tracking-tight">
+
+                  <motion.h2
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                    className="text-2xl sm:text-3xl font-display font-light tracking-tight"
+                  >
                     Jouw <span className="font-semibold">dashboard</span>
-                  </h2>
-                  <p className="text-sm text-muted-foreground/60">Kies een startlayout en thema</p>
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-sm text-muted-foreground/50 font-light"
+                  >
+                    Kies een startlayout en thema
+                  </motion.p>
                 </div>
 
                 {/* Preset cards */}
-                <motion.div
-                  variants={fieldStagger}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                >
-                  {selectablePresets.map((preset) => {
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {selectablePresets.map((preset, index) => {
                     const isSelected = selectedPreset?.id === preset.id;
                     const PresetIcon = preset.icon;
                     return (
                       <motion.button
                         key={preset.id}
-                        variants={fieldItem}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.12 + index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        whileHover={{ y: -4, scale: 1.01, rotateY: 2, rotateX: -1 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedPreset(preset)}
+                        style={{ perspective: 800, transformStyle: 'preserve-3d' }}
                         className={cn(
-                          'relative p-4 rounded-2xl text-left transition-all duration-200 backdrop-blur-xl border',
-                          'hover:scale-[1.02] active:scale-[0.98]',
+                          'relative p-4 rounded-2xl text-left transition-all duration-300 backdrop-blur-xl border',
+                          'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]',
                           isSelected
                             ? 'bg-primary/[0.08] border-primary/30 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.25)]'
-                            : 'bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15]',
+                            : 'bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.05]',
                         )}
                       >
                         <div className="flex items-start gap-3">
@@ -443,34 +465,51 @@ const OnboardingWizard = () => {
                       </motion.button>
                     );
                   })}
-                </motion.div>
-
-                {/* Theme toggle */}
-                <div className="flex items-center justify-center gap-2">
-                  {([
-                    { value: 'light' as const, icon: Sun, label: 'Licht' },
-                    { value: 'dark' as const, icon: Moon, label: 'Donker' },
-                    { value: 'system' as const, icon: Monitor, label: 'Systeem' },
-                  ]).map(({ value, icon: ThemeIcon, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => {
-                        setTheme(value);
-                        applyTheme(value);
-                      }}
-                      className={cn(
-                        'flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 backdrop-blur-xl border',
-                        'active:scale-[0.97]',
-                        theme === value
-                          ? 'bg-primary/[0.08] border-primary/30 text-foreground'
-                          : 'bg-white/[0.04] border-white/[0.08] text-muted-foreground hover:border-white/[0.15]',
-                      )}
-                    >
-                      <ThemeIcon className="h-3.5 w-3.5" />
-                      {label}
-                    </button>
-                  ))}
                 </div>
+
+                {/* Glassmorphism theme toggle */}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center justify-center"
+                >
+                  <div className="relative inline-flex items-center gap-0 rounded-2xl backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] p-1">
+                    {([
+                      { value: 'light' as const, icon: Sun, label: 'Licht' },
+                      { value: 'dark' as const, icon: Moon, label: 'Donker' },
+                      { value: 'system' as const, icon: Monitor, label: 'Systeem' },
+                    ]).map(({ value, icon: ThemeIcon, label }) => (
+                      <button
+                        key={value}
+                        onClick={() => {
+                          setTheme(value);
+                          applyTheme(value);
+                        }}
+                        className={cn(
+                          'relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all duration-300',
+                          'active:scale-[0.97]',
+                          theme === value
+                            ? 'text-foreground'
+                            : 'text-muted-foreground/50 hover:text-muted-foreground/70',
+                        )}
+                      >
+                        <ThemeIcon className="h-3.5 w-3.5" />
+                        {label}
+                      </button>
+                    ))}
+                    {/* Sliding indicator */}
+                    <motion.div
+                      layout
+                      className="absolute top-1 bottom-1 rounded-xl bg-white/[0.08] border border-white/[0.1]"
+                      style={{
+                        width: 'calc(33.333% - 2px)',
+                        left: `calc(${['light', 'dark', 'system'].indexOf(theme) * 33.333}% + 4px)`,
+                      }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    />
+                  </div>
+                </motion.div>
               </div>
             )}
 
