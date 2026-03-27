@@ -142,13 +142,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        // Defer any backend calls.
-        setTimeout(() => {
-          void ensureUserCompanyLink();
+        // Defer backend call; only finish loading after company link is ensured
+        setTimeout(async () => {
+          await ensureUserCompanyLink();
+          setLoading(false);
         }, 0);
+      } else {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     // Initial session check with error handling
@@ -169,12 +170,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        setTimeout(() => {
-          void ensureUserCompanyLink();
-        }, 0);
+        // Wait for company link before marking loading as done
+        ensureUserCompanyLink().finally(() => setLoading(false));
+      } else {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
