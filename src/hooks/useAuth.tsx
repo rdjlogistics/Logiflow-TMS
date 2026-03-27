@@ -222,10 +222,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [session, refreshSession]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => clearLoadingTimeout();
-  }, [clearLoadingTimeout]);
+
+
 
   return (
     <AuthContext.Provider value={{ user, session, loading, authStalled, signOut: handleSignOut, refreshSession }}>
