@@ -228,9 +228,9 @@ const OnboardingWizard = () => {
   }, [saving, selectedTMSPlanId, selectedAIPlanId, user, navigate, toast, companyForm, selectedPreset, theme, applyTheme, reorderWidgets, updatePreference, queryClient]);
 
   const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0, filter: 'blur(4px)' }),
-    center: { x: 0, opacity: 1, filter: 'blur(0px)' },
-    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0, filter: 'blur(4px)' }),
+    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
   };
 
   const fieldStagger = {

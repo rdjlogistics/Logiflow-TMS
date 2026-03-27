@@ -15,9 +15,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Auth loading timeout - prevents infinite loading states
-const AUTH_LOADING_TIMEOUT_MS = 5000;
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -25,34 +22,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authStalled, setAuthStalled] = useState(false);
 
   const ensuredCompanyRef = useRef(false);
-  const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Clear timeout helper
-  const clearLoadingTimeout = useCallback(() => {
-    if (loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
-      loadingTimeoutRef.current = null;
-    }
-  }, []);
-
-  // Set loading with timeout protection
-  const setLoadingWithTimeout = useCallback((isLoading: boolean) => {
-    clearLoadingTimeout();
-    
-    if (isLoading) {
-      // Start timeout - if loading doesn't complete in time, mark as stalled
-      loadingTimeoutRef.current = setTimeout(() => {
-        console.warn('[Auth] Loading timeout exceeded, marking as stalled');
-        setLoading(false);
-        setAuthStalled(true);
-      }, AUTH_LOADING_TIMEOUT_MS);
-    }
-    
-    setLoading(isLoading);
-    if (!isLoading) {
-      setAuthStalled(false);
-    }
-  }, [clearLoadingTimeout]);
 
   // Promise-based deduplication: if a call is already in-flight, reuse it
   const ensureCompanyPromiseRef = useRef<Promise<void> | null>(null);
