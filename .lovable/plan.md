@@ -1,34 +1,31 @@
 
 
-# Fix: Build Error & Framer Motion Warnings
+# Fix: Alle Mapbox Kaarten Werken Niet
 
-## Gevonden problemen
+## Probleem
+De `useMapboxToken` hook roept `supabase.functions.invoke("get-mapbox-token")` aan, maar deze edge function **bestaat niet**. Het secret `MAPBOX_PUBLIC_TOKEN` is wel geconfigureerd maar wordt nooit naar de frontend gestuurd. Hierdoor falen alle 12+ kaartcomponenten.
 
-### 1. Ongewenst `bun.lock` bestand
-Een `bun.lock` bestand is per ongeluk aangemaakt in een vorige edit. Het project gebruikt `package-lock.json`. Dit kan de build-pipeline verwarren.
+Daarnaast gebruikt `OrderRoutePreview.tsx` een hardcoded `VITE_MAPBOX_TOKEN` env var die ook niet bestaat.
 
-**Fix**: Verwijder `bun.lock`.
+## Oplossing
 
-### 2. Negatieve blur keyframes in animaties
-De `slideVariants` in `OnboardingWizard.tsx` gebruikt `filter: 'blur(4px)'` in enter/exit animaties. Framer Motion interpoleert dit en genereert negatieve blur-waarden (`blur(-0.3px)`), wat ongeldige CSS is en warnings veroorzaakt.
+### 1. Maak edge function `get-mapbox-token` aan
+**Nieuw bestand**: `supabase/functions/get-mapbox-token/index.ts`
 
-**Fix**: Verander de `slideVariants` om geen `filter` property te gebruiken, of gebruik `opacity` alleen:
+- Leest `MAPBOX_PUBLIC_TOKEN` uit Deno environment
+- Retourneert `{ token: "..." }` als JSON
+- Geen JWT verificatie nodig (het is een publieke token)
+- CORS headers toevoegen
 
-```typescript
-const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
-};
-```
+### 2. Fix `OrderRoutePreview.tsx`
+- Verwijder de hardcoded `VITE_MAPBOX_TOKEN` constante
+- Gebruik `useMapboxToken` hook zoals alle andere kaartcomponenten
+- Pas de map-initialisatie aan om op het token te wachten
 
-### 3. Ongebruikte `setLoadingWithTimeout` in `useAuth.tsx`
-De functie `setLoadingWithTimeout` is gedefinieerd maar nooit aangeroepen — `setLoading` wordt direct gebruikt. Dit is geen error maar dead code.
+### Bestanden
+1. **Nieuw**: `supabase/functions/get-mapbox-token/index.ts`
+2. **Edit**: `src/components/orders/OrderRoutePreview.tsx` — switch naar `useMapboxToken`
 
-**Fix**: Verwijder de ongebruikte functie of gebruik het consistent.
-
-## Bestanden
-1. **Verwijder**: `bun.lock`
-2. **Edit**: `src/pages/OnboardingWizard.tsx` — Fix slideVariants blur
-3. **Edit**: `src/hooks/useAuth.tsx` — Clean up unused code
+### Resultaat
+Alle kaarten (Dashboard fleet map, GPS tracking, route optimalisatie, chauffeur ritten, tankstations, B2B tracking, order preview) laden correct met het Mapbox token.
 
