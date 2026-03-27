@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -44,6 +44,7 @@ const OnboardingWizard = () => {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [saving, setSaving] = useState(false);
+  const completedRef = useRef(false);
 
   // Plan selections
   const [selectedTMSPlanId, setSelectedTMSPlanId] = useState<string | null>(null);
@@ -81,6 +82,7 @@ const OnboardingWizard = () => {
   }, [company]);
 
   useEffect(() => {
+    if (completedRef.current) return;
     if (!onboardingLoading && !needsOnboarding) {
       navigate('/', { replace: true });
     }
@@ -130,12 +132,23 @@ const OnboardingWizard = () => {
         }
       }
 
-      // Save TMS plan
+      // Save TMS plan — upsert to handle cases where ensure-user-company already created a record
       if (selectedTMSPlanId && companyId) {
-        await supabase
-          .from('tenant_subscriptions')
-          .update({ plan_id: selectedTMSPlanId })
-          .eq('tenant_id', companyId);
+        const trialEndTMS = new Date();
+        trialEndTMS.setDate(trialEndTMS.getDate() + 14);
+
+        await supabase.from('tenant_subscriptions').upsert(
+          {
+            tenant_id: companyId,
+            plan_id: selectedTMSPlanId,
+            status: 'trial',
+            billing_cycle: 'monthly',
+            current_period_start: new Date().toISOString(),
+            current_period_end: trialEndTMS.toISOString(),
+            trial_ends_at: trialEndTMS.toISOString(),
+          },
+          { onConflict: 'tenant_id' }
+        );
       }
 
       // Save AI plan
@@ -195,8 +208,11 @@ const OnboardingWizard = () => {
         description: 'Je account is volledig ingesteld. Veel succes met je trial.',
       });
 
+      completedRef.current = true;
+
       await queryClient.invalidateQueries({ queryKey: ['onboarding-required'] });
       await queryClient.invalidateQueries({ queryKey: ['user-company'] });
+      await queryClient.invalidateQueries({ queryKey: ['tenant-subscription'] });
 
       navigate('/', { replace: true });
     } catch (err) {
