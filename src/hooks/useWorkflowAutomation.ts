@@ -199,13 +199,13 @@ export const useWorkflowAutomation = () => {
   // Fetch workflow actions for a specific workflow
   const fetchWorkflowActions = async (workflowId: string) => {
     const { data, error } = await supabase
-      .from('workflow_actions' as any)
+      .from('workflow_actions')
       .select('*')
       .eq('workflow_id', workflowId)
       .order('sequence_order', { ascending: true });
     
     if (error) throw error;
-    return (data as unknown) as WorkflowAction[];
+    return data as unknown as WorkflowAction[];
   };
 
   // Fetch workflow runs
