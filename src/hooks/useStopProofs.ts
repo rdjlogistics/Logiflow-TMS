@@ -25,6 +25,7 @@ export interface StopProofRecord {
   // Joined fields
   order_number: string | null;
   customer_name: string | null;
+  customer_email: string | null;
   stop_company_name: string | null;
   stop_address: string | null;
   stop_city: string | null;
