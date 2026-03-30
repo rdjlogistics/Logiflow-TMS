@@ -867,7 +867,7 @@ const Customers = () => {
                               <div className="grid grid-cols-2 gap-2 text-sm">
                                 <div>
                                   <span className="text-muted-foreground text-xs">Email</span>
-                                  <p className="font-medium truncate">{customer.email || "-"}</p>
+                                  <p className="font-medium truncate">{customer.email || "—"}</p>
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground text-xs">Stad</span>
