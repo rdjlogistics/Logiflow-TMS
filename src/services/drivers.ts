@@ -6,6 +6,7 @@ export interface DriverFilters {
   status?: 'active' | 'inactive' | 'on_leave';
   isZzp?: boolean;
   vehicleId?: string;
+  companyId?: string;
   limit?: number;
 }
 
