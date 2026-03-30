@@ -163,6 +163,43 @@ export function formatQuarter(value: string | Date | null | undefined): string {
   return `Q${Math.ceil((d.getMonth() + 1) / 3)} ${d.getFullYear()}`;
 }
 
+/** Get today at midnight */
+export function getToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Today as YYYY-MM-DD string (for <input type="date" min=...>) */
+export function getTodayISO(): string {
+  return getToday().toISOString().split('T')[0];
+}
+
+/** 7 days ago as YYYY-MM-DD (minimum invoice date) */
+export function getMinInvoiceDate(): string {
+  const d = getToday();
+  d.setDate(d.getDate() - 7);
+  return d.toISOString().split('T')[0];
+}
+
+/** Is date valid for delivery (>= today)? */
+export function isValidDeliveryDate(value: string | Date | null | undefined): boolean {
+  const d = toDate(value);
+  if (!d) return false;
+  d.setHours(0, 0, 0, 0);
+  return d >= getToday();
+}
+
+/** Is date range valid (end >= start)? */
+export function isValidDateRange(start: string | Date | null | undefined, end: string | Date | null | undefined): boolean {
+  const s = toDate(start);
+  const e = toDate(end);
+  if (!s || !e) return true; // allow if either is empty
+  s.setHours(0, 0, 0, 0);
+  e.setHours(0, 0, 0, 0);
+  return e >= s;
+}
+
 /** Capitalize city name: "zaandam" → "Zaandam", "DEN HAAG" → "Den Haag" */
 export function capitalizeCity(name: string): string {
   if (!name) return name;

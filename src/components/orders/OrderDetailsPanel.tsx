@@ -213,6 +213,7 @@ const OrderDetailsPanel = React.forwardRef<HTMLDivElement, OrderDetailsPanelProp
                   onSelect={(date) => {
                     if (date) handleChange('order_date', format(date, 'yyyy-MM-dd'));
                   }}
+                  disabled={(date) => { const today = new Date(); today.setHours(0,0,0,0); return date < today; }}
                   locale={nl}
                   initialFocus
                   className="p-3 pointer-events-auto"

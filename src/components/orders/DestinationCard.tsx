@@ -498,6 +498,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
                               onSelect={(date) => {
                                 if (date) handleChange('pickup_date', format(date, 'yyyy-MM-dd'));
                               }}
+                              disabled={(date) => { const today = new Date(); today.setHours(0,0,0,0); return date < today; }}
                               locale={nl}
                               initialFocus
                               className="p-3 pointer-events-auto"

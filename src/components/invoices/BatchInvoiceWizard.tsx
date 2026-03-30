@@ -571,6 +571,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                     type="date"
                     value={filters.invoice_date}
                     onChange={(e) => setFilters({ ...filters, invoice_date: e.target.value })}
+                    min={(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })()}
                   />
                 </div>
 
