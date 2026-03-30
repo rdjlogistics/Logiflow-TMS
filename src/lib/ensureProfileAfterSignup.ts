@@ -1,9 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Ensures a profile and role exist for a newly signed-up user.
+ * Ensures a profile, role, and company exist for a newly signed-up user.
  * This is a fallback for the database trigger `on_auth_user_created`
- * which cannot be reliably created on `auth.users` in hosted Supabase.
+ * and the `ensure-user-company` edge function.
  */
 export async function ensureProfileAfterSignup(
   userId: string,
@@ -39,5 +39,80 @@ export async function ensureProfileAfterSignup(
     if (roleError) {
       console.error("[ensureProfile] Role upsert failed:", roleError);
     }
+  }
+
+  // 3. Ensure company + user_companies link exists (client-side fallback)
+  try {
+    const { data: existingLink } = await supabase
+      .from("user_companies")
+      .select("company_id")
+      .eq("user_id", userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (!existingLink) {
+      // Derive a company name
+      const normalizedEmail = email.trim().toLowerCase();
+      const domain = normalizedEmail.split("@")[1] || "";
+      const genericDomains = [
+        "gmail.com", "hotmail.com", "outlook.com", "yahoo.com",
+        "live.nl", "ziggo.nl", "kpnmail.nl", "icloud.com",
+      ];
+      let companyName = "Mijn Bedrijf";
+      if (domain && !genericDomains.includes(domain)) {
+        const domainBase = domain.split(".")[0];
+        companyName = domainBase.charAt(0).toUpperCase() + domainBase.slice(1);
+      } else if (fullName) {
+        companyName = `${fullName}'s Bedrijf`;
+      }
+
+      // Create company
+      const { data: newCompany, error: companyError } = await supabase
+        .from("companies")
+        .insert({
+          name: companyName,
+          email: normalizedEmail,
+          country: "Nederland",
+          is_active: true,
+          settings: {},
+        })
+        .select("id")
+        .single();
+
+      if (companyError) {
+        console.error("[ensureProfile] Company creation failed:", companyError);
+        return;
+      }
+
+      // Link user to company
+      const { error: linkError } = await supabase
+        .from("user_companies")
+        .insert({
+          user_id: userId,
+          company_id: newCompany.id,
+          is_primary: true,
+        });
+
+      if (linkError) {
+        console.error("[ensureProfile] user_companies link failed:", linkError);
+        return;
+      }
+
+      // Create tenant_settings so onboarding triggers
+      const { error: settingsError } = await supabase
+        .from("tenant_settings")
+        .insert({
+          company_id: newCompany.id,
+          onboarding_completed_at: null,
+        } as any);
+
+      if (settingsError) {
+        console.warn("[ensureProfile] tenant_settings insert warning:", settingsError.message);
+      }
+
+      console.log(`[ensureProfile] Created company ${newCompany.id} for user ${userId}`);
+    }
+  } catch (err) {
+    console.error("[ensureProfile] Company ensure failed:", err);
   }
 }

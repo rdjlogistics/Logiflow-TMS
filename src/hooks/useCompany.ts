@@ -39,25 +39,36 @@ interface CompanyData {
 }
 
 async function fetchUserCompanyData(userId: string): Promise<CompanyData> {
-  const { data: memberships, error } = await supabase
-    .from('user_companies')
-    .select(`
-      *,
-      company:companies(*)
-    `)
-    .eq('user_id', userId);
+  const maxRetries = 3;
+  const retryDelay = 1000;
 
-  if (error) throw error;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const { data: memberships, error } = await supabase
+      .from('user_companies')
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .eq('user_id', userId);
 
-  if (!memberships || memberships.length === 0) {
-    return { company: null, userCompanies: [] };
+    if (error) throw error;
+
+    if (memberships && memberships.length > 0) {
+      const userCompanies = memberships as unknown as UserCompany[];
+      const primary = memberships.find(m => m.is_primary);
+      const company = (primary?.company ?? memberships[0]?.company ?? null) as unknown as Company | null;
+      return { company, userCompanies };
+    }
+
+    // No memberships found — retry (company might still be creating)
+    if (attempt < maxRetries) {
+      console.debug(`[useCompany] No company found for user ${userId}, retry ${attempt + 1}/${maxRetries}...`);
+      await new Promise(r => setTimeout(r, retryDelay));
+    }
   }
 
-  const userCompanies = memberships as unknown as UserCompany[];
-  const primary = memberships.find(m => m.is_primary);
-  const company = (primary?.company ?? memberships[0]?.company ?? null) as unknown as Company | null;
-
-  return { company, userCompanies };
+  // All retries exhausted
+  return { company: null, userCompanies: [] };
 }
 
 export const useCompany = () => {
@@ -69,7 +80,7 @@ export const useCompany = () => {
     queryKey,
     queryFn: () => fetchUserCompanyData(user!.id),
     enabled: !!user,
-    staleTime: 5 * 60 * 1000,    // 5 min — shared across 61+ components
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
