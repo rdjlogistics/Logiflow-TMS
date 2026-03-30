@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Sparkles, TrendingUp, Users, Zap, Crown, Loader2 } from 'lucide-react';
+import AIUsagePerUser from '@/components/admin/AIUsagePerUser';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 interface DailyUsage {
@@ -250,6 +251,9 @@ export default function AIUsage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Per User Breakdown */}
+        <AIUsagePerUser />
 
         {/* Plan Comparison */}
         <div>
