@@ -491,11 +491,11 @@ const TMS_TOOLS = [
 
 function detectComplexity(message: string): "none" | "low" | "medium" | "high" {
   const lower = message.toLowerCase();
-  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing|anomalie|afwijking|contract|overeenkomst|planning.*optim|route.*optim/;
+  const highPatterns = /waarom|analyseer|voorspel|optimaliseer|strategie|vergelijk.*periode|cashflow|forecast|beste.*chauffeur.*voor|welke.*klant.*kost|hoe.*besparen|trend|correlatie|root.?cause|rapport|briefing|anomalie|afwijking|contract|overeenkomst|planning.*optim|route.*optim|prognose|seizoen|benchmark|scenario|impact.*analyse|wat.*als|kosten.*baten|rendement|winstgevend|capaciteit.*plan|demand.*plan|bottleneck|knelpunt/;
   if (highPatterns.test(lower)) return "high";
-  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk|vertaal|translate|chart|grafiek|visualis|zoek.*nieuws|marktprijs/;
+  const mediumPatterns = /wie.*best|top\s?\d|ranking|overzicht.*compleet|samenvatting|advies|aanbeveling|marge.*analyse|performance|dashboard|rapportage|wijs.*toe|factureer|bulk|vertaal|translate|chart|grafiek|visualis|zoek.*nieuws|marktprijs|verdeling|spreiding|bezetting|effici[eë]ntie|productiviteit|omzet.*per|gemiddeld|mediaan|histogram|vergelijk|benchmark.*chauffeur|levertijd.*analyse|klacht.*analyse/;
   if (mediumPatterns.test(lower)) return "medium";
-  const lowPatterns = /hoeveel|lijst|toon|geef.*overzicht|status.*van|zoek/;
+  const lowPatterns = /hoeveel|lijst|toon|geef.*overzicht|status.*van|zoek|wanneer|waar.*is|laatste|volgende|planning.*vandaag|wie.*rijdt/;
   if (lowPatterns.test(lower)) return "low";
   return "none";
 }
