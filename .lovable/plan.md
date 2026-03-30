@@ -1,48 +1,45 @@
 
 
-# Fix: Bruto Winst & Marge Berekening
+# Verificatie Resultaten & Fix
 
-## Root Cause
+## Wat CORRECT werkt
 
-The `avgMargin` in `OrderOverview.tsx` line 387-388 calculates a **simple average of stored `profit_margin_pct`** values from the database. These stored values can be stale or inconsistent with the actual `sales_total` and `purchase_total`. Meanwhile `totalProfit` is correctly computed from raw data (`sales - purchase`).
+| Check | Status |
+|-------|--------|
+| Order opslaan — form + onSubmit + Supabase RPC | CORRECT — `save_order_with_stops` RPC at line 745 |
+| Opslaan knop — loading state + toast + redirect | CORRECT — `setIsSubmitting`, feedback toast at line 820, navigation at 896 |
+| `beforeunload` na save | CORRECT — `setIsDirty(false)` at line 851 disables `useUnsavedChangesWarning` |
+| Datumveld DD-MM-YYYY | CORRECT — Popover+Calendar met `format(..., 'dd-MM-yyyy')` in OrderDetailsPanel en DestinationCard |
+| Mapbox imports | CORRECT — dynamic `import("mapbox-gl")` met `.default`, geen `mapbox_gl_exports` errors |
+| Mapbox token | CORRECT — via edge function `get-mapbox-token` |
+| `mapbox_gl_exports` string | CLEAN — 0 resultaten |
+| Hardcoded "37.0%" | CLEAN — 0 resultaten |
+| Placeholder UUID in code | CLEAN — 0 resultaten (het UUID in edge function logs komt uit een bestaand DB record, niet uit code) |
+| OrderOverview marge | CORRECT — weighted calculation from totals |
+| QuickStatsHeader kleuren | CORRECT — dynamic based on positive/negative |
+| `capitalizeCity` bij save | CORRECT — applied on pickup_city, delivery_city, and route_stops |
 
-This causes the contradiction: totalProfit = -€2.154 but avgMargin = 37% (from old stored percentages).
+## Gevonden probleem
 
-Additionally, the profit card in `QuickStatsHeader.tsx` always uses `text-success` (green) regardless of whether profit is negative.
+| Locatie | Probleem |
+|---------|----------|
+| `src/components/reporting/ReportingDashboard.tsx` line 235-236 | Nog steeds **simple average van opgeslagen `profit_margin_pct`** i.p.v. weighted berekening vanuit totals |
 
 ## Fix
 
-### 1. `src/pages/OrderOverview.tsx` — Weighted margin calculation
-Replace line 387-388:
+### `src/components/reporting/ReportingDashboard.tsx` — 1 regel
+Vervang:
 ```typescript
-// OLD: simple average of stored (potentially stale) percentages
-avgMargin: pricedOrders.reduce((sum, t) => sum + (t.profit_margin_pct || 0), 0) / pricedOrders.length
-
-// NEW: weighted margin from actual totals
-avgMargin: stats.totalRevenue > 0 
-  ? (stats.totalProfit / stats.totalRevenue) * 100 
-  : 0,
+const avgMargin = totalOrders > 0
+  ? ordersData.reduce((sum, o) => sum + (o.profit_margin_pct || 0), 0) / totalOrders
+  : 0;
+```
+Door:
+```typescript
+const avgMargin = totalRevenue > 0
+  ? (totalProfit / totalRevenue) * 100
+  : 0;
 ```
 
-### 2. `src/components/orders/QuickStatsHeader.tsx` — Dynamic color for profit
-Line 90: change from hardcoded `text-success` to dynamic based on positive/negative:
-```typescript
-valueClass: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
-```
-Line 92-93: dynamic gradient and icon color:
-```typescript
-gradient: stats.totalProfit >= 0 ? "from-success/20 to-success/10" : "from-destructive/20 to-destructive/10",
-iconColor: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
-```
-Line 95: margin badge color dynamic:
-```typescript
-{ label: `Gem. marge: ${stats.avgMargin.toFixed(1)}%`, 
-  color: stats.avgMargin >= 0 ? "bg-success/10 text-success font-semibold" : "bg-destructive/10 text-destructive font-semibold" }
-```
-
-### Files
-| File | Change |
-|------|--------|
-| `src/pages/OrderOverview.tsx` | Weighted avgMargin from totals |
-| `src/components/orders/QuickStatsHeader.tsx` | Dynamic profit/margin colors |
+Dit is de enige fix. Alle andere checks zijn correct.
 
