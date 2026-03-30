@@ -300,7 +300,7 @@ export const useWorkflowAutomation = () => {
   const deleteWorkflow = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .delete()
         .eq('id', id);
       
