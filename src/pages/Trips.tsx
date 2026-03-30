@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, Download, CheckSquare } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, CheckSquare } from "lucide-react";
+import { ExportDropdown } from "@/components/common/ExportDropdown";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
