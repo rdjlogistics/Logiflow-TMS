@@ -178,7 +178,11 @@ export default function B2BOnboarding() {
                         id="companyName"
                         value={companyData.companyName}
                         onChange={(e) => setCompanyData((p) => ({ ...p, companyName: e.target.value }))}
+                        className={attempted && !companyData.companyName.trim() ? "border-destructive" : ""}
                       />
+                      {attempted && !companyData.companyName.trim() && (
+                        <p className="text-xs text-destructive">Bedrijfsnaam is verplicht</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="contactName">Contactpersoon</Label>
