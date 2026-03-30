@@ -284,7 +284,7 @@ export const useWorkflowAutomation = () => {
   const toggleWorkflow = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
       const { error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .update({ is_active })
         .eq('id', id);
       
