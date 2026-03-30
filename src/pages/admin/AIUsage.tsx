@@ -252,6 +252,9 @@ export default function AIUsage() {
           </CardContent>
         </Card>
 
+        {/* Per User Breakdown */}
+        <AIUsagePerUser />
+
         {/* Plan Comparison */}
         <div>
           <h3 className="text-sm font-medium mb-3">Plan Vergelijking</h3>
