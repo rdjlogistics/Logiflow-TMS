@@ -232,8 +232,8 @@ export const ReportingDashboard: React.FC = () => {
     const totalOrders = ordersData.length;
     const totalRevenue = ordersData.reduce((sum, o) => sum + (o.sales_total || 0), 0);
     const totalProfit = ordersData.reduce((sum, o) => sum + (o.gross_profit || 0), 0);
-    const avgMargin = totalOrders > 0
-      ? ordersData.reduce((sum, o) => sum + (o.profit_margin_pct || 0), 0) / totalOrders
+    const avgMargin = totalRevenue > 0
+      ? (totalProfit / totalRevenue) * 100
       : 0;
     const completedOrders = ordersData.filter(o => ['afgerond', 'afgeleverd', 'gecontroleerd', 'gefactureerd'].includes(o.status)).length;
     const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
