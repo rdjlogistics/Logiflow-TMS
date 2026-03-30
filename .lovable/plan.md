@@ -1,30 +1,20 @@
 
 
-# Status Check & Fixes — Batches, Workflows en Email Queue
+# Fix: Workflow Tabellen Opnieuw Aanmaken
 
-## Bevindingen
+## Probleem
 
-### 1. Workflow Automations — Tabellen bestaan NIET
-De tabellen `workflow_automations`, `workflow_actions`, `workflow_runs` zijn nooit aangemaakt in de database. De hele workflow-engine werkt niet — alle queries falen stil door `as any` casts.
+De workflow tabellen (`workflow_automations`, `workflow_actions`, `workflow_runs`) bestaan niet in de database. De eerdere migratie is niet succesvol toegepast. De hele workflow-engine functioneert niet.
 
-**Fix**: Database migratie om de 3 tabellen aan te maken met RLS.
+## Openstaande batches
 
-### 2. Batch Facturatie — Geen openstaande batches nodig
-- 15 ritten zonder verkoopfactuur, 2 zonder inkoopfactuur
-- Allemaal `sales_total = 0` / `purchase_total = 0` → kunnen niet gefactureerd worden (wizard filtert al op `> 0`)
-- Geen actie nodig, dit is correct gedrag
-
-### 3. Email Queue — 21 vastgelopen emails opruimen
-- 15 `failed` + 3 `dlq` + 3 `pending` emails in `email_send_log` van 19 maart
-- Fouten: `missing_parameter: run_id` en `Run not found or expired`
-- Dit waren emails van een oudere versie van de queue-functie die nu gefixed is
-- De `process-email-queue` functie draait correct via cron maar leest uit pgmq, niet uit `email_send_log`
-
-**Fix**: De vastgelopen emails markeren als `cancelled` zodat ze geen verwarring geven in monitoring.
+De 7 verkoopfactuur- en 5 inkoopfactuur-openstaande ritten zijn **geen fout** — deze wachten op handmatige facturatie via de wizard. Het systeem filtert correct op `sales_total > 0` / `purchase_total > 0`. Geen automatische actie nodig.
 
 ## Plan
 
-### Stap 1: Workflow tabellen aanmaken (migratie)
+### Stap 1: Database migratie — Workflow tabellen aanmaken
+
+Nieuwe migratie met:
 
 ```sql
 CREATE TABLE public.workflow_automations (
@@ -63,54 +53,22 @@ CREATE TABLE public.workflow_runs (
   actions_executed jsonb DEFAULT '[]'::jsonb
 );
 
--- RLS
-ALTER TABLE workflow_automations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE workflow_actions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE workflow_runs ENABLE ROW LEVEL SECURITY;
-
--- Policies voor authenticated users op basis van tenant_id
-CREATE POLICY "Users can manage own workflows" ON workflow_automations
-  FOR ALL TO authenticated
-  USING (tenant_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
-
-CREATE POLICY "Users can manage workflow actions" ON workflow_actions
-  FOR ALL TO authenticated
-  USING (workflow_id IN (
-    SELECT id FROM workflow_automations 
-    WHERE tenant_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-  ));
-
-CREATE POLICY "Users can view workflow runs" ON workflow_runs
-  FOR ALL TO authenticated
-  USING (workflow_id IN (
-    SELECT id FROM workflow_automations 
-    WHERE tenant_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-  ));
+-- RLS + policies op basis van tenant_id via user_companies
 ```
 
-### Stap 2: Vastgelopen emails opruimen (migratie)
+### Stap 2: Geen code-wijzigingen nodig
 
-```sql
-UPDATE email_send_log 
-SET status = 'cancelled' 
-WHERE status IN ('failed', 'pending', 'dlq') 
-  AND created_at < '2026-03-20';
-```
-
-### Stap 3: Geen code-wijzigingen nodig
-- `useWorkflowAutomation.ts` hook is al correct geschreven voor deze tabelstructuur
-- `WorkflowAutomation.tsx` pagina is al gebouwd
-- Batch facturatie werkt correct (filtert op `> 0` bedragen)
+De hooks en UI-componenten zijn al correct geschreven voor deze tabelstructuur.
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
 | **Migratie** | Workflow tabellen + RLS aanmaken |
-| **Migratie** | Vastgelopen emails opschonen |
 
 ## Resultaat
-- Workflow automatie-pagina werkt — admins kunnen workflows aanmaken, activeren en monitoren
-- Email monitoring toont geen oude gefaalde items meer
-- Batch facturatie: geen actie nodig, werkt al correct
+
+- Workflow automatie-pagina werkt — queries slagen, admins kunnen workflows aanmaken
+- Batch facturatie: openstaande ritten wachten op handmatige facturatie (correct gedrag)
+- Email queue: schoon, geen actie nodig
 
