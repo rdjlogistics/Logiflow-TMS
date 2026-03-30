@@ -248,10 +248,20 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     });
   }, [selectedTrip, mapboxToken, startRouteAnimation]);
 
+  const [confirmStartTrip, setConfirmStartTrip] = useState<string | null>(null);
+
   const handleStartTrip = async (tripId: string) => {
+    // Show confirmation dialog instead of starting immediately
+    setConfirmStartTrip(tripId);
+  };
+
+  const executeStartTrip = async (tripId: string) => {
     if (!gpsEnabled) {
-      requestPermission();
-      return;
+      toast({
+        title: 'GPS niet beschikbaar',
+        description: 'Locatie wordt niet geregistreerd. Je kunt de rit wel starten.',
+        variant: 'default',
+      });
     }
     // Check if inspection is required
     if (inspectionRequired) {
