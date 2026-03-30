@@ -143,8 +143,8 @@ export function DispatchDashboard() {
           <TabsTrigger value="conversations" className="gap-2">
             <MessageSquare className="h-4 w-4" />
             <span className="hidden sm:inline">Gesprekken</span>
-            {(stats?.activeConversations || 0) > 0 && (
-              <Badge className="ml-1 h-5 px-1.5 bg-green-500">{stats?.activeConversations}</Badge>
+            {typeof stats?.activeConversations === 'number' && stats.activeConversations > 0 && (
+              <Badge className="ml-2 h-5 px-1.5 bg-green-500">{stats?.activeConversations}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="analytics" className="gap-2">

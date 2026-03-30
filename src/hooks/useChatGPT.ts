@@ -148,7 +148,12 @@ export const useChatGPT = () => {
   }, []);
 
   const sendMessage = useCallback(async (message: string, context?: ChatContext) => {
-    if (!user || !message.trim()) return;
+    if (!message.trim()) return;
+    if (!user) {
+      console.error('sendMessage: user is null — auth not ready');
+      toast({ title: 'Niet ingelogd', description: 'Log opnieuw in om de AI Assistent te gebruiken.', variant: 'destructive' });
+      return;
+    }
     setIsLoading(true);
 
     const userMessage: ChatMessage = {
