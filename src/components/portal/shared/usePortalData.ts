@@ -111,7 +111,7 @@ export function usePortalData(customerId?: string | null) {
         const mappedInvoices: Invoice[] = invoicesData.map(inv => {
           const dueDate = inv.due_date || inv.created_at;
           const isPastDue = dueDate && new Date(dueDate) < today;
-          const isUnpaidStatus = ['verzonden', 'definitief'].includes(inv.status || '');
+          const isUnpaidStatus = ['verzonden', 'definitief'].includes(String(inv.status || ''));
           
           let status: 'draft' | 'sent' | 'paid' | 'overdue' = 'draft';
           if (inv.status === 'betaald') status = 'paid';
