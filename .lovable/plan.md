@@ -1,39 +1,44 @@
 
 
-# Fix: Verwijder Hardcoded Placeholder/Demo Data
+# Verificatie Resultaten & Resterende Fixes
 
-## Gevonden items
+## Wat is CORRECT (geen actie nodig)
 
-| Locatie | Probleem |
-|---------|----------|
-| `src/components/dashboard/AlertsWidget.tsx` | `mockAlerts` array met "SLA Breach Order #2847", "Chauffeur Jan vertraging", etc. wordt als **default** meegegeven via `alerts = mockAlerts` |
-| `src/components/fleet/FuelManagement.tsx` | Hardcoded voertuigen `BX-123-AB`, `VK-456-CD`, `ZD-012-GH` in select dropdown |
-| `src/pages/NotFound.tsx` | Placeholder telefoon `+31 20 123 4567` |
-| `src/pages/wms/WMSDashboard.tsx` | Hardcoded `warehouseUtilization = 73` en `pickingEfficiency = 94` met `// Demo value` |
-| `src/pages/AdminSettings.tsx` | Placeholder "Uw bedrijfsnaam" en "+31 20 123 4567" in input fields — **dit zijn placeholders in input velden, acceptabel als hint-tekst** |
-| `src/components/onboarding/CompanyVerificationStep.tsx` | Placeholder tekst in inputs (KvK "12345678", BTW "NL123456789B01") — **acceptabel als format-hint** |
-| `src/components/carriers/CarrierImportDialog.tsx` | CSV voorbeeld-data — **acceptabel als import template voorbeeld** |
+| Check | Status |
+|-------|--------|
+| Placeholder UUID `a1b2c3d4-...` | **CLEAN** — 0 resultaten |
+| `localStorage.getItem('company')` | **CLEAN** — 0 resultaten |
+| Hardcoded kentekens (BX-123, HG-456, etc.) | **CLEAN** — verwijderd |
+| `mockAlerts` in AlertsWidget | **CLEAN** — verwijderd |
+| "SLA Breach" in dashboard alerts | **CLEAN** — alleen nog in SLAMonitor.tsx als UI label "SLA Breaches" (dat is een kolom-header, geen fake data) |
 
-## Wat WEL moet veranderen (4 bestanden)
+## Wat nog GEFIXED moet worden (3 items)
 
-### 1. `src/components/dashboard/AlertsWidget.tsx`
-- Verwijder de volledige `mockAlerts` array (regel 40-81)
-- Wijzig default prop van `alerts = mockAlerts` naar `alerts = []`
-- De component heeft al een mooie empty state (regel 174-213) met "Geen actieve alerts" — die wordt nu standaard getoond
+### 1. `src/pages/notifications/NotificationChannels.tsx` — Mock data
+Drie mock arrays (`mockChannels`, `mockLogs`, `mockTemplates`) worden als default state gebruikt. Nieuwe accounts zien nep-notificatie logs en kanalen.
 
-### 2. `src/components/fleet/FuelManagement.tsx`
-- Vervang hardcoded `<SelectItem>` waarden door een dynamische query op de `vehicles` tabel
-- Bij geen voertuigen: toon een disabled select met "Geen voertuigen gevonden"
+**Fix:** Vervang defaults door lege arrays `[]`. Voeg empty states toe:
+- Kanalen: "Configureer je eerste notificatiekanaal"
+- Logs: "Nog geen notificaties verzonden"
+- Templates: bestaande templates zijn configuratie-voorbeelden, die kunnen blijven als startpunt (ze bevatten `{{placeholders}}`, geen fake data)
 
-### 3. `src/pages/NotFound.tsx`
-- Verwijder het telefoonnummer `+31 20 123 4567` volledig
-- Houd alleen het email-adres `support@rdjlogistics.nl` als contactoptie
+### 2. `src/pages/AdminSettings.tsx` — Placeholder telefoon
+Regel 721: `placeholder="+31 20 123 4567"` — dit is een input placeholder (hint), niet pre-filled data. `value={settings.company_phone || ''}` zorgt dat het veld leeg begint. **Acceptabel als format-hint.** Geen actie nodig.
 
-### 4. `src/pages/wms/WMSDashboard.tsx`
-- Vervang hardcoded `73` en `94` door `0` met een label "(nog geen data)"
+### 3. Overige matches (geen actie nodig)
+- `NL123456789B01` in `nl-validators.ts` — validatie-voorbeeld in error messages
+- `12345678` in `CompanySetupWizard.tsx`, `AdminSettings.tsx` — input placeholders (format hints)
+- `CarrierImportDialog.tsx` — CSV import template voorbeelden
+- `BookingWizard.tsx` — telefoon placeholder format hint
+- `CustomerSelfService.tsx` — "uw bedrijfsnaam" is beschrijvende tekst, geen pre-filled waarde
 
-## Wat NIET verandert
-- **AdminSettings.tsx** placeholders ("Uw bedrijfsnaam", KvK "12345678") — dit zijn input field placeholders/hints, niet pre-filled waarden. `value={settings.company_name || ''}` zorgt dat het veld leeg is als er geen data is.
-- **CompanyVerificationStep.tsx** — zelfde: format hints in placeholder attr
-- **CarrierImportDialog.tsx** — CSV import template voorbeeld data
+## Plan
+
+### Bestand 1: `src/pages/notifications/NotificationChannels.tsx`
+- Verwijder `mockChannels`, `mockLogs`, `mockTemplates` arrays
+- Zet defaults op `[]` voor channels en logs
+- Houd templates als startconfiguratie (ze bevatten template variabelen, geen fake data) OF zet ook op `[]`
+- Voeg empty state UI toe voor kanalen-tab en logs-tab wanneer de arrays leeg zijn
+
+**Dat is het enige bestand dat aangepast moet worden.** Alle andere zoekresultaten zijn format-hints in placeholders of validatie-voorbeelden — geen pre-filled fake data.
 
