@@ -61,10 +61,11 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
   useEffect(() => {
     if (open && tripId) {
       setEmail(customerEmail || '');
+      setDocumentType(defaultDocumentType || 'vrachtbrief');
       setSent(false);
       fetchPublicDocuments();
     }
-  }, [open, tripId, customerEmail]);
+  }, [open, tripId, customerEmail, defaultDocumentType]);
 
   const fetchPublicDocuments = async () => {
     try {
