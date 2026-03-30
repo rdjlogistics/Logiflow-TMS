@@ -409,8 +409,6 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                description="Voeg je eerste voertuig toe om je vloot te beheren."
                action={{ label: "Voertuig toevoegen", onClick: openNewDialog, icon: Plus }}
              />
-              </Button>
-            </div>
           ) : (
             <>
               {/* Desktop Table */}
