@@ -297,31 +297,16 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
   // Draw route line
   useEffect(() => {
     if (!map.current || !mapLoaded || mapMode !== "interactive") return;
-    if (map.current.getLayer("route-glow")) map.current.removeLayer("route-glow");
     if (map.current.getLayer("optimized-route")) map.current.removeLayer("optimized-route");
     if (map.current.getSource("optimized-route")) map.current.removeSource("optimized-route");
-
-    const addGlowAndDash = () => {
-      if (!map.current?.getLayer("optimized-route")) return;
-      // Glow layer behind the route
-      if (!map.current.getLayer("route-glow")) {
-        map.current.addLayer({
-          id: "route-glow", type: "line",
-          source: "optimized-route",
-          layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#3b82f6", "line-width": 12, "line-opacity": 0.15, "line-blur": 6 },
-        }, "optimized-route");
-      }
-    };
 
     if (optimizationResult?.geometry) {
       map.current.addLayer({
         id: "optimized-route", type: "line",
         source: { type: "geojson", data: { type: "Feature", properties: {}, geometry: optimizationResult.geometry } },
         layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#3b82f6", "line-width": 5, "line-opacity": 0.75, "line-dasharray": [0, 4, 3] },
+        paint: { "line-color": "#2563eb", "line-width": 4, "line-opacity": 0.85 },
       });
-      addGlowAndDash();
     } else if (stops.length >= 2 && token) {
       const validStops = stops.filter((s) => s.latitude && s.longitude);
       if (validStops.length >= 2) {
@@ -335,9 +320,8 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
                 id: "optimized-route", type: "line",
                 source: { type: "geojson", data: { type: "Feature", properties: {}, geometry: data.routes[0].geometry } },
                 layout: { "line-join": "round", "line-cap": "round" },
-                paint: { "line-color": "#3b82f6", "line-width": 5, "line-opacity": 0.6, "line-dasharray": [0, 4, 3] },
+                paint: { "line-color": "#2563eb", "line-width": 4, "line-opacity": 0.85 },
               });
-              addGlowAndDash();
             }
           }).catch(console.error);
       }
