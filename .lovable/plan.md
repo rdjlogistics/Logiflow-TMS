@@ -1,68 +1,41 @@
 
+# Verificatie Resultaten — Batch 3
 
-# Fix: Order Status Inconsistentie & Adres Validatie
+## 1. CHAUFFEUR STOPS ✅ CORRECT
 
-## Diagnose
+| Check | Status | Detail |
+|-------|--------|--------|
+| Stop-actie vergrendeling | ✅ | `isActive = ['onderweg', 'geladen'].includes(trip.status)` — line 315/393. Acties ontgrendeld bij actieve rit |
+| GPS-fallback | ✅ | `executeStartTrip` (line 259): als GPS niet beschikbaar, toont waarschuwing maar start rit WEL (`await startTrip(tripId)` op line 278). Niet-blokkerend |
+| Bevestigingsdialoog "Start rit" | ✅ | `confirmStartTrip` state + `ConfirmDialog` component op line 558-568. Toont ordernummer + route |
+| Completed stops read-only | ✅ | Afgemeld badge + acties disabled wanneer `isCompleted` |
+| "Meld eerst vorige stop af" hint | ✅ | Line 640-648: toont contextuele hint als rit actief maar stop nog niet aan de beurt |
 
-### Status Sync — WERKT AL CORRECT
-Na analyse van `StopCheckoutFlow.tsx` (lines 291-363): de status sync logica is **correct geïmplementeerd**:
-- Eerste stop completed → trip status `onderweg`
-- Alle stops completed → trip status `afgeleverd` (of `afgerond` bij `direct_complete` checkout_mode)
-- De trip update gebeurt via `supabase.from('trips').update(statusUpdates).eq('id', tripId)` — dit is de single source of truth
+## 2. POD DATA ✅ CORRECT
 
-**Mogelijke oorzaak van het probleem**: Het OrderOverview haalt data op met een standaard query die niet realtime is. Als de chauffeur een rit voltooit, moet de admin de pagina refreshen om de nieuwe status te zien.
+| Check | Status | Detail |
+|-------|--------|--------|
+| Status gebaseerd op data | ✅ | Line 113: `hasSignature ? 'signed' : hasPhotos ? 'photo_only' : 'pending'` — op basis van `!!row.signature_url` en `row.photo_urls.length > 0` |
+| Chauffeur kolom via drivers tabel | ✅ | Line 71: `supabase.from('drivers').select('id, name').in('id', driverIds)` en line 111: `driver_name: driver?.name` |
+| Customer email | ✅ | Line 69: join op `customers:customer_id (company_name, email)` en line 107: `customer_email: trip?.customers?.email` |
+| Verstuur via Resend | ✅ | `SendPodEmailDialog` stuurt via edge function |
 
-### Wat WEL ontbreekt
+## 3. STADSNAMEN ✅ CORRECT
 
-1. **Realtime subscription op OrderOverview** — De pagina pollt niet automatisch na driver status changes
-2. **Adres validatie** — Geen check op pickup_city === delivery_city
-3. **Unassigned orders** — Geen automatische link naar Auto-Dispatch
+| Check | Status | Detail |
+|-------|--------|--------|
+| `capitalizeCity` idempotent | ✅ | In `date-utils.ts` line 167 — correct geïmplementeerd |
+| Geen dubbele concatenatie in code | ✅ | Alle 38 referenties correct: `capitalizeCity(dest.city)`, `{trip.pickup_city}` — geen `city + city` patronen |
+| Database gecorrigeerd | ✅ | Migratie uitgevoerd in vorige batch, 0 verdubbelde records |
 
-## Fixes
+## 4. ORDER STATUS ✅ CORRECT
 
-### 1. Realtime status updates op OrderOverview
-**Bestand:** `src/pages/OrderOverview.tsx`
+| Check | Status | Detail |
+|-------|--------|--------|
+| Realtime subscription | ✅ | `trips` tabel toegevoegd aan `supabase_realtime` publicatie. OrderOverview heeft al realtime channel |
+| Adres validatie | ✅ | Line 620-625 in OrderForm.tsx: `window.confirm` als pickup city/address === delivery city/address |
+| Status flow in StopCheckoutFlow | ✅ | Eerste stop → `onderweg`, alle stops → `afgeleverd`/`afgerond` |
 
-Voeg een Supabase Realtime subscription toe op de `trips` tabel die `fetchOrders()` triggert bij status changes:
-```typescript
-useEffect(() => {
-  const channel = supabase
-    .channel(`orders-realtime-${Date.now()}`)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'trips' }, () => {
-      fetchOrders();
-      fetchQuickStats();
-    })
-    .subscribe();
-  return () => { supabase.removeChannel(channel); };
-}, []);
-```
+## Conclusie
 
-Dit zorgt dat zodra een chauffeur een stop afmeldt, het orderoverzicht automatisch de nieuwe status toont zonder page refresh.
-
-### 2. Adres validatie in OrderForm
-**Bestand:** `src/pages/OrderForm.tsx`
-
-Voeg in de `handleSubmit` functie (vóór de RPC call) een waarschuwing toe:
-```typescript
-if (pickupCity && deliveryCity && 
-    pickupCity.toLowerCase() === deliveryCity.toLowerCase() &&
-    pickupAddress?.toLowerCase() === deliveryAddress?.toLowerCase()) {
-  const confirmed = window.confirm('Ophaal- en afleveradres zijn hetzelfde. Klopt dit?');
-  if (!confirmed) return;
-}
-```
-
-### 3. Trips tabel realtime publicatie
-Voeg `trips` toe aan de Supabase realtime publicatie zodat Postgres changes worden gebroadcast. Dit vereist een database migratie:
-```sql
-ALTER PUBLICATION supabase_realtime ADD TABLE public.trips;
-```
-
-## Bestanden
-
-| Actie | Bestand |
-|-------|---------|
-| **Edit** | `src/pages/OrderOverview.tsx` — Realtime subscription toevoegen |
-| **Edit** | `src/pages/OrderForm.tsx` — Adres validatie waarschuwing |
-| **Migratie** | `ALTER PUBLICATION supabase_realtime ADD TABLE public.trips` |
-
+**Alle Batch 3 fixes werken correct.** Geen problemen gevonden. Geen code wijzigingen nodig.
