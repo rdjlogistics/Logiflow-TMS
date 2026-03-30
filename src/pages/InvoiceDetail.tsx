@@ -229,9 +229,16 @@ const InvoiceDetail = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: any) {
       console.error("PDF error:", error);
-      toast({ title: "PDF genereren mislukt", description: "Probeer het opnieuw of neem contact op met support.", variant: "destructive" });
+      const isNetwork = error?.message?.includes("Failed to fetch") || error?.message?.includes("NetworkError");
+      toast({
+        title: "PDF genereren mislukt",
+        description: isNetwork
+          ? "Geen internetverbinding. Controleer je netwerk en probeer het opnieuw."
+          : "Er ging iets mis bij het genereren van de PDF. Probeer het opnieuw.",
+        variant: "destructive",
+      });
     } finally {
       setIsGenerating(false);
     }
