@@ -42,6 +42,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
   const { lookupPostcode, loading: lookingUp } = usePostcodeLookup();
   
   const [currentStep, setCurrentStep] = useState<Step>('from');
+  const [lookupFromCity, setLookupFromCity] = useState('');
+  const [lookupToCity, setLookupToCity] = useState('');
+  const todayStr = new Date().toISOString().split('T')[0];
   const [formData, setFormData] = useState({
     fromPostcode: '',
     fromHouseNumber: '',
@@ -53,7 +56,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
     toCity: '',
     description: '',
     size: 'medium',
-    pickupDate: new Date().toISOString().split('T')[0],
+    pickupDate: todayStr,
   });
 
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
@@ -71,12 +74,14 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       const result = await lookupPostcode(postcode, houseNumber);
       if (result) {
         if (type === 'from') {
+          setLookupFromCity(result.city);
           setFormData(prev => ({
             ...prev,
             fromStreet: result.street,
             fromCity: result.city,
           }));
         } else {
+          setLookupToCity(result.city);
           setFormData(prev => ({
             ...prev,
             toStreet: result.street,
@@ -86,6 +91,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       }
     }
   };
+
+  const fromCityMismatch = lookupFromCity && formData.fromCity && formData.fromCity.toLowerCase() !== lookupFromCity.toLowerCase();
+  const toCityMismatch = lookupToCity && formData.toCity && formData.toCity.toLowerCase() !== lookupToCity.toLowerCase();
 
   const nextStep = async () => {
     if (isLastStep) {
@@ -264,6 +272,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                 onChange={(e) => updateField('fromCity', e.target.value)}
                 className={cn("h-12 text-base", formData.fromCity && "border-green-500/30 bg-green-500/5")}
               />
+              {fromCityMismatch && (
+                <p className="text-xs text-yellow-600 mt-1">⚠ Postcode geeft stad "{lookupFromCity}" aan, u heeft "{formData.fromCity}" ingevuld</p>
+              )}
             </div>
           </>
         )}
@@ -327,6 +338,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                 onChange={(e) => updateField('toCity', e.target.value)}
                 className={cn("h-12 text-base", formData.toCity && "border-green-500/30 bg-green-500/5")}
               />
+              {toCityMismatch && (
+                <p className="text-xs text-yellow-600 mt-1">⚠ Postcode geeft stad "{lookupToCity}" aan, u heeft "{formData.toCity}" ingevuld</p>
+              )}
             </div>
           </>
         )}

@@ -22,6 +22,7 @@ export default function B2BOnboarding() {
   const { user, customer, loading: authLoading } = usePortalAuth();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // Company details form
   const [companyData, setCompanyData] = useState({
@@ -177,7 +178,11 @@ export default function B2BOnboarding() {
                         id="companyName"
                         value={companyData.companyName}
                         onChange={(e) => setCompanyData((p) => ({ ...p, companyName: e.target.value }))}
+                        className={attempted && !companyData.companyName.trim() ? "border-destructive" : ""}
                       />
+                      {attempted && !companyData.companyName.trim() && (
+                        <p className="text-xs text-destructive">Bedrijfsnaam is verplicht</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="contactName">Contactpersoon</Label>
@@ -194,7 +199,11 @@ export default function B2BOnboarding() {
                         type="email"
                         value={companyData.email}
                         onChange={(e) => setCompanyData((p) => ({ ...p, email: e.target.value }))}
+                        className={attempted && !companyData.email.trim() ? "border-destructive" : ""}
                       />
+                      {attempted && !companyData.email.trim() && (
+                        <p className="text-xs text-destructive">E-mailadres is verplicht</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Telefoon</Label>
@@ -352,8 +361,14 @@ export default function B2BOnboarding() {
 
           {step < 2 ? (
             <Button
-              onClick={() => setStep((s) => s + 1)}
-              disabled={step === 0 && !canProceedStep0}
+              onClick={() => {
+                if (step === 0 && !canProceedStep0) {
+                  setAttempted(true);
+                  return;
+                }
+                setAttempted(false);
+                setStep((s) => s + 1);
+              }}
               className="gap-1"
             >
               Volgende <ArrowRight className="h-4 w-4" />
