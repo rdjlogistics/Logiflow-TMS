@@ -263,6 +263,7 @@ export function ManualInvoiceForm({ onSuccess, onCancel }: ManualInvoiceFormProp
                 type="date"
                 value={formData.invoice_date}
                 onChange={(e) => setFormData({ ...formData, invoice_date: e.target.value })}
+                min={(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })()}
               />
             </div>
             <div className="space-y-2">
@@ -271,6 +272,7 @@ export function ManualInvoiceForm({ onSuccess, onCancel }: ManualInvoiceFormProp
                 type="date"
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                min={formData.invoice_date || undefined}
               />
             </div>
           </div>
