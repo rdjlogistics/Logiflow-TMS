@@ -6,15 +6,14 @@ import {
   type InvoiceFilters,
 } from '@/services/invoices';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering invoices with automatic refresh.
- * Wraps the invoices service with loading state, error handling, and refetch.
- *
- * Example:
- *   const { invoices, loading, refetch } = useInvoicesData({ status: 'verzonden' });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useInvoicesData(filters: InvoiceFilters = {}) {
+  const { company } = useCompany();
   const [invoices, setInvoices] = useState<Awaited<ReturnType<typeof fetchInvoices>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
