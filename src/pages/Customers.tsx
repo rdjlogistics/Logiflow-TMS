@@ -871,7 +871,7 @@ const Customers = () => {
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground text-xs">Stad</span>
-                                  <p className="font-medium">{customer.city || "-"}</p>
+                                  <p className="font-medium">{customer.city || "—"}</p>
                                 </div>
                               </div>
 
