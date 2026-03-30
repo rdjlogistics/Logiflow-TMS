@@ -1,62 +1,32 @@
 
 
-# Fix: Workflow Tabellen Opnieuw Aanmaken
+# Fix: Workflow Tabellen Aanmaken (Poging 3)
 
 ## Probleem
 
-De workflow tabellen (`workflow_automations`, `workflow_actions`, `workflow_runs`) bestaan niet in de database. De eerdere migratie is niet succesvol toegepast. De hele workflow-engine functioneert niet.
+De eerdere migratie `20260330181213` is aangemaakt als bestand maar **niet succesvol toegepast** op de database. De tabellen `workflow_automations`, `workflow_actions` en `workflow_runs` bestaan nog steeds niet.
 
 ## Openstaande batches
 
-De 7 verkoopfactuur- en 5 inkoopfactuur-openstaande ritten zijn **geen fout** — deze wachten op handmatige facturatie via de wizard. Het systeem filtert correct op `sales_total > 0` / `purchase_total > 0`. Geen automatische actie nodig.
+De openstaande ritten zonder factuur zijn **geen fout** — ze wachten op handmatige facturatie via de wizard. Statussen als "gepland" en "offerte" komen niet in aanmerking voor facturatie. De 7 `afgerond` ritten zonder factuur kunnen handmatig worden gefactureerd wanneer gewenst.
 
 ## Plan
 
-### Stap 1: Database migratie — Workflow tabellen aanmaken
+### Stap 1: Nieuwe database migratie uitvoeren
 
-Nieuwe migratie met:
+Exact dezelfde SQL als eerder, maar nu als nieuwe migratie zodat deze daadwerkelijk wordt toegepast:
 
-```sql
-CREATE TABLE public.workflow_automations (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id uuid NOT NULL,
-  name text NOT NULL,
-  description text,
-  trigger_type text NOT NULL,
-  trigger_config jsonb DEFAULT '{}'::jsonb,
-  is_active boolean DEFAULT false,
-  run_count integer DEFAULT 0,
-  last_run_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+- `CREATE TABLE workflow_automations` (tenant_id, name, trigger_type, trigger_config, is_active, etc.)
+- `CREATE TABLE workflow_actions` (workflow_id FK, action_type, action_config, sequence_order, etc.)
+- `CREATE TABLE workflow_runs` (workflow_id FK, trigger_event, status, error_message, etc.)
+- RLS inschakelen op alle 3 tabellen
+- Policies op basis van `tenant_id` via `user_companies`
 
-CREATE TABLE public.workflow_actions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  workflow_id uuid REFERENCES workflow_automations(id) ON DELETE CASCADE,
-  action_type text NOT NULL,
-  action_config jsonb DEFAULT '{}'::jsonb,
-  sequence_order integer DEFAULT 0,
-  delay_minutes integer DEFAULT 0,
-  condition_expression text,
-  is_active boolean DEFAULT true
-);
+### Stap 2: Verificatie
 
-CREATE TABLE public.workflow_runs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  workflow_id uuid REFERENCES workflow_automations(id) ON DELETE CASCADE,
-  trigger_event jsonb DEFAULT '{}'::jsonb,
-  status text DEFAULT 'pending',
-  started_at timestamptz DEFAULT now(),
-  completed_at timestamptz,
-  error_message text,
-  actions_executed jsonb DEFAULT '[]'::jsonb
-);
+Query uitvoeren om te bevestigen dat de tabellen bestaan na de migratie.
 
--- RLS + policies op basis van tenant_id via user_companies
-```
-
-### Stap 2: Geen code-wijzigingen nodig
+### Geen code-wijzigingen nodig
 
 De hooks en UI-componenten zijn al correct geschreven voor deze tabelstructuur.
 
@@ -68,7 +38,7 @@ De hooks en UI-componenten zijn al correct geschreven voor deze tabelstructuur.
 
 ## Resultaat
 
-- Workflow automatie-pagina werkt — queries slagen, admins kunnen workflows aanmaken
-- Batch facturatie: openstaande ritten wachten op handmatige facturatie (correct gedrag)
+- Workflow automatie-pagina functioneert — admins kunnen workflows aanmaken en monitoren
 - Email queue: schoon, geen actie nodig
+- Batch facturatie: openstaande ritten wachten op handmatige facturatie (correct gedrag)
 
