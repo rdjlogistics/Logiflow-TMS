@@ -152,7 +152,7 @@ const OrderDetailsPanel = React.forwardRef<HTMLDivElement, OrderDetailsPanelProp
         <CardHeader className="relative pb-3 px-4 lg:px-3">
           <CardTitle className="text-base font-semibold flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shrink-0">
-              <Calendar className="h-4 w-4 text-primary" />
+              <CalendarIcon className="h-4 w-4 text-primary" />
             </div>
             <span>Order details</span>
           </CardTitle>
