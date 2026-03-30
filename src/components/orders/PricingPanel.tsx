@@ -114,12 +114,12 @@ const PricingPanel = ({
         setProducts(productData);
         
         if (data.product_lines.length === 0) {
-          const lines: ProductLine[] = productData.map(p => ({
+          const lines: ProductLine[] = productData.map((p, idx) => ({
             product_id: p.id,
             product_name: p.name,
             sales_rate: p.sales_rate,
             purchase_rate: p.purchase_rate,
-            is_active: false,
+            is_active: productData.length === 1 ? true : false,
             sales_subtotal: 0,
             purchase_subtotal: 0,
             pricing_model: p.sales_pricing_model,

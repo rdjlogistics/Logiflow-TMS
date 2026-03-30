@@ -7,7 +7,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Trash2, Calendar, Loader2, CheckCircle2, Copy, MapPin, Clock, Building2, ChevronDown, GripVertical } from "lucide-react";
+import { Trash2, Calendar as CalendarIcon, Loader2, CheckCircle2, Copy, MapPin, Clock, Building2, ChevronDown, GripVertical } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, parse } from "date-fns";
+import { nl } from "date-fns/locale";
+import { capitalizeCity } from "@/lib/date-utils";
 import { supabase } from "@/integrations/supabase/client";
 import { usePostcodeLookup, formatDutchPostcode } from "@/hooks/usePostcodeLookup";
 import { cn } from "@/lib/utils";
@@ -138,7 +143,8 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
   }, []);
 
   const handleChange = (field: keyof DestinationData, value: any) => {
-    onChange({ ...data, [field]: value });
+    const finalValue = field === 'city' && typeof value === 'string' ? capitalizeCity(value) : value;
+    onChange({ ...data, [field]: finalValue });
   };
 
   const handlePostcodeLookup = useCallback(async () => {
@@ -160,7 +166,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
           const latest = dataRef.current;
           const updates: Partial<DestinationData> = {};
           if (result.street) updates.street = result.street;
-          if (result.city) updates.city = result.city;
+          if (result.city) updates.city = capitalizeCity(result.city);
           if (Object.keys(updates).length > 0) {
             onChange({ ...latest, ...updates });
             setAutoFilled(true);
@@ -467,15 +473,37 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={cn(labelClass, "flex items-center gap-1.5")}>
-                          <Calendar className="h-3 w-3" />
+                          <CalendarIcon className="h-3 w-3" />
                           {data.stop_type === 'delivery' ? 'Aflever' : 'Ophaal'} datum
                         </Label>
-                        <Input
-                          type="date"
-                          value={data.pickup_date}
-                          onChange={(e) => handleChange('pickup_date', e.target.value)}
-                          className={inputMobile}
-                        />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                inputMobile, "w-full justify-start text-left font-normal gap-2",
+                                !data.pickup_date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="h-3 w-3 text-muted-foreground shrink-0" />
+                              {data.pickup_date
+                                ? format(parse(data.pickup_date, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')
+                                : "Selecteer datum"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={data.pickup_date ? parse(data.pickup_date, 'yyyy-MM-dd', new Date()) : undefined}
+                              onSelect={(date) => {
+                                if (date) handleChange('pickup_date', format(date, 'yyyy-MM-dd'));
+                              }}
+                              locale={nl}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
 
                       <div className="space-y-1">

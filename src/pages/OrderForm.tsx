@@ -33,6 +33,7 @@ import { SendTransportOrderDialog } from "@/components/orders/SendTransportOrder
 import { CreditWarningBanner } from "@/components/orders/CreditWarningBanner";
 import OrderDetailView from "@/components/orders/OrderDetailView";
 import OrderGoodsDialog from "@/components/orders/OrderGoodsDialog";
+import { capitalizeCity } from "@/lib/date-utils";
 
 const createEmptyDestination = (): DestinationData => ({
   id: crypto.randomUUID(),
@@ -651,10 +652,10 @@ const OrderForm = () => {
         driver_id: orderDetails.driver_id && orderDetails.driver_id !== 'none' ? orderDetails.driver_id : null,
         company_id: companyId,
         pickup_address: pickupAddress || pickupDest.city || 'Ophaaladres',
-        pickup_city: pickupDest.city,
+        pickup_city: capitalizeCity(pickupDest.city),
         pickup_postal_code: pickupDest.postal_code,
         delivery_address: deliveryAddress || deliveryDest.city || 'Afleveradres',
-        delivery_city: deliveryDest.city,
+        delivery_city: capitalizeCity(deliveryDest.city),
         delivery_postal_code: deliveryDest.postal_code,
         remarks_waybill: orderDetails.remarks_waybill,
         remarks_invoice: orderDetails.remarks_invoice,
@@ -709,7 +710,7 @@ const OrderForm = () => {
         address: `${dest.street} ${dest.house_number}`.trim(),
         house_number: dest.house_number || null,
         postal_code: dest.postal_code,
-        city: dest.city,
+        city: capitalizeCity(dest.city),
         company_name: dest.company_name,
         contact_name: dest.contact_name,
         phone: dest.phone,

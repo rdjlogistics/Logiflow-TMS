@@ -6,7 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Calendar, Clock, Mail, AlertCircle, ChevronDown, User, Truck, Package, FileText, Send } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Mail, AlertCircle, ChevronDown, User, Truck, Package, FileText, Send } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, parse } from "date-fns";
+import { nl } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,7 +152,7 @@ const OrderDetailsPanel = React.forwardRef<HTMLDivElement, OrderDetailsPanelProp
         <CardHeader className="relative pb-3 px-4 lg:px-3">
           <CardTitle className="text-base font-semibold flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shrink-0">
-              <Calendar className="h-4 w-4 text-primary" />
+              <CalendarIcon className="h-4 w-4 text-primary" />
             </div>
             <span>Order details</span>
           </CardTitle>
@@ -175,8 +179,8 @@ const OrderDetailsPanel = React.forwardRef<HTMLDivElement, OrderDetailsPanelProp
       
       <CardHeader className="relative pb-2 px-4 lg:px-3 pt-4 lg:pt-3">
         <CardTitle className="text-base lg:text-sm font-semibold flex items-center gap-2.5">
-          <div className="p-2 lg:p-1.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shrink-0 shadow-sm">
-            <Calendar className="h-4 w-4 lg:h-3.5 lg:w-3.5 text-primary" />
+            <div className="p-2 lg:p-1.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shrink-0 shadow-sm">
+            <CalendarIcon className="h-4 w-4 lg:h-3.5 lg:w-3.5 text-primary" />
           </div>
           <span>Order details</span>
         </CardTitle>
@@ -187,15 +191,34 @@ const OrderDetailsPanel = React.forwardRef<HTMLDivElement, OrderDetailsPanelProp
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-2">
           <div className="space-y-1.5 lg:space-y-1 min-w-0">
             <Label className={labelClasses}>Datum</Label>
-            <div className="relative min-w-0">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 lg:h-3.5 lg:w-3.5 text-muted-foreground pointer-events-none z-10" />
-              <Input
-                type="date"
-                value={data.order_date}
-                onChange={(e) => handleChange('order_date', e.target.value)}
-                className={cn(inputClasses, "pl-10 lg:pl-9 pr-3 appearance-none text-left [text-align-last:left]")}
-              />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    inputClasses, "w-full justify-start text-left font-normal gap-2",
+                    !data.order_date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="h-4 w-4 lg:h-3.5 lg:w-3.5 text-muted-foreground shrink-0" />
+                  {data.order_date
+                    ? format(parse(data.order_date, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')
+                    : "Selecteer datum"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={data.order_date ? parse(data.order_date, 'yyyy-MM-dd', new Date()) : undefined}
+                  onSelect={(date) => {
+                    if (date) handleChange('order_date', format(date, 'yyyy-MM-dd'));
+                  }}
+                  locale={nl}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-1.5 lg:space-y-1 min-w-0">
             <Label className={labelClasses}>Tijd</Label>
