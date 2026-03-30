@@ -362,7 +362,6 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                 sheetName="Voertuigen"
                 size="icon"
                 iconOnly
-                title="Exporteer voertuigen"
               />
               <Popover open={filterOpen} onOpenChange={setFilterOpen}>
                 <PopoverTrigger asChild>
