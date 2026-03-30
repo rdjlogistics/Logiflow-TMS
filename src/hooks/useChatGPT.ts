@@ -208,7 +208,7 @@ export const useChatGPT = () => {
           id: assistantId, role: 'assistant', content: '', createdAt: new Date().toISOString(), isStreaming: true,
         }]);
 
-        await parseSSEStream(
+        const finalContent = await parseSSEStream(
           response,
           (delta) => {
             assistantContent += delta;
@@ -218,16 +218,25 @@ export const useChatGPT = () => {
           },
           (confirmation) => {
             setPendingConfirmation(confirmation);
+          },
+          (meta) => {
+            if (meta.conversationId && !conversationId) {
+              setConversationId(meta.conversationId);
+            }
           }
         );
+
+        // Guard: if stream ended with no content, treat as error
+        if (!finalContent.trim()) {
+          setMessages(prev => prev.filter(m => m.id !== assistantId));
+          toast({ title: 'AI Assistent', description: 'Geen antwoord ontvangen. Er zijn geen credits afgeschreven.', variant: 'destructive' });
+          return;
+        }
 
         // Mark streaming done
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, isStreaming: false } : m
         ));
-
-        // Extract conversationId from first SSE chunk or rely on backend
-        // The backend saves the message, so we just need to refresh conversations
 
       } else {
         // ─── Non-streaming fallback ───
