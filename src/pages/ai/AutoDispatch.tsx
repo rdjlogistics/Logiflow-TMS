@@ -178,8 +178,8 @@ export default function AutoDispatch() {
             <TabsTrigger value="conversations" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Gesprekken
-              {stats?.activeConversations && stats.activeConversations > 0 && (
-                <Badge variant="secondary" className="ml-1 text-xs">
+              {typeof stats?.activeConversations === 'number' && stats.activeConversations > 0 && (
+                <Badge variant="secondary" className="ml-2 text-xs">
                   {stats.activeConversations}
                 </Badge>
               )}

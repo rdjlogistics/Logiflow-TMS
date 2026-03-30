@@ -130,11 +130,11 @@ const Messenger = () => {
               ) : filteredTrips.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center px-4">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
-                    <Truck className="w-10 h-10 text-muted-foreground/50" />
+                    <MessageSquare className="w-10 h-10 text-muted-foreground/50" />
                   </div>
-                  <p className="font-semibold text-foreground mb-1">Geen ritten gevonden</p>
+                  <p className="font-semibold text-foreground mb-1">Geen gesprekken</p>
                   <p className="text-sm text-muted-foreground">
-                    Probeer een andere zoekopdracht
+                    Start een gesprek vanuit een order of rit
                   </p>
                 </div>
               ) : (
