@@ -847,7 +847,11 @@ const Customers = () => {
                                     className="flex-shrink-0"
                                   />
                                   <div className="min-w-0 flex-1">
-                                    <p className="font-semibold truncate">{customer.company_name}</p>
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <p className="font-semibold truncate">{customer.company_name}</p>
+                                      {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
+                                      {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
+                                    </div>
                                     {customer.contact_name && (
                                       <p className="text-sm text-muted-foreground truncate">{customer.contact_name}</p>
                                     )}
