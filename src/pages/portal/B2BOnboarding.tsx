@@ -22,6 +22,7 @@ export default function B2BOnboarding() {
   const { user, customer, loading: authLoading } = usePortalAuth();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // Company details form
   const [companyData, setCompanyData] = useState({
