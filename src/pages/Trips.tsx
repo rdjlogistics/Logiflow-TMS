@@ -34,6 +34,8 @@ import { IncomingDispatchesPanel } from "@/components/orders/IncomingDispatchesP
 import { TripFormDialog } from "@/components/trips/TripFormDialog";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { SwipeableCard, swipeActions } from "@/components/ui/swipeable-card";
+import { BulkActionBar } from "@/components/trips/BulkActionBar";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type TripStatus = "offerte" | "aanvraag" | "draft" | "gepland" | "geladen" | "onderweg" | "afgeleverd" | "afgerond" | "gecontroleerd" | "gefactureerd" | "geannuleerd";
 
