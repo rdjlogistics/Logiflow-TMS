@@ -455,9 +455,14 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
                           <Input
                             value={data.city}
                             onChange={(e) => handleChange('city', e.target.value)}
-                            className={cn(inputMobile, "transition-colors", autoFilled && "border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-950/20")}
+                            className={cn(inputMobile, "transition-colors", autoFilled && "border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-950/20", cityMismatch && "border-yellow-500/50")}
                           />
                         </motion.div>
+                        {cityMismatch && (
+                          <p className="text-[11px] text-yellow-600 dark:text-yellow-400 mt-0.5">
+                            De postcode hoort bij {cityMismatch}, niet {data.city}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

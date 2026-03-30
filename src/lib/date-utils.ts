@@ -200,10 +200,14 @@ export function isValidDateRange(start: string | Date | null | undefined, end: s
   return e >= s;
 }
 
-/** Capitalize city name: "zaandam" → "Zaandam", "DEN HAAG" → "Den Haag" */
+/** Capitalize city name: "zaandam" → "Zaandam", "DEN HAAG" → "Den Haag", "'s-hertogenbosch" → "'s-Hertogenbosch" */
 export function capitalizeCity(name: string): string {
   if (!name) return name;
-  return name
+  let result = name
     .toLowerCase()
     .replace(/(^|\s|-)(\w)/g, (_, sep, char) => sep + char.toUpperCase());
+  // Fix Dutch prefixes: 's-Hertogenbosch, 't Goy, etc.
+  result = result.replace(/^'S-/g, "'s-").replace(/^'T-/g, "'t-").replace(/^'T /g, "'t ");
+  result = result.replace(/\s'S-/g, " 's-").replace(/\s'T-/g, " 't-").replace(/\s'T /g, " 't ");
+  return result;
 }

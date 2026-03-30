@@ -81,7 +81,7 @@ export const AddressBookDialog = ({
         setForm(prev => ({
           ...prev,
           address_line: result.street,
-          city: result.city,
+          city: capitalizeCity(result.city),
           postcode: formatDutchPostcode(prev.postcode),
         }));
       }
