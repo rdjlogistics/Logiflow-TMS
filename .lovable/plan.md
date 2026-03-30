@@ -1,42 +1,90 @@
 
 
-# Verificatie Resultaten — Datum- en Adresvalidaties
+# Polish: Professionele Empty States, Loading States & Error States
 
-## 1. DATUMS ✅ CORRECT
+## Aanpak
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Date picker blokkeert verleden | ✅ | `DestinationCard.tsx` line 519: `disabled={(date) => { const today = new Date(); today.setHours(0,0,0,0); return date < today; }}` |
-| Order date picker blokkeert verleden | ✅ | `OrderDetailsPanel.tsx` line 216: zelfde `disabled` logica |
-| 4-cijferig jaar | ✅ | Calendar component toont standaard 4-cijferig jaar. Format: `dd-MM-yyyy` (line 508) |
-| Factuurdatum min 7 dagen | ✅ | `ManualInvoiceForm.tsx` line 266: `min` berekend als 7 dagen geleden |
-| Vervaldatum >= factuurdatum | ✅ | `ManualInvoiceForm.tsx` line 275: `min={formData.invoice_date}` |
-| `getToday()` utility | ✅ | `date-utils.ts` line 167-171 |
-| `getTodayISO()` utility | ✅ | `date-utils.ts` line 174-176 |
-| `getMinInvoiceDate()` utility | ✅ | `date-utils.ts` line 179-183 |
-| `isValidDeliveryDate()` utility | ✅ | `date-utils.ts` line 186-191 |
-| `isValidDateRange()` utility | ✅ | `date-utils.ts` line 194-201 |
+De app heeft al 4 verschillende EmptyState componenten (`common/EmptyState`, `portal/shared/EmptyState`, `ui/EmptyState`, `pricing/EmptyState`) plus tientallen inline empty states. Veel pagina's gebruiken kale `Loader2` spinners zonder timeout. We consolideren naar **één set herbruikbare componenten** en passen die toe op de belangrijkste pagina's.
 
-## 2. ADRESSEN ✅ CORRECT
+## Wat wordt gebouwd
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Postcode-stad mismatch waarschuwing (DestinationCard) | ✅ | Line 123-124: `apiCity` + `cityMismatch` state. Line 149-154: vergelijking bij city change. Line 461-465: gele waarschuwing tekst |
-| Postcode-stad mismatch waarschuwing (DutchAddressInput) | ✅ | Eerder geïmplementeerd met `apiCity` en `cityMismatch` state |
-| capitalizeCity Dutch prefixes | ✅ | Line 210-211: `'s-` en `'t-` correcties voor Hertogenbosch etc. |
-| Altijd overschrijven bij lookup | ✅ | Line 177-180: geen `!street`/`!city` conditie meer, altijd update |
-| Herkomst = bestemming check | ✅ | `OrderForm.tsx` line 618-627: `window.confirm` bij zelfde stad + straat |
-| AddressBookDialog capitalizeCity | ✅ | Eerder toegevoegd met import van `capitalizeCity` |
-| `pointer-events-auto` op Calendar | ✅ | Line 522: `className="p-3 pointer-events-auto"` |
+### 1. Unified componenten in `src/components/common/`
 
-## Conclusie
+**EmptyState.tsx** — al aanwezig, uitbreiden met:
+- `actionHref` prop (Link ipv onClick)
+- `illustration` variant (grotere iconen voor hoofdpagina's)
 
-**Alle datum- en adresvalidaties zijn correct geïmplementeerd.** Geen problemen gevonden. Geen code wijzigingen nodig.
+**LoadingState.tsx** — nieuw:
+- Skeleton loader (niet alleen spinner)
+- Na 10s: "Dit duurt langer dan verwacht" melding
+- Na 30s: error state met "Opnieuw laden" knop
+- Props: `message`, `onRetry`, `timeout` (default 10s)
 
-- Date pickers: 3/3 locaties blokkeren verleden datums
-- Jaar format: 4-cijferig overal (dd-MM-yyyy)
-- Factuurdatums: correct begrensd (min 7 dagen, vervaldatum >= factuurdatum)
-- Postcode-stad: mismatch waarschuwing in beide componenten
-- capitalizeCity: handelt Dutch prefixes correct af
-- Origin=destination: window.confirm waarschuwing actief
+**ErrorState.tsx** — nieuw:
+- Icon (AlertTriangle), titel, beschrijving, retry knop
+- Console.error voor technische details
+- Props: `error`, `onRetry`, `title`
+
+### 2. Toepassen op hoofdpagina's
+
+| Pagina | Huidige staat | Nieuwe staat |
+|--------|--------------|-------------|
+| `/fleet` (VehicleOverview) | Kale tekst + icoon | EmptyState met "Voeg je eerste voertuig toe" + knop |
+| `/orders` (OrderOverview) | Inline div | EmptyState component |
+| `/customers` | Inline "Voeg je eerste klant toe" | EmptyState component |
+| `/drivers` | Inline User icoon + tekst | EmptyState component |
+| `/invoices` | Zoeken naar huidige staat | EmptyState component |
+| `/messenger` | Al verbeterd (vorige fix) | Controleren/behouden |
+| `/carriers` | Inline tekst | EmptyState component |
+
+### 3. Loading states upgraden
+
+Vervang kale `<Loader2 animate-spin>` door `<LoadingState>` met timeout op:
+- FleetManagement (line 50)
+- Drivers (line 679)
+- Carriers (line 476, 1394)
+- Invoices
+- OrderOverview (al skeleton — behouden)
+
+### 4. Error states toevoegen
+
+Pagina's die data fetchen maar geen error handling hebben → voeg `<ErrorState>` toe bij fetch failures.
+
+## Technische details
+
+### LoadingState component
+```tsx
+// States: loading → slow (10s) → error (30s)
+const [phase, setPhase] = useState<'loading' | 'slow' | 'error'>('loading');
+useEffect(() => {
+  const slow = setTimeout(() => setPhase('slow'), 10000);
+  const err = setTimeout(() => setPhase('error'), 30000);
+  return () => { clearTimeout(slow); clearTimeout(err); };
+}, []);
+```
+
+### EmptyState aanroep voorbeeld
+```tsx
+<EmptyState
+  icon={Truck}
+  title="Nog geen voertuigen"
+  description="Voeg je eerste voertuig toe om je vloot te beheren"
+  action={{ label: "Voertuig toevoegen", onClick: () => setShowAdd(true) }}
+/>
+```
+
+## Bestanden
+
+| Actie | Bestand |
+|-------|---------|
+| **Edit** | `src/components/common/EmptyState.tsx` — actionHref prop toevoegen |
+| **Create** | `src/components/common/LoadingState.tsx` — skeleton + timeout logica |
+| **Create** | `src/components/common/ErrorState.tsx` — error display + retry |
+| **Edit** | `src/components/fleet/VehicleOverview.tsx` — gebruik EmptyState |
+| **Edit** | `src/pages/OrderOverview.tsx` — gebruik EmptyState |
+| **Edit** | `src/pages/Customers.tsx` — gebruik EmptyState + LoadingState |
+| **Edit** | `src/pages/Drivers.tsx` — gebruik EmptyState + LoadingState |
+| **Edit** | `src/pages/Invoices.tsx` — gebruik EmptyState + LoadingState |
+| **Edit** | `src/pages/Carriers.tsx` — gebruik EmptyState + LoadingState |
+| **Edit** | `src/pages/FleetManagement.tsx` — gebruik LoadingState |
 
