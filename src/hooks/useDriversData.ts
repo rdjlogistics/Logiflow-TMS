@@ -19,10 +19,11 @@ export function useDriversData(filters: DriverFilters = {}) {
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchDrivers(filters);
+      const data = await fetchDrivers({ ...filters, companyId: company.id });
       setDrivers(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden chauffeurs';
