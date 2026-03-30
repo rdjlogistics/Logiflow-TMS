@@ -36,7 +36,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useWeatherData } from "@/hooks/useWeatherData";
 import { useUserPreferences, DashboardWidgetConfig } from "@/hooks/useUserPreferences";
 import OpsSnapshot from "@/components/dashboard/OpsSnapshot";
-import DashboardEmptyState from "@/components/dashboard/DashboardEmptyState";
+import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import DraggableWidgetGrid from "@/components/dashboard/DraggableWidgetGrid";
 import WidgetCustomizer from "@/components/dashboard/WidgetCustomizer";
 import { DASHBOARD_PRESETS, DashboardPreset } from "@/components/dashboard/DashboardPresetSelector";
