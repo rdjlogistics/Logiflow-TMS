@@ -359,9 +359,8 @@ export const EnhancedBulkActionsBar: React.FC<EnhancedBulkActionsBarProps> = ({
 
         const companyId = customerOrders[0]?.id ? 
           (await supabase.from('trips').select('company_id').eq('id', customerOrders[0].id).single()).data?.company_id : null;
-        const { data: invoiceNumber } = companyId 
-          ? await supabase.rpc('get_next_invoice_number', { p_company_id: companyId })
-          : await supabase.rpc('generate_invoice_number');
+        if (!companyId) throw new Error('Geen bedrijf gevonden');
+        const { data: invoiceNumber } = await supabase.rpc('get_next_invoice_number', { p_company_id: companyId });
 
         const paymentDays = customer?.payment_terms_days || 30;
         const { data: invoice, error: invoiceError } = await supabase

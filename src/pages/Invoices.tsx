@@ -131,6 +131,10 @@ const Invoices = () => {
   
   const [customerDocSettings, setCustomerDocSettings] = useState<Record<string, boolean | null>>({});
   const [tenantAttachDocs, setTenantAttachDocs] = useState<boolean>(false);
+  const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
+  const [demoInvoices, setDemoInvoices] = useState<InvoiceWithCustomer[]>([]);
+  const [selectedDemoIds, setSelectedDemoIds] = useState<Set<string>>(new Set());
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
   
   const { toast } = useToast();
 
@@ -234,6 +238,52 @@ const Invoices = () => {
     } finally {
       setDeleteDialogOpen(false);
       setInvoiceToDelete(null);
+    }
+  };
+
+  // Demo invoices cleanup
+  const handleOpenCleanup = async () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const cutoff = thirtyDaysAgo.toISOString().split("T")[0];
+
+    const candidates = invoices.filter(inv => {
+      const isDemo = (inv.status === "concept" || inv.status === "vervallen") && !inv.sent_at;
+      const isOld = inv.invoice_date && inv.invoice_date < cutoff;
+      return isDemo && isOld;
+    });
+
+    if (candidates.length === 0) {
+      toast({ title: "Geen demo facturen gevonden", description: "Er zijn geen oude concept/vervallen facturen zonder verzenddatum." });
+      return;
+    }
+
+    setDemoInvoices(candidates);
+    setSelectedDemoIds(new Set(candidates.map(i => i.id)));
+    setCleanupDialogOpen(true);
+  };
+
+  const handleCleanupConfirm = async () => {
+    if (selectedDemoIds.size === 0) return;
+    setIsCleaningUp(true);
+    try {
+      const ids = Array.from(selectedDemoIds);
+
+      // Delete all selected demo invoices (lines first, then invoices)
+      if (ids.length > 0) {
+        await supabase.from("invoice_lines").delete().in("invoice_id", ids);
+        await supabase.from("invoices").delete().in("id", ids);
+      }
+
+      toast({ title: `${ids.length} demo facturen verwijderd` });
+      fetchInvoices();
+    } catch (error) {
+      toast({ title: "Fout bij opruimen", variant: "destructive" });
+    } finally {
+      setIsCleaningUp(false);
+      setCleanupDialogOpen(false);
+      setDemoInvoices([]);
+      setSelectedDemoIds(new Set());
     }
   };
 
@@ -407,16 +457,21 @@ const Invoices = () => {
               </SelectContent>
             </Select>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="btn-premium w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" />Nieuwe factuur<ChevronDown className="ml-2 h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => navigate("/invoices/new")}><Sparkles className="mr-2 h-4 w-4 text-primary" /><div><p className="font-medium">Batch Facturatie</p><p className="text-xs text-muted-foreground">Automatisch uit orders</p></div></DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/invoices/new?tab=manual")}><FileText className="mr-2 h-4 w-4" /><div><p className="font-medium">Losse Factuur</p><p className="text-xs text-muted-foreground">Handmatig aanmaken</p></div></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" onClick={handleOpenCleanup} className="text-muted-foreground">
+              <Trash2 className="mr-2 h-4 w-4" />Demo opruimen
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="btn-premium flex-1 sm:flex-none"><Plus className="mr-2 h-4 w-4" />Nieuwe factuur<ChevronDown className="ml-2 h-4 w-4" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/invoices/new")}><Sparkles className="mr-2 h-4 w-4 text-primary" /><div><p className="font-medium">Batch Facturatie</p><p className="text-xs text-muted-foreground">Automatisch uit orders</p></div></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/invoices/new?tab=manual")}><FileText className="mr-2 h-4 w-4" /><div><p className="font-medium">Losse Factuur</p><p className="text-xs text-muted-foreground">Handmatig aanmaken</p></div></DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </motion.div>
 
         {/* Desktop Table */}
@@ -854,6 +909,48 @@ const Invoices = () => {
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Demo Cleanup Dialog */}
+      <AlertDialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Demo facturen opruimen</AlertDialogTitle>
+            <AlertDialogDescription>
+              {demoInvoices.length} oude concept/vervallen facturen gevonden (nooit verstuurd, ouder dan 30 dagen). Selecteer welke je wilt verwijderen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="max-h-60 overflow-y-auto space-y-2 py-2">
+            {demoInvoices.map(inv => (
+              <label key={inv.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer">
+                <Checkbox
+                  checked={selectedDemoIds.has(inv.id)}
+                  onCheckedChange={(checked) => {
+                    const next = new Set(selectedDemoIds);
+                    if (checked) next.add(inv.id); else next.delete(inv.id);
+                    setSelectedDemoIds(next);
+                  }}
+                />
+                <div className="flex-1 min-w-0">
+                  <span className="font-mono text-sm">{inv.invoice_number}</span>
+                  <span className="text-muted-foreground text-xs ml-2">{inv.customers?.company_name || "-"}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">{inv.status}</span>
+                <span className="text-sm font-medium tabular-nums">€{Number(inv.total_amount || 0).toLocaleString("nl-NL", { minimumFractionDigits: 0 })}</span>
+              </label>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCleaningUp}>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleCleanupConfirm(); }}
+              disabled={isCleaningUp || selectedDemoIds.size === 0}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isCleaningUp ? "Bezig..." : `${selectedDemoIds.size} facturen verwijderen`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
