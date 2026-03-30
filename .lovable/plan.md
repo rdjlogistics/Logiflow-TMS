@@ -1,80 +1,90 @@
 
 
-# Workflow Engine Afmaken — Execution Backend
+# Automatische Factuur-Herinnering Workflows
 
 ## Overzicht
 
-De workflow UI en database zijn klaar, maar er ontbreekt een execution engine. We bouwen een edge function die:
-1. Luistert naar database events via een trigger
-2. Matching workflows vindt en runs aanmaakt
-3. De acties sequentieel uitvoert (email, webhook, status update, etc.)
+Voeg een nieuw trigger type `invoice_overdue` toe aan het workflow systeem, plus een dagelijkse cron job die vervallen facturen detecteert en de juiste workflows triggert. Gebruikers krijgen een "Templates" tab op de workflow pagina waar ze met één klik de 3 standaard herinnerings-workflows kunnen installeren.
 
 ## Architectuur
 
 ```text
-[Event trigger op trips tabel]
+[pg_cron: dagelijks 08:00]
        │
        ▼
-[execute-workflow edge function]
+[check-overdue-invoices edge function]
+       │ query invoices WHERE due_date < NOW() - interval X days
+       │ AND status NOT IN ('betaald')
        │
-       ├── Match actieve workflows op trigger_type + config
-       ├── Maak workflow_run record aan
-       ├── Voer acties uit in sequence_order:
-       │     ├── send_email → email queue (bestaand)
-       │     ├── send_webhook → fetch() naar URL
-       │     ├── update_status → trips.status update
-       │     ├── send_sms → placeholder/log
-       │     ├── notify_slack → Slack webhook POST
-       │     └── create_task → insert in tasks tabel
-       └── Update run status → completed/failed
+       ▼  voor elke vervallen factuur:
+[execute-workflow edge function]
+       │ trigger_type = 'invoice_overdue'
+       │ trigger_data = { days_overdue, invoice_id, customer.email, ... }
+       │
+       ▼  matched workflows voeren acties uit
+[send_email / send_sms / create_task / etc.]
 ```
 
 ## Stappen
 
-### Stap 1: Edge Function `execute-workflow`
+### Stap 1: Trigger type toevoegen
 
-Nieuwe edge function `supabase/functions/execute-workflow/index.ts`:
-- Accepteert JSON payload: `{ trigger_type, trigger_data, tenant_id }`
-- Query `workflow_automations` voor matching actieve workflows
-- Voor elke match: maak `workflow_run`, voer `workflow_actions` uit in volgorde
-- Acties:
-  - **send_email**: Stuur via bestaande email queue (pgmq)
-  - **send_webhook**: HTTP POST naar geconfigureerde URL
-  - **update_status**: Update trips.status via service role
-  - **notify_slack**: POST naar Slack webhook URL
-  - **create_task/send_sms/send_whatsapp**: Log als placeholder, markeer als completed
-- Update `workflow_runs.status` en `workflow_automations.run_count`
+**`src/hooks/useWorkflowAutomation.ts`** — Voeg `invoice_overdue` toe aan de `WorkflowTrigger` type union en aan `WORKFLOW_TRIGGERS` array:
+- Label: "Factuur vervallen"
+- Icon: "AlertTriangle"
+- Config fields: `days_overdue` (number) — drempel in dagen (7, 14, 30)
 
-### Stap 2: Database trigger op trips tabel
+### Stap 2: Edge Function `check-overdue-invoices`
 
-Migratie met een database function + trigger die bij INSERT of UPDATE op `trips`:
-- Bij INSERT → roept edge function aan met `trigger_type: 'order_created'`
-- Bij status UPDATE → roept edge function aan met `trigger_type: 'order_status_changed'` + old/new status
-- Bij driver_id UPDATE → `trigger_type: 'driver_assigned'`
-- Gebruikt `pg_net.http_post()` om de edge function async aan te roepen
+**Nieuw: `supabase/functions/check-overdue-invoices/index.ts`**
 
-### Stap 3: Invoice trigger
+Dagelijkse cron-functie die:
+1. Alle openstaande facturen ophaalt met `due_date < NOW()` en status niet `betaald`
+2. Per factuur het aantal dagen overdue berekent
+3. Per factuur `execute-workflow` aanroept met `trigger_type: 'invoice_overdue'` en `trigger_data: { days_overdue, invoice_id, invoice_number, customer: { email, name, phone }, total_amount, amount_paid }`
+4. Deduplicatie: bijhoudt welke factuur+dagen-combinatie al getriggerd is (via `workflow_runs.trigger_event`) om dubbele herinneringen te voorkomen
 
-Migratie met trigger op `invoices` tabel:
-- Bij INSERT → `trigger_type: 'invoice_created'`
+### Stap 3: Cron job aanmaken
 
-### Stap 4: Code cleanup
+SQL insert (niet migratie) om een dagelijkse cron job aan te maken die `check-overdue-invoices` elke dag om 08:00 aanroept via `pg_net.http_post()`.
 
-In `useWorkflowAutomation.ts`:
-- Verwijder `as any` casts — de types zijn nu beschikbaar in het gegenereerde schema
-- Gebruik directe tabel-referenties
+### Stap 4: Templates tab op workflow pagina
+
+**`src/pages/admin/WorkflowAutomation.tsx`** — Voeg een "Templates" tab toe met 3 standaard workflow templates:
+
+| Template | Trigger config | Actie |
+|----------|---------------|-------|
+| Herinnering (7 dagen) | `invoice_overdue`, `days_overdue: 7` | Email: vriendelijke herinnering |
+| Aanmaning (14 dagen) | `invoice_overdue`, `days_overdue: 14` | Email: formele aanmaning |
+| Laatste aanmaning (30 dagen) | `invoice_overdue`, `days_overdue: 30` | Email: laatste waarschuwing + taak aanmaken |
+
+Elke template heeft een "Installeren" knop die `createWorkflow` aanroept met vooraf ingevulde naam, trigger, en acties. Templates die al geïnstalleerd zijn tonen een "Geïnstalleerd" badge.
+
+### Stap 5: Execute-workflow aanpassing
+
+**`supabase/functions/execute-workflow/index.ts`** — Voeg matching logica toe voor `invoice_overdue`:
+- Check of `trigger_data.days_overdue >= config.days_overdue` zodat een "7 dagen" workflow ook triggert bij 8, 9, etc. dagen overdue
+- Maar alleen als `days_overdue < next_threshold` (voorkomt dubbele herinneringen)
+
+### Stap 6: Config.toml registratie
+
+Registreer `check-overdue-invoices` in `supabase/config.toml`.
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Nieuw** | `supabase/functions/execute-workflow/index.ts` |
-| **Migratie** | Trigger function + triggers op trips en invoices |
-| **Edit** | `src/hooks/useWorkflowAutomation.ts` — verwijder `as any` casts |
+| **Edit** | `src/hooks/useWorkflowAutomation.ts` — nieuw trigger type + templates export |
+| **Edit** | `src/pages/admin/WorkflowAutomation.tsx` — Templates tab |
+| **Nieuw** | `supabase/functions/check-overdue-invoices/index.ts` |
+| **Edit** | `supabase/functions/execute-workflow/index.ts` — invoice_overdue matching |
+| **Edit** | `supabase/config.toml` — functie registratie |
+| **Insert** | Cron job via SQL insert |
 
 ## Resultaat
 
-- Workflows worden automatisch getriggerd bij echte events (order aanmaken, status wijziging, chauffeur toewijzing, factuur aanmaken)
-- Acties worden daadwerkelijk uitgevoerd (emails, webhooks, status updates)
-- Run history is zichtbaar op de workflow pagina met status en foutmeldingen
+- Dagelijkse automatische controle op vervallen facturen
+- 3 standaard herinnerings-templates installeerbaar met één klik
+- Deduplicatie voorkomt dubbele herinneringen per factuur
+- Volledig geïntegreerd in bestaand workflow systeem met run history
 
