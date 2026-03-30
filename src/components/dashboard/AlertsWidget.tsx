@@ -80,7 +80,7 @@ const formatTimeAgo = (date: Date) => {
   return `${Math.floor(diffHours / 24)}d geleden`;
 };
 
-const AlertsWidget = ({ alerts = mockAlerts, loading }: AlertsWidgetProps) => {
+const AlertsWidget = ({ alerts = [], loading }: AlertsWidgetProps) => {
   const criticalCount = alerts.filter(a => a.severity === 'critical').length;
   const warningCount = alerts.filter(a => a.severity === 'warning').length;
 

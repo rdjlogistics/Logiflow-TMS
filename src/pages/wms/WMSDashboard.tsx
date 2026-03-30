@@ -212,8 +212,8 @@ export default function WMSDashboard() {
   const zones: any[] = [];
 
   // Calculate percentages for progress
-  const warehouseUtilization = 73; // Demo value
-  const pickingEfficiency = 94; // Demo value
+  const warehouseUtilization = 0;
+  const pickingEfficiency = 0;
 
   return (
     <DashboardLayout title="WMS Control Tower">
