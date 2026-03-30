@@ -129,6 +129,29 @@ const Trips = () => {
   const { toast } = useToast();
   const { canDelete, canManageTrips } = usePermissions();
   const isMobile = useIsMobile();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredTrips.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredTrips.map(t => t.id)));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
 
   useEffect(() => {
     fetchData();
