@@ -1,54 +1,52 @@
 
 
-# Fix: POD (Proof of Delivery) Data & Functies
+# Fix: Stadsnamen Verdubbeld in Database
 
-## Root Causes
+## Diagnose
 
-1. **Chauffeur leeg**: `useStopProofs` queries `profiles` by `user_id`, maar `driver_id` in `stop_proofs` referenceert `drivers.id` (niet `auth.users.id`). Moet `drivers` table queryen op `id` i.p.v. `profiles` op `user_id`.
+Na uitgebreide codebase-analyse: **er is GEEN code-bug**. Alle 45+ bestanden die stadsnamen tonen gebruiken correcte patronen (`{trip.pickup_city} → {trip.delivery_city}`). De `capitalizeCity()` functie is idempotent. Geen dubbele concatenatie gevonden.
 
-2. **Status vs inhoud mismatch**: De status-logica is correct (gebaseerd op `!!row.signature_url`), maar `signature_url` bevat een storage *path* die niet gevonden kan worden via `getCachedSignedUrl`. Het detail modal toont "Geen handtekening" omdat de signed URL `null` teruggeeft. De status badge zou alleen "Getekend" moeten tonen als de signed URL daadwerkelijk opgelost kan worden — maar dat is een async operatie. Pragmatische fix: de detail modal moet niet `getCachedSignedUrl` gebruiken met een incorrect bucket; verifieer dat `pod-files` bucket correct is.
+Het probleem zit **uitsluitend in de database data**:
 
-3. **Timestamps gelijk**: `arrivalTime` en `departureTime` worden allebei door de chauffeur ingevuld in het checkout formulier. Als de chauffeur ze hetzelfde invult, zijn ze gelijk. De UI moet "-" tonen als ze identiek zijn i.p.v. 0 min wachttijd.
+| Tabel | Getroffen records |
+|-------|-------------------|
+| `trips` | 1 record: "Amsterdamamsterdam", "Rotterdamrotterdam" |
+| `route_stops` | 2 records: "Amsterdamamsterdam", "Rotterdamrotterdam" |
+| `customer_submissions` | 1 record (bronrecord) |
 
-4. **`generate-pod-pdf` ontbreekt**: De edge function bestaat niet, waardoor de PDF download knop faalt.
+Dit is waarschijnlijk veroorzaakt door een eenmalige handmatige invoer of een eerder opgeloste bug.
 
-5. **Verstuur knop**: Dialog werkt al (`SendPodEmailDialog`) maar stuurt een vrachtbrief i.p.v. POD PDF. Moet ook customer email auto-invullen.
+## Fix
 
-## Fixes
+### Database migratie — corrigeer verdubbelde stadsnamen
 
-### 1. Fix chauffeur koppeling — `src/hooks/useStopProofs.ts`
-Vervang de `profiles` query door een `drivers` query:
-```typescript
-// OUD:
-supabase.from('profiles').select('user_id, full_name').in('user_id', driverIds)
-// NIEUW:
-supabase.from('drivers').select('id, name').in('id', driverIds)
+Eén SQL migratie die alle drie de tabellen scant op herhaalde stadsnamen en ze corrigeert:
+
+```sql
+-- Fix trips
+UPDATE trips SET pickup_city = left(pickup_city, length(pickup_city)/2)
+WHERE lower(pickup_city) ~ '^(.+)\1$';
+
+UPDATE trips SET delivery_city = left(delivery_city, length(delivery_city)/2)
+WHERE lower(delivery_city) ~ '^(.+)\1$';
+
+-- Fix route_stops
+UPDATE route_stops SET city = left(city, length(city)/2)
+WHERE lower(city) ~ '^(.+)\1$';
+
+-- Fix customer_submissions
+UPDATE customer_submissions SET pickup_city = left(pickup_city, length(pickup_city)/2)
+WHERE lower(pickup_city) ~ '^(.+)\1$';
+
+UPDATE customer_submissions SET delivery_city = left(delivery_city, length(delivery_city)/2)
+WHERE lower(delivery_city) ~ '^(.+)\1$';
 ```
-En map `driver_name: driver?.name || null` (i.p.v. `profile?.full_name`).
 
-### 2. Fix timestamps UI — `src/pages/operations/DigitalPOD.tsx`
-In `TimeCard` en de times section: als `arrival_time === departure_time`, toon departure als "-" en wachttijd als "-".
+**Geen code wijzigingen nodig.** De display-code is overal correct.
 
-### 3. Auto-fill customer email in Verstuur dialog
-In `DigitalPOD.tsx` waar `SendPodEmailDialog` wordt aangeroepen, haal het customer email op via de trip → customer relatie. Voeg `customer_email` toe aan `StopProofRecord` en vul het via de trip join in `useStopProofs`.
-
-### 4. Maak `generate-pod-pdf` edge function
-Nieuwe edge function `supabase/functions/generate-pod-pdf/index.ts` die:
-- Stop proof data ophaalt uit de database
-- Trip, stop, driver, customer data joinet
-- Signature en photo signed URLs genereert
-- Een PDF genereert met jsPDF-achtige HTML-to-PDF of een eenvoudige HTML-based PDF
-- Base64 PDF teruggeeft
-
-### 5. Fix `SendPodEmailDialog` — POD context
-Voeg optie toe om POD PDF te versturen (naast vrachtbrief/transportopdracht). Wanneer geopend vanuit POD detail, default naar POD type.
-
-## Bestanden
+### Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Edit** | `src/hooks/useStopProofs.ts` — drivers query i.p.v. profiles, customer_email toevoegen |
-| **Edit** | `src/pages/operations/DigitalPOD.tsx` — timestamp display fix, customer email doorgeven |
-| **Edit** | `src/components/operations/SendPodEmailDialog.tsx` — POD document type toevoegen |
-| **Nieuw** | `supabase/functions/generate-pod-pdf/index.ts` — PDF generatie |
+| **Data fix** | SQL migratie via insert tool (6 UPDATE statements) |
 
