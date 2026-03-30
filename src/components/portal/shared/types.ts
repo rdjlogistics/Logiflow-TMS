@@ -91,6 +91,7 @@ export interface Invoice {
   id: string;
   number: string;
   amount: number;
+  amountPaid?: number;
   currency: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue';
   dueDate: string;

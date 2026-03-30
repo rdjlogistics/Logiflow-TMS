@@ -108,7 +108,31 @@ export const B2BDashboard = ({
 
   const openInvoices = invoices.filter(i => i.status !== 'paid');
   const overdueInvoices = openInvoices.filter(i => i.status === 'overdue' || (i.dueDate && new Date(i.dueDate) < new Date()));
-  const openInvoicesTotal = openInvoices.reduce((sum, i) => sum + i.amount, 0);
+  const openInvoicesTotal = openInvoices.reduce((sum, i) => {
+    const paid = i.amountPaid ?? 0;
+    return sum + Math.max(0, i.amount - paid);
+  }, 0);
+  const totalInvoicesAmount = openInvoices.reduce((sum, i) => sum + i.amount, 0);
+  const totalPaidAmount = openInvoices.reduce((sum, i) => sum + (i.amountPaid ?? 0), 0);
+  const paymentProgress = totalInvoicesAmount > 0 ? Math.round((totalPaidAmount / totalInvoicesAmount) * 100) : 0;
+
+  const formatEuro = (amount: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount);
+  
+  const getDaysOverdue = (dueDate: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+    return Math.floor((today.getTime() - due.getTime()) / 86400000);
+  };
+
+  const getDeliveryStep = (status: string) => {
+    const steps = ['confirmed', 'picked_up', 'in_transit', 'delivered'];
+    const statusMap: Record<string, number> = {
+      confirmed: 0, pickup_scheduled: 0, picked_up: 1, in_transit: 2, out_for_delivery: 2, delivered: 3,
+    };
+    return statusMap[status] ?? 0;
+  };
 
   const activeStatuses = new Set(['pickup_scheduled', 'picked_up', 'in_transit', 'out_for_delivery'] as const);
   const activeShipments = recentShipments
