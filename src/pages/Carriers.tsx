@@ -473,11 +473,14 @@ const DriversTab = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Laden...</div>
+            <LoadingState message="Chauffeurs laden..." />
           ) : filtered.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {search || statusFilter !== 'all' ? 'Geen chauffeurs gevonden' : 'Voeg je eerste chauffeur toe.'}
-            </div>
+            <EmptyState
+              icon={Users}
+              title={search || statusFilter !== 'all' ? 'Geen chauffeurs gevonden' : 'Nog geen chauffeurs'}
+              description={search || statusFilter !== 'all' ? 'Pas je filters aan.' : 'Voeg je eerste chauffeur toe.'}
+              action={!search && statusFilter === 'all' ? { label: 'Chauffeur toevoegen', onClick: openNewDialog, icon: Plus } : undefined}
+            />
           ) : isMobile ? (
             <div className="space-y-3">
               {filtered.map((d) => (
