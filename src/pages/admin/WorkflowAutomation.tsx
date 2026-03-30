@@ -441,6 +441,7 @@ const WorkflowAutomation = () => {
         <Tabs defaultValue="workflows" className="space-y-4">
           <TabsList>
             <TabsTrigger value="workflows">Workflows</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="runs">Uitvoeringslog</TabsTrigger>
           </TabsList>
 
