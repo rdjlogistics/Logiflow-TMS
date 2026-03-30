@@ -74,12 +74,14 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       const result = await lookupPostcode(postcode, houseNumber);
       if (result) {
         if (type === 'from') {
+          setLookupFromCity(result.city);
           setFormData(prev => ({
             ...prev,
             fromStreet: result.street,
             fromCity: result.city,
           }));
         } else {
+          setLookupToCity(result.city);
           setFormData(prev => ({
             ...prev,
             toStreet: result.street,
@@ -89,6 +91,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       }
     }
   };
+
+  const fromCityMismatch = lookupFromCity && formData.fromCity && formData.fromCity.toLowerCase() !== lookupFromCity.toLowerCase();
+  const toCityMismatch = lookupToCity && formData.toCity && formData.toCity.toLowerCase() !== lookupToCity.toLowerCase();
 
   const nextStep = async () => {
     if (isLastStep) {
