@@ -10,7 +10,7 @@ import {
   Search,
   ArrowLeft,
   Compass,
-  Phone,
+  
   Mail,
   Clock,
   Truck
