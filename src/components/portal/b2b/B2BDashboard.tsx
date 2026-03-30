@@ -108,7 +108,31 @@ export const B2BDashboard = ({
 
   const openInvoices = invoices.filter(i => i.status !== 'paid');
   const overdueInvoices = openInvoices.filter(i => i.status === 'overdue' || (i.dueDate && new Date(i.dueDate) < new Date()));
-  const openInvoicesTotal = openInvoices.reduce((sum, i) => sum + i.amount, 0);
+  const openInvoicesTotal = openInvoices.reduce((sum, i) => {
+    const paid = i.amountPaid ?? 0;
+    return sum + Math.max(0, i.amount - paid);
+  }, 0);
+  const totalInvoicesAmount = openInvoices.reduce((sum, i) => sum + i.amount, 0);
+  const totalPaidAmount = openInvoices.reduce((sum, i) => sum + (i.amountPaid ?? 0), 0);
+  const paymentProgress = totalInvoicesAmount > 0 ? Math.round((totalPaidAmount / totalInvoicesAmount) * 100) : 0;
+
+  const formatEuro = (amount: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount);
+  
+  const getDaysOverdue = (dueDate: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+    return Math.floor((today.getTime() - due.getTime()) / 86400000);
+  };
+
+  const getDeliveryStep = (status: string) => {
+    const steps = ['confirmed', 'picked_up', 'in_transit', 'delivered'];
+    const statusMap: Record<string, number> = {
+      confirmed: 0, pickup_scheduled: 0, picked_up: 1, in_transit: 2, out_for_delivery: 2, delivered: 3,
+    };
+    return statusMap[status] ?? 0;
+  };
 
   const activeStatuses = new Set(['pickup_scheduled', 'picked_up', 'in_transit', 'out_for_delivery'] as const);
   const activeShipments = recentShipments
@@ -360,13 +384,32 @@ export const B2BDashboard = ({
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 400, damping: 15 }}
                       >
-                        €{openInvoicesTotal.toFixed(2)}
+                        {formatEuro(openInvoicesTotal)}
                       </motion.p>
                       <p className="text-xs text-muted-foreground">{openInvoices.length} openstaand</p>
                     </div>
+                    {/* Payment progress bar */}
+                    {totalInvoicesAmount > 0 && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-muted-foreground">
+                          <span>Betaald</span>
+                          <span className="tabular-nums">{paymentProgress}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-emerald-500"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${paymentProgress}%` }}
+                            transition={{ type: "spring", stiffness: 80, damping: 20, delay: 0.2 }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="divide-y divide-border/20">
                       {openInvoices.slice(0, 3).map((inv, i) => {
                         const isOverdue = inv.status === 'overdue' || (inv.dueDate && new Date(inv.dueDate) < new Date());
+                        const outstanding = Math.max(0, inv.amount - (inv.amountPaid ?? 0));
+                        const daysOver = isOverdue && inv.dueDate ? getDaysOverdue(inv.dueDate) : 0;
                         return (
                           <motion.div
                             key={inv.id}
@@ -374,19 +417,29 @@ export const B2BDashboard = ({
                             variants={listItemVariants}
                             initial="hidden"
                             animate="visible"
-                            className="flex items-center justify-between py-2 text-sm"
                           >
-                            <div className="min-w-0">
-                              <span className="font-medium truncate block">{inv.number}</span>
-                              {inv.dueDate && (
-                                <span className={`text-[10px] ${isOverdue ? 'text-red-400' : 'text-muted-foreground'}`}>
-                                  {isOverdue ? '⚠ ' : ''}Verval: {format(new Date(inv.dueDate), "d MMM", { locale: nl })}
+                            <Link to="/portal/b2b/invoices" className="flex items-center justify-between py-2 text-sm group touch-manipulation">
+                              <div className="min-w-0">
+                                <span className="font-medium truncate block group-hover:text-primary transition-colors">{inv.number}</span>
+                                {inv.dueDate && (
+                                  <span className={`text-[10px] ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                    {isOverdue && daysOver > 0
+                                      ? `⚠ ${daysOver} dag${daysOver !== 1 ? 'en' : ''} verlopen`
+                                      : `Verval: ${format(new Date(inv.dueDate), "d MMM", { locale: nl })}`}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0 ml-2">
+                                <span className={`font-semibold tabular-nums text-sm ${isOverdue ? 'text-destructive' : ''}`}>
+                                  {formatEuro(outstanding)}
                                 </span>
-                              )}
-                            </div>
-                            <span className={`font-semibold tabular-nums ${isOverdue ? 'text-red-400' : ''}`}>
-                              €{inv.amount.toFixed(2)}
-                            </span>
+                                {(inv.amountPaid ?? 0) > 0 && (
+                                  <p className="text-[9px] text-muted-foreground tabular-nums">
+                                    van {formatEuro(inv.amount)}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
                           </motion.div>
                         );
                       })}
@@ -438,6 +491,7 @@ export const B2BDashboard = ({
                     <div className="divide-y divide-border/20">
                       {activeShipments.slice(0, 3).map((s, i) => {
                         const st = statusConfig[s.status];
+                        const currentStep = getDeliveryStep(s.status);
                         return (
                           <motion.div
                             key={s.id}
@@ -446,19 +500,34 @@ export const B2BDashboard = ({
                             initial="hidden"
                             animate="visible"
                           >
-                            <Link to={`/portal/b2b/shipments/${s.id}`} className="flex items-center justify-between py-2.5 group touch-manipulation">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
-                                  <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px] shrink-0`}>{st.label}</Badge>
+                            <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 group touch-manipulation">
+                              <div className="flex items-center justify-between">
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">{s.referenceNumber}</span>
+                                    <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px] shrink-0`}>{st.label}</Badge>
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</p>
                                 </div>
-                                <p className="text-[11px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</p>
+                                <div className="text-right shrink-0 ml-2">
+                                  {s.estimatedDelivery && (
+                                    <span className="text-[10px] text-muted-foreground block">
+                                      {format(new Date(s.estimatedDelivery), "d MMM", { locale: nl })}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {s.parcels} colli{s.weight ? ` · ${s.weight}kg` : ''}
+                                  </span>
+                                </div>
                               </div>
-                              {s.estimatedDelivery && (
-                                <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
-                                  {format(new Date(s.estimatedDelivery), "d MMM", { locale: nl })}
-                                </span>
-                              )}
+                              {/* Mini progress steps */}
+                              <div className="flex items-center gap-0.5 mt-1.5">
+                                {['Bevestigd', 'Opgehaald', 'Onderweg', 'Bezorgd'].map((step, idx) => (
+                                  <div key={step} className="flex items-center flex-1">
+                                    <div className={`h-1 w-full rounded-full ${idx <= currentStep ? 'bg-primary' : 'bg-muted'}`} />
+                                  </div>
+                                ))}
+                              </div>
                             </Link>
                           </motion.div>
                         );
@@ -511,19 +580,22 @@ export const B2BDashboard = ({
                           initial="hidden"
                           animate="visible"
                           whileHover={{ backgroundColor: "hsl(var(--muted) / 0.15)" }}
-                          className="py-2.5 px-1 rounded-md transition-colors"
+                          className="rounded-md transition-colors"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.color.replace('text-', 'bg-')}`} />
-                              <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                          <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 px-1 touch-manipulation">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.color.replace('text-', 'bg-')}`} />
+                                <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                              </div>
+                              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo}</span>
                             </div>
-                            <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 ml-3.5">
-                            <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px]`}>{st.label}</Badge>
-                            <span className="text-[10px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</span>
-                          </div>
+                            <div className="flex items-center gap-1.5 mt-1 ml-3.5">
+                              <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px]`}>{st.label}</Badge>
+                              <span className="text-[10px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</span>
+                              <span className="text-[10px] text-muted-foreground shrink-0">· {s.parcels} colli</span>
+                            </div>
+                          </Link>
                         </motion.div>
                       );
                     })}

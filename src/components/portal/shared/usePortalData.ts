@@ -106,20 +106,31 @@ export function usePortalData(customerId?: string | null) {
         .limit(50);
 
       if (invoicesData && invoicesData.length > 0) {
-        const mappedInvoices: Invoice[] = invoicesData.map(inv => ({
-          id: inv.id,
-          number: inv.invoice_number || `INV-${inv.id.slice(0, 8).toUpperCase()}`,
-          status: inv.status === 'betaald' ? 'paid' 
-            : inv.status === 'verzonden' ? 'sent'
-            : inv.status === 'vervallen' ? 'overdue'
-            : 'draft',
-          amount: Number(inv.total_amount) || 0,
-          currency: 'EUR',
-          createdAt: inv.created_at,
-          dueDate: inv.due_date || inv.created_at,
-          paidAt: inv.paid_at || undefined,
-          shipmentIds: [],
-        }));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const mappedInvoices: Invoice[] = invoicesData.map(inv => {
+          const dueDate = inv.due_date || inv.created_at;
+          const isPastDue = dueDate && new Date(dueDate) < today;
+          const rawStatus = String(inv.status ?? 'concept');
+          
+          let status: 'draft' | 'sent' | 'paid' | 'overdue' = 'draft';
+          if (rawStatus === 'betaald') status = 'paid';
+          else if (rawStatus === 'vervallen' || (['verzonden', 'definitief'].includes(rawStatus) && isPastDue)) status = 'overdue';
+          else if (rawStatus === 'verzonden' || rawStatus === 'definitief') status = 'sent';
+
+          return {
+            id: inv.id,
+            number: inv.invoice_number || `INV-${inv.id.slice(0, 8).toUpperCase()}`,
+            status,
+            amount: Number(inv.total_amount) || 0,
+            amountPaid: inv.amount_paid != null ? Number(inv.amount_paid) : undefined,
+            currency: 'EUR',
+            createdAt: inv.created_at,
+            dueDate,
+            paidAt: inv.paid_at || undefined,
+            shipmentIds: [],
+          };
+        });
         setInvoices(mappedInvoices);
       }
 
