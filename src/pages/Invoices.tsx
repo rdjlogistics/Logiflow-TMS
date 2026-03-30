@@ -131,6 +131,10 @@ const Invoices = () => {
   
   const [customerDocSettings, setCustomerDocSettings] = useState<Record<string, boolean | null>>({});
   const [tenantAttachDocs, setTenantAttachDocs] = useState<boolean>(false);
+  const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
+  const [demoInvoices, setDemoInvoices] = useState<InvoiceWithCustomer[]>([]);
+  const [selectedDemoIds, setSelectedDemoIds] = useState<Set<string>>(new Set());
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
   
   const { toast } = useToast();
 

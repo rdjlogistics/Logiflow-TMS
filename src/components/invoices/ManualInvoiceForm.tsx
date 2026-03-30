@@ -115,6 +115,23 @@ export function ManualInvoiceForm({ onSuccess, onCancel }: ManualInvoiceFormProp
       return;
     }
 
+    const { total } = calculateTotals();
+    if (total <= 0) {
+      toast.error("Totaalbedrag moet groter zijn dan €0");
+      return;
+    }
+
+    // Warn if invoice date is more than 7 days in the past
+    const invoiceDate = new Date(formData.invoice_date);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    if (invoiceDate < sevenDaysAgo) {
+      const proceed = window.confirm(
+        `De factuurdatum (${formData.invoice_date}) ligt meer dan 7 dagen in het verleden. Weet je zeker dat dit klopt?`
+      );
+      if (!proceed) return;
+    }
+
     setIsSubmitting(true);
     try {
       const { subtotal, vatAmount, total } = calculateTotals();
