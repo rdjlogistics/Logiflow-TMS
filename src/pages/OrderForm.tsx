@@ -33,6 +33,7 @@ import { SendTransportOrderDialog } from "@/components/orders/SendTransportOrder
 import { CreditWarningBanner } from "@/components/orders/CreditWarningBanner";
 import OrderDetailView from "@/components/orders/OrderDetailView";
 import OrderGoodsDialog from "@/components/orders/OrderGoodsDialog";
+import { capitalizeCity } from "@/lib/date-utils";
 
 const createEmptyDestination = (): DestinationData => ({
   id: crypto.randomUUID(),
