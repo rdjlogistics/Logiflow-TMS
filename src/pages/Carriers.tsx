@@ -440,9 +440,26 @@ const DriversTab = () => {
             Inactief
           </Button>
         </div>
-        <Button onClick={() => { resetForm(); setAddOpen(true); }} className="min-h-[44px] gap-2">
-          <Plus className="h-4 w-4" /> Chauffeur toevoegen
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            headers={['Naam', 'E-mail', 'Telefoon', 'Categorie', 'ZZP', 'Status', 'Rijbewijsnummer', 'Portaal actief']}
+            rows={filtered.map(d => [
+              d.name,
+              d.email || '',
+              d.phone || '',
+              d.driver_category === 'heavy' ? 'Zwaar' : 'Licht',
+              d.is_zzp ? 'Ja' : 'Nee',
+              d.status === 'active' ? 'Actief' : 'Inactief',
+              d.license_number || '',
+              d.user_id ? 'Ja' : 'Nee',
+            ])}
+            filename="chauffeurs"
+            sheetName="Chauffeurs"
+          />
+          <Button onClick={() => { resetForm(); setAddOpen(true); }} className="min-h-[44px] gap-2">
+            <Plus className="h-4 w-4" /> Chauffeur toevoegen
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

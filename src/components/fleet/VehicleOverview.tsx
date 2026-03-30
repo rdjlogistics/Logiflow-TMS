@@ -355,9 +355,15 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                   className="pl-9"
                 />
               </div>
-              <Button variant="outline" size="icon" onClick={handleExportCSV} title="CSV exporteren">
-                <Download className="h-4 w-4" />
-              </Button>
+              <ExportDropdown
+                headers={exportHeaders}
+                rows={exportData()}
+                filename="voertuigen"
+                sheetName="Voertuigen"
+                size="icon"
+                iconOnly
+                title="Exporteer voertuigen"
+              />
               <Popover open={filterOpen} onOpenChange={setFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="icon" className={cn(statusFilters.length > 0 && 'border-primary bg-primary/10')}>
