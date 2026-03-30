@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, Download } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, Download, CheckSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -34,6 +34,8 @@ import { IncomingDispatchesPanel } from "@/components/orders/IncomingDispatchesP
 import { TripFormDialog } from "@/components/trips/TripFormDialog";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { SwipeableCard, swipeActions } from "@/components/ui/swipeable-card";
+import { BulkActionBar } from "@/components/trips/BulkActionBar";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type TripStatus = "offerte" | "aanvraag" | "draft" | "gepland" | "geladen" | "onderweg" | "afgeleverd" | "afgerond" | "gecontroleerd" | "gefactureerd" | "geannuleerd";
 
@@ -127,6 +129,29 @@ const Trips = () => {
   const { toast } = useToast();
   const { canDelete, canManageTrips } = usePermissions();
   const isMobile = useIsMobile();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredTrips.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredTrips.map(t => t.id)));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
 
   useEffect(() => {
     fetchData();
@@ -257,6 +282,16 @@ const Trips = () => {
               />
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
+              {isMobile && (
+                <Button
+                  variant={selectionMode ? "default" : "outline"}
+                  onClick={() => { setSelectionMode(!selectionMode); if (selectionMode) clearSelection(); }}
+                  className="gap-2 flex-1 sm:flex-none"
+                >
+                  <CheckSquare className="h-4 w-4" />
+                  {selectionMode ? "Klaar" : "Selecteer"}
+                </Button>
+              )}
               <Button variant="outline" onClick={handleExportCSV} className="gap-2 flex-1 sm:flex-none">
                 <Download className="h-4 w-4" />
                 CSV
@@ -315,8 +350,17 @@ const Trips = () => {
                     initial="hidden"
                     animate="visible"
                   >
-                    {filteredTrips.map((trip, i) => (
-                      <motion.div key={trip.id} variants={itemVariants}>
+                    {filteredTrips.map((trip) => (
+                      <motion.div key={trip.id} variants={itemVariants} className="relative">
+                      {selectionMode && (
+                        <div className="absolute left-2 top-2 z-10">
+                          <Checkbox
+                            checked={selectedIds.has(trip.id)}
+                            onCheckedChange={() => toggleSelect(trip.id)}
+                            className="h-5 w-5 border-2"
+                          />
+                        </div>
+                      )}
                       <SwipeableCard
                         leftActions={[swipeActions.more(() => handleEdit(trip))]}
                         rightActions={canDelete ? [swipeActions.delete(() => handleDeleteClick(trip.id))] : []}
@@ -423,8 +467,14 @@ const Trips = () => {
                 /* Desktop table view */
                 <div className="overflow-x-auto rounded-xl">
                   <Table>
-                    <TableHeader>
+                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[40px]">
+                          <Checkbox
+                            checked={filteredTrips.length > 0 && selectedIds.size === filteredTrips.length}
+                            onCheckedChange={toggleSelectAll}
+                          />
+                        </TableHead>
                         <TableHead>Datum</TableHead>
                         <TableHead>Klant</TableHead>
                         <TableHead>Referentie</TableHead>
@@ -438,7 +488,13 @@ const Trips = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredTrips.map((trip) => (
-                        <TableRow key={trip.id}>
+                        <TableRow key={trip.id} data-state={selectedIds.has(trip.id) ? "selected" : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.has(trip.id)}
+                              onCheckedChange={() => toggleSelect(trip.id)}
+                            />
+                          </TableCell>
                           <TableCell>
                             {format(new Date(trip.trip_date), "d MMM yyyy", { locale: nl })}
                           </TableCell>
@@ -529,6 +585,12 @@ const Trips = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BulkActionBar
+        selectedIds={selectedIds}
+        onClear={clearSelection}
+        onComplete={fetchData}
+      />
     </DashboardLayout>
   );
 };
