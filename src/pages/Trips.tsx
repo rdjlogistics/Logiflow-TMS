@@ -282,6 +282,16 @@ const Trips = () => {
               />
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
+              {isMobile && (
+                <Button
+                  variant={selectionMode ? "default" : "outline"}
+                  onClick={() => { setSelectionMode(!selectionMode); if (selectionMode) clearSelection(); }}
+                  className="gap-2 flex-1 sm:flex-none"
+                >
+                  <CheckSquare className="h-4 w-4" />
+                  {selectionMode ? "Klaar" : "Selecteer"}
+                </Button>
+              )}
               <Button variant="outline" onClick={handleExportCSV} className="gap-2 flex-1 sm:flex-none">
                 <Download className="h-4 w-4" />
                 CSV
