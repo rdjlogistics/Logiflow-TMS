@@ -52,10 +52,19 @@ export function EmptyState({
       {(action || secondaryAction) && (
         <div className="flex items-center gap-3 mt-6">
           {action && (
-            <Button onClick={action.onClick} size={size === 'sm' ? 'sm' : 'default'}>
-              {action.icon && <action.icon className="h-4 w-4 mr-2" />}
-              {action.label}
-            </Button>
+            action.href ? (
+              <Button asChild size={size === 'sm' ? 'sm' : 'default'}>
+                <Link to={action.href}>
+                  {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+                  {action.label}
+                </Link>
+              </Button>
+            ) : (
+              <Button onClick={action.onClick} size={size === 'sm' ? 'sm' : 'default'}>
+                {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+                {action.label}
+              </Button>
+            )
           )}
           {secondaryAction && (
             <Button
