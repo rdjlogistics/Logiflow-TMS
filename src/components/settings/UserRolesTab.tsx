@@ -153,7 +153,14 @@ export function UserRolesTab() {
       const { data, error } = await supabase.functions.invoke('create-staff-account', {
         body: { full_name: name, email, role },
       });
-      if (error) throw error;
+      if (error) {
+        let msg = error.message || 'Uitnodiging mislukt';
+        try {
+          const body = await (error as any).context?.json?.();
+          if (body?.error) msg = body.error;
+        } catch { /* use default */ }
+        throw new Error(msg);
+      }
       if (data?.error) throw new Error(data.error);
       return data;
     },
@@ -166,7 +173,14 @@ export function UserRolesTab() {
     },
     onError: (err: Error) => {
       console.error('Invite error:', err);
-      toast({ title: 'Fout bij uitnodigen', description: err.message || 'Kon de uitnodiging niet versturen.', variant: 'destructive' });
+      const isNetwork = err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError');
+      toast({
+        title: 'Fout bij uitnodigen',
+        description: isNetwork
+          ? 'Geen internetverbinding. Controleer je netwerk en probeer het opnieuw.'
+          : err.message || 'Kon de uitnodiging niet versturen.',
+        variant: 'destructive',
+      });
     },
   });
 

@@ -268,7 +268,9 @@ export function SendReminderDialog({
       });
 
       if (response.error) {
-        throw new Error(response.error.message);
+        const errMsg = response.error.message || "Onbekende fout";
+        console.error("[SendReminder] Edge function error:", errMsg);
+        throw new Error(errMsg);
       }
 
       const result = response.data;
@@ -280,9 +282,12 @@ export function SendReminderDialog({
       } else {
         toast.error(result.error || "Verzenden mislukt");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Send reminder error:", error);
-      toast.error("Fout bij verzenden herinnering");
+      const msg = error?.message?.includes("NetworkError") || error?.message?.includes("Failed to fetch")
+        ? "Geen internetverbinding. Controleer je netwerk en probeer het opnieuw."
+        : error?.message || "Fout bij verzenden herinnering. Probeer het opnieuw.";
+      toast.error(msg);
     } finally {
       setIsSending(false);
     }
