@@ -12,7 +12,6 @@ interface CreditBadgeProps {
 export const CreditBadge = ({ creditInfo, subscription, compact }: CreditBadgeProps) => {
   const remaining = creditInfo?.remaining ?? subscription?.credits_remaining ?? 0;
   const total = subscription?.plan?.credits_included ?? 500;
-  const plan = creditInfo?.plan ?? subscription?.plan?.slug ?? 'starter';
   const percent = Math.min(100, (remaining / total) * 100);
 
   const planLabel = 'AI Credits';
