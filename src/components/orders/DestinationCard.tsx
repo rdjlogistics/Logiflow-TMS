@@ -165,7 +165,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
           const latest = dataRef.current;
           const updates: Partial<DestinationData> = {};
           if (result.street) updates.street = result.street;
-          if (result.city) updates.city = result.city;
+          if (result.city) updates.city = capitalizeCity(result.city);
           if (Object.keys(updates).length > 0) {
             onChange({ ...latest, ...updates });
             setAutoFilled(true);
