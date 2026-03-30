@@ -213,13 +213,13 @@ export const useWorkflowAutomation = () => {
     queryKey: ['workflow-runs'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workflow_runs' as any)
+        .from('workflow_runs')
         .select('*')
         .order('started_at', { ascending: false })
         .limit(50);
       
       if (error) throw error;
-      return (data as unknown) as WorkflowRun[];
+      return data as unknown as WorkflowRun[];
     },
   });
 
