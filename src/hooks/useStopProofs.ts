@@ -25,6 +25,7 @@ export interface StopProofRecord {
   // Joined fields
   order_number: string | null;
   customer_name: string | null;
+  customer_email: string | null;
   stop_company_name: string | null;
   stop_address: string | null;
   stop_city: string | null;
@@ -64,22 +65,22 @@ export function useStopProofs() {
       const stopIds = [...new Set(rawProofs.map(r => r.stop_id))];
       const driverIds = [...new Set(rawProofs.map(r => r.driver_id))];
 
-      const [tripsRes, stopsRes, profilesRes] = await Promise.all([
-        supabase.from('trips').select('id, order_number, customer_id, customers:customer_id (company_name)').in('id', tripIds),
+      const [tripsRes, stopsRes, driversRes] = await Promise.all([
+        supabase.from('trips').select('id, order_number, customer_id, customers:customer_id (company_name, email)').in('id', tripIds),
         supabase.from('route_stops').select('id, company_name, address, city, driver_remarks').in('id', stopIds),
-        supabase.from('profiles').select('user_id, full_name').in('user_id', driverIds),
+        supabase.from('drivers').select('id, name').in('id', driverIds),
       ]);
 
       const tripsMap = new Map((tripsRes.data || []).map((t: any) => [t.id, t]));
       const stopsMap = new Map((stopsRes.data || []).map((s: any) => [s.id, s]));
-      const profilesMap = new Map((profilesRes.data || []).map((p: any) => [p.user_id, p]));
+      const driversMap = new Map((driversRes.data || []).map((d: any) => [d.id, d]));
 
       const mapped: StopProofRecord[] = rawProofs.map((row: any) => {
         const hasSignature = !!row.signature_url;
         const hasPhotos = row.photo_urls && row.photo_urls.length > 0;
         const trip = tripsMap.get(row.trip_id);
         const stop = stopsMap.get(row.stop_id);
-        const profile = profilesMap.get(row.driver_id);
+        const driver = driversMap.get(row.driver_id);
 
         return {
           id: row.id,
@@ -103,10 +104,11 @@ export function useStopProofs() {
           created_at: row.created_at,
           order_number: trip?.order_number || null,
           customer_name: trip?.customers?.company_name || null,
+          customer_email: trip?.customers?.email || null,
           stop_company_name: stop?.company_name || null,
           stop_address: stop?.address || null,
           stop_city: stop?.city || null,
-          driver_name: profile?.full_name || null,
+          driver_name: driver?.name || null,
           driver_remarks: stop?.driver_remarks || null,
           status: hasSignature ? 'signed' : hasPhotos ? 'photo_only' : 'pending',
         };

@@ -29,6 +29,8 @@ interface SendPodEmailDialogProps {
   tripId: string;
   orderNumber: string;
   customerEmail?: string | null;
+  defaultDocumentType?: string;
+  stopProofId?: string;
   isDemo?: boolean;
 }
 
@@ -45,9 +47,9 @@ const formatSize = (bytes: number | null) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, customerEmail, isDemo }: SendPodEmailDialogProps) {
+export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, customerEmail, defaultDocumentType, stopProofId, isDemo }: SendPodEmailDialogProps) {
   const [email, setEmail] = useState(customerEmail || '');
-  const [documentType, setDocumentType] = useState<string>('vrachtbrief');
+  const [documentType, setDocumentType] = useState<string>(defaultDocumentType || 'vrachtbrief');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -59,10 +61,11 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
   useEffect(() => {
     if (open && tripId) {
       setEmail(customerEmail || '');
+      setDocumentType(defaultDocumentType || 'vrachtbrief');
       setSent(false);
       fetchPublicDocuments();
     }
-  }, [open, tripId, customerEmail]);
+  }, [open, tripId, customerEmail, defaultDocumentType]);
 
   const fetchPublicDocuments = async () => {
     try {
@@ -107,13 +110,24 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
     try {
       let documentUrl = '';
       try {
-        const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
-          body: { orderId: tripId, documentType, copies: ['sender', 'receiver', 'carrier'], language: 'nl' },
-        });
-        if (genError) {
-          console.warn('Document generatie mislukt, e-mail wordt zonder document verstuurd:', genError);
+        if (documentType === 'pod' && stopProofId) {
+          const { data: podData, error: podError } = await supabase.functions.invoke('generate-pod-pdf', {
+            body: { stop_proof_id: stopProofId },
+          });
+          if (podError) {
+            console.warn('POD PDF generatie mislukt:', podError);
+          } else {
+            documentUrl = podData?.url || '';
+          }
         } else {
-          documentUrl = genData?.url || '';
+          const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
+            body: { orderId: tripId, documentType, copies: ['sender', 'receiver', 'carrier'], language: 'nl' },
+          });
+          if (genError) {
+            console.warn('Document generatie mislukt:', genError);
+          } else {
+            documentUrl = genData?.url || '';
+          }
         }
       } catch (genErr) {
         console.warn('Document generatie mislukt, e-mail wordt zonder document verstuurd:', genErr);
@@ -145,7 +159,8 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
       if (sendError) throw sendError;
 
       setSent(true);
-      toast.success(`${documentType === 'vrachtbrief' ? 'Vrachtbrief' : 'Transportopdracht'} verstuurd`);
+      const typeLabels: Record<string, string> = { pod: 'POD', vrachtbrief: 'Vrachtbrief', transportopdracht: 'Transportopdracht' };
+      toast.success(`${typeLabels[documentType] || documentType} verstuurd naar ${email}`);
       setTimeout(() => {
         onOpenChange(false);
         setSent(false);
@@ -222,6 +237,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
+                    <SelectItem value="pod">Proof of Delivery (POD)</SelectItem>
                     <SelectItem value="vrachtbrief">Vrachtbrief</SelectItem>
                     <SelectItem value="transportopdracht">Transportopdracht</SelectItem>
                   </SelectContent>
