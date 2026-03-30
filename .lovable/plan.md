@@ -1,81 +1,56 @@
 
 
-# B2B Portaal Dashboard Verbeteren — Widgets
-
-## Overzicht
-
-Vervang de huidige simpele sidebar (Maandoverzicht + Open Cases) door drie rijke widgets: **Openstaande Facturen**, **Aankomende Leveringen** en **Recente Statusupdates**. Behoud de bestaande greeting, KPI's en recente zendingen sectie.
+# Excel/CSV Export Toevoegen aan Trips, Chauffeurs & Vlootbeheer
 
 ## Huidige staat
 
-De sidebar bevat twee simpele kaarten: een "Maandoverzicht" met 4 regels tekst en een "Open Cases" kaart. Er is geen dedicated widget voor openstaande facturen, aankomende leveringen of statusupdates.
+Alle drie de pagina's hebben al een simpele CSV export, maar:
+- **Trips**: inline CSV-generatie met beperkte kolommen (8), enkele "CSV" knop
+- **Chauffeurs** (in Carriers.tsx): alleen bulk-selectie CSV export (6 kolommen)
+- **Vlootbeheer** (VehicleOverview.tsx): inline CSV met 11 kolommen, enkele knop
 
-## Nieuwe layout
+Geen van de pagina's biedt Excel (.xlsx) export aan, terwijl `writeExcelFile` en `writeCsvFile` al beschikbaar zijn in `src/lib/excelUtils.ts`.
 
-```text
-┌──────────────────────────────────────────────────┐
-│  Greeting + Quick Actions + KPI Cards (ongewijzigd) │
-├──────────────────────┬───────────────────────────┤
-│  Recente Zendingen   │  Openstaande Facturen     │
-│  (ongewijzigd,       │  (NIEUW widget)           │
-│   lg:col-span-2)     │                           │
-│                      ├───────────────────────────┤
-│                      │  Aankomende Leveringen    │
-│                      │  (NIEUW widget)           │
-│                      ├───────────────────────────┤
-│                      │  Recente Statusupdates    │
-│                      │  (NIEUW widget)           │
-└──────────────────────┴───────────────────────────┘
-```
+## Plan
 
-## Stappen
+### Stap 1: Herbruikbaar ExportDropdown component
 
-### Stap 1: Openstaande Facturen Widget
+Maak `src/components/common/ExportDropdown.tsx` — een dropdown knop met "Excel (.xlsx)" en "CSV" opties. Accepteert:
+- `headers: string[]` — kolomnamen
+- `rows: unknown[][]` — data rijen
+- `filename: string` — basisnaam zonder extensie
+- `sheetName?: string` — Excel sheet naam
 
-Vervang de "Maandoverzicht" kaart. Toont:
-- Totaalbedrag openstaand met grote € weergave
-- Aantal openstaande facturen + aantal verlopen (rode badge)
-- Lijst van max 3 recente openstaande facturen met factuurnummer, bedrag, vervaldatum
-- Verlopen facturen krijgen een `InvoiceAgingBadge`-achtige indicator
-- "Bekijk alle facturen" link naar `/portal/b2b/invoices`
+Gebruikt intern `writeExcelFile` en `writeCsvFile` uit `excelUtils.ts`.
 
-Data komt uit de bestaande `invoices` prop (al aanwezig in B2BDashboard).
+### Stap 2: Trips pagina upgraden
 
-### Stap 2: Aankomende Leveringen Widget
+Vervang de huidige `handleExportCSV` functie en "CSV" knop door het ExportDropdown component. Breid de kolommen uit:
+- Ordernummer, Datum, Klant, Klantreferentie, Ophaaladres, Ophaalstad, Afleveradres, Afleverstad, Status, Voertuig, Gewicht (kg), Afstand (km), Prijs (€), Vrachtbrief, CMR, Notities
 
-Vervang de "Open Cases" kaart. Toont:
-- Aantal zendingen met status `pickup_scheduled`, `picked_up`, `in_transit`, `out_for_delivery`
-- Lijst van max 3 eerstvolgende leveringen gesorteerd op `estimatedDelivery`
-- Per levering: referentienummer, route (van → naar), verwachte datum, status badge
-- "Bekijk alle leveringen" link naar `/portal/b2b/shipments`
+### Stap 3: Chauffeurs pagina upgraden
 
-Data komt uit bestaande `recentShipments` prop — filter op actieve statussen.
+Voeg een standalone export knop toe naast de "Toevoegen" knop (niet alleen bij bulk selectie). Kolommen:
+- Naam, E-mail, Telefoon, Categorie, ZZP, Status, Rijbewijsnummer, Portaal actief
 
-### Stap 3: Recente Statusupdates Widget
+Exporteert gefilterde lijst of geselecteerde chauffeurs.
 
-Nieuw widget onder de andere twee. Toont:
-- De 5 meest recente zendingen gesorteerd op `createdAt` die een niet-pending status hebben
-- Per update: referentienummer, oude → nieuwe status met gekleurde badges, tijdstempel relatief ("2u geleden")
-- Animatie bij hover
-- Als er geen updates zijn: lege staat met CheckCircle2 icoon
+### Stap 4: Vlootbeheer upgraden
 
-Data: filtert `recentShipments` op niet-pending statussen, toont de recentste.
-
-### Stap 4: Cases indicator behouden
-
-Voeg een compacte cases-indicator toe aan de Aankomende Leveringen widget als er open cases zijn (kleine badge met count), zodat die info niet verloren gaat.
+Vervang de huidige CSV-only export door het ExportDropdown. Behoudt dezelfde 11 kolommen.
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Edit** | `src/components/portal/b2b/B2BDashboard.tsx` — vervang sidebar met 3 nieuwe widgets |
+| **Nieuw** | `src/components/common/ExportDropdown.tsx` |
+| **Edit** | `src/pages/Trips.tsx` — vervang CSV knop door ExportDropdown |
+| **Edit** | `src/pages/Carriers.tsx` — voeg export knop toe in header |
+| **Edit** | `src/components/fleet/VehicleOverview.tsx` — vervang CSV knop door ExportDropdown |
 
 ## Resultaat
 
-- Dashboard biedt direct inzicht in financiële status (openstaande facturen)
-- Aankomende leveringen zijn in één oogopslag zichtbaar
-- Statusupdates geven een activiteitsfeed-gevoel
-- Consistente glassmorphism styling met bestaande Elite Class esthetiek
-- Geen nieuwe database queries nodig — alle data is al beschikbaar via props
+- Alle drie pagina's bieden Excel (.xlsx) en CSV export aan via een consistente dropdown
+- Meer kolommen in de exports voor completer overzicht
+- Herbruikbaar component voor toekomstige pagina's
 
