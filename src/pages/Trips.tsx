@@ -585,6 +585,12 @@ const Trips = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BulkActionBar
+        selectedIds={selectedIds}
+        onClear={clearSelection}
+        onComplete={fetchData}
+      />
     </DashboardLayout>
   );
 };
