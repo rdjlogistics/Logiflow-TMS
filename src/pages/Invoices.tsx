@@ -502,9 +502,9 @@ const Invoices = () => {
                 </TableHeader>
                 <TableBody>
                   {loading ? (
-                    <TableRow><TableCell colSpan={8} className="text-center py-12"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto" /></TableCell></TableRow>
+                    <TableRow><TableCell colSpan={8}><LoadingState message="Facturen laden..." /></TableCell></TableRow>
                   ) : filteredInvoices.length === 0 ? (
-                    <TableRow><TableCell colSpan={8} className="text-center py-12"><FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-2" /><p className="text-muted-foreground">Geen facturen gevonden</p></TableCell></TableRow>
+                    <TableRow><TableCell colSpan={8}><EmptyState icon={FileText} title="Geen facturen gevonden" description="Maak je eerste factuur aan of pas je filters aan." size="sm" /></TableCell></TableRow>
                   ) : (
                     filteredInvoices.map((invoice) => (
                       <TableRow 
