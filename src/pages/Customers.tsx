@@ -830,7 +830,7 @@ const Customers = () => {
                         <SwipeableCard
                           key={customer.id}
                           leftActions={[swipeActions.more(() => handleEdit(customer))]}
-                          rightActions={isAdmin ? [swipeActions.delete(() => setDeleteTarget(customer))] : []}
+                          rightActions={isAdmin ? [swipeActions.delete(() => handleDeleteRequest(customer))] : []}
                         >
                           <motion.div
                             initial={{ opacity: 0, y: 12 }}
