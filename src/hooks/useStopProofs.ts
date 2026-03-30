@@ -80,7 +80,7 @@ export function useStopProofs() {
         const hasPhotos = row.photo_urls && row.photo_urls.length > 0;
         const trip = tripsMap.get(row.trip_id);
         const stop = stopsMap.get(row.stop_id);
-        const profile = profilesMap.get(row.driver_id);
+        const driver = driversMap.get(row.driver_id);
 
         return {
           id: row.id,
