@@ -1004,7 +1004,11 @@ const Customers = () => {
           open={!!deleteTarget}
           onOpenChange={(open) => !open && setDeleteTarget(null)}
           title="Klant verwijderen"
-          description={`Weet je zeker dat je "${deleteTarget?.company_name}" wilt verwijderen? De klant wordt naar de prullenbak verplaatst en kan later hersteld worden.`}
+          description={
+            deleteOrderCount > 0
+              ? `"${deleteTarget?.company_name}" heeft ${deleteOrderCount} order(s). De klant wordt gearchiveerd (data blijft behouden).`
+              : `Weet je zeker dat je "${deleteTarget?.company_name}" wilt verwijderen? De klant wordt naar de prullenbak verplaatst en kan later hersteld worden.`
+          }
           onConfirm={handleDelete}
           isLoading={deleting}
         />
