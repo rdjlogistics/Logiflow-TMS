@@ -1098,7 +1098,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           )}
         </div>
       )}
-    </div>
       <ConfirmDialog
         open={showConfirm}
         title="Facturen definitief aanmaken?"
