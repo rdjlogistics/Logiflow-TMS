@@ -347,7 +347,7 @@ const Customers = () => {
     setDialogOpen(true);
   };
 
-  const [deleteOrderCount, setDeleteOrderCount] = useState(0);
+  
 
   const handleDeleteRequest = async (customer: Customer) => {
     // Check linked orders
