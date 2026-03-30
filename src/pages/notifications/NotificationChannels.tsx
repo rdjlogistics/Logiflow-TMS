@@ -438,34 +438,46 @@ export default function NotificationChannels() {
                 <CardDescription>Recente notificaties en hun status</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Kanaal</TableHead>
-                      <TableHead>Ontvanger</TableHead>
-                      <TableHead>Bericht</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Verzonden</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {logs.map(log => (
-                      <TableRow key={log.id}>
-                        <TableCell>
-                          <Badge variant="outline">{log.channel}</Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">{log.recipient}</TableCell>
-                        <TableCell>
-                          <p className="text-sm truncate max-w-xs">{log.message}</p>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(log.status)}</TableCell>
-                        <TableCell>
-                          {format(log.sentAt, "d MMM HH:mm", { locale: nl })}
-                        </TableCell>
+                {logs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center py-12">
+                    <div className="rounded-full bg-muted p-4 mb-4">
+                      <Send className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Nog geen notificaties verzonden</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Zodra er notificaties worden verstuurd, verschijnen ze hier in het verzendlog.
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Kanaal</TableHead>
+                        <TableHead>Ontvanger</TableHead>
+                        <TableHead>Bericht</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Verzonden</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {logs.map(log => (
+                        <TableRow key={log.id}>
+                          <TableCell>
+                            <Badge variant="outline">{log.channel}</Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">{log.recipient}</TableCell>
+                          <TableCell>
+                            <p className="text-sm truncate max-w-xs">{log.message}</p>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(log.status)}</TableCell>
+                          <TableCell>
+                            {format(log.sentAt, "d MMM HH:mm", { locale: nl })}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
