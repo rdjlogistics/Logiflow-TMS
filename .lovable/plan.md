@@ -1,56 +1,61 @@
 
 
-# Excel/CSV Export Toevoegen aan Trips, Chauffeurs & Vlootbeheer
+# B2B Portaal Dashboard Widgets Verbeteren
 
 ## Huidige staat
 
-Alle drie de pagina's hebben al een simpele CSV export, maar:
-- **Trips**: inline CSV-generatie met beperkte kolommen (8), enkele "CSV" knop
-- **Chauffeurs** (in Carriers.tsx): alleen bulk-selectie CSV export (6 kolommen)
-- **Vlootbeheer** (VehicleOverview.tsx): inline CSV met 11 kolommen, enkele knop
+De drie widgets (Openstaande Facturen, Aankomende Leveringen, Recente Statusupdates) zijn al aanwezig maar kunnen worden verbeterd:
 
-Geen van de pagina's biedt Excel (.xlsx) export aan, terwijl `writeExcelFile` en `writeCsvFile` al beschikbaar zijn in `src/lib/excelUtils.ts`.
+1. **Facturen widget** — toont `amount` maar mist `amount_paid` info, geen nl-NL formattering, geen onderscheid openstaand vs totaal
+2. **Invoice type** — mist `amountPaid` veld, waardoor deelbetalingen niet zichtbaar zijn
+3. **Leveringen widget** — geen prijsindicatie per levering
+4. **Statusupdates** — geen klikbare items
 
-## Plan
+## Verbeteringen
 
-### Stap 1: Herbruikbaar ExportDropdown component
+### Stap 1: Invoice type uitbreiden
 
-Maak `src/components/common/ExportDropdown.tsx` — een dropdown knop met "Excel (.xlsx)" en "CSV" opties. Accepteert:
-- `headers: string[]` — kolomnamen
-- `rows: unknown[][]` — data rijen
-- `filename: string` — basisnaam zonder extensie
-- `sheetName?: string` — Excel sheet naam
+In `src/components/portal/shared/types.ts`:
+- Voeg `amountPaid?: number` toe aan `Invoice` interface
 
-Gebruikt intern `writeExcelFile` en `writeCsvFile` uit `excelUtils.ts`.
+In `src/components/portal/shared/usePortalData.ts`:
+- Map `amount_paid` uit de database naar `amountPaid`
+- Detecteer overdue beter: facturen met status `verzonden` of `definitief` waarvan `due_date < today`
 
-### Stap 2: Trips pagina upgraden
+### Stap 2: Facturen widget verbeteren
 
-Vervang de huidige `handleExportCSV` functie en "CSV" knop door het ExportDropdown component. Breid de kolommen uit:
-- Ordernummer, Datum, Klant, Klantreferentie, Ophaaladres, Ophaalstad, Afleveradres, Afleverstad, Status, Voertuig, Gewicht (kg), Afstand (km), Prijs (€), Vrachtbrief, CMR, Notities
+In `src/components/portal/b2b/B2BDashboard.tsx`:
+- Toon **openstaand bedrag** (amount - amountPaid) i.p.v. alleen totaalbedrag
+- Gebruik `nl-NL` locale formattering: `€ 1.234,56`
+- Voeg een **betaald vs openstaand** progress bar toe
+- Toon verlopen dagen als rode tekst bij overdue facturen (bijv. "3 dagen verlopen")
+- Maak individuele facturen klikbaar naar `/portal/b2b/invoices`
 
-### Stap 3: Chauffeurs pagina upgraden
+### Stap 3: Leveringen widget verbeteren
 
-Voeg een standalone export knop toe naast de "Toevoegen" knop (niet alleen bij bulk selectie). Kolommen:
-- Naam, E-mail, Telefoon, Categorie, ZZP, Status, Rijbewijsnummer, Portaal actief
+- Toon geschat gewicht en aantal colli per levering
+- Voeg een mini progress indicator toe (4 stappen: Bevestigd → Opgehaald → Onderweg → Bezorgd)
+- Maak items klikbaar (al geïmplementeerd, behouden)
 
-Exporteert gefilterde lijst of geselecteerde chauffeurs.
+### Stap 4: Statusupdates widget verbeteren
 
-### Stap 4: Vlootbeheer upgraden
-
-Vervang de huidige CSV-only export door het ExportDropdown. Behoudt dezelfde 11 kolommen.
+- Maak elke update klikbaar naar de shipment detail pagina
+- Voeg een subtiel animatie-effect toe bij nieuwe updates
+- Toon het aantal colli bij elke update
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Nieuw** | `src/components/common/ExportDropdown.tsx` |
-| **Edit** | `src/pages/Trips.tsx` — vervang CSV knop door ExportDropdown |
-| **Edit** | `src/pages/Carriers.tsx` — voeg export knop toe in header |
-| **Edit** | `src/components/fleet/VehicleOverview.tsx` — vervang CSV knop door ExportDropdown |
+| **Edit** | `src/components/portal/shared/types.ts` — voeg `amountPaid` toe |
+| **Edit** | `src/components/portal/shared/usePortalData.ts` — map `amount_paid`, betere overdue detectie |
+| **Edit** | `src/components/portal/b2b/B2BDashboard.tsx` — verbeterde widgets met bedragen, progress bars, klikbare items |
 
 ## Resultaat
 
-- Alle drie pagina's bieden Excel (.xlsx) en CSV export aan via een consistente dropdown
-- Meer kolommen in de exports voor completer overzicht
-- Herbruikbaar component voor toekomstige pagina's
+- Facturen widget toont helder openstaand bedrag met visuele progress bar
+- Bedragen in nl-NL formaat (€ 1.234,56)
+- Verlopen facturen tonen exact aantal dagen te laat
+- Leveringen tonen meer operationele details
+- Alle widget-items zijn klikbaar voor snelle navigatie
 
