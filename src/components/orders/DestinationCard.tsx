@@ -146,6 +146,13 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
   const handleChange = (field: keyof DestinationData, value: any) => {
     const finalValue = field === 'city' && typeof value === 'string' ? capitalizeCity(value) : value;
+    if (field === 'city' && typeof value === 'string' && apiCity) {
+      if (value.toLowerCase() !== apiCity.toLowerCase()) {
+        setCityMismatch(apiCity);
+      } else {
+        setCityMismatch(null);
+      }
+    }
     onChange({ ...data, [field]: finalValue });
   };
 
