@@ -37,7 +37,8 @@ export interface CreditInfo {
 async function parseSSEStream(
   response: Response,
   onDelta: (text: string) => void,
-  onConfirmation?: (data: any) => void
+  onConfirmation?: (data: any) => void,
+  onMeta?: (data: { conversationId?: string; toolsUsed?: string[] }) => void
 ): Promise<string> {
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
@@ -67,12 +68,13 @@ async function parseSSEStream(
           fullContent += content;
           onDelta(content);
         }
-        // Check for pending confirmation injected by backend
         if (parsed._pendingConfirmation && onConfirmation) {
           onConfirmation(parsed._pendingConfirmation);
         }
+        if (parsed._conversationId && onMeta) {
+          onMeta({ conversationId: parsed._conversationId, toolsUsed: parsed._toolsUsed });
+        }
       } catch {
-        // Partial JSON — put back and wait
         buffer = line + '\n' + buffer;
         break;
       }
