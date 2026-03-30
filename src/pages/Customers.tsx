@@ -226,6 +226,37 @@ const Customers = () => {
       return;
     }
 
+    // Duplicate detection (only for new customers)
+    if (!editingCustomer) {
+      const { data: nameMatches } = await supabase
+        .from("customers")
+        .select("id, company_name")
+        .ilike("company_name", formData.company_name.trim())
+        .is("deleted_at", null)
+        .limit(1);
+
+      if (nameMatches && nameMatches.length > 0) {
+        if (!window.confirm(`Er bestaat al een klant met de naam "${nameMatches[0].company_name}". Wil je doorgaan?`)) {
+          return;
+        }
+      }
+
+      if (formData.email?.trim()) {
+        const { data: emailMatches } = await supabase
+          .from("customers")
+          .select("id, company_name, email")
+          .eq("email", formData.email.trim())
+          .is("deleted_at", null)
+          .limit(1);
+
+        if (emailMatches && emailMatches.length > 0) {
+          if (!window.confirm(`Het e-mailadres "${formData.email}" is al in gebruik bij "${emailMatches[0].company_name}". Wil je doorgaan?`)) {
+            return;
+          }
+        }
+      }
+    }
+
     setSaving(true);
     try {
       let customerId = editingCustomer?.id;
