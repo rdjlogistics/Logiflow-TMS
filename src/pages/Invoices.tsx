@@ -649,12 +649,11 @@ const Invoices = () => {
               ))}
             </div>
           ) : filteredInvoices.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
-                <p className="font-medium text-muted-foreground">Geen facturen gevonden</p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={FileText}
+              title="Geen facturen gevonden"
+              description="Maak je eerste factuur aan of pas je filters aan."
+            />
           ) : (
             filteredInvoices.map((invoice, index) => {
               const overdue = isOverdue(invoice);
