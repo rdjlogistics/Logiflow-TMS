@@ -217,8 +217,20 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
           className="grid grid-cols-3 gap-2.5"
         >
           <TimeCard icon={<Clock className="h-4 w-4 text-emerald-500" />} label="Aankomst" value={pod.arrival_time} />
-          <TimeCard icon={<Clock className="h-4 w-4 text-blue-500" />} label="Vertrek" value={pod.departure_time} />
-          <TimeCard icon={<Timer className="h-4 w-4 text-amber-500" />} label="Wachttijd" timeValue={pod.waiting_minutes != null ? `${pod.waiting_minutes} min` : '-'} />
+          <TimeCard 
+            icon={<Clock className="h-4 w-4 text-blue-500" />} 
+            label="Vertrek" 
+            value={pod.departure_time && pod.arrival_time && pod.departure_time !== pod.arrival_time ? pod.departure_time : null} 
+          />
+          <TimeCard 
+            icon={<Timer className="h-4 w-4 text-amber-500" />} 
+            label="Wachttijd" 
+            timeValue={
+              pod.arrival_time && pod.departure_time && pod.departure_time !== pod.arrival_time && pod.waiting_minutes != null
+                ? `${pod.waiting_minutes} min`
+                : '-'
+            } 
+          />
         </motion.div>
       )}
 
