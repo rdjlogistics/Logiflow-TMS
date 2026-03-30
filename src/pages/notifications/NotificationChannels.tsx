@@ -66,29 +66,6 @@ interface NotificationTemplate {
   isActive: boolean;
 }
 
-const mockChannels: NotificationChannel[] = [
-  { id: '1', type: 'whatsapp', name: 'WhatsApp Business', isActive: true, phoneNumber: '+31612345678' },
-  { id: '2', type: 'sms', name: 'SMS Gateway', isActive: true },
-  { id: '3', type: 'email', name: 'Email (Resend)', isActive: true },
-  { id: '4', type: 'push', name: 'Push Notificaties', isActive: false },
-];
-
-const mockLogs: NotificationLog[] = [
-  { id: '1', channel: 'WhatsApp', recipient: '+31687654321', message: 'Uw zending ORD-2024-1234 is onderweg', status: 'delivered', sentAt: new Date(Date.now() - 1000 * 60 * 5), deliveredAt: new Date(Date.now() - 1000 * 60 * 4) },
-  { id: '2', channel: 'SMS', recipient: '+31612345678', message: 'Chauffeur arriveert over 15 minuten', status: 'delivered', sentAt: new Date(Date.now() - 1000 * 60 * 30), deliveredAt: new Date(Date.now() - 1000 * 60 * 29) },
-  { id: '3', channel: 'Email', recipient: 'klant@bedrijf.nl', message: 'Factuur INV-2024-0856 is verzonden', status: 'sent', sentAt: new Date(Date.now() - 1000 * 60 * 60) },
-  { id: '4', channel: 'WhatsApp', recipient: '+31699887766', message: 'Uw zending is afgeleverd', status: 'failed', sentAt: new Date(Date.now() - 1000 * 60 * 90) },
-];
-
-const mockTemplates: NotificationTemplate[] = [
-  { id: '1', event: 'order_confirmed', channels: ['email', 'whatsapp'], messageTemplate: 'Uw order {{order_id}} is bevestigd. Verwachte levering: {{delivery_date}}', isActive: true },
-  { id: '2', event: 'driver_assigned', channels: ['sms'], messageTemplate: 'Chauffeur {{driver_name}} is toegewezen aan uw levering', isActive: true },
-  { id: '3', event: 'in_transit', channels: ['whatsapp', 'push'], messageTemplate: 'Uw zending {{order_id}} is onderweg. Track hier: {{tracking_url}}', isActive: true },
-  { id: '4', event: 'arriving_soon', channels: ['sms', 'whatsapp'], messageTemplate: 'Chauffeur arriveert over {{eta}} minuten bij {{address}}', isActive: true },
-  { id: '5', event: 'delivered', channels: ['email', 'whatsapp'], messageTemplate: 'Uw zending {{order_id}} is succesvol afgeleverd. Bekijk POD: {{pod_url}}', isActive: true },
-  { id: '6', event: 'invoice_sent', channels: ['email'], messageTemplate: 'Factuur {{invoice_number}} is verzonden. Bedrag: {{amount}}', isActive: true },
-];
-
 const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 
 export default function NotificationChannels() {
