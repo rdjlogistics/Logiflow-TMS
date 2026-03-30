@@ -1,44 +1,48 @@
 
 
-# Fix: Order Formulier — Datum, Prijzen & Stadsnaam
+# Fix: Bruto Winst & Marge Berekening
 
-## Probleem 1 — Datum "25-03-20"
+## Root Cause
 
-De `<input type="date">` HTML element gebruikt het browser-native format. Dit wordt bepaald door de browser locale en geeft in sommige browsers/OS-combinaties een 2-cijferig jaar. Dit is niet iets wat we via CSS of HTML attributen kunnen sturen.
+The `avgMargin` in `OrderOverview.tsx` line 387-388 calculates a **simple average of stored `profit_margin_pct`** values from the database. These stored values can be stale or inconsistent with the actual `sales_total` and `purchase_total`. Meanwhile `totalProfit` is correctly computed from raw data (`sales - purchase`).
 
-**Fix:** Vervang de native `<input type="date">` door een Popover + Calendar (Shadcn datepicker pattern) met een expliciete `format(date, 'dd-MM-yyyy')` weergave. Dit garandeert altijd een 4-cijferig jaar.
+This causes the contradiction: totalProfit = -€2.154 but avgMargin = 37% (from old stored percentages).
 
-**Bestanden:**
-- `src/components/orders/OrderDetailsPanel.tsx` — regel 192-197: vervang `<Input type="date">` door Popover+Calendar
-- `src/components/orders/DestinationCard.tsx` — regel 473-477: zelfde fix voor pickup_date veld
+Additionally, the profit card in `QuickStatsHeader.tsx` always uses `text-success` (green) regardless of whether profit is negative.
 
-## Probleem 2 — Prijzen altijd €0
+## Fix
 
-De prices zijn €0 omdat `product_lines` standaard allemaal `is_active: false` starten (PricingPanel regel 122). Gebruikers moeten handmatig elke tariefregel activeren, maar doen dat niet.
+### 1. `src/pages/OrderOverview.tsx` — Weighted margin calculation
+Replace line 387-388:
+```typescript
+// OLD: simple average of stored (potentially stale) percentages
+avgMargin: pricedOrders.reduce((sum, t) => sum + (t.profit_margin_pct || 0), 0) / pricedOrders.length
 
-**Fix:**
-- In `PricingPanel.tsx` (regel 116-128): wanneer product_lines voor het eerst worden geladen en er is precies 1 product, activeer dat product automatisch (`is_active: true`)
-- Voeg validatie toe in `OrderForm.tsx` (rond regel 592): check of `salesSubtotal > 0` voordat de order wordt opgeslagen. Toon foutmelding: "Voer een verkoopprijs in of activeer minimaal één tariefregel"
-- Voeg een optionele checkbox "Geen kosten (€0)" toe die de validatie overslaat
+// NEW: weighted margin from actual totals
+avgMargin: stats.totalRevenue > 0 
+  ? (stats.totalProfit / stats.totalRevenue) * 100 
+  : 0,
+```
 
-## Probleem 3 — Stadsnaam lowercase
+### 2. `src/components/orders/QuickStatsHeader.tsx` — Dynamic color for profit
+Line 90: change from hardcoded `text-success` to dynamic based on positive/negative:
+```typescript
+valueClass: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
+```
+Line 92-93: dynamic gradient and icon color:
+```typescript
+gradient: stats.totalProfit >= 0 ? "from-success/20 to-success/10" : "from-destructive/20 to-destructive/10",
+iconColor: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
+```
+Line 95: margin badge color dynamic:
+```typescript
+{ label: `Gem. marge: ${stats.avgMargin.toFixed(1)}%`, 
+  color: stats.avgMargin >= 0 ? "bg-success/10 text-success font-semibold" : "bg-destructive/10 text-destructive font-semibold" }
+```
 
-De postcode-lookup API retourneert soms lowercase stadsnamen. 
-
-**Fix:**
-- Maak een `capitalizeCity(name: string)` utility in een bestaand utils bestand
-- Pas toe in `DestinationCard.tsx` handlePostcodeLookup (regel 163) en handleChange voor 'city' veld
-- Pas toe in `OrderForm.tsx` bij het bouwen van `orderData` (regel 654, 657)
-- Database migratie: `UPDATE route_stops SET city = INITCAP(city)` en `UPDATE trips SET pickup_city = INITCAP(pickup_city), delivery_city = INITCAP(delivery_city)`
-
-## Bestanden
-
-| Actie | Bestand |
-|-------|---------|
-| **Edit** | `src/components/orders/OrderDetailsPanel.tsx` — Popover datepicker |
-| **Edit** | `src/components/orders/DestinationCard.tsx` — Popover datepicker + capitalizeCity |
-| **Edit** | `src/components/orders/PricingPanel.tsx` — Auto-activate eerste product |
-| **Edit** | `src/pages/OrderForm.tsx` — Prijs validatie + capitalizeCity bij save |
-| **Edit** | `src/lib/date-utils.ts` — capitalizeCity utility |
-| **Migratie** | INITCAP op bestaande stadsnamen |
+### Files
+| File | Change |
+|------|--------|
+| `src/pages/OrderOverview.tsx` | Weighted avgMargin from totals |
+| `src/components/orders/QuickStatsHeader.tsx` | Dynamic profit/margin colors |
 
