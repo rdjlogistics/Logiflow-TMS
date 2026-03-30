@@ -1,31 +1,28 @@
 
 
-# Fix: Alle Mapbox Kaarten Werken Niet
+# Bevestigingsdialoog voor Factuuraanmaak
 
-## Probleem
-De `useMapboxToken` hook roept `supabase.functions.invoke("get-mapbox-token")` aan, maar deze edge function **bestaat niet**. Het secret `MAPBOX_PUBLIC_TOKEN` is wel geconfigureerd maar wordt nooit naar de frontend gestuurd. Hierdoor falen alle 12+ kaartcomponenten.
+## Wat
+Voeg een extra bevestigingsdialoog toe op het moment dat de gebruiker op "Facturen aanmaken" klikt — zowel bij **verkoop** (BatchInvoiceWizard) als **inkoop** (BatchPurchaseInvoiceWizard). De dialoog toont een samenvatting (aantal facturen, totaalbedrag) en vereist expliciete bevestiging.
 
-Daarnaast gebruikt `OrderRoutePreview.tsx` een hardcoded `VITE_MAPBOX_TOKEN` env var die ook niet bestaat.
+## Aanpak
+Gebruik de bestaande `ConfirmDialog` component (`src/components/ui/ConfirmDialog.tsx`) die al variant-support en loading state heeft.
 
-## Oplossing
+### 1. `src/components/invoices/BatchInvoiceWizard.tsx`
+- Voeg `showConfirm` state toe
+- Wijzig `handleSubmit` (regel 392): in plaats van direct `batchInvoiceMutation.mutate()`, zet `showConfirm = true`
+- Render `ConfirmDialog` met:
+  - Titel: "Facturen definitief aanmaken?"
+  - Beschrijving: dynamisch met aantal facturen en totaalbedrag
+  - Variant: `warning`
+  - `isLoading` gekoppeld aan `batchInvoiceMutation.isPending`
+  - `onConfirm`: roept `batchInvoiceMutation.mutate()` aan
 
-### 1. Maak edge function `get-mapbox-token` aan
-**Nieuw bestand**: `supabase/functions/get-mapbox-token/index.ts`
+### 2. `src/components/purchase-invoices/BatchPurchaseInvoiceWizard.tsx`
+- Zelfde patroon: `showConfirm` state
+- De `onNext` op regel 288 opent de dialoog i.p.v. direct `createInvoicesMutation.mutate()`
+- `ConfirmDialog` met variant `warning` en loading state
 
-- Leest `MAPBOX_PUBLIC_TOKEN` uit Deno environment
-- Retourneert `{ token: "..." }` als JSON
-- Geen JWT verificatie nodig (het is een publieke token)
-- CORS headers toevoegen
-
-### 2. Fix `OrderRoutePreview.tsx`
-- Verwijder de hardcoded `VITE_MAPBOX_TOKEN` constante
-- Gebruik `useMapboxToken` hook zoals alle andere kaartcomponenten
-- Pas de map-initialisatie aan om op het token te wachten
-
-### Bestanden
-1. **Nieuw**: `supabase/functions/get-mapbox-token/index.ts`
-2. **Edit**: `src/components/orders/OrderRoutePreview.tsx` — switch naar `useMapboxToken`
-
-### Resultaat
-Alle kaarten (Dashboard fleet map, GPS tracking, route optimalisatie, chauffeur ritten, tankstations, B2B tracking, order preview) laden correct met het Mapbox token.
+### Geen andere bestanden wijzigen
+De `ConfirmDialog` component bestaat al en hoeft niet aangepast te worden.
 
