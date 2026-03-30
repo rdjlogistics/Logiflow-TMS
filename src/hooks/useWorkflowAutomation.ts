@@ -187,12 +187,12 @@ export const useWorkflowAutomation = () => {
     queryKey: ['workflows'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return (data as unknown) as Workflow[];
+      return data as unknown as Workflow[];
     },
   });
 
