@@ -57,10 +57,12 @@ const DutchAddressInput = ({
         const result = await lookupPostcode(cleaned, houseNumber);
         
         if (result) {
-          if (result.street && !street) {
+          if (result.street) {
             onStreetChange(result.street);
           }
-          if (result.city && !city) {
+          if (result.city) {
+            setApiCity(result.city);
+            setCityMismatch(null);
             onCityChange(result.city);
           }
           setAutoFilled(true);
