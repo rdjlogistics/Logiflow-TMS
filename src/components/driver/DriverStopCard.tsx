@@ -637,13 +637,21 @@ export const DriverStopCard = ({
         {(
           <div className="px-4 py-4 border-t border-border/40 bg-background/80 backdrop-blur-xl">
             {/* Disabled hint */}
-            {!isActive && (
+            {!isActive && !isCompleted && (
               <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                 <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
                 <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                  {tripStatus === 'onderweg' 
+                  {tripStatus === 'onderweg' || tripStatus === 'geladen'
                     ? 'Meld eerst de vorige stop af' 
                     : 'Start eerst de rit om acties te gebruiken'}
+                </span>
+              </div>
+            )}
+            {isCompleted && (
+              <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  Stop afgemeld
                 </span>
               </div>
             )}

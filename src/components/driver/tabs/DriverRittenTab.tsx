@@ -17,6 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DocumentsSheet } from '@/components/driver/DocumentsSheet';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { 
   Route, 
   Clock, 
