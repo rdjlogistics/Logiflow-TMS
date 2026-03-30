@@ -300,81 +300,213 @@ export const B2BDashboard = ({
           </Card>
         </motion.div>
 
-        {/* Sidebar */}
-        <motion.div className="space-y-4" variants={itemVariants}>
-          <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+        {/* Sidebar Widgets */}
+        <motion.div className="space-y-4" variants={containerVariants}>
+          {/* Widget 1: Openstaande Facturen */}
+          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <motion.div whileHover={{ rotate: 20 }}><Euro className="h-4 w-4 text-gold" /></motion.div>
-                  Maandoverzicht
+                <CardTitle className="text-sm font-medium flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <motion.div whileHover={{ rotate: 20 }}><Euro className="h-4 w-4 text-gold" /></motion.div>
+                    Openstaande Facturen
+                  </span>
+                  {overdueInvoices.length > 0 && (
+                    <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                      {overdueInvoices.length} verlopen
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {loading ? (
                   <div className="space-y-3">
                     {[0, 1, 2].map(i => (
-                      <div key={i} className="flex justify-between items-center">
-                        <Skeleton className="h-3 w-24" />
-                        <Skeleton className="h-4 w-12" />
-                      </div>
+                      <div key={i} className="flex justify-between"><Skeleton className="h-3 w-24" /><Skeleton className="h-4 w-16" /></div>
                     ))}
                   </div>
+                ) : openInvoices.length === 0 ? (
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Alles betaald</p>
+                  </motion.div>
                 ) : (
                   <>
-                    <div className="flex justify-between items-center"><span className="text-xs text-muted-foreground">Totaal zendingen</span><span className="font-semibold">{stats.total}</span></div>
-                    <div className="flex justify-between items-center"><span className="text-xs text-muted-foreground">Leveringsratio</span><span className="font-semibold text-emerald-400">{stats.total > 0 ? Math.round((stats.delivered / stats.total) * 100) : 0}%</span></div>
-                    <div className="flex justify-between items-center"><span className="text-xs text-muted-foreground">Geschatte kosten</span><span className="font-semibold">€{recentShipments.reduce((sum, s) => sum + (s.price || 0), 0).toFixed(2)}</span></div>
-                    {openInvoices.length > 0 && (
-                      <div className="flex justify-between items-center"><span className="text-xs text-muted-foreground">Openstaand ({openInvoices.length})</span><span className="font-semibold text-amber-400">€{openInvoicesTotal.toFixed(2)}</span></div>
-                    )}
+                    <div className="text-center py-2">
+                      <motion.p
+                        className="text-2xl font-display font-bold tabular-nums"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                      >
+                        €{openInvoicesTotal.toFixed(2)}
+                      </motion.p>
+                      <p className="text-xs text-muted-foreground">{openInvoices.length} openstaand</p>
+                    </div>
+                    <div className="divide-y divide-border/20">
+                      {openInvoices.slice(0, 3).map((inv, i) => {
+                        const isOverdue = inv.status === 'overdue' || (inv.dueDate && new Date(inv.dueDate) < new Date());
+                        return (
+                          <motion.div
+                            key={inv.id}
+                            custom={i}
+                            variants={listItemVariants}
+                            initial="hidden"
+                            animate="visible"
+                            className="flex items-center justify-between py-2 text-sm"
+                          >
+                            <div className="min-w-0">
+                              <span className="font-medium truncate block">{inv.number}</span>
+                              {inv.dueDate && (
+                                <span className={`text-[10px] ${isOverdue ? 'text-red-400' : 'text-muted-foreground'}`}>
+                                  {isOverdue ? '⚠ ' : ''}Verval: {format(new Date(inv.dueDate), "d MMM", { locale: nl })}
+                                </span>
+                              )}
+                            </div>
+                            <span className={`font-semibold tabular-nums ${isOverdue ? 'text-red-400' : ''}`}>
+                              €{inv.amount.toFixed(2)}
+                            </span>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
                   </>
                 )}
-                <div className="pt-2 border-t border-border/30 space-y-2">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="outline" size="sm" className="w-full" asChild><Link to="/portal/b2b/invoices">Bekijk facturen</Link></Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="ghost" size="sm" className="w-full" asChild><Link to="/portal/b2b/deliveries">Afleveringen bekijken</Link></Button>
-                  </motion.div>
-                </div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-1">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link to="/portal/b2b/invoices" className="gap-1">
+                      Bekijk alle facturen <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </motion.div>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          {/* Widget 2: Aankomende Leveringen */}
+          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+            <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <motion.div whileHover={{ rotate: 20 }}><CalendarClock className="h-4 w-4 text-primary" /></motion.div>
+                    Aankomende Leveringen
+                  </span>
+                  {openCasesCount > 0 && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/40 text-amber-400 bg-amber-500/10">
+                      {openCasesCount} cases
+                    </Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {loading ? (
+                  <div className="space-y-3">
+                    {[0, 1].map(i => (
+                      <div key={i} className="flex justify-between"><Skeleton className="h-3 w-28" /><Skeleton className="h-4 w-14" /></div>
+                    ))}
+                  </div>
+                ) : activeShipments.length === 0 ? (
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Geen actieve leveringen</p>
+                  </motion.div>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground">{activeShipments.length} actieve zending{activeShipments.length !== 1 ? 'en' : ''}</p>
+                    <div className="divide-y divide-border/20">
+                      {activeShipments.slice(0, 3).map((s, i) => {
+                        const st = statusConfig[s.status];
+                        return (
+                          <motion.div
+                            key={s.id}
+                            custom={i}
+                            variants={listItemVariants}
+                            initial="hidden"
+                            animate="visible"
+                          >
+                            <Link to={`/portal/b2b/shipments/${s.id}`} className="flex items-center justify-between py-2.5 group touch-manipulation">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                                  <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px] shrink-0`}>{st.label}</Badge>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</p>
+                              </div>
+                              {s.estimatedDelivery && (
+                                <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
+                                  {format(new Date(s.estimatedDelivery), "d MMM", { locale: nl })}
+                                </span>
+                              )}
+                            </Link>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-1">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link to="/portal/b2b/shipments" className="gap-1">
+                      Bekijk alle zendingen <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Widget 3: Recente Statusupdates */}
+          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <motion.div animate={stats.problems > 0 ? { scale: [1, 1.1, 1] } : {}} transition={{ repeat: Infinity, duration: 2 }}>
-                    <AlertTriangle className="h-4 w-4 text-amber-400" />
-                  </motion.div>
-                  Open Cases
+                  <motion.div whileHover={{ rotate: 20 }}><Activity className="h-4 w-4 text-emerald-400" /></motion.div>
+                  Recente Statusupdates
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-3 w-32" />
+                  <div className="space-y-3">
+                    {[0, 1, 2].map(i => (
+                      <div key={i} className="flex justify-between"><Skeleton className="h-3 w-32" /><Skeleton className="h-3 w-10" /></div>
+                    ))}
                   </div>
-                ) : openCasesCount > 0 ? (
-                  <div className="space-y-2">
-                    <motion.p className="text-2xl font-display font-bold text-amber-400" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}>
-                      {openCasesCount}
-                    </motion.p>
-                    <p className="text-xs text-muted-foreground">actieve cases vereisen aandacht</p>
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button variant="outline" size="sm" className="w-full mt-2" asChild><Link to="/portal/b2b/cases">Bekijk cases</Link></Button>
-                    </motion.div>
-                  </div>
-                ) : (
-                  <motion.div className="text-center py-4" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}>
-                      <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                    </motion.div>
-                    <p className="text-sm text-muted-foreground">Geen open cases</p>
+                ) : recentUpdates.length === 0 ? (
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <Inbox className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Geen recente updates</p>
                   </motion.div>
+                ) : (
+                  <div className="space-y-0 divide-y divide-border/20">
+                    {recentUpdates.map((s, i) => {
+                      const st = statusConfig[s.status];
+                      const timeAgo = getRelativeTime(s.createdAt);
+                      return (
+                        <motion.div
+                          key={s.id}
+                          custom={i}
+                          variants={listItemVariants}
+                          initial="hidden"
+                          animate="visible"
+                          whileHover={{ backgroundColor: "hsl(var(--muted) / 0.15)" }}
+                          className="py-2.5 px-1 rounded-md transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.color.replace('text-', 'bg-')}`} />
+                              <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1 ml-3.5">
+                            <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px]`}>{st.label}</Badge>
+                            <span className="text-[10px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</span>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 )}
               </CardContent>
             </Card>
