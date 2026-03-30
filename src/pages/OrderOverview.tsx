@@ -384,8 +384,8 @@ const OrderOverview = () => {
             const profit = (t.sales_total || 0) - (t.purchase_total || 0);
             return sum + profit;
           }, 0),
-          avgMargin: pricedOrders.length > 0 
-            ? pricedOrders.reduce((sum, t) => sum + (t.profit_margin_pct || 0), 0) / pricedOrders.length 
+          avgMargin: data.reduce((sum, t) => sum + (t.sales_total || 0), 0) > 0
+            ? (data.reduce((sum, t) => sum + ((t.sales_total || 0) - (t.purchase_total || 0)), 0) / data.reduce((sum, t) => sum + (t.sales_total || 0), 0)) * 100
             : 0,
           plannedCount: data.filter(t => t.status === "gepland").length,
           enRouteCount: data.filter(t => t.status === "onderweg").length,

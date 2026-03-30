@@ -87,12 +87,12 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
       id: "profit",
       title: "Bruto Winst",
       value: formatCurrency(stats.totalProfit),
-      valueClass: "text-success",
+      valueClass: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
       icon: TrendingUp,
-      gradient: "from-success/20 to-success/10",
-      iconColor: "text-success",
+      gradient: stats.totalProfit >= 0 ? "from-success/20 to-success/10" : "from-destructive/20 to-destructive/10",
+      iconColor: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
       badges: [
-        { label: `Gem. marge: ${stats.avgMargin.toFixed(1)}%`, color: "bg-success/10 text-success font-semibold" },
+        { label: `Gem. marge: ${stats.avgMargin.toFixed(1)}%`, color: stats.avgMargin >= 0 ? "bg-success/10 text-success font-semibold" : "bg-destructive/10 text-destructive font-semibold" },
       ],
     },
     {
