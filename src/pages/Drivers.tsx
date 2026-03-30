@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
+import { LoadingState } from "@/components/common/LoadingState";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -676,24 +678,20 @@ const Drivers = () => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
+              <LoadingState message="Chauffeurs laden..." />
             ) : filteredDrivers.length === 0 ? (
-              <div className="text-center py-12">
-                <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  {searchTerm || statusFilter !== "all"
-                    ? "Geen chauffeurs gevonden voor deze filters"
-                    : "Nog geen chauffeurs. Voeg een chauffeur toe om te beginnen."}
-                </p>
-                {canManageDrivers && !searchTerm && statusFilter === "all" && (
-                  <Button onClick={openNewDialog} className="mt-4 gap-2">
-                    <Plus className="h-4 w-4" />
-                    Eerste chauffeur toevoegen
-                  </Button>
-                )}
-              </div>
+              <EmptyState
+                icon={User}
+                title={searchTerm || statusFilter !== "all"
+                  ? "Geen chauffeurs gevonden"
+                  : "Nog geen chauffeurs"}
+                description={searchTerm || statusFilter !== "all"
+                  ? "Pas je filters aan of probeer een andere zoekterm."
+                  : "Voeg je eerste chauffeur toe om te beginnen."}
+                action={canManageDrivers && !searchTerm && statusFilter === "all"
+                  ? { label: "Eerste chauffeur toevoegen", onClick: openNewDialog, icon: Plus }
+                  : undefined}
+              />
             ) : (
               <>
                 {/* Desktop table */}

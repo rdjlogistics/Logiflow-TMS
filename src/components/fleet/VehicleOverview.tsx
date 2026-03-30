@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { EmptyState } from '@/components/common/EmptyState';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -403,13 +404,12 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
         </CardHeader>
         <CardContent>
           {filteredVehicles.length === 0 ? (
-            <div className="text-center py-12">
-              <Truck className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">Geen voertuigen gevonden</p>
-              <Button variant="outline" size="sm" className="mt-3" onClick={openNewDialog}>
-                Voertuig toevoegen
-              </Button>
-            </div>
+             <EmptyState
+               icon={Truck}
+               title="Nog geen voertuigen"
+               description="Voeg je eerste voertuig toe om je vloot te beheren."
+               action={{ label: "Voertuig toevoegen", onClick: openNewDialog, icon: Plus }}
+             />
           ) : (
             <>
               {/* Desktop Table */}

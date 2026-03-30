@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
+import { LoadingState } from "@/components/common/LoadingState";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -473,11 +475,14 @@ const DriversTab = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Laden...</div>
+            <LoadingState message="Chauffeurs laden..." />
           ) : filtered.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {search || statusFilter !== 'all' ? 'Geen chauffeurs gevonden' : 'Voeg je eerste chauffeur toe.'}
-            </div>
+            <EmptyState
+              icon={Users}
+              title={search || statusFilter !== 'all' ? 'Geen chauffeurs gevonden' : 'Nog geen chauffeurs'}
+              description={search || statusFilter !== 'all' ? 'Pas je filters aan.' : 'Voeg je eerste chauffeur toe.'}
+              action={!search && statusFilter === 'all' ? { label: 'Chauffeur toevoegen', onClick: () => setAddOpen(true), icon: Plus } : undefined}
+            />
           ) : isMobile ? (
             <div className="space-y-3">
               {filtered.map((d) => (
@@ -1391,10 +1396,10 @@ const Carriers = () => {
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="text-center py-8 text-muted-foreground">Laden...</div>
+                  <LoadingState message="Charters laden..." />
                 ) : filteredCarriers.length === 0 ? (
                   (searchTerm || statusFilter !== 'all') ? (
-                    <div className="text-center py-8 text-muted-foreground">Geen charters gevonden</div>
+                    <EmptyState icon={Truck} title="Geen charters gevonden" description="Pas je filters aan of probeer een andere zoekterm." />
                   ) : (
                     <div className="rounded-lg border border-amber-500/30 bg-amber-50 dark:bg-amber-950/20 p-6">
                       <div className="flex items-start gap-3">

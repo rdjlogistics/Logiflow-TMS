@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback, Fragment } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ToastAction } from "@/components/ui/toast";
 import { useOrderSubstatuses } from "@/hooks/useOrderSubstatuses";
@@ -1097,19 +1098,12 @@ const OrderOverview = () => {
               {loading ? (
                 <TableSkeleton rows={8} columns={6} />
               ) : trips.length === 0 ? (
-                <div className="empty-state py-16">
-                  <div className="empty-state-icon">
-                    <Package className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-medium text-lg mb-1">Geen orders gevonden</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Pas je filters aan of maak een nieuwe order aan
-                  </p>
-                  <Button onClick={() => navigate("/orders/edit")}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nieuwe order
-                  </Button>
-                </div>
+                <EmptyState
+                  icon={Package}
+                  title="Geen orders gevonden"
+                  description="Pas je filters aan of maak een nieuwe order aan."
+                  action={{ label: "Nieuwe order", onClick: () => navigate("/orders/edit"), icon: Plus }}
+                />
               ) : isMobile ? (
                 /* Mobile card view with pull-to-refresh */
                 <div ref={containerRef} className="relative min-h-[200px]">
