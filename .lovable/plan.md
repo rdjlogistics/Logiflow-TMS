@@ -1,52 +1,66 @@
 
 
-# Verificatie Resultaten — Alle 6 Gebieden
+# Fix: Datum- en Tijdvalidaties Door de Hele App
 
-## 1. B2B PORTAAL ✅ CORRECT
+## Wat wordt gedaan
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| "Volgende" knop handler | ✅ | Line 364-371: `onClick` met validatie (`canProceedStep0`) en `setStep(s+1)` |
-| Stap navigatie 1→2→3 | ✅ | Werkt correct, met `AnimatePresence` animatie |
-| Validatie feedback | ✅ | `setAttempted(true)` toont rode border + foutmelding bij lege verplichte velden |
-| Adresboek duplicaten | ✅ | Line 53-54: `favorites = filtered.filter(l => l.is_favorite)`, `others = filtered.filter(l => !l.is_favorite)` — wederzijds exclusief |
+### 1. Validatie-functies toevoegen aan `date-utils.ts`
+**File:** `src/lib/date-utils.ts`
 
-## 2. B2C PORTAAL ✅ CORRECT
+Nieuwe exports:
+- `isValidDeliveryDate(date)` — `date >= vandaag (middernacht)`
+- `isValidDateRange(start, end)` — `end >= start`
+- `getToday()` — vandaag als `Date` met tijd op 00:00
+- `getTodayISO()` — vandaag als `YYYY-MM-DD` string (voor `<input type="date" min=...>`)
+- `getMinInvoiceDate()` — 7 dagen geleden als `YYYY-MM-DD`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Geen redirect naar B2B onboarding | ✅ | `PortalGuard.tsx` line 85: onboarding redirect is beperkt tot `location.pathname.startsWith("/portal/b2b")` |
+`formatShortDate` en `formatDateTime` gebruiken al `nl-NL` locale met 4-cijferig jaar — deze zijn correct.
 
-## 3. MESSENGER ✅ CORRECT
+### 2. Order formulier — DestinationCard.tsx
+**File:** `src/components/orders/DestinationCard.tsx`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| 5s timeout | ✅ | Line 42-44: `setTimeout(() => setLoading(false), 5000)` |
-| Empty state | ✅ | Line 131-139: MessageSquare icoon + "Geen gesprekken" + "Start een gesprek vanuit een order of rit" |
+- Calendar component: voeg `disabled={(date) => date < getToday()}` toe voor de pickup/delivery date picker (line 495)
 
-## 4. AI ASSISTENT ✅ CORRECT
+### 3. Order formulier — OrderDetailsPanel.tsx
+**File:** `src/components/orders/OrderDetailsPanel.tsx`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Verzendknop handler | ✅ | `sendMessage` in `useChatGPT.ts` met werkende fetch naar edge function |
-| Error handling `!user` | ✅ | Line 152-156: toast "Niet ingelogd" bij ontbrekende user |
-| Error handling fetch | ✅ | Try-catch met toast bij fout (line 232-235 in vorige versie) |
+- Calendar voor order_date: voeg `disabled={(date) => date < getToday()}` toe (line 210)
 
-## 5. NAVIGATIE ✅ CORRECT
+### 4. B2C Booking Wizard
+**File:** `src/components/portal/b2c/B2CBookingWizard.tsx`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| `/planning` redirect | ✅ | `App.tsx` line 374: `<Route path="/planning" element={<Navigate to="/planning/program" replace />} />` |
-| 404 geen placeholder telefoon | ✅ | `NotFound.tsx` bevat geen telefoonnummer. De `+31 20 123 4567` is een input placeholder in AdminSettings (correct gedrag) |
-| Abonnement loading | ✅ | `SubscriptionTab.tsx` line 185-191: Loader2 spinner bij `loading` state |
+- `pickupDate` wordt als string gezet (`todayStr`). Voeg `min={getTodayISO()}` toe aan de date input als die bestaat, of voeg een date picker toe met `disabled` voor verleden datums.
+- Momenteel geen expliciet date input veld zichtbaar in de wizard stappen — de datum wordt automatisch op vandaag gezet. Geen wijziging nodig.
 
-## 6. SPACING ✅ CORRECT
+### 5. Facturatie — ManualInvoiceForm.tsx
+**File:** `src/components/invoices/ManualInvoiceForm.tsx`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| "Gesprekken" tab | ✅ | `AutoDispatch.tsx` line 178-183: "Gesprekken" als tekst, badge als apart element met `ml-2`, alleen getoond als `> 0` |
+- Factuurdatum `<Input type="date">` (line 262): voeg `min={getMinInvoiceDate()}` toe
+- Vervaldatum `<Input type="date">` (line 270): voeg `min={formData.invoice_date}` toe (vervaldatum >= factuurdatum)
 
-## Conclusie
+### 6. Facturatie — BatchInvoiceWizard.tsx
+**File:** `src/components/invoices/BatchInvoiceWizard.tsx`
 
-**Alle 6 gebieden zijn correct geïmplementeerd.** Geen problemen gevonden. Geen code wijzigingen nodig.
+- Factuurdatum input (line 570): voeg `min={getMinInvoiceDate()}` toe
+
+### 7. GiftCenter datum picker
+**File:** `src/pages/crm/GiftCenter.tsx`
+
+- Al correct: `disabled={(date) => date < new Date()}` (line 486). Geen wijziging nodig.
+
+## Technische Details
+
+Alle `<Input type="date">` velden gebruiken het native browser date format dat al `YYYY-MM-DD` is (ISO). De weergave in de UI hangt af van de browser locale. De Calendar component (Shadcn) toont standaard 4-cijferige jaren.
+
+De `min` attribuut op `<Input type="date">` voorkomt selectie van verleden datums op browser-niveau. De `disabled` callback op de Calendar component doet hetzelfde voor de Shadcn date picker.
+
+## Bestanden
+
+| Actie | Bestand |
+|-------|---------|
+| **Edit** | `src/lib/date-utils.ts` — Nieuwe validatie functies |
+| **Edit** | `src/components/orders/DestinationCard.tsx` — min date op Calendar |
+| **Edit** | `src/components/orders/OrderDetailsPanel.tsx` — min date op Calendar |
+| **Edit** | `src/components/invoices/ManualInvoiceForm.tsx` — min/max op date inputs |
+| **Edit** | `src/components/invoices/BatchInvoiceWizard.tsx` — min op factuurdatum |
 
