@@ -110,13 +110,24 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
     try {
       let documentUrl = '';
       try {
-        const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
-          body: { orderId: tripId, documentType, copies: ['sender', 'receiver', 'carrier'], language: 'nl' },
-        });
-        if (genError) {
-          console.warn('Document generatie mislukt, e-mail wordt zonder document verstuurd:', genError);
+        if (documentType === 'pod' && stopProofId) {
+          const { data: podData, error: podError } = await supabase.functions.invoke('generate-pod-pdf', {
+            body: { stop_proof_id: stopProofId },
+          });
+          if (podError) {
+            console.warn('POD PDF generatie mislukt:', podError);
+          } else {
+            documentUrl = podData?.url || '';
+          }
         } else {
-          documentUrl = genData?.url || '';
+          const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
+            body: { orderId: tripId, documentType, copies: ['sender', 'receiver', 'carrier'], language: 'nl' },
+          });
+          if (genError) {
+            console.warn('Document generatie mislukt:', genError);
+          } else {
+            documentUrl = genData?.url || '';
+          }
         }
       } catch (genErr) {
         console.warn('Document generatie mislukt, e-mail wordt zonder document verstuurd:', genErr);
