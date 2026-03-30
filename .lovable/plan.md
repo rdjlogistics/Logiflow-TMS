@@ -1,44 +1,74 @@
 
 
-# Verificatie Resultaten & Resterende Fixes
+# Fix: Ontbrekende Edge Functions & Redirect URL
 
-## Wat is CORRECT (geen actie nodig)
+## Status: Wat WERKT al correct
 
-| Check | Status |
-|-------|--------|
-| Placeholder UUID `a1b2c3d4-...` | **CLEAN** — 0 resultaten |
-| `localStorage.getItem('company')` | **CLEAN** — 0 resultaten |
-| Hardcoded kentekens (BX-123, HG-456, etc.) | **CLEAN** — verwijderd |
-| `mockAlerts` in AlertsWidget | **CLEAN** — verwijderd |
-| "SLA Breach" in dashboard alerts | **CLEAN** — alleen nog in SLAMonitor.tsx als UI label "SLA Breaches" (dat is een kolom-header, geen fake data) |
+Na testen van alle 49 bestaande edge functions:
+- **CORS headers**: correct op alle functies (inclusief extended Supabase client headers)
+- **OPTIONS handlers**: aanwezig op alle functies
+- **`Deno.env.get()`**: gebruikt voor alle secrets (MOLLIE_API_KEY, RESEND_API_KEY, etc.)
+- **try/catch met JSON error responses**: aanwezig op alle functies
+- **Health check**: retourneert 200, alle services healthy (mollie, resend, mapbox, openai, vapid)
+- **Auth validatie**: correcte `getClaims()` pattern op alle authenticated functies
 
-## Wat nog GEFIXED moet worden (3 items)
+## Wat GEFIXED moet worden
 
-### 1. `src/pages/notifications/NotificationChannels.tsx` — Mock data
-Drie mock arrays (`mockChannels`, `mockLogs`, `mockTemplates`) worden als default state gebruikt. Nieuwe accounts zien nep-notificatie logs en kanalen.
+### 1. Redirect URL in `create-subscription-checkout` (1 regel)
+Huidige: `https://rdjlogistics.nl/settings?payment=success`
+Moet zijn: `https://rdjlogistics.nl/settings/subscription?payment=success`
 
-**Fix:** Vervang defaults door lege arrays `[]`. Voeg empty states toe:
-- Kanalen: "Configureer je eerste notificatiekanaal"
-- Logs: "Nog geen notificaties verzonden"
-- Templates: bestaande templates zijn configuratie-voorbeelden, die kunnen blijven als startpunt (ze bevatten `{{placeholders}}`, geen fake data)
+### 2. Zes ontbrekende Edge Functions
+De frontend roept deze functies aan maar ze bestaan niet (retourneren 404):
 
-### 2. `src/pages/AdminSettings.tsx` — Placeholder telefoon
-Regel 721: `placeholder="+31 20 123 4567"` — dit is een input placeholder (hint), niet pre-filled data. `value={settings.company_phone || ''}` zorgt dat het veld leeg begint. **Acceptabel als format-hint.** Geen actie nodig.
+| Functie | Aangeroepen door | Doel |
+|---------|-----------------|------|
+| `smart-document-ocr` | SmartDocumentOCR.tsx | AI OCR van documenten |
+| `analyze-driver-document` | useDriverDocumentUpload.ts, DocumentVerification.tsx | AI verificatie rijbewijzen/documenten |
+| `portal-ai` | usePortalAI.ts | AI chat voor klant/chauffeur portals |
+| `ecommerce-sync` | useEcommerceIntegrations.ts | Sync met webshops |
+| `convert-ecommerce-order` | useEcommerceIntegrations.ts | Webshop order → TMS rit |
+| `process-email-queue` | config.toml verwijzing maar geen code | Email queue verwerking |
 
-### 3. Overige matches (geen actie nodig)
-- `NL123456789B01` in `nl-validators.ts` — validatie-voorbeeld in error messages
-- `12345678` in `CompanySetupWizard.tsx`, `AdminSettings.tsx` — input placeholders (format hints)
-- `CarrierImportDialog.tsx` — CSV import template voorbeelden
-- `BookingWizard.tsx` — telefoon placeholder format hint
-- `CustomerSelfService.tsx` — "uw bedrijfsnaam" is beschrijvende tekst, geen pre-filled waarde
+### 3. Config.toml — 5 ontbrekende function blocks
+De nieuwe functies moeten ook in `config.toml` met `verify_jwt = false`.
 
-## Plan
+## Aanpak per functie
 
-### Bestand 1: `src/pages/notifications/NotificationChannels.tsx`
-- Verwijder `mockChannels`, `mockLogs`, `mockTemplates` arrays
-- Zet defaults op `[]` voor channels en logs
-- Houd templates als startconfiguratie (ze bevatten template variabelen, geen fake data) OF zet ook op `[]`
-- Voeg empty state UI toe voor kanalen-tab en logs-tab wanneer de arrays leeg zijn
+### `smart-document-ocr`
+- Accepteert `fileBase64`, `fileName`, `mimeType`
+- Gebruikt Lovable AI Gateway (Gemini) voor document parsing
+- Retourneert `{ success: true, extractedData: {...}, documentType, confidence }`
 
-**Dat is het enige bestand dat aangepast moet worden.** Alle andere zoekresultaten zijn format-hints in placeholders of validatie-voorbeelden — geen pre-filled fake data.
+### `analyze-driver-document`
+- Accepteert `documentId`, `imageUrl`, `documentType`
+- Gebruikt Lovable AI Gateway voor document verificatie (geldigheid, vervaldatum)
+- Update `driver_documents` tabel met analyse resultaat
+
+### `portal-ai`
+- AI chatbot voor portals
+- Accepteert `conversationId`, `portalType`, `message`, etc.
+- Gebruikt Lovable AI Gateway
+- Retourneert `{ assistantMessage, actionDraft }`
+
+### `ecommerce-sync` & `convert-ecommerce-order`
+- Placeholder functies (e-commerce integratie is nog niet live)
+- Retourneren `{ success: true, message: "..." }` met beschrijvende melding
+
+### `process-email-queue`
+- Verwerkt email queue uit database
+- Haalt pending emails op en verstuurt via Resend
+
+## Bestanden
+
+| Actie | Bestand |
+|-------|---------|
+| **Edit** | `supabase/functions/create-subscription-checkout/index.ts` (redirect URL) |
+| **Nieuw** | `supabase/functions/smart-document-ocr/index.ts` |
+| **Nieuw** | `supabase/functions/analyze-driver-document/index.ts` |
+| **Nieuw** | `supabase/functions/portal-ai/index.ts` |
+| **Nieuw** | `supabase/functions/ecommerce-sync/index.ts` |
+| **Nieuw** | `supabase/functions/convert-ecommerce-order/index.ts` |
+| **Nieuw** | `supabase/functions/process-email-queue/index.ts` |
+| **Edit** | `supabase/config.toml` (5 nieuwe function blocks) |
 
