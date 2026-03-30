@@ -11,7 +11,9 @@ const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 const COPILOT_SYSTEM = `Je bent de LogiFlow Co-Pilot — een snelle, slimme assistent ingebouwd in het TMS. Nederlands. Max 150 woorden.
 Je hebt toegang tot tools om real-time data op te halen. Gebruik ALTIJD tools voor TMS-data, verzin NOOIT cijfers.
-Wees bondig, concreet en actionable. Marges <15%: waarschuw 🚨.`;
+Wees bondig, concreet en actionable. Marges <15%: waarschuw 🚨.
+Statussen in het systeem: aanvraag, draft, gepland, geladen, onderweg, afgeleverd, afgerond, gecontroleerd, gefactureerd, geannuleerd.
+Factuurstatussen: concept, verzonden, betaald, vervallen.`;
 
 const COPILOT_TOOLS = [
   {
@@ -22,7 +24,7 @@ const COPILOT_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"] },
+          status: { type: "string", enum: ["aanvraag", "draft", "gepland", "geladen", "onderweg", "afgeleverd", "afgerond", "gecontroleerd", "gefactureerd", "geannuleerd"] },
           search: { type: "string" },
           date_from: { type: "string" },
           date_to: { type: "string" },
@@ -74,7 +76,7 @@ const COPILOT_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status_filter: { type: "string", enum: ["all", "pending", "overdue", "paid"] },
+          status_filter: { type: "string", enum: ["all", "concept", "verzonden", "betaald", "vervallen"] },
           days_overdue: { type: "number" },
         },
       },
@@ -96,11 +98,30 @@ const COPILOT_TOOLS = [
   },
 ];
 
-function detectComplexity(message: string): "none" | "low" | "medium" {
+// ── Complexity detection with 4 tiers ──────────────────────────────
+function detectComplexity(message: string): "high" | "medium" | "low" | "none" {
   const lower = message.toLowerCase();
-  if (/waarom|analyseer|vergelijk|optimaliseer|advies|strategie|briefing|rapport/.test(lower)) return "medium";
-  if (/hoeveel|wat is|toon|lijst|status|zoek/.test(lower)) return "low";
+
+  // HIGH → deep analysis, forecasting, multi-step reasoning
+  if (/forecast|prognose|seizoen|benchmark|scenario|impact.*analyse|wat.*als|kosten.*baten|rendement|winstgevend|capaciteit.*plan|demand.*plan|bottleneck|knelpunt|trend|optimaliseer|strategie|correlatie|regressie|predict|voorspel|simuleer|monte.?carlo|what.?if|langetermijn/.test(lower)) return "high";
+
+  // MEDIUM → comparisons, summaries, moderate analysis
+  if (/waarom|analyseer|vergelijk|advies|briefing|rapport|ranking|samenvatting|verdeling|spreiding|bezetting|effici[eë]ntie|productiviteit|omzet.*per|gemiddeld|mediaan|histogram|benchmark.*chauffeur|levertijd.*analyse|klacht.*analyse|uitleg|verklaar|top.\d|slechtst|best/.test(lower)) return "medium";
+
+  // LOW → simple lookups, lists, status checks
+  if (/hoeveel|wat is|toon|lijst|status|zoek|wanneer|waar.*is|laatste|volgende|planning.*vandaag|wie.*rijdt|geef|laat.*zien|open.*orders|check/.test(lower)) return "low";
+
   return "none";
+}
+
+// ── Model selection per complexity tier ─────────────────────────────
+function getModelForComplexity(complexity: "high" | "medium" | "low" | "none"): string {
+  switch (complexity) {
+    case "high": return "google/gemini-2.5-pro";
+    case "medium": return "google/gemini-3-flash-preview";
+    case "low": return "google/gemini-2.5-flash";
+    case "none": return "google/gemini-2.5-flash-lite";
+  }
 }
 
 function getDateFrom(period: string, now: Date): string {
@@ -123,15 +144,15 @@ async function executeCopilotTool(
     switch (toolName) {
       case "search_orders": {
         let query = supabase
-          .from("orders")
-          .select("id, order_number, status, pickup_date, total_amount, customers(company_name), drivers(name)")
+          .from("trips")
+          .select("id, trip_number, status, trip_date, sales_total, purchase_total, customers(company_name), drivers(name)")
           .eq("company_id", tenantId)
           .order("created_at", { ascending: false })
           .limit((args.limit as number) || 10);
         if (args.status) query = query.eq("status", args.status);
-        if (args.search) query = query.or(`order_number.ilike.%${args.search}%,reference.ilike.%${args.search}%`);
-        if (args.date_from) query = query.gte("pickup_date", args.date_from);
-        if (args.date_to) query = query.lte("pickup_date", args.date_to);
+        if (args.search) query = query.or(`trip_number.ilike.%${args.search}%,customer_reference.ilike.%${args.search}%`);
+        if (args.date_from) query = query.gte("trip_date", args.date_from);
+        if (args.date_to) query = query.lte("trip_date", args.date_to);
         const { data, error } = await query;
         if (error) return JSON.stringify({ error: error.message });
         return JSON.stringify({ orders: data, count: data?.length ?? 0 });
@@ -140,18 +161,18 @@ async function executeCopilotTool(
       case "get_kpis": {
         const period = (args.period as string) || "month";
         const dateFrom = getDateFrom(period, new Date());
-        const [ordersRes, invoicesRes] = await Promise.all([
-          supabase.from("orders").select("id, status, total_amount, purchase_amount").eq("company_id", tenantId).gte("created_at", dateFrom),
-          supabase.from("invoices").select("id, status, total_amount, due_date").eq("company_id", tenantId).gte("created_at", dateFrom),
+        const [tripsRes, invoicesRes] = await Promise.all([
+          supabase.from("trips").select("id, status, sales_total, purchase_total").eq("company_id", tenantId).gte("created_at", dateFrom),
+          supabase.from("invoices").select("id, status, total_amount, due_date").eq("tenant_id", tenantId).gte("created_at", dateFrom),
         ]);
-        const orders = ordersRes.data || [];
+        const trips = tripsRes.data || [];
         const invoices = invoicesRes.data || [];
-        const revenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-        const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+        const revenue = trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+        const cost = trips.reduce((s, o) => s + (o.purchase_total || 0), 0);
         const margin = revenue > 0 ? ((revenue - cost) / revenue * 100) : 0;
-        const overdue = invoices.filter(i => i.status === "overdue");
+        const overdue = invoices.filter(i => i.status === "vervallen");
         return JSON.stringify({
-          period, total_orders: orders.length, revenue, cost,
+          period, total_trips: trips.length, revenue, cost,
           margin_percent: Math.round(margin * 10) / 10,
           overdue_invoices: overdue.length,
           overdue_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
@@ -162,46 +183,46 @@ async function executeCopilotTool(
         const date = (args.date as string) || new Date().toISOString().split("T")[0];
         const tomorrow = new Date(date);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const [todayOrders, unassigned, overdueInv] = await Promise.all([
-          supabase.from("orders").select("id, order_number, status, driver_id, total_amount, drivers(name)")
-            .eq("company_id", tenantId).gte("pickup_date", date).lt("pickup_date", tomorrow.toISOString().split("T")[0]),
-          supabase.from("orders").select("id, order_number").eq("company_id", tenantId).is("driver_id", null).in("status", ["draft", "pending", "confirmed"]),
-          supabase.from("invoices").select("id, total_amount").eq("company_id", tenantId).eq("status", "overdue"),
+        const [todayTrips, unassigned, overdueInv] = await Promise.all([
+          supabase.from("trips").select("id, trip_number, status, driver_id, sales_total, drivers(name)")
+            .eq("company_id", tenantId).gte("trip_date", date).lt("trip_date", tomorrow.toISOString().split("T")[0]),
+          supabase.from("trips").select("id, trip_number").eq("company_id", tenantId).is("driver_id", null).in("status", ["aanvraag", "draft", "gepland"]),
+          supabase.from("invoices").select("id, total_amount").eq("tenant_id", tenantId).eq("status", "vervallen"),
         ]);
         const risks: string[] = [];
-        if ((unassigned.data || []).length > 0) risks.push(`🚨 ${unassigned.data!.length} orders zonder chauffeur`);
+        if ((unassigned.data || []).length > 0) risks.push(`🚨 ${unassigned.data!.length} ritten zonder chauffeur`);
         if ((overdueInv.data || []).length > 0) risks.push(`💰 ${overdueInv.data!.length} achterstallige facturen`);
         return JSON.stringify({
-          date, planned: (todayOrders.data || []).length,
+          date, planned: (todayTrips.data || []).length,
           unassigned: (unassigned.data || []).length, risks,
         });
       }
 
       case "route_suggest": {
-        const { data: order } = await supabase.from("orders")
-          .select("id, order_number, pickup_date").eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
-        if (!order) return JSON.stringify({ error: "Order niet gevonden" });
+        const { data: trip } = await supabase.from("trips")
+          .select("id, trip_number, trip_date").eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
+        if (!trip) return JSON.stringify({ error: "Rit niet gevonden" });
         const [driversRes, activeRes] = await Promise.all([
-          supabase.from("drivers").select("id, name, rating, status, city").eq("company_id", tenantId).eq("is_active", true).in("status", ["available", "busy"]),
-          supabase.from("orders").select("driver_id").eq("company_id", tenantId).in("status", ["confirmed", "in_transit"]),
+          supabase.from("drivers").select("id, name, rating, status, current_city").eq("tenant_id", tenantId).is("deleted_at", null),
+          supabase.from("trips").select("driver_id").eq("company_id", tenantId).in("status", ["gepland", "geladen", "onderweg"]),
         ]);
         const workload = new Map<string, number>();
         for (const o of activeRes.data || []) if (o.driver_id) workload.set(o.driver_id, (workload.get(o.driver_id) || 0) + 1);
         const suggestions = (driversRes.data || []).map(d => ({
-          name: d.name, rating: d.rating || 0, workload: workload.get(d.id) || 0,
+          name: d.name, rating: d.rating || 0, city: d.current_city, workload: workload.get(d.id) || 0,
           score: ((d.rating || 3) * 20) - ((workload.get(d.id) || 0) * 15) + (d.status === "available" ? 20 : 0),
         })).sort((a, b) => b.score - a.score).slice(0, 3);
-        return JSON.stringify({ order: order.order_number, suggestions });
+        return JSON.stringify({ trip: trip.trip_number, suggestions });
       }
 
       case "invoice_status": {
         let query = supabase.from("invoices")
           .select("id, invoice_number, total_amount, status, due_date, customers(company_name)")
-          .eq("company_id", tenantId).order("due_date", { ascending: true }).limit(20);
+          .eq("tenant_id", tenantId).order("due_date", { ascending: true }).limit(20);
         if (args.status_filter && args.status_filter !== "all") query = query.eq("status", args.status_filter);
         const { data } = await query;
         const invoices = data || [];
-        const overdue = invoices.filter(i => i.status === "overdue");
+        const overdue = invoices.filter(i => i.status === "vervallen");
         return JSON.stringify({
           total: invoices.length, overdue: overdue.length,
           overdue_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
@@ -214,8 +235,8 @@ async function executeCopilotTool(
 
       case "list_drivers": {
         let query = supabase.from("drivers")
-          .select("id, name, phone, status, rating, city")
-          .eq("company_id", tenantId).eq("is_active", true);
+          .select("id, name, phone, status, rating, current_city")
+          .eq("tenant_id", tenantId).is("deleted_at", null);
         if (args.search) query = query.ilike("name", `%${args.search}%`);
         if (args.status && args.status !== "all") query = query.eq("status", args.status);
         const { data } = await query;
@@ -266,8 +287,8 @@ serve(async (req) => {
     const pageCtx = context?.currentPage ? `\nPagina: ${context.currentPage}` : "";
     const lastUserMsg = [...messages].reverse().find((m: any) => m.role === "user")?.content || "";
     const complexity = detectComplexity(lastUserMsg);
-    const model = complexity === "medium" ? "google/gemini-3-flash-preview" : "google/gemini-2.5-flash-lite";
-    const reasoning = complexity === "medium" ? { effort: "medium" } : undefined;
+    const model = getModelForComplexity(complexity);
+    const reasoning = complexity === "high" ? { effort: "high" } : complexity === "medium" ? { effort: "medium" } : undefined;
 
     console.log(JSON.stringify({ event: "copilot_request", model, complexity, user_id: userId, message_preview: lastUserMsg.slice(0, 80), timestamp: new Date().toISOString() }));
 
@@ -335,13 +356,13 @@ serve(async (req) => {
       throw new Error("AI gateway error");
     }
 
-    // Deduct credits (more for tool usage)
-    const creditCost = toolsUsed.length > 0 ? 2 : 1;
+    // Deduct credits based on model tier
+    const creditCost = complexity === "high" ? 4 : complexity === "medium" ? 2 : toolsUsed.length > 0 ? 2 : 1;
     await supabase.rpc("deduct_ai_credits", {
       p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
       p_action_type: toolsUsed.length > 0 ? "copilot_tool" : "copilot",
-      p_complexity: complexity !== "none" ? "complex" : "simple",
-      p_model: model.includes("flash-lite") ? "gemini-2.5-flash-lite" : "gemini-3-flash",
+      p_complexity: complexity,
+      p_model: model.split("/")[1] || model,
     });
 
     console.log(JSON.stringify({ event: "copilot_complete", model, complexity, tools_used: toolsUsed, tool_count: toolsUsed.length, credit_cost: creditCost, duration_ms: Date.now() - startTime }));
