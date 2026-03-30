@@ -81,6 +81,7 @@ const Customers = () => {
   const { lookupPostcode, loading: postcodeLoading } = usePostcodeLookup();
   const [autoFilled, setAutoFilled] = useState(false);
   const [lastLookup, setLastLookup] = useState<string>("");
+  const [hideTestData, setHideTestData] = useState(false);
   const [attachDocsOverride, setAttachDocsOverride] = useState<boolean | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<string>('to_planning');
   const [deliveryConfEnabled, setDeliveryConfEnabled] = useState<boolean>(true);
