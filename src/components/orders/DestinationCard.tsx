@@ -143,7 +143,8 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
   }, []);
 
   const handleChange = (field: keyof DestinationData, value: any) => {
-    onChange({ ...data, [field]: value });
+    const finalValue = field === 'city' && typeof value === 'string' ? capitalizeCity(value) : value;
+    onChange({ ...data, [field]: finalValue });
   };
 
   const handlePostcodeLookup = useCallback(async () => {
