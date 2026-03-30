@@ -659,7 +659,17 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
         selectedCount={selectedIds.size}
         onActivate={() => setBulkConfirm({ open: true, action: 'activate' })}
         onDeactivate={() => setBulkConfirm({ open: true, action: 'deactivate' })}
-        onExportCsv={handleExportCSV}
+        onExportCsv={() => {
+          const data = exportData().map(row => {
+            const obj: Record<string, unknown> = {};
+            exportHeaders.forEach((h, i) => { obj[h] = row[i] ?? ''; });
+            return obj;
+          });
+          import('@/lib/excelUtils').then(({ writeCsvFile }) => {
+            writeCsvFile(data, `voertuigen-${new Date().toISOString().slice(0, 10)}.csv`);
+            toast({ title: 'CSV gedownload' });
+          });
+        }}
         onScheduleMaintenance={() => {}}
         onUpdateMileage={() => setMileageDialogOpen(true)}
         onClearSelection={() => setSelectedIds(new Set())}
