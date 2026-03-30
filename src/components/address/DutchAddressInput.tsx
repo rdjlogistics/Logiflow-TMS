@@ -41,6 +41,8 @@ const DutchAddressInput = ({
   const { lookupPostcode, loading } = usePostcodeLookup();
   const [autoFilled, setAutoFilled] = useState(false);
   const [lastLookup, setLastLookup] = useState<string>("");
+  const [apiCity, setApiCity] = useState<string | null>(null);
+  const [cityMismatch, setCityMismatch] = useState<string | null>(null);
 
   // Auto-lookup when postcode is complete and valid
   const handlePostcodeBlur = useCallback(async () => {
