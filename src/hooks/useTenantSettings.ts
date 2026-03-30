@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/hooks/useCompany';
 
 export interface TenantSettings {
   id: string;
@@ -20,10 +19,8 @@ export interface TenantSettings {
   route_vehicle_type: string;
   route_optimization_provider: string;
   route_speed_percentage: number;
-  // Theme settings
   theme_preset: string;
   theme_mode: string;
-  // Driver App settings
   driver_app_use_arrival_departure_times: boolean;
   driver_app_separate_remarks_field: boolean;
   driver_app_auto_save_waiting: boolean;
@@ -35,21 +32,14 @@ export interface TenantSettings {
 }
 
 export const useTenantSettings = () => {
-  const { company } = useCompany();
-  const companyId = company?.id;
-
   return useQuery({
-    queryKey: ['tenant-settings', companyId],
+    queryKey: ['tenant-settings'],
     queryFn: async (): Promise<TenantSettings | null> => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('tenant_settings')
-        .select('*');
-
-      if (companyId) {
-        query = query.eq('company_id', companyId);
-      }
-
-      const { data, error } = await query.limit(1).maybeSingle();
+        .select('*')
+        .limit(1)
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching tenant settings:', error);
@@ -58,6 +48,5 @@ export const useTenantSettings = () => {
 
       return data as TenantSettings | null;
     },
-    enabled: !!companyId,
   });
 };
