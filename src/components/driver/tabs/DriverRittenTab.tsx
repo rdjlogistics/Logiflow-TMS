@@ -276,6 +276,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     }
     await startTrip(tripId);
     onStartRoute?.(tripId);
+    setConfirmStartTrip(null);
   };
 
   const handleInspectionCompleted = async (passed: boolean) => {
