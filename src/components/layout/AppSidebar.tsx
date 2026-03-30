@@ -352,6 +352,7 @@ const AppSidebar = () => {
   const isCollapsed = state === "collapsed";
   // No auto-close — menu stays open until user dismisses it
   const { isFeatureEnabled } = useFeatureGate();
+  const { plan: currentPlan, isTrialing, trialDaysLeft } = useSubscriptionPlan();
   const [searchQuery, setSearchQuery] = React.useState("");
   const {
     canAccessOperations,
