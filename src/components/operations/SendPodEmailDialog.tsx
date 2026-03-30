@@ -29,6 +29,8 @@ interface SendPodEmailDialogProps {
   tripId: string;
   orderNumber: string;
   customerEmail?: string | null;
+  defaultDocumentType?: string;
+  stopProofId?: string;
   isDemo?: boolean;
 }
 
