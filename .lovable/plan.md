@@ -1,57 +1,111 @@
 
 
-# Verificatie: Company-koppeling Fix — Resultaat
+# Fix: Edge Functions — Ontbrekende Functies & Deployment
 
-## Bevinding: Alles is correct geïmplementeerd
+## Kernprobleem
 
-Na doorzoeken van de volledige codebase (150+ `.eq('company_id')` matches in 16 bestanden, 300+ `tenant_id` matches in 27 bestanden, 95 `get_user_company_cached` aanroepen in 17 bestanden) is de conclusie:
+Het project heeft **8 edge functions in de codebase** maar de frontend roept **40+ unieke edge functions** aan. De ontbrekende ~32 functies retourneren automatisch 404/500, waardoor Mollie betalingen, portaal accounts, email verzending, en vele andere features falen.
 
-**Er zijn geen hardcoded placeholders, geen localStorage fallbacks, en geen onbeveiligde company_id bronnen.**
+### Bestaande functies (8)
+`chatgpt`, `copilot`, `create-batch-invoices`, `create-batch-purchase-invoices`, `ensure-user-company`, `generate-invoice-pdf`, `generate-purchase-invoice-pdf`, `get-mapbox-token`
 
-## Hoe company_id wordt opgehaald (2 correcte patronen)
+### Ontbrekende functies die door de frontend worden aangeroepen (~32)
+| Categorie | Functie | Aangeroepen door |
+|-----------|---------|------------------|
+| **Betalingen** | `mollie-create-payment` | MolliePaymentButton |
+| **Betalingen** | `create-subscription-checkout` | useSubscriptionInvoices |
+| **Portals** | `create-driver-portal-account` | CreateDriverPortalDialog |
+| **Portals** | `create-customer-portal-account` | CreateCustomerPortalDialog, CustomerSelfService |
+| **Portals** | `create-carrier-user` | CarrierPortalAccessTab |
+| **Team** | `create-staff-account` | UserRolesTab |
+| **Team** | `remove-staff-account` | UserRolesTab |
+| **Email** | `send-invoice-email` | InvoiceEmailComposer, EmailDomainTab |
+| **Email** | `send-invoice-reminder` | SendReminderDialog, InvoiceBulkActionsBar |
+| **Email** | `send-purchase-invoice-email` | PurchaseInvoiceEmailComposer |
+| **Email** | `send-order-confirmation` | OrderCompactRow, OrderForm, EnhancedBulkActionsBar |
+| **Email** | `send-delivery-confirmation` | useDriverTrips, useStopEvents, EnhancedBulkActionsBar |
+| **Email** | `send-document-email` | SendTransportOrderDialog |
+| **Email** | `send-carrier-credentials` | CarrierPortalAccessTab |
+| **Email** | `send-submission-confirmation` | usePortalShipments |
+| **Email** | `send-audit-alert-email` | useAuditRealtimeAlerts |
+| **Email** | `manage-email-domain` | EmailDomainTab, CustomerSelfService |
+| **Email** | `auto-send-vrachtbrief` | useDriverTrips, useStopEvents, OrderCompleteDialog |
+| **Documents** | `generate-document-pdf` | SendTransportOrderDialog, ClaimsInbox, useDocumentTemplates, EnhancedBulkActionsBar |
+| **AI/Dispatch** | `ai-dispatch-engine` | useAIAutoDispatch, DispatchConversationsPanel |
+| **AI/Pricing** | `calculate-price` | useSmartPricing |
+| **AI/RFQ** | `rfq-parser` | RFQInbox |
+| **Migration** | `migration-api-sync` | ApiConnectorPanel |
+| **Migration** | `migration-field-mapper` | FieldMappingWizard, BulkImportDialog |
+| **GPS/Tracking** | `live-eta` | useLiveETA |
+| **Push** | `send-push-notification` | OrderForm |
+| **Push** | `get-vapid-key` | usePushNotifications |
+| **Push** | `notify-new-submission` | usePortalShipments |
+| **Finance** | `bank-reconcile` | useBankReconciliation |
+| **Finance** | `exact-oauth-start` | AccountingIntegrations |
+| **Finance** | `exact-sync-invoices` | ExactOnlineSyncButton |
+| **Security** | `webauthn-auth` | useWebAuthn |
+| **Logging** | `log-client-error` | errorReporter |
+| **Health** | `health-check` | useQATests |
+| **Admin** | `test-tenant-isolation` | TenantIsolationTest |
 
-| Patroon | Gebruikt door | Veilig? |
-|---------|--------------|---------|
-| `useCompany()` → `company.id` | 22 pagina's (Drivers, Customers, Carriers, Settings, etc.) | Ja — haalt uit `user_companies` tabel |
-| `supabase.rpc('get_user_company_cached')` | 17 enterprise pagina's (SLA, Disputes, LiveBoard, etc.) | Ja — server-side RPC |
+## Wat NIET klopt
 
-## Per pagina check
+1. **`config.toml` is leeg** — bevat alleen `project_id`, geen `[functions.*]` blokken met `verify_jwt = false`
+2. **32+ functies bestaan niet** — elke aanroep faalt met 404 of boot error
+3. **Geen edge function logs** — zelfs de 8 bestaande functies tonen geen logs, wat duidt op deployment issues
 
-| Pagina | Methode | Loading guard | Status |
-|--------|---------|---------------|--------|
-| Dashboard | `useCompany()` | `enabled: !!company?.id` | OK |
-| /drivers | `useCompany()` → `.eq('tenant_id', company.id)` | `enabled: !!company?.id` | OK |
-| /customers | `useCompany()` → `.eq('tenant_id', company.id)` | `if (!company?.id) return` | OK |
-| /trips | Service layer, RLS filtert | RLS | OK |
-| /invoices | Service layer, RLS filtert | RLS | OK |
-| /fleet | `useCompany()` | `enabled: !!company?.id` | OK |
-| /settings | `useTenantSettings()` → RLS filtert | `.maybeSingle()` | OK |
-| /carriers | `useCompany()` → `.eq('company_id', company.id)` | `enabled: !!company?.id` | OK |
-| Enterprise pages (17x) | `get_user_company_cached` RPC | `if (!companyId) return []` | OK |
+## Plan van Aanpak
 
-## Twee kleine verbeteringen mogelijk
+### Fase 1: Config & Deployment fixen (prioriteit)
+1. **Update `supabase/config.toml`** — Voeg `verify_jwt = false` toe voor alle 8 bestaande functies
+2. **Deploy alle 8 bestaande functies** via `deploy_edge_functions`
+3. **Verifieer deployment** via edge function logs
 
-### 1. `useTenantSettings` — voeg company_id aan queryKey toe
-Nu is de queryKey `['tenant-settings']` zonder company context. Als een user wisselt van company (via `switchCompany`), kan gecachte data van de vorige company getoond worden.
+### Fase 2: Kritieke ontbrekende functies aanmaken (top 10)
+Maak de meest impactvolle functies aan die de kernfunctionaliteit blokkeren:
 
-**Fix**: Gebruik `useCompany()` en voeg `company.id` toe aan de queryKey.
+1. **`mollie-create-payment`** — iDEAL betaallinks voor facturen
+2. **`create-driver-portal-account`** — Chauffeur portaal accounts
+3. **`create-customer-portal-account`** — Klant portaal accounts  
+4. **`create-staff-account`** — Team uitnodigen
+5. **`remove-staff-account`** — Team verwijderen
+6. **`send-invoice-email`** — Factuur emailen
+7. **`send-invoice-reminder`** — Herinneringen sturen
+8. **`generate-document-pdf`** — Transport documenten genereren
+9. **`health-check`** — Systeem health monitoring
+10. **`get-vapid-key`** — Push notifications key
 
-### 2. Services zonder company filter (drivers, customers, invoices)
-De services `fetchDrivers()`, `fetchCustomers()`, `fetchInvoices()` vertrouwen 100% op RLS voor tenant-isolatie. Dit werkt correct, maar als RLS ooit misconfigured raakt, lekt data. 
+### Fase 3: Secundaire functies aanmaken
+De overige ~22 functies (AI dispatch, RFQ parser, live-ETA, etc.) worden als volgende batch aangemaakt.
 
-**Fix**: Voeg een optionele `companyId` parameter toe aan de fetch-functies en gebruik `.eq('tenant_id', companyId)` als defense-in-depth. De hooks die deze services aanroepen (`useDriversData`, `useCustomersData`, `useInvoicesData`) krijgen company_id van `useCompany()`.
+### Fase 4: Frontend error handling verbeteren
+- Voeg retry logica toe aan kritieke `functions.invoke` calls
+- Betere foutmeldingen bij 404/500 responses
+- Console logging van response bodies
 
-### Bestanden te wijzigen
+## Technische Details per Kritieke Functie
 
-| Bestand | Wijziging |
-|---------|-----------|
-| `src/hooks/useTenantSettings.ts` | Voeg `useCompany()` toe, filter op `company_id`, update queryKey |
-| `src/services/drivers.ts` | Voeg optionele `companyId` param toe aan `fetchDrivers` |
-| `src/services/customers.ts` | Voeg optionele `companyId` param toe aan `fetchCustomers` |
-| `src/services/invoices.ts` | Voeg optionele `companyId` param toe aan `fetchInvoices` |
-| `src/hooks/useDriversData.ts` | Geef `companyId` door aan `fetchDrivers` |
-| `src/hooks/useCustomersData.ts` | Geef `companyId` door aan `fetchCustomers` |
-| `src/hooks/useInvoicesData.ts` | Geef `companyId` door aan `fetchInvoices` |
+Elke functie volgt hetzelfde patroon:
+- CORS headers (al correct in bestaande functies)
+- OPTIONS preflight handler
+- JWT validatie in code (niet via config)
+- Service role client voor admin operaties
+- Tenant isolatie via `user_companies`
+- Logging met `console.log`/`console.error`
 
-### Geen database migraties nodig
+### Secrets beschikbaar
+`MOLLIE_API_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `MAPBOX_PUBLIC_TOKEN`, `OPENAI_API_KEY`, `MESSAGEBIRD_API_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY` — allemaal geconfigureerd.
+
+## Bestanden
+
+| Actie | Aantal |
+|-------|--------|
+| **Edit** | `supabase/config.toml` |
+| **Deploy** | 8 bestaande functies |
+| **Nieuw** | ~10 kritieke edge functions (Fase 2) |
+| **Nieuw** | ~22 secundaire edge functions (Fase 3) |
+| **Edit** | Frontend error handling in ~10 bestanden |
+
+## Omvang
+Dit is een groot project (~40 nieuwe bestanden). Ik stel voor om het in batches te doen: eerst Fase 1+2 (config fix + 10 kritieke functies), dan Fase 3+4 in een vervolgstap.
 
