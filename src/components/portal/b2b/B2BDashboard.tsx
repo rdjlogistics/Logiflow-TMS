@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { 
   Package, Truck, CheckCircle2, AlertTriangle, TrendingUp,
   Clock, ArrowUpRight, FileText, PlusCircle, Upload, Euro,
-  Sun, Moon, Sunset, Sunrise, Inbox,
+  Sun, Moon, Sunset, Sunrise, Inbox, CalendarClock, Activity,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
