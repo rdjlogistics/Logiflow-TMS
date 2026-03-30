@@ -174,9 +174,7 @@ const FuelManagement = () => {
                           <SelectValue placeholder="Selecteer voertuig" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1">BX-123-AB (DAF XF 480)</SelectItem>
-                          <SelectItem value="2">VK-456-CD (Volvo FH 500)</SelectItem>
-                          <SelectItem value="3">ZD-012-GH (Scania R 450)</SelectItem>
+                          <SelectItem value="no-vehicles" disabled>Geen voertuigen gevonden — voeg eerst een voertuig toe</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

@@ -10,7 +10,7 @@ import {
   Search,
   ArrowLeft,
   Compass,
-  Phone,
+  
   Mail,
   Clock,
   Truck
@@ -229,13 +229,6 @@ const NotFound = () => {
             >
               <Mail className="h-4 w-4" />
               support@rdjlogistics.nl
-            </a>
-            <a 
-              href="tel:+31201234567" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Phone className="h-4 w-4" />
-              +31 20 123 4567
             </a>
           </div>
         </motion.div>
