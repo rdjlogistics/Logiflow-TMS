@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, Download, CheckSquare } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, MapPin, Calendar, Truck, Euro, CheckSquare } from "lucide-react";
+import { ExportDropdown } from "@/components/common/ExportDropdown";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -224,34 +225,25 @@ const Trips = () => {
       t.waybill_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleExportCSV = () => {
-    if (filteredTrips.length === 0) {
-      toast({ title: "Geen ritten om te exporteren", variant: "destructive" });
-      return;
-    }
-    const headers = ["ID", "Datum", "Klant", "Afhaaladres", "Afleveradres", "Status", "Voertuig", "Prijs"];
-    const rows = filteredTrips.map((t) => [
-      t.id.slice(0, 8),
-      t.trip_date || "",
-      t.customers?.company_name || "",
-      [t.pickup_address, t.pickup_city].filter(Boolean).join(", "),
-      [t.delivery_address, t.delivery_city].filter(Boolean).join(", "),
-      t.status || "",
-      t.vehicles?.license_plate || "",
-      t.price != null ? String(t.price) : "",
-    ]);
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-      .join("\n");
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ritten-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: "CSV gedownload", description: `${filteredTrips.length} rit(ten) geëxporteerd` });
-  };
+  const exportHeaders = ["Ordernummer", "Datum", "Klant", "Klantreferentie", "Ophaaladres", "Ophaalstad", "Afleveradres", "Afleverstad", "Status", "Voertuig", "Gewicht (kg)", "Afstand (km)", "Prijs (€)", "Vrachtbrief", "CMR", "Notities"];
+  const exportRows = filteredTrips.map((t) => [
+    t.id.slice(0, 8),
+    t.trip_date || "",
+    t.customers?.company_name || "",
+    t.customer_reference || "",
+    t.pickup_address || "",
+    t.pickup_city || "",
+    t.delivery_address || "",
+    t.delivery_city || "",
+    t.status || "",
+    t.vehicles?.license_plate || "",
+    t.weight_kg != null ? t.weight_kg : "",
+    t.distance_km != null ? t.distance_km : "",
+    t.price != null ? t.price : "",
+    t.waybill_number || "",
+    t.cmr_number || "",
+    t.notes || "",
+  ]);
 
   const openNewDialog = () => {
     setEditingTrip(null);
@@ -292,10 +284,13 @@ const Trips = () => {
                   {selectionMode ? "Klaar" : "Selecteer"}
                 </Button>
               )}
-              <Button variant="outline" onClick={handleExportCSV} className="gap-2 flex-1 sm:flex-none">
-                <Download className="h-4 w-4" />
-                CSV
-              </Button>
+              <ExportDropdown
+                headers={exportHeaders}
+                rows={exportRows}
+                filename="ritten"
+                sheetName="Ritten"
+                className="flex-1 sm:flex-none"
+              />
               {canManageTrips && (
                 <Button onClick={openNewDialog} className="flex-1 sm:flex-none">
                   <Plus className="mr-2 h-4 w-4" />

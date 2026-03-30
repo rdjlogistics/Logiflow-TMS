@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Plus, Pencil, Trash2, Truck, Search, Star, UserPlus, X, Upload, Download, Play, Pause, CheckSquare, RotateCcw, AlertTriangle, MoreHorizontal, Power, Users, Phone, Mail, Shield, UserCheck, Briefcase } from "lucide-react";
+import { ExportDropdown } from "@/components/common/ExportDropdown";
 import { DriverBulkActions } from "@/components/drivers/DriverBulkActions";
 import CarrierImportDialog from "@/components/carriers/CarrierImportDialog";
 import { CreateDriverPortalDialog } from "@/components/drivers/CreateDriverPortalDialog";
@@ -439,9 +440,26 @@ const DriversTab = () => {
             Inactief
           </Button>
         </div>
-        <Button onClick={() => { resetForm(); setAddOpen(true); }} className="min-h-[44px] gap-2">
-          <Plus className="h-4 w-4" /> Chauffeur toevoegen
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            headers={['Naam', 'E-mail', 'Telefoon', 'Categorie', 'ZZP', 'Status', 'Rijbewijsnummer', 'Portaal actief']}
+            rows={filtered.map(d => [
+              d.name,
+              d.email || '',
+              d.phone || '',
+              d.driver_category === 'heavy' ? 'Zwaar' : 'Licht',
+              d.is_zzp ? 'Ja' : 'Nee',
+              d.status === 'active' ? 'Actief' : 'Inactief',
+              d.license_number || '',
+              d.user_id ? 'Ja' : 'Nee',
+            ])}
+            filename="chauffeurs"
+            sheetName="Chauffeurs"
+          />
+          <Button onClick={() => { resetForm(); setAddOpen(true); }} className="min-h-[44px] gap-2">
+            <Plus className="h-4 w-4" /> Chauffeur toevoegen
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

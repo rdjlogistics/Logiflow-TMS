@@ -34,9 +34,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Truck, Search, Filter, MoreVertical, CheckCircle, AlertTriangle,
-  XCircle, Pencil, Calendar, Loader2, Plus, Trash2, Download,
+  XCircle, Pencil, Calendar, Loader2, Plus, Trash2,
   Gauge, FileCheck, Wrench, Shield, ChevronRight, Car,
 } from 'lucide-react';
+import { ExportDropdown } from '@/components/common/ExportDropdown';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -307,14 +308,10 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
     }
   };
 
-  const handleExportCSV = () => {
+  const exportHeaders = ['Kenteken', 'Merk', 'Model', 'Type', 'Bouwjaar', 'Km-stand', 'Laadvermogen (kg)', 'APK vervalt', 'Verzekering vervalt', 'Volgend onderhoud', 'Status'];
+  const exportData = () => {
     const selected = selectedIds.size > 0 ? vehicles.filter(v => selectedIds.has(v.id)) : filteredVehicles;
-    if (selected.length === 0) {
-      toast({ title: 'Geen voertuigen om te exporteren', variant: 'destructive' });
-      return;
-    }
-    const headers = ['Kenteken', 'Merk', 'Model', 'Type', 'Bouwjaar', 'Km-stand', 'Laadvermogen (kg)', 'APK vervalt', 'Verzekering vervalt', 'Volgend onderhoud', 'Status'];
-    const rows = selected.map(v => [
+    return selected.map(v => [
       v.license_plate,
       v.brand || '',
       v.model || '',
@@ -327,15 +324,6 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
       v.next_service_date || '',
       v.is_active ? 'Actief' : 'Inactief',
     ]);
-    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `voertuigen-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: `${selected.length} voertuig(en) geëxporteerd` });
   };
 
   if (vehiclesLoading) {
@@ -367,9 +355,14 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                   className="pl-9"
                 />
               </div>
-              <Button variant="outline" size="icon" onClick={handleExportCSV} title="CSV exporteren">
-                <Download className="h-4 w-4" />
-              </Button>
+              <ExportDropdown
+                headers={exportHeaders}
+                rows={exportData()}
+                filename="voertuigen"
+                sheetName="Voertuigen"
+                size="icon"
+                iconOnly
+              />
               <Popover open={filterOpen} onOpenChange={setFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="icon" className={cn(statusFilters.length > 0 && 'border-primary bg-primary/10')}>
@@ -666,7 +659,17 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
         selectedCount={selectedIds.size}
         onActivate={() => setBulkConfirm({ open: true, action: 'activate' })}
         onDeactivate={() => setBulkConfirm({ open: true, action: 'deactivate' })}
-        onExportCsv={handleExportCSV}
+        onExportCsv={() => {
+          const data = exportData().map(row => {
+            const obj: Record<string, unknown> = {};
+            exportHeaders.forEach((h, i) => { obj[h] = row[i] ?? ''; });
+            return obj;
+          });
+          import('@/lib/excelUtils').then(({ writeCsvFile }) => {
+            writeCsvFile(data, `voertuigen-${new Date().toISOString().slice(0, 10)}.csv`);
+            toast({ title: 'CSV gedownload' });
+          });
+        }}
         onScheduleMaintenance={() => {}}
         onUpdateMileage={() => setMileageDialogOpen(true)}
         onClearSelection={() => setSelectedIds(new Set())}
