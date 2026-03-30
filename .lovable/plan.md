@@ -1,45 +1,42 @@
 
 
-# Fix: Klantenlijst Duplicaat Detectie, Test-data Markering & Incomplete Badge
+# Fix: Route Optimalisatie Werkt Niet
 
-## Huidige Staat
+## Root Cause
 
-- **Verwijder-functionaliteit**: Bestaat al (soft delete + prullenbak + permanent delete + bulk delete)
-- **Order-check bij verwijdering**: Ontbreekt — er wordt niet gecheckt of orders aan de klant zijn gekoppeld
-- **Duplicaat detectie**: Ontbreekt — geen check bij aanmaken
-- **Test-data markering**: Ontbreekt
-- **Incomplete badge**: Ontbreekt
-- **Empty fields**: Consistent "—" wordt al gebruikt in desktop table (line 893-896), maar mobiel toont soms niets
+**De `useAIRouteOptimizer` hook crasht** omdat de edge function (`ai-route-optimizer`) een compleet ander response-formaat teruggeeft dan wat de hook verwacht.
 
-## Fixes
+**Edge function retourneert:**
+```json
+{ "optimizedOrder": ["id1","id2"], "totalDistanceKm": 45.2, "originalDistanceKm": 52.1, "savingsPercent": 13 }
+```
 
-### 1. Duplicaat Detectie bij Aanmaken
-**File:** `src/pages/Customers.tsx` — `handleSubmit`
+**Hook verwacht (`OptimizedRoute` interface):**
+```json
+{ "stops": [...], "totalDistance": 45, "totalDuration": 90, "geometry": {...}, "savings": { "timeSaved": 10, "distanceSaved": 7, "fuelSaved": 0.5 } }
+```
 
-Vóór het inserten, query `customers` op `company_name` (case-insensitive, `ilike`) en op `email`. Als match gevonden → `window.confirm("Er bestaat al een klant met de naam X. Wil je doorgaan?")`. Bij "Nee" → stop.
+Op line 103 crasht de hook met `result.savings.timeSaved` → `Cannot read properties of undefined`. De hele optimalisatie stopt.
 
-### 2. Order-check bij Verwijdering
-**File:** `src/pages/Customers.tsx` — `handleDelete`
+Ondertussen bestaat er al een **werkende** `useAdvancedRouteOptimization` hook die:
+- Nearest neighbor + 2-opt doet (identiek aan de edge function)
+- Mapbox Directions API gebruikt voor echte routing + geometry
+- Het correcte `OptimizationResult` formaat retourneert met stops, geometry, distances, etc.
 
-Voordat soft-delete uitgevoerd wordt, query `trips` (of `route_stops`) op `customer_id` om te tellen hoeveel orders gekoppeld zijn. Als > 0, pas de bevestigingstekst aan: "Deze klant heeft X orders. De klant wordt gearchiveerd (data blijft behouden)."
+## Fix
 
-### 3. Test-data Markering + Filter
-**File:** `src/pages/Customers.tsx`
+**Vervang `useAIRouteOptimizer` door `useAdvancedRouteOptimization`** in de RouteOptimization pagina. Dit elimineert de onnodige edge function call en gebruikt de bewezen lokale optimalisatie die al correct werkt met Mapbox.
 
-- Helper functie: `isTestCustomer(c)` → `true` als `company_name` "test" bevat (case-insensitive) OF email domein `@ghevd8.nl`
-- Badge: rode "Test" badge naast bedrijfsnaam
-- Filter toggle: `hideTestData` state, default `false`. Checkbox "Verberg test-data" boven de lijst
-- `filteredCustomers` filter uitbreiden met `hideTestData` logica
+### Wijzigingen in `src/pages/RouteOptimization.tsx`:
 
-### 4. Incomplete Data Badge
-**File:** `src/pages/Customers.tsx`
+1. **Import wijzigen** — Vervang `useAIRouteOptimizer` import door `useAdvancedRouteOptimization`
+2. **Hook call wijzigen** — Line 190: gebruik `useAdvancedRouteOptimization()` i.p.v. `useAIRouteOptimizer()`
+3. **`handleOptimize` herschrijven** — Roep `optimizeRoute(optimizableStops, options)` aan met het correcte `OptimizableStop[]` formaat en `OptimizationOptions`. Het resultaat is een `OptimizationResult` met `stops`, `geometry`, `totalDistance`, `totalDuration`, `savings`.
+4. **Response mapping aanpassen** — De `setOptimizationResult()` en `setStops()` calls updaten voor het `OptimizationResult` formaat (stops hebben `etaMinutes`, `distanceFromPrevious`, `arrivalTime` etc.)
 
-- Helper: `isIncomplete(c)` → `true` als `!email && !contact_name && !address`
-- Badge: oranje "Incompleet" badge naast bedrijfsnaam in zowel mobile als desktop view
-
-## Bestanden
+### Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Edit** | `src/pages/Customers.tsx` — Duplicaat check, order-check, test badge, incomplete badge, filter |
+| **Edit** | `src/pages/RouteOptimization.tsx` — Hook swap + handleOptimize rewrite |
 
