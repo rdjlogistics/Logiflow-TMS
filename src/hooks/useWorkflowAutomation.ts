@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WorkflowTrigger {
-  type: 'order_created' | 'order_status_changed' | 'delay_detected' | 'driver_assigned' | 'invoice_created' | 'custom_webhook';
+  type: 'order_created' | 'order_status_changed' | 'delay_detected' | 'driver_assigned' | 'invoice_created' | 'invoice_overdue' | 'custom_webhook';
   label: string;
   description: string;
   icon: string;
