@@ -72,6 +72,7 @@ const Customers = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleteOrderCount, setDeleteOrderCount] = useState(0);
   const [auditCustomerId, setAuditCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
