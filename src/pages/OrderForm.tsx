@@ -615,6 +615,17 @@ const OrderForm = () => {
         return;
       }
 
+      // Check if pickup and delivery are the same
+      if (pickupDest.city && deliveryDest.city &&
+          pickupDest.city.toLowerCase() === deliveryDest.city.toLowerCase() &&
+          pickupAddress.toLowerCase() === deliveryAddress.toLowerCase()) {
+        const confirmed = window.confirm('Ophaal- en afleveradres zijn hetzelfde. Klopt dit?');
+        if (!confirmed) {
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Get user's company_id from user_companies table, fallback to first available company
       let companyId: string | null = null;
       
