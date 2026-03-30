@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { usePurchaseInvoicePdf } from "@/hooks/use-purchase-invoice-pdf";
 import { type TripWithRate } from "./TripRateBreakdown";
 import { useCompany } from "@/hooks/useCompany";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { WizardHeader } from "./wizard/WizardHeader";
 import { WizardProgress } from "./wizard/WizardProgress";
 import { Step1SelectionSection } from "./wizard/Step1SelectionSection";
@@ -51,6 +52,7 @@ export const BatchPurchaseInvoiceWizard = () => {
   
   // Step 3 state
   const [createdInvoices, setCreatedInvoices] = useState<CreatedInvoice[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Calculate period dates based on preset
   const getPeriodDates = () => {
@@ -285,7 +287,7 @@ export const BatchPurchaseInvoiceWizard = () => {
           carrierGroups={carrierGroups}
           onToggleCarrier={toggleCarrierSelection}
           onBack={() => setStep(1)}
-          onNext={() => createInvoicesMutation.mutate()}
+          onNext={() => setShowConfirm(true)}
           isCreating={createInvoicesMutation.isPending}
           formatCurrency={formatCurrency}
         />
@@ -301,6 +303,25 @@ export const BatchPurchaseInvoiceWizard = () => {
           isDownloading={isGenerating}
         />
       )}
+      {(() => {
+        const selected = carrierGroups.filter(g => g.selected);
+        const totalAmount = selected.reduce((sum, g) => sum + g.subtotal, 0);
+        return (
+          <ConfirmDialog
+            open={showConfirm}
+            title="Inkoopfacturen definitief aanmaken?"
+            description={`Er ${selected.length === 1 ? 'wordt 1 inkoopfactuur' : `worden ${selected.length} inkoopfacturen`} aangemaakt voor een totaalbedrag van ${formatCurrency(totalAmount)}. Deze actie kan niet ongedaan worden gemaakt.`}
+            confirmText="Facturen aanmaken"
+            variant="warning"
+            isLoading={createInvoicesMutation.isPending}
+            onConfirm={() => {
+              setShowConfirm(false);
+              createInvoicesMutation.mutate();
+            }}
+            onCancel={() => setShowConfirm(false)}
+          />
+        );
+      })()}
     </div>
   );
 };
