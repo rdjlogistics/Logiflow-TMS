@@ -284,10 +284,13 @@ const Trips = () => {
                   {selectionMode ? "Klaar" : "Selecteer"}
                 </Button>
               )}
-              <Button variant="outline" onClick={handleExportCSV} className="gap-2 flex-1 sm:flex-none">
-                <Download className="h-4 w-4" />
-                CSV
-              </Button>
+              <ExportDropdown
+                headers={exportHeaders}
+                rows={exportRows}
+                filename="ritten"
+                sheetName="Ritten"
+                className="flex-1 sm:flex-none"
+              />
               {canManageTrips && (
                 <Button onClick={openNewDialog} className="flex-1 sm:flex-none">
                   <Plus className="mr-2 h-4 w-4" />
