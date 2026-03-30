@@ -1,34 +1,39 @@
 
-# Fix: App crashes — `useAuth must be used within an AuthProvider`
 
-## Root Cause
+# Fix: Verwijder Hardcoded Placeholder/Demo Data
 
-The previous edit to `useTenantSettings.ts` added `useCompany()` (which internally calls `useAuth()`). But in `App.tsx`, the component tree is:
+## Gevonden items
 
-```text
-ErrorBoundary
-  └─ QueryClientProvider
-       └─ ThemeProvider          ← calls useTenantSettings → useCompany → useAuth ❌
-            └─ AuthProvider      ← useAuth context lives HERE
-                 └─ ...rest
-```
+| Locatie | Probleem |
+|---------|----------|
+| `src/components/dashboard/AlertsWidget.tsx` | `mockAlerts` array met "SLA Breach Order #2847", "Chauffeur Jan vertraging", etc. wordt als **default** meegegeven via `alerts = mockAlerts` |
+| `src/components/fleet/FuelManagement.tsx` | Hardcoded voertuigen `BX-123-AB`, `VK-456-CD`, `ZD-012-GH` in select dropdown |
+| `src/pages/NotFound.tsx` | Placeholder telefoon `+31 20 123 4567` |
+| `src/pages/wms/WMSDashboard.tsx` | Hardcoded `warehouseUtilization = 73` en `pickingEfficiency = 94` met `// Demo value` |
+| `src/pages/AdminSettings.tsx` | Placeholder "Uw bedrijfsnaam" en "+31 20 123 4567" in input fields — **dit zijn placeholders in input velden, acceptabel als hint-tekst** |
+| `src/components/onboarding/CompanyVerificationStep.tsx` | Placeholder tekst in inputs (KvK "12345678", BTW "NL123456789B01") — **acceptabel als format-hint** |
+| `src/components/carriers/CarrierImportDialog.tsx` | CSV voorbeeld-data — **acceptabel als import template voorbeeld** |
 
-`ThemeProvider` renders BEFORE `AuthProvider`, so `useAuth()` throws "must be used within an AuthProvider".
+## Wat WEL moet veranderen (4 bestanden)
 
-## Fix
+### 1. `src/components/dashboard/AlertsWidget.tsx`
+- Verwijder de volledige `mockAlerts` array (regel 40-81)
+- Wijzig default prop van `alerts = mockAlerts` naar `alerts = []`
+- De component heeft al een mooie empty state (regel 174-213) met "Geen actieve alerts" — die wordt nu standaard getoond
 
-Modify `useTenantSettings.ts` to NOT use `useCompany()`. Instead, query `tenant_settings` directly via Supabase (relying on RLS for tenant isolation, which already works). This restores the original pattern where `useTenantSettings` had no auth dependency.
+### 2. `src/components/fleet/FuelManagement.tsx`
+- Vervang hardcoded `<SelectItem>` waarden door een dynamische query op de `vehicles` tabel
+- Bij geen voertuigen: toon een disabled select met "Geen voertuigen gevonden"
 
-### File: `src/hooks/useTenantSettings.ts`
-- Remove `import { useCompany }` 
-- Remove `useCompany()` call
-- Query `tenant_settings` with `.limit(1).maybeSingle()` (RLS handles filtering)
-- Set `queryKey` back to `['tenant-settings']`
-- Remove `enabled: !!companyId` guard (always enabled — returns null if no RLS match)
+### 3. `src/pages/NotFound.tsx`
+- Verwijder het telefoonnummer `+31 20 123 4567` volledig
+- Houd alleen het email-adres `support@rdjlogistics.nl` als contactoptie
 
-This is safe because:
-1. RLS on `tenant_settings` already filters by user's company
-2. Before auth, the query returns null (no session = no RLS match)
-3. The ThemeProvider already handles `null` gracefully (falls back to defaults)
+### 4. `src/pages/wms/WMSDashboard.tsx`
+- Vervang hardcoded `73` en `94` door `0` met een label "(nog geen data)"
 
-### No other files need changes.
+## Wat NIET verandert
+- **AdminSettings.tsx** placeholders ("Uw bedrijfsnaam", KvK "12345678") — dit zijn input field placeholders/hints, niet pre-filled waarden. `value={settings.company_name || ''}` zorgt dat het veld leeg is als er geen data is.
+- **CompanyVerificationStep.tsx** — zelfde: format hints in placeholder attr
+- **CarrierImportDialog.tsx** — CSV import template voorbeeld data
+
