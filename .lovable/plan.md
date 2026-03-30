@@ -1,90 +1,96 @@
 
+Ik snap je frustratie. Op basis van de code en de recente data lijkt dit geen “Gemini doet het niet”-probleem, maar een regressie in de chat-orchestratie.
 
-# Polish: Professionele Empty States, Loading States & Error States
+## Waarschijnlijk root cause
 
-## Aanpak
+De recente chat-conversaties in de database bevatten wél nieuwe **user** berichten, maar géén **assistant** berichten. Dat betekent: verzoeken komen binnen, maar de reply-keten breekt vóór het opslaan/renderen van het antwoord.
 
-De app heeft al 4 verschillende EmptyState componenten (`common/EmptyState`, `portal/shared/EmptyState`, `ui/EmptyState`, `pricing/EmptyState`) plus tientallen inline empty states. Veel pagina's gebruiken kale `Loader2` spinners zonder timeout. We consolideren naar **één set herbruikbare componenten** en passen die toe op de belangrijkste pagina's.
+In `supabase/functions/chatgpt/index.ts` zie ik de meest waarschijnlijke fout:
+- `runToolLoop(...)` doet al een AI-call en kan al een **finale assistant reply** opleveren
+- daarna wordt nóg een tweede AI-call gestart in de streaming tak
+- credits worden afgeschreven **vóór** gecontroleerd is dat er echt bruikbare assistant-output is
+- als die tweede call leeg eindigt, ziet de gebruiker niets maar is er wel verbruik
 
-## Wat wordt gebouwd
+Dus: de backend lijkt nu dubbel te sturen / verkeerd te finaliseren.
 
-### 1. Unified componenten in `src/components/common/`
+## Fix plan
 
-**EmptyState.tsx** — al aanwezig, uitbreiden met:
-- `actionHref` prop (Link ipv onClick)
-- `illustration` variant (grotere iconen voor hoofdpagina's)
+### 1. Backend chat-flow herstellen
+Bestand: `supabase/functions/chatgpt/index.ts`
 
-**LoadingState.tsx** — nieuw:
-- Skeleton loader (niet alleen spinner)
-- Na 10s: "Dit duurt langer dan verwacht" melding
-- Na 30s: error state met "Opnieuw laden" knop
-- Props: `message`, `onRetry`, `timeout` (default 10s)
+Ik ga de flow terugbrengen naar één betrouwbare finale antwoordstap:
 
-**ErrorState.tsx** — nieuw:
-- Icon (AlertTriangle), titel, beschrijving, retry knop
-- Console.error voor technische details
-- Props: `error`, `onRetry`, `title`
+- `runToolLoop()` laten eindigen met:
+  - óf `pendingConfirmation`
+  - óf een echte finale assistant boodschap
+- de extra tweede completion-call verwijderen of overslaan zodra er al finale assistant content is
+- geen “lege stream” meer toestaan als succesvol pad
 
-### 2. Toepassen op hoofdpagina's
+### 2. Credits pas ná succesvolle assistant output afboeken
+Zelfde bestand.
 
-| Pagina | Huidige staat | Nieuwe staat |
-|--------|--------------|-------------|
-| `/fleet` (VehicleOverview) | Kale tekst + icoon | EmptyState met "Voeg je eerste voertuig toe" + knop |
-| `/orders` (OrderOverview) | Inline div | EmptyState component |
-| `/customers` | Inline "Voeg je eerste klant toe" | EmptyState component |
-| `/drivers` | Inline User icoon + tekst | EmptyState component |
-| `/invoices` | Zoeken naar huidige staat | EmptyState component |
-| `/messenger` | Al verbeterd (vorige fix) | Controleren/behouden |
-| `/carriers` | Inline tekst | EmptyState component |
+Ik verplaats de credit-afschrijving zodat die pas gebeurt als:
+- er echt assistant content is ontvangen
+- die content is opgeslagen
+- of er een geldige confirmation response is opgebouwd
 
-### 3. Loading states upgraden
+Bij lege output / error:
+- géén credit-afschrijving
+- duidelijke foutresponse terug naar de frontend
 
-Vervang kale `<Loader2 animate-spin>` door `<LoadingState>` met timeout op:
-- FleetManagement (line 50)
-- Drivers (line 679)
-- Carriers (line 476, 1394)
-- Invoices
-- OrderOverview (al skeleton — behouden)
+### 3. Frontend beschermen tegen stille failures
+Bestand: `src/hooks/useChatGPT.ts`
 
-### 4. Error states toevoegen
+Ik voeg een harde guard toe:
+- als de stream eindigt zonder tekst en zonder confirmation payload:
+  - lege assistant bubble verwijderen
+  - fouttoast tonen
+  - gebruiker niet met “niets gebeurd” achterlaten
 
-Pagina's die data fetchen maar geen error handling hebben → voeg `<ErrorState>` toe bij fetch failures.
+Melding wordt iets als:
+- “AI Assistent reageerde niet. Er zijn geen credits afgeschreven voor dit mislukte verzoek.”
+of, als backend tijdelijk niet klaar is:
+- “AI Assistent wordt hersteld. Probeer het zo opnieuw.”
 
-## Technische details
+### 4. Conversation state en credit state corrigeren
+Bestand: `src/hooks/useChatGPT.ts` en mogelijk `supabase/functions/chatgpt/index.ts`
 
-### LoadingState component
-```tsx
-// States: loading → slow (10s) → error (30s)
-const [phase, setPhase] = useState<'loading' | 'slow' | 'error'>('loading');
-useEffect(() => {
-  const slow = setTimeout(() => setPhase('slow'), 10000);
-  const err = setTimeout(() => setPhase('error'), 30000);
-  return () => { clearTimeout(slow); clearTimeout(err); };
-}, []);
-```
+Ik herstel ook de metadata-flow zodat na het eerste bericht correct wordt bijgewerkt:
+- `conversationId`
+- credit-info
+- eventuele pending confirmation
 
-### EmptyState aanroep voorbeeld
-```tsx
-<EmptyState
-  icon={Truck}
-  title="Nog geen voertuigen"
-  description="Voeg je eerste voertuig toe om je vloot te beheren"
-  action={{ label: "Voertuig toevoegen", onClick: () => setShowAdd(true) }}
-/>
-```
+Nu wordt in de streaming tak die status niet netjes teruggekoppeld.
+
+### 5. Veilige stabilisatie boven fancy streaming
+Als de stream-path de instabiele factor blijft, kies ik voor de veilige route:
+- `/chatgpt` tijdelijk stabiel non-streaming laten antwoorden
+- eerst betrouwbaarheid herstellen
+- daarna streaming opnieuw netjes inbouwen
+
+Dat is waarschijnlijk de snelste manier om te stoppen met credits verspillen op “lege” antwoorden.
+
+## Waarom dit waarschijnlijk de echte fout is
+
+Deze signalen wijzen daar sterk op:
+- recente gesprekken hebben alleen user-rows
+- secrets zijn aanwezig, dus het is niet simpelweg “AI key ontbreekt”
+- er zijn geen duidelijke runtime errors in de logs
+- credits worden wel geraakt, dus de backend-call loopt deels door
+- de huidige code doet zichtbaar een tool/finalisatie-flow die makkelijk dubbel kan lopen
 
 ## Bestanden
 
 | Actie | Bestand |
-|-------|---------|
-| **Edit** | `src/components/common/EmptyState.tsx` — actionHref prop toevoegen |
-| **Create** | `src/components/common/LoadingState.tsx` — skeleton + timeout logica |
-| **Create** | `src/components/common/ErrorState.tsx` — error display + retry |
-| **Edit** | `src/components/fleet/VehicleOverview.tsx` — gebruik EmptyState |
-| **Edit** | `src/pages/OrderOverview.tsx` — gebruik EmptyState |
-| **Edit** | `src/pages/Customers.tsx` — gebruik EmptyState + LoadingState |
-| **Edit** | `src/pages/Drivers.tsx` — gebruik EmptyState + LoadingState |
-| **Edit** | `src/pages/Invoices.tsx` — gebruik EmptyState + LoadingState |
-| **Edit** | `src/pages/Carriers.tsx` — gebruik EmptyState + LoadingState |
-| **Edit** | `src/pages/FleetManagement.tsx` — gebruik LoadingState |
+|---|---|
+| Edit | `supabase/functions/chatgpt/index.ts` — dubbele AI-finalisatie verwijderen, credit timing fixen |
+| Edit | `src/hooks/useChatGPT.ts` — lege stream als fout behandelen, duidelijke toast/fallback |
+| Mogelijk edit | `src/components/chatgpt/ChatGPTPanel.tsx` — optionele user-facing foutstatus bij mislukte reply |
 
+## Verwachte uitkomst
+
+Na deze fix:
+- chat in `/chatgpt` geeft weer echt antwoord
+- mislukte requests falen zichtbaar in plaats van stil
+- credits worden niet meer afgeschreven voor lege / kapotte responses
+- nieuwe gesprekken slaan weer zowel user als assistant berichten op
