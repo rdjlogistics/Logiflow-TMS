@@ -530,6 +530,90 @@ const WorkflowAutomation = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="templates" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Standaard Templates</CardTitle>
+                <CardDescription>
+                  Installeer kant-en-klare workflow templates met één klik
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {WORKFLOW_TEMPLATES.map((template) => {
+                  const isInstalled = workflows?.some(
+                    (w) => w.name === template.name && w.trigger_type === template.trigger_type
+                  );
+                  const trigger = WORKFLOW_TRIGGERS.find((t) => t.type === template.trigger_type);
+
+                  return (
+                    <div
+                      key={template.id}
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          {trigger && iconMap[trigger.icon]}
+                        </div>
+                        <div>
+                          <p className="font-medium">{template.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {template.description}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {trigger?.label}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {template.actions.length} actie(s)
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      {isInstalled ? (
+                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Geïnstalleerd
+                        </Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            const { data: { user } } = await (await import('@/integrations/supabase/client')).supabase.auth.getUser();
+                            if (!user) return;
+                            const { data: userCompany } = await (await import('@/integrations/supabase/client')).supabase
+                              .from('user_companies')
+                              .select('company_id')
+                              .eq('user_id', user.id)
+                              .single();
+                            if (!userCompany) return;
+
+                            await createWorkflow.mutateAsync({
+                              tenant_id: userCompany.company_id,
+                              name: template.name,
+                              description: template.description,
+                              trigger_type: template.trigger_type,
+                              trigger_config: template.trigger_config,
+                              is_active: true,
+                              actions: template.actions as WorkflowAction[],
+                            });
+                          }}
+                          disabled={createWorkflow.isPending}
+                        >
+                          {createWorkflow.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <Plus className="h-4 w-4 mr-1" />
+                          )}
+                          Installeren
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="runs" className="space-y-4">
             <Card>
               <CardHeader>

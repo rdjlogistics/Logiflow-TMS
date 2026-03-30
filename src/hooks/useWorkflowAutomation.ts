@@ -96,10 +96,93 @@ export const WORKFLOW_TRIGGERS: WorkflowTrigger[] = [
     icon: 'FileText',
   },
   {
+    type: 'invoice_overdue',
+    label: 'Factuur vervallen',
+    description: 'Trigger wanneer een factuur X dagen over de vervaldatum is',
+    icon: 'AlertTriangle',
+    configFields: [
+      { name: 'days_overdue', label: 'Dagen na vervaldatum', type: 'number' },
+    ],
+  },
+  {
     type: 'custom_webhook',
     label: 'Custom Webhook',
     description: 'Trigger via externe webhook call',
     icon: 'Globe',
+  },
+];
+
+// Pre-built workflow templates for common use cases
+export const WORKFLOW_TEMPLATES = [
+  {
+    id: 'invoice_reminder_7',
+    name: 'Betalingsherinnering (7 dagen)',
+    description: 'Stuur een vriendelijke herinnering 7 dagen na vervaldatum',
+    trigger_type: 'invoice_overdue' as const,
+    trigger_config: { days_overdue: 7 },
+    actions: [
+      {
+        action_type: 'send_email',
+        action_config: {
+          to: '{{customer.email}}',
+          subject: 'Herinnering: factuur {{invoice.number}} is verlopen',
+          body: 'Beste {{customer.name}},\n\nWij willen u vriendelijk herinneren dat factuur {{invoice.number}} ter waarde van €{{invoice.total_amount}} op {{invoice.due_date}} vervallen is.\n\nGraag ontvangen wij de betaling zo spoedig mogelijk.\n\nMet vriendelijke groet,\nRDJ Logistics',
+        },
+        sequence_order: 0,
+        delay_minutes: 0,
+        is_active: true,
+      },
+    ],
+  },
+  {
+    id: 'invoice_reminder_14',
+    name: 'Aanmaning (14 dagen)',
+    description: 'Stuur een formele aanmaning 14 dagen na vervaldatum',
+    trigger_type: 'invoice_overdue' as const,
+    trigger_config: { days_overdue: 14 },
+    actions: [
+      {
+        action_type: 'send_email',
+        action_config: {
+          to: '{{customer.email}}',
+          subject: 'Aanmaning: factuur {{invoice.number}} — 14 dagen vervallen',
+          body: 'Beste {{customer.name}},\n\nOndanks onze eerdere herinnering hebben wij nog geen betaling ontvangen voor factuur {{invoice.number}} ter waarde van €{{invoice.total_amount}}.\n\nDeze factuur is reeds 14 dagen over de vervaldatum. Wij verzoeken u dringend om de betaling binnen 5 werkdagen te voldoen.\n\nMet vriendelijke groet,\nRDJ Logistics',
+        },
+        sequence_order: 0,
+        delay_minutes: 0,
+        is_active: true,
+      },
+    ],
+  },
+  {
+    id: 'invoice_reminder_30',
+    name: 'Laatste aanmaning (30 dagen)',
+    description: 'Stuur een laatste waarschuwing en maak een opvolgtaak aan na 30 dagen',
+    trigger_type: 'invoice_overdue' as const,
+    trigger_config: { days_overdue: 30 },
+    actions: [
+      {
+        action_type: 'send_email',
+        action_config: {
+          to: '{{customer.email}}',
+          subject: 'LAATSTE AANMANING: factuur {{invoice.number}} — 30+ dagen vervallen',
+          body: 'Beste {{customer.name}},\n\nDit is onze laatste aanmaning voor factuur {{invoice.number}} ter waarde van €{{invoice.total_amount}}. Deze factuur is meer dan 30 dagen over de vervaldatum.\n\nIndien wij binnen 7 dagen geen betaling ontvangen, zijn wij genoodzaakt verdere stappen te ondernemen.\n\nMet vriendelijke groet,\nRDJ Logistics',
+        },
+        sequence_order: 0,
+        delay_minutes: 0,
+        is_active: true,
+      },
+      {
+        action_type: 'create_task',
+        action_config: {
+          title: 'Openstaande factuur opvolgen: {{invoice.number}}',
+          assignee: 'administratie',
+        },
+        sequence_order: 1,
+        delay_minutes: 0,
+        is_active: true,
+      },
+    ],
   },
 ];
 
