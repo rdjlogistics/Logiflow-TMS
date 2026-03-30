@@ -66,35 +66,12 @@ interface NotificationTemplate {
   isActive: boolean;
 }
 
-const mockChannels: NotificationChannel[] = [
-  { id: '1', type: 'whatsapp', name: 'WhatsApp Business', isActive: true, phoneNumber: '+31612345678' },
-  { id: '2', type: 'sms', name: 'SMS Gateway', isActive: true },
-  { id: '3', type: 'email', name: 'Email (Resend)', isActive: true },
-  { id: '4', type: 'push', name: 'Push Notificaties', isActive: false },
-];
-
-const mockLogs: NotificationLog[] = [
-  { id: '1', channel: 'WhatsApp', recipient: '+31687654321', message: 'Uw zending ORD-2024-1234 is onderweg', status: 'delivered', sentAt: new Date(Date.now() - 1000 * 60 * 5), deliveredAt: new Date(Date.now() - 1000 * 60 * 4) },
-  { id: '2', channel: 'SMS', recipient: '+31612345678', message: 'Chauffeur arriveert over 15 minuten', status: 'delivered', sentAt: new Date(Date.now() - 1000 * 60 * 30), deliveredAt: new Date(Date.now() - 1000 * 60 * 29) },
-  { id: '3', channel: 'Email', recipient: 'klant@bedrijf.nl', message: 'Factuur INV-2024-0856 is verzonden', status: 'sent', sentAt: new Date(Date.now() - 1000 * 60 * 60) },
-  { id: '4', channel: 'WhatsApp', recipient: '+31699887766', message: 'Uw zending is afgeleverd', status: 'failed', sentAt: new Date(Date.now() - 1000 * 60 * 90) },
-];
-
-const mockTemplates: NotificationTemplate[] = [
-  { id: '1', event: 'order_confirmed', channels: ['email', 'whatsapp'], messageTemplate: 'Uw order {{order_id}} is bevestigd. Verwachte levering: {{delivery_date}}', isActive: true },
-  { id: '2', event: 'driver_assigned', channels: ['sms'], messageTemplate: 'Chauffeur {{driver_name}} is toegewezen aan uw levering', isActive: true },
-  { id: '3', event: 'in_transit', channels: ['whatsapp', 'push'], messageTemplate: 'Uw zending {{order_id}} is onderweg. Track hier: {{tracking_url}}', isActive: true },
-  { id: '4', event: 'arriving_soon', channels: ['sms', 'whatsapp'], messageTemplate: 'Chauffeur arriveert over {{eta}} minuten bij {{address}}', isActive: true },
-  { id: '5', event: 'delivered', channels: ['email', 'whatsapp'], messageTemplate: 'Uw zending {{order_id}} is succesvol afgeleverd. Bekijk POD: {{pod_url}}', isActive: true },
-  { id: '6', event: 'invoice_sent', channels: ['email'], messageTemplate: 'Factuur {{invoice_number}} is verzonden. Bedrag: {{amount}}', isActive: true },
-];
-
 const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 
 export default function NotificationChannels() {
-  const [channels, setChannels] = useState<NotificationChannel[]>(mockChannels);
-  const [logs] = useState<NotificationLog[]>(mockLogs);
-  const [templates, setTemplates] = useState<NotificationTemplate[]>(mockTemplates);
+  const [channels, setChannels] = useState<NotificationChannel[]>([]);
+  const [logs] = useState<NotificationLog[]>([]);
+  const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   
   // Template edit dialog state
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
@@ -106,10 +83,10 @@ export default function NotificationChannels() {
   const [editingChannel, setEditingChannel] = useState<NotificationChannel | null>(null);
 
   const stats = {
-    sent24h: 156,
-    delivered: 148,
-    failed: 8,
-    deliveryRate: 95,
+    sent24h: logs.length,
+    delivered: logs.filter(l => l.status === 'delivered').length,
+    failed: logs.filter(l => l.status === 'failed').length,
+    deliveryRate: logs.length > 0 ? Math.round((logs.filter(l => l.status === 'delivered').length / logs.length) * 100) : 0,
   };
 
   const getChannelIcon = (type: NotificationChannel['type']) => {
@@ -293,45 +270,61 @@ export default function NotificationChannels() {
           </TabsList>
 
           <TabsContent value="channels" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              {channels.map(channel => (
-                <Card key={channel.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-lg bg-muted">
-                          {getChannelIcon(channel.type)}
+            {channels.length === 0 ? (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="rounded-full bg-muted p-4 mb-4">
+                      <Bell className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Geen kanalen geconfigureerd</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Configureer je eerste notificatiekanaal (WhatsApp, SMS, Email of Push) om automatische berichten te versturen.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {channels.map(channel => (
+                  <Card key={channel.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-lg bg-muted">
+                            {getChannelIcon(channel.type)}
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{channel.name}</h3>
+                            <p className="text-sm text-muted-foreground capitalize">{channel.type}</p>
+                            {channel.phoneNumber && (
+                              <p className="text-sm font-mono mt-1">{channel.phoneNumber}</p>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium">{channel.name}</h3>
-                          <p className="text-sm text-muted-foreground capitalize">{channel.type}</p>
-                          {channel.phoneNumber && (
-                            <p className="text-sm font-mono mt-1">{channel.phoneNumber}</p>
-                          )}
-                        </div>
+                        <Switch 
+                          checked={channel.isActive}
+                          onCheckedChange={() => toggleChannel(channel.id)}
+                        />
                       </div>
-                      <Switch 
-                        checked={channel.isActive}
-                        onCheckedChange={() => toggleChannel(channel.id)}
-                      />
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <Badge variant={channel.isActive ? 'default' : 'secondary'}>
-                        {channel.isActive ? 'Actief' : 'Inactief'}
-                      </Badge>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleConfigureChannel(channel)}
-                      >
-                        <Settings className="h-4 w-4 mr-1" />
-                        Configureren
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <div className="mt-4 flex items-center gap-2">
+                        <Badge variant={channel.isActive ? 'default' : 'secondary'}>
+                          {channel.isActive ? 'Actief' : 'Inactief'}
+                        </Badge>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleConfigureChannel(channel)}
+                        >
+                          <Settings className="h-4 w-4 mr-1" />
+                          Configureren
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             <Card>
               <CardHeader>
@@ -445,34 +438,46 @@ export default function NotificationChannels() {
                 <CardDescription>Recente notificaties en hun status</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Kanaal</TableHead>
-                      <TableHead>Ontvanger</TableHead>
-                      <TableHead>Bericht</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Verzonden</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {logs.map(log => (
-                      <TableRow key={log.id}>
-                        <TableCell>
-                          <Badge variant="outline">{log.channel}</Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">{log.recipient}</TableCell>
-                        <TableCell>
-                          <p className="text-sm truncate max-w-xs">{log.message}</p>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(log.status)}</TableCell>
-                        <TableCell>
-                          {format(log.sentAt, "d MMM HH:mm", { locale: nl })}
-                        </TableCell>
+                {logs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center py-12">
+                    <div className="rounded-full bg-muted p-4 mb-4">
+                      <Send className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Nog geen notificaties verzonden</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Zodra er notificaties worden verstuurd, verschijnen ze hier in het verzendlog.
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Kanaal</TableHead>
+                        <TableHead>Ontvanger</TableHead>
+                        <TableHead>Bericht</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Verzonden</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {logs.map(log => (
+                        <TableRow key={log.id}>
+                          <TableCell>
+                            <Badge variant="outline">{log.channel}</Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">{log.recipient}</TableCell>
+                          <TableCell>
+                            <p className="text-sm truncate max-w-xs">{log.message}</p>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(log.status)}</TableCell>
+                          <TableCell>
+                            {format(log.sentAt, "d MMM HH:mm", { locale: nl })}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
