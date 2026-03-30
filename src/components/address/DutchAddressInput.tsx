@@ -41,6 +41,8 @@ const DutchAddressInput = ({
   const { lookupPostcode, loading } = usePostcodeLookup();
   const [autoFilled, setAutoFilled] = useState(false);
   const [lastLookup, setLastLookup] = useState<string>("");
+  const [apiCity, setApiCity] = useState<string | null>(null);
+  const [cityMismatch, setCityMismatch] = useState<string | null>(null);
 
   // Auto-lookup when postcode is complete and valid
   const handlePostcodeBlur = useCallback(async () => {
@@ -55,10 +57,12 @@ const DutchAddressInput = ({
         const result = await lookupPostcode(cleaned, houseNumber);
         
         if (result) {
-          if (result.street && !street) {
+          if (result.street) {
             onStreetChange(result.street);
           }
-          if (result.city && !city) {
+          if (result.city) {
+            setApiCity(result.city);
+            setCityMismatch(null);
             onCityChange(result.city);
           }
           setAutoFilled(true);
@@ -171,15 +175,29 @@ const DutchAddressInput = ({
           )}
           <Input
             value={city}
-            onChange={(e) => onCityChange(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              onCityChange(val);
+              if (apiCity && val && val.toLowerCase() !== apiCity.toLowerCase()) {
+                setCityMismatch(apiCity);
+              } else {
+                setCityMismatch(null);
+              }
+            }}
             placeholder="Plaatsnaam"
             className={cn(
               inputHeight, 
               textSize,
-              autoFilled && "border-success/50 bg-success/5"
+              autoFilled && "border-success/50 bg-success/5",
+              cityMismatch && "border-yellow-500/50"
             )}
             disabled={disabled}
           />
+          {cityMismatch && (
+            <p className="text-[11px] text-yellow-600 dark:text-yellow-400 mt-0.5">
+              De postcode hoort bij {cityMismatch}, niet {city}
+            </p>
+          )}
         </div>
       </div>
     </div>
