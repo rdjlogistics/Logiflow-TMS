@@ -580,19 +580,22 @@ export const B2BDashboard = ({
                           initial="hidden"
                           animate="visible"
                           whileHover={{ backgroundColor: "hsl(var(--muted) / 0.15)" }}
-                          className="py-2.5 px-1 rounded-md transition-colors"
+                          className="rounded-md transition-colors"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.color.replace('text-', 'bg-')}`} />
-                              <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                          <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 px-1 touch-manipulation">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${st.color.replace('text-', 'bg-')}`} />
+                                <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
+                              </div>
+                              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo}</span>
                             </div>
-                            <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{timeAgo}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 ml-3.5">
-                            <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px]`}>{st.label}</Badge>
-                            <span className="text-[10px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</span>
-                          </div>
+                            <div className="flex items-center gap-1.5 mt-1 ml-3.5">
+                              <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px]`}>{st.label}</Badge>
+                              <span className="text-[10px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</span>
+                              <span className="text-[10px] text-muted-foreground shrink-0">· {s.parcels} colli</span>
+                            </div>
+                          </Link>
                         </motion.div>
                       );
                     })}
