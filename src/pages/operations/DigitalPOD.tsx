@@ -372,6 +372,9 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
         onOpenChange={setShowSendDialog}
         tripId={pod.trip_id}
         orderNumber={pod.order_number || pod.id.slice(0, 8)}
+        customerEmail={pod.customer_email}
+        defaultDocumentType="pod"
+        stopProofId={pod.id}
         isDemo={false}
       />
 

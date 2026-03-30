@@ -159,7 +159,8 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
       if (sendError) throw sendError;
 
       setSent(true);
-      toast.success(`${documentType === 'vrachtbrief' ? 'Vrachtbrief' : 'Transportopdracht'} verstuurd`);
+      const typeLabels: Record<string, string> = { pod: 'POD', vrachtbrief: 'Vrachtbrief', transportopdracht: 'Transportopdracht' };
+      toast.success(`${typeLabels[documentType] || documentType} verstuurd naar ${email}`);
       setTimeout(() => {
         onOpenChange(false);
         setSent(false);

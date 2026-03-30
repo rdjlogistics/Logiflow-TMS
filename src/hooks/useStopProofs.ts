@@ -104,10 +104,11 @@ export function useStopProofs() {
           created_at: row.created_at,
           order_number: trip?.order_number || null,
           customer_name: trip?.customers?.company_name || null,
+          customer_email: trip?.customers?.email || null,
           stop_company_name: stop?.company_name || null,
           stop_address: stop?.address || null,
           stop_city: stop?.city || null,
-          driver_name: profile?.full_name || null,
+          driver_name: driver?.name || null,
           driver_remarks: stop?.driver_remarks || null,
           status: hasSignature ? 'signed' : hasPhotos ? 'photo_only' : 'pending',
         };
