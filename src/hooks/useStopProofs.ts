@@ -65,15 +65,15 @@ export function useStopProofs() {
       const stopIds = [...new Set(rawProofs.map(r => r.stop_id))];
       const driverIds = [...new Set(rawProofs.map(r => r.driver_id))];
 
-      const [tripsRes, stopsRes, profilesRes] = await Promise.all([
-        supabase.from('trips').select('id, order_number, customer_id, customers:customer_id (company_name)').in('id', tripIds),
+      const [tripsRes, stopsRes, driversRes] = await Promise.all([
+        supabase.from('trips').select('id, order_number, customer_id, customers:customer_id (company_name, email)').in('id', tripIds),
         supabase.from('route_stops').select('id, company_name, address, city, driver_remarks').in('id', stopIds),
-        supabase.from('profiles').select('user_id, full_name').in('user_id', driverIds),
+        supabase.from('drivers').select('id, name').in('id', driverIds),
       ]);
 
       const tripsMap = new Map((tripsRes.data || []).map((t: any) => [t.id, t]));
       const stopsMap = new Map((stopsRes.data || []).map((s: any) => [s.id, s]));
-      const profilesMap = new Map((profilesRes.data || []).map((p: any) => [p.user_id, p]));
+      const driversMap = new Map((driversRes.data || []).map((d: any) => [d.id, d]));
 
       const mapped: StopProofRecord[] = rawProofs.map((row: any) => {
         const hasSignature = !!row.signature_url;
