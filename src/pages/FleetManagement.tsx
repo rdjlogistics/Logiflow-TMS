@@ -84,7 +84,7 @@ const FleetManagement = () => {
                 variant="ghost"
                 size="sm"
                 className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => setActiveTab('overview')}
+                onClick={() => setActiveTab('maintenance')}
               >
                 Bekijk
               </Button>
