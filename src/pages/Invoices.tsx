@@ -241,6 +241,57 @@ const Invoices = () => {
     }
   };
 
+  // Demo invoices cleanup
+  const handleOpenCleanup = async () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const cutoff = thirtyDaysAgo.toISOString().split("T")[0];
+
+    const candidates = invoices.filter(inv => {
+      const isDemo = (inv.status === "concept" || inv.status === "vervallen") && !inv.sent_at;
+      const isOld = inv.invoice_date && inv.invoice_date < cutoff;
+      return isDemo && isOld;
+    });
+
+    if (candidates.length === 0) {
+      toast({ title: "Geen demo facturen gevonden", description: "Er zijn geen oude concept/vervallen facturen zonder verzenddatum." });
+      return;
+    }
+
+    setDemoInvoices(candidates);
+    setSelectedDemoIds(new Set(candidates.map(i => i.id)));
+    setCleanupDialogOpen(true);
+  };
+
+  const handleCleanupConfirm = async () => {
+    if (selectedDemoIds.size === 0) return;
+    setIsCleaningUp(true);
+    try {
+      const ids = Array.from(selectedDemoIds);
+      const conceptIds = demoInvoices.filter(i => selectedDemoIds.has(i.id) && i.status === "concept").map(i => i.id);
+      const vervallenIds = demoInvoices.filter(i => selectedDemoIds.has(i.id) && i.status === "vervallen").map(i => i.id);
+
+      if (conceptIds.length > 0) {
+        await supabase.from("invoice_lines").delete().in("invoice_id", conceptIds);
+        await supabase.from("invoices").delete().in("id", conceptIds).eq("status", "concept");
+      }
+
+      if (vervallenIds.length > 0) {
+        await supabase.from("invoices").update({ status: "geannuleerd" }).in("id", vervallenIds);
+      }
+
+      toast({ title: `${ids.length} facturen opgeruimd`, description: `${conceptIds.length} verwijderd, ${vervallenIds.length} gearchiveerd` });
+      fetchInvoices();
+    } catch (error) {
+      toast({ title: "Fout bij opruimen", variant: "destructive" });
+    } finally {
+      setIsCleaningUp(false);
+      setCleanupDialogOpen(false);
+      setDemoInvoices([]);
+      setSelectedDemoIds(new Set());
+    }
+  };
+
   const handleDownloadPdf = async (invoice: InvoiceWithCustomer) => {
     try {
       toast({ title: "PDF wordt gegenereerd..." });
