@@ -182,7 +182,13 @@ export const SubscriptionTab = () => {
 
   // Payment success is now handled by /checkout/success page
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   // ─── No subscription: attractive empty state ───
   if (!plan || !subscription) {
