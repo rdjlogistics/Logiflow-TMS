@@ -457,16 +457,21 @@ const Invoices = () => {
               </SelectContent>
             </Select>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="btn-premium w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" />Nieuwe factuur<ChevronDown className="ml-2 h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => navigate("/invoices/new")}><Sparkles className="mr-2 h-4 w-4 text-primary" /><div><p className="font-medium">Batch Facturatie</p><p className="text-xs text-muted-foreground">Automatisch uit orders</p></div></DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/invoices/new?tab=manual")}><FileText className="mr-2 h-4 w-4" /><div><p className="font-medium">Losse Factuur</p><p className="text-xs text-muted-foreground">Handmatig aanmaken</p></div></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" onClick={handleOpenCleanup} className="text-muted-foreground">
+              <Trash2 className="mr-2 h-4 w-4" />Demo opruimen
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="btn-premium flex-1 sm:flex-none"><Plus className="mr-2 h-4 w-4" />Nieuwe factuur<ChevronDown className="ml-2 h-4 w-4" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/invoices/new")}><Sparkles className="mr-2 h-4 w-4 text-primary" /><div><p className="font-medium">Batch Facturatie</p><p className="text-xs text-muted-foreground">Automatisch uit orders</p></div></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/invoices/new?tab=manual")}><FileText className="mr-2 h-4 w-4" /><div><p className="font-medium">Losse Factuur</p><p className="text-xs text-muted-foreground">Handmatig aanmaken</p></div></DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </motion.div>
 
         {/* Desktop Table */}
