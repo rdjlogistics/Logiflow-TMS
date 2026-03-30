@@ -268,19 +268,14 @@ const Invoices = () => {
     setIsCleaningUp(true);
     try {
       const ids = Array.from(selectedDemoIds);
-      const conceptIds = demoInvoices.filter(i => selectedDemoIds.has(i.id) && i.status === "concept").map(i => i.id);
-      const vervallenIds = demoInvoices.filter(i => selectedDemoIds.has(i.id) && i.status === "vervallen").map(i => i.id);
 
-      if (conceptIds.length > 0) {
-        await supabase.from("invoice_lines").delete().in("invoice_id", conceptIds);
-        await supabase.from("invoices").delete().in("id", conceptIds).eq("status", "concept");
+      // Delete all selected demo invoices (lines first, then invoices)
+      if (ids.length > 0) {
+        await supabase.from("invoice_lines").delete().in("invoice_id", ids);
+        await supabase.from("invoices").delete().in("id", ids);
       }
 
-      if (vervallenIds.length > 0) {
-        await supabase.from("invoices").update({ status: "geannuleerd" }).in("id", vervallenIds);
-      }
-
-      toast({ title: `${ids.length} facturen opgeruimd`, description: `${conceptIds.length} verwijderd, ${vervallenIds.length} gearchiveerd` });
+      toast({ title: `${ids.length} demo facturen verwijderd` });
       fetchInvoices();
     } catch (error) {
       toast({ title: "Fout bij opruimen", variant: "destructive" });
