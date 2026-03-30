@@ -553,6 +553,18 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
           tripId={selectedTrip.id}
           orderNumber={selectedTrip.order_number}
         />
+
+        {/* Confirmation Dialog for Start Trip */}
+        <ConfirmDialog
+          open={!!confirmStartTrip}
+          title="Wil je deze rit starten?"
+          description={`${selectedTrip.order_number} — ${selectedTrip.pickup_city || ''} → ${selectedTrip.delivery_city || ''}`}
+          confirmText="Starten"
+          cancelText="Annuleren"
+          variant="default"
+          onConfirm={() => confirmStartTrip && executeStartTrip(confirmStartTrip)}
+          onCancel={() => setConfirmStartTrip(null)}
+        />
       </div>
     );
   }
