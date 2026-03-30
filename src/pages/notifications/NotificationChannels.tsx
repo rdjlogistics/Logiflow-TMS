@@ -270,45 +270,61 @@ export default function NotificationChannels() {
           </TabsList>
 
           <TabsContent value="channels" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              {channels.map(channel => (
-                <Card key={channel.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-lg bg-muted">
-                          {getChannelIcon(channel.type)}
+            {channels.length === 0 ? (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="rounded-full bg-muted p-4 mb-4">
+                      <Bell className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Geen kanalen geconfigureerd</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Configureer je eerste notificatiekanaal (WhatsApp, SMS, Email of Push) om automatische berichten te versturen.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {channels.map(channel => (
+                  <Card key={channel.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-lg bg-muted">
+                            {getChannelIcon(channel.type)}
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{channel.name}</h3>
+                            <p className="text-sm text-muted-foreground capitalize">{channel.type}</p>
+                            {channel.phoneNumber && (
+                              <p className="text-sm font-mono mt-1">{channel.phoneNumber}</p>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium">{channel.name}</h3>
-                          <p className="text-sm text-muted-foreground capitalize">{channel.type}</p>
-                          {channel.phoneNumber && (
-                            <p className="text-sm font-mono mt-1">{channel.phoneNumber}</p>
-                          )}
-                        </div>
+                        <Switch 
+                          checked={channel.isActive}
+                          onCheckedChange={() => toggleChannel(channel.id)}
+                        />
                       </div>
-                      <Switch 
-                        checked={channel.isActive}
-                        onCheckedChange={() => toggleChannel(channel.id)}
-                      />
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <Badge variant={channel.isActive ? 'default' : 'secondary'}>
-                        {channel.isActive ? 'Actief' : 'Inactief'}
-                      </Badge>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleConfigureChannel(channel)}
-                      >
-                        <Settings className="h-4 w-4 mr-1" />
-                        Configureren
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <div className="mt-4 flex items-center gap-2">
+                        <Badge variant={channel.isActive ? 'default' : 'secondary'}>
+                          {channel.isActive ? 'Actief' : 'Inactief'}
+                        </Badge>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleConfigureChannel(channel)}
+                        >
+                          <Settings className="h-4 w-4 mr-1" />
+                          Configureren
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             <Card>
               <CardHeader>
