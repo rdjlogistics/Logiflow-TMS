@@ -1743,8 +1743,8 @@ serve(async (req) => {
     }
     const userId = claims.claims.sub as string;
 
-    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", userId).maybeSingle();
-    const tenantId = profile?.company_id;
+    const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", userId).eq("is_primary", true).maybeSingle();
+    const tenantId = uc?.company_id;
     if (!tenantId) {
       return new Response(JSON.stringify({ error: "Geen bedrijf gekoppeld" }), { status: 403, headers: corsHeaders });
     }

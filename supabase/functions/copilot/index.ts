@@ -255,11 +255,11 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub as string;
 
-    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", userId).maybeSingle();
-    if (!profile?.company_id) {
+    const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", userId).eq("is_primary", true).maybeSingle();
+    if (!uc?.company_id) {
       return new Response(JSON.stringify({ error: "No tenant" }), { status: 403, headers: corsHeaders });
     }
-    const tenantId = profile.company_id;
+    const tenantId = uc.company_id;
 
     const { messages: rawMessages, context } = await req.json();
     const messages = (rawMessages || []).slice(-15);
