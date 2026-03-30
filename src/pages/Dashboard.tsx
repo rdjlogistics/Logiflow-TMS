@@ -588,21 +588,8 @@ const Dashboard = () => {
         </motion.section>
 
 
-        {/* Empty State / Setup Guide */}
-        {!hasEnoughData && !loading && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <DashboardEmptyState
-              hasOrders={stats.tripsThisMonth > 0}
-              hasRates={true}
-              hasBankConnected={false}
-              hasCustomers={stats.customers > 0}
-            />
-          </motion.div>
-        )}
+        {/* Onboarding Checklist */}
+        <OnboardingChecklist />
       </motion.div>
 
       {/* Widget Customizer + Presets — unified panel */}
