@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 /**
  * Ensures a profile, role, and company exist for a newly signed-up user.
@@ -110,7 +111,7 @@ export async function ensureProfileAfterSignup(
         console.warn("[ensureProfile] tenant_settings insert warning:", settingsError.message);
       }
 
-      console.log(`[ensureProfile] Created company ${newCompany.id} for user ${userId}`);
+      logger.info(`[ensureProfile] Created company ${newCompany.id} for user ${userId}`);
     }
   } catch (err) {
     console.error("[ensureProfile] Company ensure failed:", err);
