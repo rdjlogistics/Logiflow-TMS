@@ -481,7 +481,7 @@ const DriversTab = () => {
               icon={Users}
               title={search || statusFilter !== 'all' ? 'Geen chauffeurs gevonden' : 'Nog geen chauffeurs'}
               description={search || statusFilter !== 'all' ? 'Pas je filters aan.' : 'Voeg je eerste chauffeur toe.'}
-              action={!search && statusFilter === 'all' ? { label: 'Chauffeur toevoegen', onClick: openNewDialog, icon: Plus } : undefined}
+              action={!search && statusFilter === 'all' ? { label: 'Chauffeur toevoegen', onClick: () => setAddOpen(true), icon: Plus } : undefined}
             />
           ) : isMobile ? (
             <div className="space-y-3">
