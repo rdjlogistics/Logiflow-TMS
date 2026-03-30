@@ -814,13 +814,14 @@ const Customers = () => {
           </CardHeader>
           <CardContent className="p-0 md:p-6">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
+              <LoadingState message="Klanten laden..." />
             ) : filteredCustomers.length === 0 ? (
-              <p className="text-center py-8 text-muted-foreground px-4">
-                {searchTerm ? "Geen klanten gevonden" : "Nog geen klanten toegevoegd"}
-              </p>
+              <EmptyState
+                icon={UserPlus}
+                title={searchTerm ? "Geen klanten gevonden" : "Nog geen klanten"}
+                description={searchTerm ? "Pas je zoekterm aan." : "Voeg je eerste klant toe om te beginnen."}
+                action={!searchTerm ? { label: "Klant toevoegen", onClick: () => { resetForm(); setEditingCustomer(null); setShowAddDialog(true); }, icon: Plus } : undefined}
+              />
             ) : (
               <>
                 {/* Mobile card view with pull-to-refresh and swipe gestures */}

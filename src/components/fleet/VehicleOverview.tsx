@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { EmptyState } from '@/components/common/EmptyState';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

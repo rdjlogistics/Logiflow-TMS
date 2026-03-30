@@ -1394,10 +1394,10 @@ const Carriers = () => {
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="text-center py-8 text-muted-foreground">Laden...</div>
+                  <LoadingState message="Charters laden..." />
                 ) : filteredCarriers.length === 0 ? (
                   (searchTerm || statusFilter !== 'all') ? (
-                    <div className="text-center py-8 text-muted-foreground">Geen charters gevonden</div>
+                    <EmptyState icon={Truck} title="Geen charters gevonden" description="Pas je filters aan of probeer een andere zoekterm." />
                   ) : (
                     <div className="rounded-lg border border-amber-500/30 bg-amber-50 dark:bg-amber-950/20 p-6">
                       <div className="flex items-start gap-3">
