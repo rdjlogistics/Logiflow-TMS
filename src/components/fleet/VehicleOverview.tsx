@@ -34,9 +34,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Truck, Search, Filter, MoreVertical, CheckCircle, AlertTriangle,
-  XCircle, Pencil, Calendar, Loader2, Plus, Trash2, Download,
+  XCircle, Pencil, Calendar, Loader2, Plus, Trash2,
   Gauge, FileCheck, Wrench, Shield, ChevronRight, Car,
 } from 'lucide-react';
+import { ExportDropdown } from '@/components/common/ExportDropdown';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
