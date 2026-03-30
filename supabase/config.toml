@@ -149,3 +149,21 @@ verify_jwt = false
 
 [functions.dispatch-notify]
 verify_jwt = false
+
+[functions.smart-document-ocr]
+verify_jwt = false
+
+[functions.analyze-driver-document]
+verify_jwt = false
+
+[functions.portal-ai]
+verify_jwt = false
+
+[functions.ecommerce-sync]
+verify_jwt = false
+
+[functions.convert-ecommerce-order]
+verify_jwt = false
+
+[functions.process-email-queue]
+verify_jwt = false

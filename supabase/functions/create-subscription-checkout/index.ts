@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         amount: { currency: "EUR", value: amount.toFixed(2) },
         description: `${plan.name} - ${billing_cycle}`,
-        redirectUrl: `https://rdjlogistics.nl/settings?payment=success`,
+        redirectUrl: `https://rdjlogistics.nl/settings/subscription?payment=success`,
         webhookUrl: `${Deno.env.get("SUPABASE_URL")}/functions/v1/create-subscription-checkout?webhook=true`,
         metadata: { tenant_id: uc.company_id, plan_id: plan.id, billing_cycle },
       }),
