@@ -5,14 +5,14 @@ import {
   type DriverFilters,
 } from '@/services/drivers';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering drivers with automatic refresh.
- *
- * Example:
- *   const { drivers, loading, refetch } = useDriversData({ status: 'active' });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useDriversData(filters: DriverFilters = {}) {
+  const { company } = useCompany();
   const [drivers, setDrivers] = useState<Awaited<ReturnType<typeof fetchDrivers>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
