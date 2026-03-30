@@ -350,8 +350,17 @@ const Trips = () => {
                     initial="hidden"
                     animate="visible"
                   >
-                    {filteredTrips.map((trip, i) => (
-                      <motion.div key={trip.id} variants={itemVariants}>
+                    {filteredTrips.map((trip) => (
+                      <motion.div key={trip.id} variants={itemVariants} className="relative">
+                      {selectionMode && (
+                        <div className="absolute left-2 top-2 z-10">
+                          <Checkbox
+                            checked={selectedIds.has(trip.id)}
+                            onCheckedChange={() => toggleSelect(trip.id)}
+                            className="h-5 w-5 border-2"
+                          />
+                        </div>
+                      )}
                       <SwipeableCard
                         leftActions={[swipeActions.more(() => handleEdit(trip))]}
                         rightActions={canDelete ? [swipeActions.delete(() => handleDeleteClick(trip.id))] : []}
