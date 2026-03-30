@@ -311,7 +311,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
   const RouteListItem = ({ trip }: { trip: typeof trips[0] }) => {
     const stops = trip.route_stops || [];
     const completedStops = stops.filter(s => s.status === 'completed').length;
-    const isActive = trip.status === 'onderweg';
+    const isActive = ['onderweg', 'geladen'].includes(trip.status);
 
     return (
       <motion.div
