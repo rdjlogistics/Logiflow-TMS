@@ -59,8 +59,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCompany } from "@/hooks/useCompany";
 import AddStopDialog from "@/components/route/AddStopDialog";
 import ImportStopsDialog from "@/components/route/ImportStopsDialog";
-import type { OptimizableStop } from "@/hooks/useAdvancedRouteOptimization";
-import { useAIRouteOptimizer, type RouteStop } from "@/hooks/useAIRouteOptimizer";
+import { useAdvancedRouteOptimization, type OptimizableStop } from "@/hooks/useAdvancedRouteOptimization";
 import { useRouteOptimizationStops } from "@/hooks/useRouteOptimizationStops";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeocodeBackfill } from "@/hooks/useGeocodeBackfill";
@@ -187,7 +186,7 @@ const RouteOptimization = () => {
   const [isLoadingTollFreeAlt, setIsLoadingTollFreeAlt] = useState(false);
   const { detectTolls, isDetecting: isTollDetecting } = useTollDetection();
   
-  const { optimizeRoute, isOptimizing, error } = useAIRouteOptimizer();
+  const { optimizeRoute, isOptimizing, error } = useAdvancedRouteOptimization();
 
   // Initialize from tenant settings
   useEffect(() => {
@@ -452,7 +451,8 @@ const RouteOptimization = () => {
     const serviceTime = tenantSettings?.route_service_time_minutes || 15;
     const speedPct = tenantSettings?.route_speed_percentage || 85;
 
-    const routeStops: RouteStop[] = stops.map((stop) => {
+    // Map stops to OptimizableStop format for useAdvancedRouteOptimization
+    const optimizableStops: OptimizableStop[] = stops.map((stop) => {
       const hasValidTimeWindow = stop.timeWindow !== "Flexibel" 
         && !stop.timeWindow.includes("Invalid") 
         && stop.timeWindow.includes("-");
@@ -463,25 +463,18 @@ const RouteOptimization = () => {
         postalCode: "",
         latitude: stop.lat,
         longitude: stop.lng,
-        timeWindow: hasValidTimeWindow ? {
-          from: stop.timeWindow.split("-")[0].trim(),
-          to: stop.timeWindow.split("-")[1].trim()
-        } : undefined,
-        priority: stop.priority === "high" ? "high" : stop.priority === "medium" ? "medium" : "low",
+        stopType: "delivery" as const,
+        timeWindowStart: hasValidTimeWindow ? stop.timeWindow.split("-")[0].trim() : null,
+        timeWindowEnd: hasValidTimeWindow ? stop.timeWindow.split("-")[1].trim() : null,
+        priority: stop.priority === "high" ? "urgent" : stop.priority === "medium" ? "high" : "normal",
+        serviceDuration: serviceTime,
       };
     });
 
-    const result = await optimizeRoute({
-      stops: routeStops,
-      vehicleType: vehicleType === "truck" ? "truck" : vehicleType === "van" ? "van" : "car",
-      departureTime: new Date().toISOString(),
-      preferences: {
-        preferFastest: optimizationStrategy === "time",
-        preferShortest: optimizationStrategy === "distance",
-        avoidTolls,
-        avoidFerries,
-        avoidHighways,
-      },
+    const result = await optimizeRoute(optimizableStops, {
+      strategy: optimizationStrategy === "distance" ? "shortest" : "fastest",
+      respectTimeWindows: true,
+      startTime: new Date(),
     });
 
     if (result) {
@@ -495,7 +488,7 @@ const RouteOptimization = () => {
         totalDistance: result.totalDistance,
         totalDuration: correctedDuration,
         totalTime: `${Math.floor(correctedDuration / 60)}u ${Math.round(correctedDuration % 60)}m`,
-        fuelSaved: result.savings?.fuelSaved ? (result.savings.fuelSaved / 1.85).toFixed(1) : 0,
+        fuelSaved: result.savings ? ((result.savings.distanceSaved / 100) * 8 * 1.85).toFixed(1) : 0,
         co2Saved: result.co2Emissions || (result.savings?.distanceSaved || 0) * 0.12,
         originalDistance,
         originalTime: `${Math.floor(originalDuration / 60)}u ${Math.round(originalDuration % 60)}m`,
@@ -506,48 +499,26 @@ const RouteOptimization = () => {
         savings: {
           distance: originalDistance > 0 ? Math.round(((result.savings?.distanceSaved || 0) / originalDistance) * 100) : 0,
           time: originalDuration > 0 ? Math.round((timeSavedMin / originalDuration) * 100) : 0,
-          fuel: result.savings?.fuelSaved ? Math.round((result.savings.fuelSaved / (originalDistance * 0.15 * 1.85)) * 100) : 0
+          fuel: 0
         },
-        aiAnalysis: result.aiAnalysis,
-        optimizationScore: result.optimizationScore,
         serviceTimeUsed: serviceTime,
         speedCorrectionUsed: speedPct,
       });
       
       if (result.stops && result.stops.length > 0) {
-        // Calculate ETA per stop client-side
-        const departureDate = new Date();
-        let cumulativeMinutes = 0;
-        const totalStops = result.stops.length;
-        const avgDurationPerStop = totalStops > 1 ? correctedDuration / (totalStops - 1) : 0;
-
-        const reorderedStops = result.stops.map((s: any, i: number) => {
-          let durationFromPrev = 0;
-          if (i > 0) {
-            // Use per-stop duration if available, otherwise distribute evenly
-            durationFromPrev = s.durationFromPrev || Math.round(avgDurationPerStop);
-            cumulativeMinutes += durationFromPrev;
-          }
-          // Add service time for all stops except the last
-          if (i > 0 && i < totalStops) {
-            cumulativeMinutes += serviceTime;
-          }
-
-          const etaDate = new Date(departureDate.getTime() + cumulativeMinutes * 60000);
-          const eta = etaDate.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
-
-          return {
-            id: s.id,
-            address: s.address,
-            city: s.city,
-            lat: s.latitude || 0,
-            lng: s.longitude || 0,
-            timeWindow: s.timeWindow ? `${s.timeWindow.from}-${s.timeWindow.to}` : "Flexibel",
-            priority: s.priority || "medium",
-            eta: i === 0 ? departureDate.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" }) : eta,
-            durationFromPrev: i > 0 ? durationFromPrev : null,
-          };
-        });
+        const reorderedStops = result.stops.map((s, i) => ({
+          id: s.id,
+          address: s.address,
+          city: s.city || "",
+          lat: s.latitude || 0,
+          lng: s.longitude || 0,
+          timeWindow: s.timeWindowStart && s.timeWindowEnd ? `${s.timeWindowStart}-${s.timeWindowEnd}` : "Flexibel",
+          priority: s.priority === "urgent" ? "high" : s.priority === "high" ? "medium" : "low" as string,
+          eta: s.arrivalTime
+            ? new Date(s.arrivalTime).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })
+            : new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" }),
+          durationFromPrev: i > 0 ? Math.round(s.etaMinutes - (result.stops[i - 1]?.etaMinutes || 0)) : null,
+        }));
         setStops(reorderedStops);
       }
 
@@ -555,35 +526,8 @@ const RouteOptimization = () => {
       if (result.geometry) {
         detectTolls(result.geometry, vehicleType).then(tollRes => {
           setTollResult(tollRes);
-          
-          // If tolls detected and user hasn't opted for toll-free, calculate toll-free alternative
           if (tollRes.hasTolls && !avoidTolls) {
-            setIsLoadingTollFreeAlt(true);
             setTollFreeAlt(null);
-            // Re-run optimization with avoidTolls=true for comparison
-            optimizeRoute({
-              stops: routeStops,
-              vehicleType: vehicleType === "truck" ? "truck" : vehicleType === "van" ? "van" : "car",
-              departureTime: new Date().toISOString(),
-              preferences: {
-                preferFastest: optimizationStrategy === "time",
-                preferShortest: optimizationStrategy === "distance",
-                avoidTolls: true,
-                avoidFerries,
-                avoidHighways,
-              },
-            }).then(async (altResult) => {
-              if (altResult && altResult.geometry) {
-                const altTollRes = await detectTolls(altResult.geometry, vehicleType);
-                setTollFreeAlt({
-                  totalDistance: altResult.totalDistance,
-                  totalDuration: altResult.totalDuration * (100 / speedPct),
-                  tollResult: altTollRes,
-                  geometry: altResult.geometry,
-                });
-              }
-              setIsLoadingTollFreeAlt(false);
-            }).catch(() => setIsLoadingTollFreeAlt(false));
           } else {
             setTollFreeAlt(null);
           }
