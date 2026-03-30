@@ -440,14 +440,14 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
           />
         </div>
 
-        {/* GPS Warning */}
-        {!gpsEnabled && !isActive && (
+        {/* GPS Warning - informational only, not blocking */}
+        {!gpsEnabled && !isActive && !isCompletedTrip && (
           <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/30">
             <div className="flex items-center gap-3">
               <Navigation className="h-5 w-5 text-amber-500" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Locatie vereist</p>
-                <p className="text-xs text-muted-foreground">Activeer locatie om te starten</p>
+                <p className="text-sm font-medium">GPS niet actief</p>
+                <p className="text-xs text-muted-foreground">Locatie wordt niet geregistreerd. Je kunt de rit wel starten.</p>
               </div>
               <Button size="sm" onClick={requestPermission} className="bg-amber-500 hover:bg-amber-600">
                 Toestaan
