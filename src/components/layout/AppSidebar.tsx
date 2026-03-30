@@ -81,6 +81,7 @@ import {
   Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscriptionPlan } from "@/hooks/useSubscriptionPlan";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useCompany } from "@/hooks/useCompany";
 import { useTheme } from "@/components/ThemeProvider";
