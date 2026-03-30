@@ -187,25 +187,25 @@ export const useWorkflowAutomation = () => {
     queryKey: ['workflows'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return (data as unknown) as Workflow[];
+      return data as unknown as Workflow[];
     },
   });
 
   // Fetch workflow actions for a specific workflow
   const fetchWorkflowActions = async (workflowId: string) => {
     const { data, error } = await supabase
-      .from('workflow_actions' as any)
+      .from('workflow_actions')
       .select('*')
       .eq('workflow_id', workflowId)
       .order('sequence_order', { ascending: true });
     
     if (error) throw error;
-    return (data as unknown) as WorkflowAction[];
+    return data as unknown as WorkflowAction[];
   };
 
   // Fetch workflow runs
@@ -213,13 +213,13 @@ export const useWorkflowAutomation = () => {
     queryKey: ['workflow-runs'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workflow_runs' as any)
+        .from('workflow_runs')
         .select('*')
         .order('started_at', { ascending: false })
         .limit(50);
       
       if (error) throw error;
-      return (data as unknown) as WorkflowRun[];
+      return data as unknown as WorkflowRun[];
     },
   });
 
@@ -229,8 +229,8 @@ export const useWorkflowAutomation = () => {
       const { actions, ...workflowData } = workflow;
       
       const { data: newWorkflow, error: workflowError } = await supabase
-        .from('workflow_automations' as any)
-        .insert(workflowData)
+        .from('workflow_automations')
+        .insert(workflowData as any)
         .select()
         .single();
       
@@ -244,8 +244,8 @@ export const useWorkflowAutomation = () => {
         }));
         
         const { error: actionsError } = await supabase
-          .from('workflow_actions' as any)
-          .insert(actionsWithWorkflowId);
+          .from('workflow_actions')
+          .insert(actionsWithWorkflowId as any);
         
         if (actionsError) throw actionsError;
       }
@@ -265,8 +265,8 @@ export const useWorkflowAutomation = () => {
   const updateWorkflow = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Workflow> & { id: string }) => {
       const { data, error } = await supabase
-        .from('workflow_automations' as any)
-        .update(updates)
+        .from('workflow_automations')
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();
@@ -284,7 +284,7 @@ export const useWorkflowAutomation = () => {
   const toggleWorkflow = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
       const { error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .update({ is_active })
         .eq('id', id);
       
@@ -300,7 +300,7 @@ export const useWorkflowAutomation = () => {
   const deleteWorkflow = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('workflow_automations' as any)
+        .from('workflow_automations')
         .delete()
         .eq('id', id);
       
@@ -315,7 +315,7 @@ export const useWorkflowAutomation = () => {
   // Manually trigger a workflow
   const triggerWorkflow = async (workflowId: string, testData: Record<string, any> = {}) => {
     const { error } = await supabase
-      .from('workflow_runs' as any)
+      .from('workflow_runs')
       .insert({
         workflow_id: workflowId,
         trigger_event: testData,
