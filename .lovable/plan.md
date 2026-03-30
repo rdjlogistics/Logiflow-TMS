@@ -1,30 +1,23 @@
 
 
-# Route Optimalisatie: Animatie verwijderen, solide lijn
+# Fix: "Bekijk" knop bij kritieke meldingen navigeert naar onderhoud tab
 
-## Wat verandert
+## Probleem
 
-In `src/components/route/RouteOptimizationMap.tsx`:
+De "Bekijk" knop in de kritieke meldingen banner (line 87) doet `setActiveTab('overview')` — als je al op overview zit, gebeurt er niets. De kritieke meldingen gaan over onderhoud/APK, dus de knop moet naar de **maintenance** tab navigeren.
 
-1. **Verwijder de dash-array animatie** (line 347-376) — het hele `useEffect` blok dat `requestAnimationFrame` gebruikt om de `line-dasharray` te animeren wordt verwijderd.
+## Fix
 
-2. **Verwijder de glow layer** (line 304-314) — de `addGlowAndDash` functie en de `route-glow` layer worden verwijderd. Te druk voor een professionele transport-kaart.
+**Bestand:** `src/pages/FleetManagement.tsx` line 87
 
-3. **Solide lijn ipv dashed** — Beide `addLayer` calls (line 318-323 en line 334-338) krijgen een eenvoudige solide lijn:
-   - `"line-dasharray"` verwijderen
-   - `"line-width": 4`
-   - `"line-opacity": 0.85`
-   - `"line-color": "#2563eb"` (iets donkerder blauw, professioneler)
+Wijzig:
+```tsx
+onClick={() => setActiveTab('overview')}
+```
+Naar:
+```tsx
+onClick={() => setActiveTab('maintenance')}
+```
 
-4. **Cleanup vereenvoudigen** — de `route-glow` layer hoeft niet meer verwijderd te worden in de cleanup (line 300).
-
-## Resultaat
-
-Een strakke, solide blauwe lijn tussen stops — zoals verwacht in professionele transport/logistics software.
-
-## Bestand
-
-| Actie | Bestand |
-|-------|---------|
-| **Edit** | `src/components/route/RouteOptimizationMap.tsx` — animatie + glow verwijderen, solide lijn |
+Eén regel, klaar.
 
