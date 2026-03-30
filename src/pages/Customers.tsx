@@ -347,6 +347,19 @@ const Customers = () => {
     setDialogOpen(true);
   };
 
+  const [deleteOrderCount, setDeleteOrderCount] = useState(0);
+
+  const handleDeleteRequest = async (customer: Customer) => {
+    // Check linked orders
+    const { count } = await supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("customer_id", customer.id)
+      .is("deleted_at", null);
+    setDeleteOrderCount(count || 0);
+    setDeleteTarget(customer);
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -356,8 +369,9 @@ const Customers = () => {
         .update({ deleted_at: new Date().toISOString(), is_active: false } as any)
         .eq("id", deleteTarget.id);
       if (error) throw error;
-      toast({ title: "Klant naar prullenbak verplaatst" });
+      toast({ title: deleteOrderCount > 0 ? "Klant gearchiveerd (data blijft behouden)" : "Klant naar prullenbak verplaatst" });
       setDeleteTarget(null);
+      setDeleteOrderCount(0);
       fetchCustomers();
       fetchTrashCount();
     } catch (err: any) {
