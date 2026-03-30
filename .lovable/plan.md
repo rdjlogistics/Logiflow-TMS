@@ -1,45 +1,72 @@
 
 
-# Verificatie Resultaten & Fix
+# Fix: Chauffeur Stops Kunnen Niet Worden Afgemeld
 
-## Wat CORRECT werkt
+## Root Cause
 
-| Check | Status |
-|-------|--------|
-| Order opslaan — form + onSubmit + Supabase RPC | CORRECT — `save_order_with_stops` RPC at line 745 |
-| Opslaan knop — loading state + toast + redirect | CORRECT — `setIsSubmitting`, feedback toast at line 820, navigation at 896 |
-| `beforeunload` na save | CORRECT — `setIsDirty(false)` at line 851 disables `useUnsavedChangesWarning` |
-| Datumveld DD-MM-YYYY | CORRECT — Popover+Calendar met `format(..., 'dd-MM-yyyy')` in OrderDetailsPanel en DestinationCard |
-| Mapbox imports | CORRECT — dynamic `import("mapbox-gl")` met `.default`, geen `mapbox_gl_exports` errors |
-| Mapbox token | CORRECT — via edge function `get-mapbox-token` |
-| `mapbox_gl_exports` string | CLEAN — 0 resultaten |
-| Hardcoded "37.0%" | CLEAN — 0 resultaten |
-| Placeholder UUID in code | CLEAN — 0 resultaten (het UUID in edge function logs komt uit een bestaand DB record, niet uit code) |
-| OrderOverview marge | CORRECT — weighted calculation from totals |
-| QuickStatsHeader kleuren | CORRECT — dynamic based on positive/negative |
-| `capitalizeCity` bij save | CORRECT — applied on pickup_city, delivery_city, and route_stops |
+1. **`isActive` is alleen `true` als `trip.status === 'onderweg'`** (DriverRittenTab.tsx line 381). Maar `handleStartTrip` blokkeert als GPS niet beschikbaar is (`gpsEnabled === false` → line 252-254). Dus als GPS geweigerd is, kan de rit nooit gestart worden → `isActive` blijft `false` → alle stop-acties vergrendeld.
 
-## Gevonden probleem
+2. **Voltooide ritten** (status `afgeleverd`/`afgerond`/`gecontroleerd`) hebben ook `isActive = false`, waardoor completed data niet zichtbaar is in de stop cards.
 
-| Locatie | Probleem |
-|---------|----------|
-| `src/components/reporting/ReportingDashboard.tsx` line 235-236 | Nog steeds **simple average van opgeslagen `profit_margin_pct`** i.p.v. weighted berekening vanuit totals |
+3. **Toast toont geen ordernummer** — "Rit gestart" zonder referentie naar het ordernummer.
 
-## Fix
+## Fixes
 
-### `src/components/reporting/ReportingDashboard.tsx` — 1 regel
-Vervang:
+### 1. GPS niet langer hard requirement voor "Start rit"
+**Bestanden:** `DriverRittenTab.tsx` (line 251-255), `DriverHomeTab.tsx` (line 79-84)
+
+Verwijder de `if (!gpsEnabled) { return; }` guard. In plaats daarvan:
+- Start de rit altijd
+- Toon een waarschuwing als GPS niet beschikbaar: "GPS niet beschikbaar. Locatie wordt niet geregistreerd."
+- De `disabled={!gpsEnabled}` op de Start knop (line 454) wordt ook verwijderd
+
+### 2. `isActive` verbreden voor actieve ritten
+**Bestand:** `DriverRittenTab.tsx` (line 381)
+
+Verander:
 ```typescript
-const avgMargin = totalOrders > 0
-  ? ordersData.reduce((sum, o) => sum + (o.profit_margin_pct || 0), 0) / totalOrders
-  : 0;
+const isActive = selectedTrip.status === 'onderweg';
 ```
-Door:
+Naar:
 ```typescript
-const avgMargin = totalRevenue > 0
-  ? (totalProfit / totalRevenue) * 100
-  : 0;
+const isActive = ['onderweg', 'geladen'].includes(selectedTrip.status);
+```
+Zelfde fix op line 303 (RouteListItem).
+
+### 3. Voltooide ritten: data zichtbaar maken
+**Bestand:** `DriverStopCard.tsx` (line 637)
+
+Verander `{!isCompleted && (` naar toon altijd de actie-knoppen, maar in read-only mode als `isCompleted`:
+- Navigeer: altijd beschikbaar
+- Teken/Foto/Afmelden: disabled + visueel verborgen bij completed
+- Upload: altijd beschikbaar (achteraf documenten toevoegen)
+- Toon bestaande handtekeningen/foto's als read-only
+
+### 4. Toast met ordernummer
+**Bestand:** `useDriverTrips.ts` (line 360-363)
+
+Het ordernummer wordt al opgehaald (line 353-357 voor notificatie). Gebruik dit in de toast:
+```typescript
+toast({
+  title: 'Rit gestart',
+  description: `Rit #${tripForNotif?.order_number || ''} is onderweg`,
+});
 ```
 
-Dit is de enige fix. Alle andere checks zijn correct.
+### 5. Bevestigingsdialoog voor "Start rit"
+**Bestand:** `DriverRittenTab.tsx`
+
+Voeg een `AlertDialog` toe rond de "Start rit" knop met:
+- Titel: "Wil je deze rit starten?"
+- Beschrijving: ordernummer + pickup → delivery
+- Knoppen: Annuleren / Starten
+
+## Bestanden
+
+| Actie | Bestand |
+|-------|---------|
+| **Edit** | `src/components/driver/tabs/DriverRittenTab.tsx` — GPS guard verwijderen, `isActive` verbreden, bevestigingsdialoog, disabled verwijderen |
+| **Edit** | `src/components/driver/tabs/DriverHomeTab.tsx` — GPS guard verwijderen |
+| **Edit** | `src/components/driver/DriverStopCard.tsx` — Completed stops read-only met data, action bar altijd tonen |
+| **Edit** | `src/hooks/useDriverTrips.ts` — Toast met ordernummer |
 
