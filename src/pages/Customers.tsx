@@ -820,7 +820,7 @@ const Customers = () => {
                 icon={UserPlus}
                 title={searchTerm ? "Geen klanten gevonden" : "Nog geen klanten"}
                 description={searchTerm ? "Pas je zoekterm aan." : "Voeg je eerste klant toe om te beginnen."}
-                action={!searchTerm ? { label: "Klant toevoegen", onClick: () => { resetForm(); setEditingCustomer(null); setShowAddDialog(true); }, icon: Plus } : undefined}
+                action={!searchTerm ? { label: "Klant toevoegen", onClick: openNewDialog, icon: Plus } : undefined}
               />
             ) : (
               <>
