@@ -287,7 +287,7 @@ export const BatchPurchaseInvoiceWizard = () => {
           carrierGroups={carrierGroups}
           onToggleCarrier={toggleCarrierSelection}
           onBack={() => setStep(1)}
-          onNext={() => createInvoicesMutation.mutate()}
+          onNext={() => setShowConfirm(true)}
           isCreating={createInvoicesMutation.isPending}
           formatCurrency={formatCurrency}
         />
