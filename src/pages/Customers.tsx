@@ -446,12 +446,20 @@ const Customers = () => {
     setTrashOpen(true);
   };
 
-  const filteredCustomers = customers.filter(
-    (c) =>
+  const isTestCustomer = (c: Customer) =>
+    c.company_name?.toLowerCase().includes("test") ||
+    (c.email && c.email.toLowerCase().endsWith("@ghevd8.nl"));
+
+  const isIncomplete = (c: Customer) =>
+    !c.email && !c.contact_name && !c.address;
+
+  const filteredCustomers = customers
+    .filter((c) =>
       c.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.contact_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    )
+    .filter((c) => !hideTestData || !isTestCustomer(c));
 
   const allSelected = filteredCustomers.length > 0 && filteredCustomers.every(c => selectedIds.has(c.id));
   const someSelected = selectedIds.size > 0;
