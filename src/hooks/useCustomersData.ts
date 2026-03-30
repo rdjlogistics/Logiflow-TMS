@@ -19,10 +19,11 @@ export function useCustomersData(filters: CustomerFilters = {}) {
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchCustomers(filters);
+      const data = await fetchCustomers({ ...filters, companyId: company.id });
       setCustomers(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden klanten';
