@@ -39,6 +39,10 @@ const Messenger = () => {
   const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     const fetchTrips = async () => {
       const { data, error } = await supabase
         .from('trips')
@@ -64,6 +68,7 @@ const Messenger = () => {
     };
 
     fetchTrips();
+    return () => clearTimeout(timeout);
   }, []);
 
   const filteredTrips = trips.filter((trip) => {
