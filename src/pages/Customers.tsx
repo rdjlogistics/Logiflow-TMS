@@ -951,11 +951,17 @@ const Customers = () => {
                               onCheckedChange={() => toggleSelect(customer.id)}
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{customer.company_name}</TableCell>
-                          <TableCell>{customer.contact_name || "-"}</TableCell>
-                          <TableCell>{customer.email || "-"}</TableCell>
-                          <TableCell>{customer.phone || "-"}</TableCell>
-                          <TableCell>{customer.city || "-"}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-1.5">
+                              {customer.company_name}
+                              {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
+                              {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
+                            </div>
+                          </TableCell>
+                          <TableCell>{customer.contact_name || "—"}</TableCell>
+                          <TableCell>{customer.email || "—"}</TableCell>
+                          <TableCell>{customer.phone || "—"}</TableCell>
+                          <TableCell>{customer.city || "—"}</TableCell>
                           <TableCell>
                             {customer.user_id ? (
                               <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30">
