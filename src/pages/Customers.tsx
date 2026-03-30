@@ -72,6 +72,7 @@ const Customers = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleteOrderCount, setDeleteOrderCount] = useState(0);
   const [auditCustomerId, setAuditCustomerId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -81,6 +82,7 @@ const Customers = () => {
   const { lookupPostcode, loading: postcodeLoading } = usePostcodeLookup();
   const [autoFilled, setAutoFilled] = useState(false);
   const [lastLookup, setLastLookup] = useState<string>("");
+  const [hideTestData, setHideTestData] = useState(false);
   const [attachDocsOverride, setAttachDocsOverride] = useState<boolean | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<string>('to_planning');
   const [deliveryConfEnabled, setDeliveryConfEnabled] = useState<boolean>(true);
@@ -225,6 +227,37 @@ const Customers = () => {
       return;
     }
 
+    // Duplicate detection (only for new customers)
+    if (!editingCustomer) {
+      const { data: nameMatches } = await supabase
+        .from("customers")
+        .select("id, company_name")
+        .ilike("company_name", formData.company_name.trim())
+        .is("deleted_at", null)
+        .limit(1);
+
+      if (nameMatches && nameMatches.length > 0) {
+        if (!window.confirm(`Er bestaat al een klant met de naam "${nameMatches[0].company_name}". Wil je doorgaan?`)) {
+          return;
+        }
+      }
+
+      if (formData.email?.trim()) {
+        const { data: emailMatches } = await supabase
+          .from("customers")
+          .select("id, company_name, email")
+          .eq("email", formData.email.trim())
+          .is("deleted_at", null)
+          .limit(1);
+
+        if (emailMatches && emailMatches.length > 0) {
+          if (!window.confirm(`Het e-mailadres "${formData.email}" is al in gebruik bij "${emailMatches[0].company_name}". Wil je doorgaan?`)) {
+            return;
+          }
+        }
+      }
+    }
+
     setSaving(true);
     try {
       let customerId = editingCustomer?.id;
@@ -315,6 +348,19 @@ const Customers = () => {
     setDialogOpen(true);
   };
 
+  
+
+  const handleDeleteRequest = async (customer: Customer) => {
+    // Check linked orders
+    const { count } = await supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("customer_id", customer.id)
+      .is("deleted_at", null);
+    setDeleteOrderCount(count || 0);
+    setDeleteTarget(customer);
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -324,8 +370,9 @@ const Customers = () => {
         .update({ deleted_at: new Date().toISOString(), is_active: false } as any)
         .eq("id", deleteTarget.id);
       if (error) throw error;
-      toast({ title: "Klant naar prullenbak verplaatst" });
+      toast({ title: deleteOrderCount > 0 ? "Klant gearchiveerd (data blijft behouden)" : "Klant naar prullenbak verplaatst" });
       setDeleteTarget(null);
+      setDeleteOrderCount(0);
       fetchCustomers();
       fetchTrashCount();
     } catch (err: any) {
@@ -400,12 +447,20 @@ const Customers = () => {
     setTrashOpen(true);
   };
 
-  const filteredCustomers = customers.filter(
-    (c) =>
+  const isTestCustomer = (c: Customer) =>
+    c.company_name?.toLowerCase().includes("test") ||
+    (c.email && c.email.toLowerCase().endsWith("@ghevd8.nl"));
+
+  const isIncomplete = (c: Customer) =>
+    !c.email && !c.contact_name && !c.address;
+
+  const filteredCustomers = customers
+    .filter((c) =>
       c.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.contact_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    )
+    .filter((c) => !hideTestData || !isTestCustomer(c));
 
   const allSelected = filteredCustomers.length > 0 && filteredCustomers.every(c => selectedIds.has(c.id));
   const someSelected = selectedIds.size > 0;
@@ -485,7 +540,11 @@ const Customers = () => {
               className="pl-10"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+              <Checkbox checked={hideTestData} onCheckedChange={(v) => setHideTestData(!!v)} />
+              Verberg test-data
+            </label>
             <Button variant="outline" onClick={handleExportCSV} className="gap-2">
               <Download className="h-4 w-4" />
               CSV
@@ -772,7 +831,7 @@ const Customers = () => {
                         <SwipeableCard
                           key={customer.id}
                           leftActions={[swipeActions.more(() => handleEdit(customer))]}
-                          rightActions={isAdmin ? [swipeActions.delete(() => setDeleteTarget(customer))] : []}
+                          rightActions={isAdmin ? [swipeActions.delete(() => handleDeleteRequest(customer))] : []}
                         >
                           <motion.div
                             initial={{ opacity: 0, y: 12 }}
@@ -789,7 +848,11 @@ const Customers = () => {
                                     className="flex-shrink-0"
                                   />
                                   <div className="min-w-0 flex-1">
-                                    <p className="font-semibold truncate">{customer.company_name}</p>
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <p className="font-semibold truncate">{customer.company_name}</p>
+                                      {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
+                                      {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
+                                    </div>
                                     {customer.contact_name && (
                                       <p className="text-sm text-muted-foreground truncate">{customer.contact_name}</p>
                                     )}
@@ -805,11 +868,11 @@ const Customers = () => {
                               <div className="grid grid-cols-2 gap-2 text-sm">
                                 <div>
                                   <span className="text-muted-foreground text-xs">Email</span>
-                                  <p className="font-medium truncate">{customer.email || "-"}</p>
+                                  <p className="font-medium truncate">{customer.email || "—"}</p>
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground text-xs">Stad</span>
-                                  <p className="font-medium">{customer.city || "-"}</p>
+                                  <p className="font-medium">{customer.city || "—"}</p>
                                 </div>
                               </div>
 
@@ -848,7 +911,7 @@ const Customers = () => {
                                     variant="ghost"
                                     size="icon"
                                     className="min-h-[44px] min-w-[44px] ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    onClick={() => setDeleteTarget(customer)}
+                                    onClick={() => handleDeleteRequest(customer)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
@@ -889,11 +952,17 @@ const Customers = () => {
                               onCheckedChange={() => toggleSelect(customer.id)}
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{customer.company_name}</TableCell>
-                          <TableCell>{customer.contact_name || "-"}</TableCell>
-                          <TableCell>{customer.email || "-"}</TableCell>
-                          <TableCell>{customer.phone || "-"}</TableCell>
-                          <TableCell>{customer.city || "-"}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-1.5">
+                              {customer.company_name}
+                              {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
+                              {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
+                            </div>
+                          </TableCell>
+                          <TableCell>{customer.contact_name || "—"}</TableCell>
+                          <TableCell>{customer.email || "—"}</TableCell>
+                          <TableCell>{customer.phone || "—"}</TableCell>
+                          <TableCell>{customer.city || "—"}</TableCell>
                           <TableCell>
                             {customer.user_id ? (
                               <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30">
@@ -915,7 +984,7 @@ const Customers = () => {
                                 <Pencil className="h-4 w-4" />
                               </Button>
                               {isAdmin && (
-                                <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(customer)}>
+                                <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(customer)}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
                               )}
@@ -936,7 +1005,11 @@ const Customers = () => {
           open={!!deleteTarget}
           onOpenChange={(open) => !open && setDeleteTarget(null)}
           title="Klant verwijderen"
-          description={`Weet je zeker dat je "${deleteTarget?.company_name}" wilt verwijderen? De klant wordt naar de prullenbak verplaatst en kan later hersteld worden.`}
+          description={
+            deleteOrderCount > 0
+              ? `"${deleteTarget?.company_name}" heeft ${deleteOrderCount} order(s). De klant wordt gearchiveerd (data blijft behouden).`
+              : `Weet je zeker dat je "${deleteTarget?.company_name}" wilt verwijderen? De klant wordt naar de prullenbak verplaatst en kan later hersteld worden.`
+          }
           onConfirm={handleDelete}
           isLoading={deleting}
         />
