@@ -199,7 +199,11 @@ export default function B2BOnboarding() {
                         type="email"
                         value={companyData.email}
                         onChange={(e) => setCompanyData((p) => ({ ...p, email: e.target.value }))}
+                        className={attempted && !companyData.email.trim() ? "border-destructive" : ""}
                       />
+                      {attempted && !companyData.email.trim() && (
+                        <p className="text-xs text-destructive">E-mailadres is verplicht</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Telefoon</Label>
