@@ -33,7 +33,7 @@ const TMS_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"] },
+          status: { type: "string", enum: ["offerte", "aanvraag", "draft", "gepland", "geladen", "onderweg", "afgeleverd", "afgerond", "gecontroleerd", "gefactureerd", "geannuleerd"] },
           search: { type: "string", description: "Zoek op ordernummer, klantnaam, referentie" },
           date_from: { type: "string", description: "YYYY-MM-DD" },
           date_to: { type: "string", description: "YYYY-MM-DD" },
@@ -52,7 +52,7 @@ const TMS_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["available", "busy", "off_duty", "all"] },
+          status: { type: "string", enum: ["active", "inactive", "all"] },
           search: { type: "string" },
         },
       },
@@ -169,7 +169,7 @@ const TMS_TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          status_filter: { type: "string", enum: ["all", "pending", "overdue", "paid", "draft"] },
+          status_filter: { type: "string", enum: ["all", "concept", "verzonden", "betaald", "vervallen", "gedeeltelijk_betaald"] },
           customer_id: { type: "string" },
           days_overdue: { type: "number" },
         },
@@ -232,12 +232,12 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "update_order_status",
-      description: "Wijzig orderstatus (draft→confirmed→in_transit→delivered→cancelled). Vereist bevestiging.",
+      description: "Wijzig orderstatus. Vereist bevestiging.",
       parameters: {
         type: "object",
         properties: {
           order_id: { type: "string" },
-          new_status: { type: "string", enum: ["draft", "pending", "confirmed", "in_transit", "delivered", "cancelled"] },
+          new_status: { type: "string", enum: ["offerte", "aanvraag", "draft", "gepland", "geladen", "onderweg", "afgeleverd", "afgerond", "gecontroleerd", "gefactureerd", "geannuleerd"] },
           reason: { type: "string", description: "Reden voor statuswijziging" },
         },
         required: ["order_id", "new_status"],
@@ -284,7 +284,7 @@ const TMS_TOOLS = [
         type: "object",
         properties: {
           order_ids: { type: "array", items: { type: "string" }, description: "Lijst van order UUIDs" },
-          new_status: { type: "string", enum: ["confirmed", "in_transit", "delivered", "cancelled"] },
+          new_status: { type: "string", enum: ["gepland", "geladen", "onderweg", "afgeleverd", "geannuleerd"] },
           reason: { type: "string" },
         },
         required: ["order_ids", "new_status"],
@@ -300,7 +300,7 @@ const TMS_TOOLS = [
         type: "object",
         properties: {
           order_id: { type: "string" },
-          claim_type: { type: "string", enum: ["damage", "loss", "delay", "shortage", "other"] },
+          claim_type: { type: "string", enum: ["damage", "shortage", "delay", "no_show", "other"] },
           description: { type: "string" },
           estimated_amount: { type: "number" },
         },
@@ -314,7 +314,7 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "generate_chart",
-      description: "Genereer een chart-beschrijving die de frontend als Recharts visualisatie rendert. Gebruik voor trends, vergelijkingen, verdelingen.",
+      description: "Genereer een chart-beschrijving die de frontend als Recharts visualisatie rendert.",
       parameters: {
         type: "object",
         properties: {
@@ -377,7 +377,7 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "generate_image",
-      description: "Genereer een afbeelding via AI. Gebruik voor bedrijfslogo's, route-visualisaties, rapportage-graphics, infographics.",
+      description: "Genereer een afbeelding via AI.",
       parameters: {
         type: "object",
         properties: {
@@ -392,7 +392,7 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "smart_planning",
-      description: "Multi-order route optimalisatie — analyseer N orders en stel optimale volgorde + chauffeur-toewijzingen voor.",
+      description: "Multi-order route optimalisatie.",
       parameters: {
         type: "object",
         properties: {
@@ -408,7 +408,7 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "anomaly_detect",
-      description: "Detecteer afwijkingen in KPIs: plotselinge margeverandering, ongewone factuurpatronen, prestatieverval.",
+      description: "Detecteer afwijkingen in KPIs.",
       parameters: {
         type: "object",
         properties: {
@@ -423,7 +423,7 @@ const TMS_TOOLS = [
     type: "function",
     function: {
       name: "draft_contract",
-      description: "Genereer concept transportovereenkomst, offerte of raamcontract tekst. Vereist bevestiging.",
+      description: "Genereer concept transportovereenkomst. Vereist bevestiging.",
       parameters: {
         type: "object",
         properties: {
@@ -522,16 +522,16 @@ async function executeTool(
     switch (toolName) {
       case "search_orders": {
         let query = supabase
-          .from("orders")
-          .select("id, order_number, status, customer_id, driver_id, pickup_date, delivery_date, total_amount, reference, created_at, customers(company_name), drivers(name)")
+          .from("trips")
+          .select("id, order_number, status, customer_id, driver_id, trip_date, estimated_arrival, sales_total, customer_reference, created_at, customers(company_name), drivers(name)")
           .eq("company_id", tenantId)
           .order("created_at", { ascending: false })
           .limit((args.limit as number) || 20);
 
         if (args.status) query = query.eq("status", args.status);
-        if (args.search) query = query.or(`order_number.ilike.%${args.search}%,reference.ilike.%${args.search}%`);
-        if (args.date_from) query = query.gte("pickup_date", args.date_from);
-        if (args.date_to) query = query.lte("pickup_date", args.date_to);
+        if (args.search) query = query.or(`order_number.ilike.%${args.search}%,customer_reference.ilike.%${args.search}%`);
+        if (args.date_from) query = query.gte("trip_date", args.date_from);
+        if (args.date_to) query = query.lte("trip_date", args.date_to);
         if (args.driver_id) query = query.eq("driver_id", args.driver_id);
         if (args.customer_id) query = query.eq("customer_id", args.customer_id);
 
@@ -543,9 +543,9 @@ async function executeTool(
       case "list_drivers": {
         let query = supabase
           .from("drivers")
-          .select("id, name, phone, email, status, license_type, is_active, rating, city")
-          .eq("company_id", tenantId)
-          .eq("is_active", true);
+          .select("id, name, phone, email, status, license_number, rating, current_city, total_trips, on_time_percentage")
+          .eq("tenant_id", tenantId)
+          .is("deleted_at", null);
 
         if (args.search) query = query.ilike("name", `%${args.search}%`);
         if (args.status && args.status !== "all") query = query.eq("status", args.status);
@@ -560,28 +560,28 @@ async function executeTool(
         const now = new Date();
         const dateFrom = getDateFrom(period, now);
 
-        const [ordersRes, invoicesRes, driversRes] = await Promise.all([
-          supabase.from("orders").select("id, status, total_amount, purchase_amount").eq("company_id", tenantId).gte("created_at", dateFrom),
+        const [tripsRes, invoicesRes, driversRes] = await Promise.all([
+          supabase.from("trips").select("id, status, sales_total, purchase_total").eq("company_id", tenantId).gte("created_at", dateFrom),
           supabase.from("invoices").select("id, status, total_amount, due_date").eq("company_id", tenantId).gte("created_at", dateFrom),
-          supabase.from("drivers").select("id, status").eq("company_id", tenantId).eq("is_active", true),
+          supabase.from("drivers").select("id, status").eq("tenant_id", tenantId).is("deleted_at", null),
         ]);
 
-        const orders = ordersRes.data || [];
+        const trips = tripsRes.data || [];
         const invoices = invoicesRes.data || [];
         const drivers = driversRes.data || [];
 
-        const totalRevenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-        const totalCost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+        const totalRevenue = trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+        const totalCost = trips.reduce((s, o) => s + (o.purchase_total || 0), 0);
         const margin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue * 100) : 0;
-        const openInvoices = invoices.filter(i => i.status === "pending" || i.status === "overdue");
-        const overdueInvoices = invoices.filter(i => i.status === "overdue");
+        const openInvoices = invoices.filter(i => i.status === "concept" || i.status === "verzonden");
+        const overdueInvoices = invoices.filter(i => i.status === "vervallen");
 
         const statusCounts: Record<string, number> = {};
-        for (const o of orders) statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
+        for (const o of trips) statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
 
         return JSON.stringify({
           period, date_from: dateFrom,
-          total_orders: orders.length, order_status_breakdown: statusCounts,
+          total_orders: trips.length, order_status_breakdown: statusCounts,
           total_revenue: totalRevenue, total_cost: totalCost,
           gross_margin_percent: Math.round(margin * 10) / 10,
           open_invoices: openInvoices.length,
@@ -601,7 +601,7 @@ async function executeTool(
           : { column: "id", value: args.order_id };
 
         const { data: order, error } = await supabase
-          .from("orders")
+          .from("trips")
           .select("*, customers(company_name, email, phone), drivers(name, phone)")
           .eq("company_id", tenantId)
           .eq(filter.column, filter.value)
@@ -611,7 +611,7 @@ async function executeTool(
         if (!order) return JSON.stringify({ error: "Order niet gevonden" });
 
         const [stopsRes, eventsRes] = await Promise.all([
-          supabase.from("order_stops").select("*").eq("order_id", order.id).order("sequence", { ascending: true }),
+          supabase.from("route_stops").select("*").eq("trip_id", order.id).order("stop_order", { ascending: true }),
           supabase.from("order_events").select("*").eq("order_id", order.id).order("created_at", { ascending: true }),
         ]);
 
@@ -649,13 +649,12 @@ async function executeTool(
         });
       }
 
-      // ─── NEW MUTATION TOOLS ───
+      // ─── MUTATION TOOLS ───
 
       case "assign_driver_to_order": {
-        // Fetch order and driver info for preview
         const [orderRes, driverRes] = await Promise.all([
-          supabase.from("orders").select("id, order_number, status, pickup_date, customers(company_name)").eq("company_id", tenantId).eq("id", args.order_id).maybeSingle(),
-          supabase.from("drivers").select("id, name, phone, rating, status").eq("company_id", tenantId).eq("id", args.driver_id).maybeSingle(),
+          supabase.from("trips").select("id, order_number, status, trip_date, customers(company_name)").eq("company_id", tenantId).eq("id", args.order_id).maybeSingle(),
+          supabase.from("drivers").select("id, name, phone, rating, status").eq("tenant_id", tenantId).eq("id", args.driver_id).maybeSingle(),
         ]);
 
         if (!orderRes.data) return JSON.stringify({ error: "Order niet gevonden" });
@@ -671,7 +670,7 @@ async function executeTool(
             details: {
               order: orderRes.data.order_number,
               klant: (orderRes.data.customers as any)?.company_name || "Onbekend",
-              ophaaldatum: orderRes.data.pickup_date,
+              ophaaldatum: orderRes.data.trip_date,
               chauffeur: driverRes.data.name,
               rating: driverRes.data.rating ? `${driverRes.data.rating}/5 ⭐` : "Geen rating",
               chauffeur_status: driverRes.data.status,
@@ -682,7 +681,7 @@ async function executeTool(
       }
 
       case "update_order_status": {
-        const { data: order } = await supabase.from("orders")
+        const { data: order } = await supabase.from("trips")
           .select("id, order_number, status, customers(company_name)")
           .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
 
@@ -708,12 +707,14 @@ async function executeTool(
       }
 
       case "create_invoice_for_order": {
-        const { data: order } = await supabase.from("orders")
-          .select("id, order_number, status, total_amount, customers(company_name)")
+        const { data: order } = await supabase.from("trips")
+          .select("id, order_number, status, sales_total, customers(company_name)")
           .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
 
         if (!order) return JSON.stringify({ error: "Order niet gevonden" });
-        if (order.status !== "delivered") return JSON.stringify({ error: `Order is niet afgeleverd (status: ${order.status}). Alleen afgeleverde orders kunnen gefactureerd worden.` });
+        if (!["afgeleverd", "afgerond", "gecontroleerd"].includes(order.status)) {
+          return JSON.stringify({ error: `Order is niet afgeleverd (status: ${order.status}). Alleen afgeleverde/afgeronde orders kunnen gefactureerd worden.` });
+        }
 
         return JSON.stringify({
           type: "confirmation_required",
@@ -725,7 +726,7 @@ async function executeTool(
             details: {
               order: order.order_number,
               klant: (order.customers as any)?.company_name || "Onbekend",
-              bedrag: `€${(order.total_amount || 0).toFixed(2)}`,
+              bedrag: `€${(order.sales_total || 0).toFixed(2)}`,
               status: order.status,
             },
           },
@@ -736,7 +737,7 @@ async function executeTool(
       case "send_customer_email": {
         const { data: customer } = await supabase.from("customers")
           .select("id, company_name, email")
-          .eq("company_id", tenantId).eq("id", args.customer_id).maybeSingle();
+          .eq("tenant_id", tenantId).eq("id", args.customer_id).maybeSingle();
 
         if (!customer) return JSON.stringify({ error: "Klant niet gevonden" });
         if (!customer.email) return JSON.stringify({ error: `Klant ${customer.company_name} heeft geen e-mailadres` });
@@ -763,7 +764,7 @@ async function executeTool(
         const orderIds = args.order_ids as string[];
         if (!orderIds?.length) return JSON.stringify({ error: "Geen orders opgegeven" });
 
-        const { data: orders } = await supabase.from("orders")
+        const { data: orders } = await supabase.from("trips")
           .select("id, order_number, status, customers(company_name)")
           .eq("company_id", tenantId)
           .in("id", orderIds);
@@ -789,7 +790,7 @@ async function executeTool(
       }
 
       case "create_claim_case": {
-        const { data: order } = await supabase.from("orders")
+        const { data: order } = await supabase.from("trips")
           .select("id, order_number, customers(company_name)")
           .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
 
@@ -817,52 +818,49 @@ async function executeTool(
       // ─── INTELLIGENCE TOOLS ───
 
       case "fleet_overview": {
-        const [vehiclesRes, driversRes, ordersRes] = await Promise.all([
-          supabase.from("vehicles").select("id, plate_number, type, status, make, model, year").eq("company_id", tenantId).eq("is_active", true),
-          supabase.from("drivers").select("id, name, status, rating").eq("company_id", tenantId).eq("is_active", true),
-          supabase.from("orders").select("id, status, driver_id").eq("company_id", tenantId).in("status", ["confirmed", "in_transit"]),
+        const [vehiclesRes, driversRes, tripsRes] = await Promise.all([
+          supabase.from("vehicles").select("id, license_plate, vehicle_type, brand, model, year_of_manufacture, is_active").eq("company_id", tenantId).eq("is_active", true),
+          supabase.from("drivers").select("id, name, status, rating").eq("tenant_id", tenantId).is("deleted_at", null),
+          supabase.from("trips").select("id, status, driver_id").eq("company_id", tenantId).in("status", ["gepland", "geladen", "onderweg"]),
         ]);
 
         const vehicles = vehiclesRes.data || [];
         const drivers = driversRes.data || [];
-        const activeOrders = ordersRes.data || [];
+        const activeTrips = tripsRes.data || [];
 
-        const busyDriverIds = new Set(activeOrders.filter(o => o.driver_id).map(o => o.driver_id));
+        const busyDriverIds = new Set(activeTrips.filter(o => o.driver_id).map(o => o.driver_id));
 
         return JSON.stringify({
           vehicles: {
             total: vehicles.length,
-            by_status: vehicles.reduce((m: Record<string, number>, v) => { m[v.status || "unknown"] = (m[v.status || "unknown"] || 0) + 1; return m; }, {}),
             list: vehicles.slice(0, 20),
           },
           drivers: {
             total: drivers.length,
-            available: drivers.filter(d => d.status === "available" && !busyDriverIds.has(d.id)).length,
+            available: drivers.filter(d => d.status === "active" && !busyDriverIds.has(d.id)).length,
             busy: busyDriverIds.size,
-            off_duty: drivers.filter(d => d.status === "off_duty").length,
           },
-          active_orders: activeOrders.length,
-          unassigned_orders: activeOrders.filter(o => !o.driver_id).length,
+          active_orders: activeTrips.length,
+          unassigned_orders: activeTrips.filter(o => !o.driver_id).length,
         });
       }
 
       case "route_suggest": {
-        const { data: order } = await supabase.from("orders")
-          .select("id, order_number, pickup_date, status, customers(company_name)")
+        const { data: order } = await supabase.from("trips")
+          .select("id, order_number, trip_date, status, customers(company_name)")
           .eq("company_id", tenantId).eq("id", args.order_id).maybeSingle();
 
         if (!order) return JSON.stringify({ error: "Order niet gevonden" });
 
-        // Get available drivers with their current workload
-        const [driversRes, activeOrdersRes] = await Promise.all([
-          supabase.from("drivers").select("id, name, rating, status, city").eq("company_id", tenantId).eq("is_active", true).in("status", ["available", "busy"]),
-          supabase.from("orders").select("driver_id").eq("company_id", tenantId).in("status", ["confirmed", "in_transit"]),
+        const [driversRes, activeTripsRes] = await Promise.all([
+          supabase.from("drivers").select("id, name, rating, status, current_city").eq("tenant_id", tenantId).is("deleted_at", null),
+          supabase.from("trips").select("driver_id").eq("company_id", tenantId).in("status", ["gepland", "geladen", "onderweg"]),
         ]);
 
         const drivers = driversRes.data || [];
-        const activeOrders = activeOrdersRes.data || [];
+        const activeTrips = activeTripsRes.data || [];
         const workload = new Map<string, number>();
-        for (const o of activeOrders) {
+        for (const o of activeTrips) {
           if (o.driver_id) workload.set(o.driver_id, (workload.get(o.driver_id) || 0) + 1);
         }
 
@@ -871,14 +869,14 @@ async function executeTool(
           name: d.name,
           rating: d.rating || 0,
           status: d.status,
-          city: d.city || "Onbekend",
+          city: d.current_city || "Onbekend",
           current_workload: workload.get(d.id) || 0,
-          score: ((d.rating || 3) * 20) - ((workload.get(d.id) || 0) * 15) + (d.status === "available" ? 20 : 0),
+          score: ((d.rating || 3) * 20) - ((workload.get(d.id) || 0) * 15) + (d.status === "active" ? 20 : 0),
         })).sort((a, b) => b.score - a.score).slice(0, 5);
 
         return JSON.stringify({
           order: order.order_number,
-          pickup_date: order.pickup_date,
+          trip_date: order.trip_date,
           suggestions,
           recommendation: suggestions[0] ? `Aanbeveling: ${suggestions[0].name} (score: ${suggestions[0].score}, rating: ${suggestions[0].rating}/5, werkdruk: ${suggestions[0].current_workload} orders)` : "Geen beschikbare chauffeurs gevonden",
         });
@@ -889,36 +887,34 @@ async function executeTool(
         const tomorrow = new Date(date);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const [todayOrders, unassigned, overdueInvoices, driversRes] = await Promise.all([
-          supabase.from("orders").select("id, order_number, status, driver_id, pickup_date, total_amount, customers(company_name), drivers(name)")
-            .eq("company_id", tenantId).gte("pickup_date", date).lt("pickup_date", tomorrow.toISOString().split("T")[0]),
-          supabase.from("orders").select("id, order_number, pickup_date, customers(company_name)")
-            .eq("company_id", tenantId).is("driver_id", null).in("status", ["draft", "pending", "confirmed"]),
+        const [todayTrips, unassigned, overdueInvoices, driversRes] = await Promise.all([
+          supabase.from("trips").select("id, order_number, status, driver_id, trip_date, sales_total, customers(company_name), drivers(name)")
+            .eq("company_id", tenantId).gte("trip_date", date).lt("trip_date", tomorrow.toISOString().split("T")[0]),
+          supabase.from("trips").select("id, order_number, trip_date, customers(company_name)")
+            .eq("company_id", tenantId).is("driver_id", null).in("status", ["draft", "aanvraag", "gepland"]),
           supabase.from("invoices").select("id, invoice_number, total_amount, due_date, customers(company_name)")
-            .eq("company_id", tenantId).eq("status", "overdue").order("due_date", { ascending: true }).limit(5),
-          supabase.from("drivers").select("id, name, status").eq("company_id", tenantId).eq("is_active", true),
+            .eq("company_id", tenantId).eq("status", "vervallen").order("due_date", { ascending: true }).limit(5),
+          supabase.from("drivers").select("id, name, status").eq("tenant_id", tenantId).is("deleted_at", null),
         ]);
 
-        const orders = todayOrders.data || [];
+        const trips = todayTrips.data || [];
         const statusBreakdown: Record<string, number> = {};
-        for (const o of orders) statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
+        for (const o of trips) statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
 
         const risks: string[] = [];
         const unassignedOrders = unassigned.data || [];
         if (unassignedOrders.length > 0) risks.push(`🚨 ${unassignedOrders.length} orders zonder chauffeur`);
         const overdueList = overdueInvoices.data || [];
         if (overdueList.length > 0) risks.push(`💰 ${overdueList.length} achterstallige facturen (€${overdueList.reduce((s, i) => s + (i.total_amount || 0), 0).toFixed(0)})`);
-        const offDuty = (driversRes.data || []).filter(d => d.status === "off_duty");
-        if (offDuty.length > 0) risks.push(`⚠️ ${offDuty.length} chauffeurs off-duty`);
 
         return JSON.stringify({
           date,
-          planned_orders: orders.length,
+          planned_orders: trips.length,
           status_breakdown: statusBreakdown,
-          total_revenue: orders.reduce((s, o) => s + (o.total_amount || 0), 0),
-          unassigned_orders: unassignedOrders.slice(0, 5).map(o => ({ number: o.order_number, pickup: o.pickup_date, customer: (o.customers as any)?.company_name })),
+          total_revenue: trips.reduce((s, o) => s + (o.sales_total || 0), 0),
+          unassigned_orders: unassignedOrders.slice(0, 5).map(o => ({ number: o.order_number, pickup: o.trip_date, customer: (o.customers as any)?.company_name })),
           overdue_invoices: overdueList.map(i => ({ number: i.invoice_number, amount: i.total_amount, customer: (i.customers as any)?.company_name })),
-          available_drivers: (driversRes.data || []).filter(d => d.status === "available").length,
+          available_drivers: (driversRes.data || []).filter(d => d.status === "active").length,
           risks,
           actions_needed: risks.length > 0 ? "Actie vereist — zie risico's hierboven" : "Alles op schema ✅",
         });
@@ -929,55 +925,54 @@ async function executeTool(
         const period = (args.period as string) || "month";
         const dateFrom = getDateFrom(period, new Date());
 
-        const [ordersRes, invoicesRes, driversRes] = await Promise.all([
-          supabase.from("orders").select("id, status, total_amount, purchase_amount, customer_id, driver_id, pickup_date, customers(company_name), drivers(name)")
+        const [tripsRes, invoicesRes, driversRes] = await Promise.all([
+          supabase.from("trips").select("id, status, sales_total, purchase_total, customer_id, driver_id, trip_date, customers(company_name), drivers(name)")
             .eq("company_id", tenantId).gte("created_at", dateFrom),
           supabase.from("invoices").select("id, status, total_amount, due_date")
             .eq("company_id", tenantId).gte("created_at", dateFrom),
           supabase.from("drivers").select("id, name, rating, status")
-            .eq("company_id", tenantId).eq("is_active", true),
+            .eq("tenant_id", tenantId).is("deleted_at", null),
         ]);
 
-        const orders = ordersRes.data || [];
+        const trips = tripsRes.data || [];
         const invoices = invoicesRes.data || [];
-        const revenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-        const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+        const revenue = trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+        const cost = trips.reduce((s, o) => s + (o.purchase_total || 0), 0);
         const margin = revenue > 0 ? ((revenue - cost) / revenue * 100) : 0;
-        const delivered = orders.filter(o => o.status === "delivered").length;
-        const overdue = invoices.filter(i => i.status === "overdue");
+        const delivered = trips.filter(o => ["afgeleverd", "afgerond", "gecontroleerd", "gefactureerd"].includes(o.status)).length;
+        const overdue = invoices.filter(i => i.status === "vervallen");
 
         return JSON.stringify({
           report_type: reportType,
           period,
           date_from: dateFrom,
           kpis: {
-            total_orders: orders.length,
-            delivered: delivered,
-            delivery_rate: orders.length > 0 ? Math.round(delivered / orders.length * 100) : 0,
-            revenue: revenue,
-            cost: cost,
+            total_orders: trips.length,
+            delivered,
+            delivery_rate: trips.length > 0 ? Math.round(delivered / trips.length * 100) : 0,
+            revenue, cost,
             profit: revenue - cost,
             margin_percent: Math.round(margin * 10) / 10,
-            open_invoices: invoices.filter(i => i.status === "pending").length,
+            open_invoices: invoices.filter(i => i.status === "concept" || i.status === "verzonden").length,
             overdue_invoices: overdue.length,
             overdue_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
           },
           top_customers: (() => {
             const cMap = new Map<string, { name: string; revenue: number; count: number }>();
-            for (const o of orders) {
+            for (const o of trips) {
               const name = (o.customers as any)?.company_name || "Onbekend";
               const e = cMap.get(o.customer_id || "") || { name, revenue: 0, count: 0 };
-              e.revenue += o.total_amount || 0; e.count++;
+              e.revenue += o.sales_total || 0; e.count++;
               cMap.set(o.customer_id || "", e);
             }
             return Array.from(cMap.values()).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
           })(),
           driver_count: (driversRes.data || []).length,
-          available_drivers: (driversRes.data || []).filter(d => d.status === "available").length,
+          available_drivers: (driversRes.data || []).filter(d => d.status === "active").length,
         });
       }
 
-      // ─── EXISTING ANALYSIS TOOLS ───
+      // ─── ANALYSIS TOOLS ───
 
       case "margin_analysis": {
         const period = args.period as string || "month";
@@ -985,35 +980,35 @@ async function executeTool(
         const dateFrom = getDateFrom(period, now);
 
         if (args.customer_id) {
-          const { data } = await supabase.from("orders")
-            .select("id, order_number, total_amount, purchase_amount, status, pickup_date, customers(company_name)")
+          const { data } = await supabase.from("trips")
+            .select("id, order_number, sales_total, purchase_total, status, trip_date, customers(company_name)")
             .eq("company_id", tenantId).eq("customer_id", args.customer_id).gte("created_at", dateFrom);
 
-          const orders = data || [];
-          const revenue = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-          const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+          const trips = data || [];
+          const revenue = trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+          const cost = trips.reduce((s, o) => s + (o.purchase_total || 0), 0);
           const margin = revenue > 0 ? ((revenue - cost) / revenue * 100) : 0;
 
           return JSON.stringify({
-            customer: orders[0]?.customers?.company_name || "Onbekend",
-            period, total_orders: orders.length, revenue, cost,
+            customer: (trips[0]?.customers as any)?.company_name || "Onbekend",
+            period, total_orders: trips.length, revenue, cost,
             profit: revenue - cost, margin_percent: Math.round(margin * 10) / 10,
             warning: margin < 15 ? "⚠️ Marge onder benchmark van 15%!" : null,
           });
         }
 
         const groupBy = args.group_by as string;
-        const { data: orders } = await supabase.from("orders")
-          .select("id, total_amount, purchase_amount, customer_id, driver_id, customers(company_name), drivers(name)")
+        const { data: trips } = await supabase.from("trips")
+          .select("id, sales_total, purchase_total, customer_id, driver_id, customers(company_name), drivers(name)")
           .eq("company_id", tenantId).gte("created_at", dateFrom);
 
         const grouped = new Map<string, { name: string; revenue: number; cost: number; count: number }>();
-        for (const o of orders || []) {
+        for (const o of trips || []) {
           const key = groupBy === "customer" ? (o.customer_id || "unknown") : (o.driver_id || "unassigned");
           const name = groupBy === "customer" ? (o.customers as any)?.company_name || "Onbekend" : (o.drivers as any)?.name || "Niet toegewezen";
           const entry = grouped.get(key) || { name, revenue: 0, cost: 0, count: 0 };
-          entry.revenue += o.total_amount || 0;
-          entry.cost += o.purchase_amount || 0;
+          entry.revenue += o.sales_total || 0;
+          entry.cost += o.purchase_total || 0;
           entry.count++;
           grouped.set(key, entry);
         }
@@ -1042,19 +1037,18 @@ async function executeTool(
         const [receivablesRes, payablesRes] = await Promise.all([
           supabase.from("invoices")
             .select("id, invoice_number, total_amount, status, due_date, customers(company_name)")
-            .eq("company_id", tenantId).in("status", ["pending", "overdue"])
+            .eq("company_id", tenantId).in("status", ["concept", "verzonden", "vervallen"])
             .lte("due_date", futureDate.toISOString().split("T")[0]),
           supabase.from("finance_transactions")
-            .select("id, amount, type, status, due_date, description")
-            .eq("company_id", tenantId).in("status", ["pending", "scheduled"])
-            .lte("due_date", futureDate.toISOString().split("T")[0]),
+            .select("id, amount, transaction_type, status, description")
+            .eq("company_id", tenantId).eq("status", "pending"),
         ]);
 
         const receivables = receivablesRes.data || [];
         const payables = payablesRes.data || [];
         const totalReceivable = receivables.reduce((s, r) => s + (r.total_amount || 0), 0);
         const totalPayable = payables.reduce((s, p) => s + (Math.abs(p.amount) || 0), 0);
-        const overdueReceivables = receivables.filter(r => r.status === "overdue");
+        const overdueReceivables = receivables.filter(r => r.status === "vervallen");
 
         return JSON.stringify({
           forecast_days: daysAhead,
@@ -1080,9 +1074,9 @@ async function executeTool(
         const period = (args.period as string) || "quarter";
         const dateFrom = getDateFrom(period, new Date());
 
-        const [ordersRes, invoicesRes] = await Promise.all([
-          supabase.from("orders")
-            .select("customer_id, total_amount, purchase_amount, status, customers(company_name)")
+        const [tripsRes, invoicesRes] = await Promise.all([
+          supabase.from("trips")
+            .select("customer_id, sales_total, purchase_total, status, customers(company_name)")
             .eq("company_id", tenantId).gte("created_at", dateFrom),
           supabase.from("invoices")
             .select("customer_id, total_amount, status, due_date")
@@ -1094,19 +1088,20 @@ async function executeTool(
           overdueAmount: number; overdueCount: number;
         }>();
 
-        for (const o of ordersRes.data || []) {
+        for (const o of tripsRes.data || []) {
+          if (!o.customer_id) continue;
           const entry = customerMap.get(o.customer_id) || {
             name: (o.customers as any)?.company_name || "Onbekend",
             revenue: 0, cost: 0, orderCount: 0, overdueAmount: 0, overdueCount: 0,
           };
-          entry.revenue += o.total_amount || 0;
-          entry.cost += o.purchase_amount || 0;
+          entry.revenue += o.sales_total || 0;
+          entry.cost += o.purchase_total || 0;
           entry.orderCount++;
           customerMap.set(o.customer_id, entry);
         }
 
         for (const inv of invoicesRes.data || []) {
-          if (inv.status === "overdue" && inv.customer_id) {
+          if (inv.status === "vervallen" && inv.customer_id) {
             const entry = customerMap.get(inv.customer_id);
             if (entry) { entry.overdueAmount += inv.total_amount || 0; entry.overdueCount++; }
           }
@@ -1136,12 +1131,12 @@ async function executeTool(
         const dateFrom = getDateFrom(period, new Date());
 
         let driverFilter = supabase.from("drivers").select("id, name, rating, status")
-          .eq("company_id", tenantId).eq("is_active", true);
+          .eq("tenant_id", tenantId).is("deleted_at", null);
         if (args.driver_id) driverFilter = driverFilter.eq("id", args.driver_id);
 
-        const [driversRes, ordersRes] = await Promise.all([
+        const [driversRes, tripsRes] = await Promise.all([
           driverFilter,
-          supabase.from("orders").select("driver_id, status, total_amount, delivery_date")
+          supabase.from("trips").select("driver_id, status, sales_total")
             .eq("company_id", tenantId).gte("created_at", dateFrom).not("driver_id", "is", null),
         ]);
 
@@ -1149,12 +1144,12 @@ async function executeTool(
         for (const d of driversRes.data || []) {
           driverMap.set(d.id, { name: d.name, rating: d.rating, trips: 0, delivered: 0, revenue: 0 });
         }
-        for (const o of ordersRes.data || []) {
+        for (const o of tripsRes.data || []) {
           const entry = driverMap.get(o.driver_id);
           if (entry) {
             entry.trips++;
-            if (o.status === "delivered") entry.delivered++;
-            entry.revenue += o.total_amount || 0;
+            if (["afgeleverd", "afgerond", "gecontroleerd", "gefactureerd"].includes(o.status)) entry.delivered++;
+            entry.revenue += o.sales_total || 0;
           }
         }
 
@@ -1185,9 +1180,10 @@ async function executeTool(
 
         const invoices = data || [];
         const today = new Date().toISOString().split("T")[0];
-        const overdue = invoices.filter(i => (i.status === "pending" || i.status === "overdue") && i.due_date && i.due_date < today);
-        const pending = invoices.filter(i => i.status === "pending");
-        const paid = invoices.filter(i => i.status === "paid");
+        const overdue = invoices.filter(i => i.status === "vervallen" || (i.status === "verzonden" && i.due_date && i.due_date < today));
+        const pending = invoices.filter(i => i.status === "verzonden");
+        const paid = invoices.filter(i => i.status === "betaald");
+        const concept = invoices.filter(i => i.status === "concept");
 
         if (args.days_overdue) {
           const minDate = new Date();
@@ -1207,9 +1203,10 @@ async function executeTool(
         return JSON.stringify({
           summary: {
             total: invoices.length,
-            pending: pending.length, pending_amount: pending.reduce((s, i) => s + (i.total_amount || 0), 0),
-            overdue: overdue.length, overdue_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
-            paid: paid.length, paid_amount: paid.reduce((s, i) => s + (i.total_amount || 0), 0),
+            concept: concept.length,
+            verzonden: pending.length, verzonden_amount: pending.reduce((s, i) => s + (i.total_amount || 0), 0),
+            vervallen: overdue.length, vervallen_amount: overdue.reduce((s, i) => s + (i.total_amount || 0), 0),
+            betaald: paid.length, betaald_amount: paid.reduce((s, i) => s + (i.total_amount || 0), 0),
           },
           overdue_invoices: overdue.slice(0, 10).map(i => ({
             number: i.invoice_number, amount: i.total_amount,
@@ -1232,24 +1229,24 @@ async function executeTool(
         const prevFrom = getDateFrom(period, prevEnd);
 
         const [currentRes, previousRes] = await Promise.all([
-          supabase.from("orders").select("id, total_amount, purchase_amount, status, delivery_date")
+          supabase.from("trips").select("id, sales_total, purchase_total, status")
             .eq("company_id", tenantId).gte("created_at", currentFrom),
-          supabase.from("orders").select("id, total_amount, purchase_amount, status, delivery_date")
+          supabase.from("trips").select("id, sales_total, purchase_total, status")
             .eq("company_id", tenantId).gte("created_at", prevFrom).lt("created_at", currentFrom),
         ]);
 
         const cur = currentRes.data || [];
         const prev = previousRes.data || [];
 
-        const calcMetric = (orders: typeof cur) => {
-          if (metric === "revenue") return orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-          if (metric === "orders") return orders.length;
+        const calcMetric = (trips: typeof cur) => {
+          if (metric === "revenue") return trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+          if (metric === "orders") return trips.length;
           if (metric === "margin") {
-            const rev = orders.reduce((s, o) => s + (o.total_amount || 0), 0);
-            const cost = orders.reduce((s, o) => s + (o.purchase_amount || 0), 0);
+            const rev = trips.reduce((s, o) => s + (o.sales_total || 0), 0);
+            const cost = trips.reduce((s, o) => s + (o.purchase_total || 0), 0);
             return rev > 0 ? Math.round((rev - cost) / rev * 1000) / 10 : 0;
           }
-          if (metric === "on_time") return orders.filter(o => o.status === "delivered").length;
+          if (metric === "on_time") return trips.filter(o => ["afgeleverd", "afgerond", "gecontroleerd", "gefactureerd"].includes(o.status)).length;
           return 0;
         };
 
@@ -1276,15 +1273,15 @@ async function executeTool(
         const period = (args.period as string) || "month";
         const dateFrom = getDateFrom(period, new Date());
 
-        const { data: orders } = await supabase.from("orders")
-          .select("id, total_amount, purchase_amount, status, pickup_date, created_at, customers(company_name), drivers(name)")
+        const { data: trips } = await supabase.from("trips")
+          .select("id, sales_total, purchase_total, status, trip_date, created_at, customers(company_name), drivers(name)")
           .eq("company_id", tenantId).gte("created_at", dateFrom);
 
-        const chartData = (orders || []).reduce((acc: Record<string, { date: string; revenue: number; cost: number; orders: number }>, o) => {
-          const date = (o.pickup_date || o.created_at)?.split("T")[0] || "unknown";
+        const chartData = (trips || []).reduce((acc: Record<string, { date: string; revenue: number; cost: number; orders: number }>, o) => {
+          const date = (o.trip_date || o.created_at)?.split("T")[0] || "unknown";
           if (!acc[date]) acc[date] = { date, revenue: 0, cost: 0, orders: 0 };
-          acc[date].revenue += o.total_amount || 0;
-          acc[date].cost += o.purchase_amount || 0;
+          acc[date].revenue += o.sales_total || 0;
+          acc[date].cost += o.purchase_total || 0;
           acc[date].orders++;
           return acc;
         }, {});
@@ -1294,12 +1291,11 @@ async function executeTool(
           chart_type: chartType,
           title: args.title,
           data: Object.values(chartData).sort((a, b) => a.date.localeCompare(b.date)),
-          summary: `${(orders || []).length} orders in ${period}, totaal €${(orders || []).reduce((s, o) => s + (o.total_amount || 0), 0).toFixed(0)} omzet`,
+          summary: `${(trips || []).length} orders in ${period}, totaal €${(trips || []).reduce((s, o) => s + (o.sales_total || 0), 0).toFixed(0)} omzet`,
         });
       }
 
       case "web_search": {
-        // AI-powered search synthesis — returns contextual transport info
         return JSON.stringify({
           type: "search_result",
           query: args.query,
@@ -1353,7 +1349,6 @@ async function executeTool(
 
           if (!imageUrl) return JSON.stringify({ error: "No image generated" });
 
-          // Store in Supabase Storage
           const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, "");
           const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
           const fileName = `${crypto.randomUUID()}.png`;
@@ -1387,29 +1382,29 @@ async function executeTool(
         const orderIds = args.order_ids as string[];
         if (!orderIds?.length) return JSON.stringify({ error: "Geen orders opgegeven" });
 
-        const { data: orders } = await supabase.from("orders")
-          .select("id, order_number, pickup_date, delivery_date, total_amount, purchase_amount, status, driver_id, customers(company_name), drivers(name), order_stops(city, sequence, stop_type)")
+        const { data: trips } = await supabase.from("trips")
+          .select("id, order_number, trip_date, estimated_arrival, sales_total, purchase_total, status, driver_id, customers(company_name), drivers(name)")
           .eq("company_id", tenantId).in("id", orderIds);
 
         const { data: availableDrivers } = await supabase.from("drivers")
-          .select("id, name, rating, status, city")
-          .eq("company_id", tenantId).eq("is_active", true).in("status", ["available", "busy"]);
+          .select("id, name, rating, status, current_city")
+          .eq("tenant_id", tenantId).is("deleted_at", null);
 
-        const totalRevenue = (orders || []).reduce((s, o) => s + (o.total_amount || 0), 0);
-        const totalCost = (orders || []).reduce((s, o) => s + (o.purchase_amount || 0), 0);
-        const unassigned = (orders || []).filter(o => !o.driver_id);
+        const totalRevenue = (trips || []).reduce((s, o) => s + (o.sales_total || 0), 0);
+        const totalCost = (trips || []).reduce((s, o) => s + (o.purchase_total || 0), 0);
+        const unassigned = (trips || []).filter(o => !o.driver_id);
 
         return JSON.stringify({
           type: "planning_analysis",
           optimize_for: args.optimize_for || "balanced",
-          orders: (orders || []).map(o => ({
-            id: o.id, number: o.order_number, pickup: o.pickup_date, delivery: o.delivery_date,
+          orders: (trips || []).map(o => ({
+            id: o.id, number: o.order_number, pickup: o.trip_date, delivery: o.estimated_arrival,
             customer: (o.customers as any)?.company_name, driver: (o.drivers as any)?.name || "Niet toegewezen",
-            stops: o.order_stops, revenue: o.total_amount, cost: o.purchase_amount,
+            revenue: o.sales_total, cost: o.purchase_total,
           })),
-          available_drivers: (availableDrivers || []).map(d => ({ id: d.id, name: d.name, rating: d.rating, city: d.city })),
+          available_drivers: (availableDrivers || []).map(d => ({ id: d.id, name: d.name, rating: d.rating, city: d.current_city })),
           summary: {
-            total_orders: (orders || []).length, unassigned: unassigned.length,
+            total_orders: (trips || []).length, unassigned: unassigned.length,
             total_revenue: totalRevenue, total_cost: totalCost,
             margin: totalRevenue > 0 ? Math.round((totalRevenue - totalCost) / totalRevenue * 100) : 0,
             available_driver_count: (availableDrivers || []).length,
@@ -1424,18 +1419,18 @@ async function executeTool(
         const dateFrom = new Date();
         dateFrom.setDate(dateFrom.getDate() - lookback);
 
-        const { data: orders } = await supabase.from("orders")
-          .select("id, total_amount, purchase_amount, status, pickup_date, created_at, customer_id, driver_id")
+        const { data: trips } = await supabase.from("trips")
+          .select("id, sales_total, purchase_total, status, trip_date, created_at, customer_id, driver_id")
           .eq("company_id", tenantId).gte("created_at", dateFrom.toISOString());
 
         const dailyData: Record<string, { date: string; revenue: number; cost: number; count: number; delivered: number }> = {};
-        for (const o of orders || []) {
+        for (const o of trips || []) {
           const date = (o.created_at)?.split("T")[0] || "unknown";
           if (!dailyData[date]) dailyData[date] = { date, revenue: 0, cost: 0, count: 0, delivered: 0 };
-          dailyData[date].revenue += o.total_amount || 0;
-          dailyData[date].cost += o.purchase_amount || 0;
+          dailyData[date].revenue += o.sales_total || 0;
+          dailyData[date].cost += o.purchase_total || 0;
           dailyData[date].count++;
-          if (o.status === "delivered") dailyData[date].delivered++;
+          if (["afgeleverd", "afgerond", "gecontroleerd", "gefactureerd"].includes(o.status)) dailyData[date].delivered++;
         }
 
         const values = Object.values(dailyData).sort((a, b) => a.date.localeCompare(b.date));
@@ -1461,7 +1456,7 @@ async function executeTool(
         if (args.customer_id) {
           const { data } = await supabase.from("customers")
             .select("company_name, email, address, city, postal_code, vat_number, payment_terms_days")
-            .eq("company_id", tenantId).eq("id", args.customer_id).maybeSingle();
+            .eq("tenant_id", tenantId).eq("id", args.customer_id).maybeSingle();
           customerInfo = data;
         }
 
@@ -1563,7 +1558,6 @@ async function runToolLoop(
       } catch {}
     }
 
-    // Stop if a confirmation is pending
     if (pendingConfirmation) break;
   }
 
@@ -1581,11 +1575,14 @@ async function executeConfirmedAction(
 ): Promise<{ success: boolean; message: string }> {
   switch (toolName) {
     case "smart_order_entry": {
-      const { data, error } = await supabase.from("orders").insert({
-        company_id: tenantId, status: "draft",
-        reference: (payload.description as string)?.substring(0, 100),
-        pickup_date: payload.pickup_date || null,
-        notes: payload.description, created_by: userId,
+      const { data, error } = await supabase.from("trips").insert({
+        company_id: tenantId,
+        status: "draft",
+        customer_reference: (payload.description as string)?.substring(0, 100),
+        trip_date: payload.pickup_date || new Date().toISOString().split("T")[0],
+        pickup_address: payload.pickup_address || "Nog in te vullen",
+        delivery_address: payload.delivery_address || "Nog in te vullen",
+        notes: payload.description as string,
       }).select("id, order_number").single();
 
       if (error) return { success: false, message: error.message };
@@ -1593,8 +1590,8 @@ async function executeConfirmedAction(
     }
 
     case "assign_driver_to_order": {
-      const { error } = await supabase.from("orders")
-        .update({ driver_id: payload.driver_id, status: "confirmed", updated_at: new Date().toISOString() })
+      const { error } = await supabase.from("trips")
+        .update({ driver_id: payload.driver_id, status: "gepland", updated_at: new Date().toISOString() })
         .eq("id", payload.order_id).eq("company_id", tenantId);
 
       if (error) return { success: false, message: error.message };
@@ -1602,15 +1599,15 @@ async function executeConfirmedAction(
       await supabase.from("order_events").insert({
         order_id: payload.order_id as string,
         event_type: "driver_assigned",
-        description: `Chauffeur toegewezen via AI Assistent`,
-        created_by: userId,
+        actor_user_id: userId,
+        payload: { driver_id: payload.driver_id, source: "ai_assistant" },
       });
 
       return { success: true, message: "Chauffeur succesvol toegewezen aan de order." };
     }
 
     case "update_order_status": {
-      const { error } = await supabase.from("orders")
+      const { error } = await supabase.from("trips")
         .update({ status: payload.new_status, updated_at: new Date().toISOString() })
         .eq("id", payload.order_id).eq("company_id", tenantId);
 
@@ -1619,70 +1616,63 @@ async function executeConfirmedAction(
       await supabase.from("order_events").insert({
         order_id: payload.order_id as string,
         event_type: "status_changed",
-        description: `Status gewijzigd naar ${payload.new_status} via AI${payload.reason ? `: ${payload.reason}` : ""}`,
-        created_by: userId,
+        actor_user_id: userId,
+        payload: { new_status: payload.new_status, reason: payload.reason, source: "ai_assistant" },
       });
 
       return { success: true, message: `Order status gewijzigd naar ${payload.new_status}.` };
     }
 
     case "create_invoice_for_order": {
-      const { data: order } = await supabase.from("orders")
-        .select("id, order_number, total_amount, customer_id").eq("id", payload.order_id).eq("company_id", tenantId).single();
+      const { data: order } = await supabase.from("trips")
+        .select("id, order_number, sales_total, customer_id").eq("id", payload.order_id).eq("company_id", tenantId).single();
 
       if (!order) return { success: false, message: "Order niet gevonden" };
 
       const { data: invoice, error } = await supabase.from("invoices").insert({
         company_id: tenantId,
         customer_id: order.customer_id,
-        order_id: order.id,
-        total_amount: order.total_amount || 0,
-        status: "draft",
+        total_amount: order.sales_total || 0,
+        subtotal: order.sales_total || 0,
+        vat_amount: 0,
+        status: "concept",
         due_date: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
-        created_by: userId,
       }).select("id, invoice_number").single();
 
       if (error) return { success: false, message: error.message };
 
       await supabase.from("order_events").insert({
-        order_id: order.id, event_type: "invoice_created",
-        description: `Factuur ${invoice.invoice_number} aangemaakt via AI`,
-        created_by: userId,
+        order_id: order.id,
+        event_type: "invoice_created",
+        actor_user_id: userId,
+        payload: { invoice_id: invoice.id, invoice_number: invoice.invoice_number, source: "ai_assistant" },
       });
 
-      return { success: true, message: `Factuur ${invoice.invoice_number} aangemaakt (€${(order.total_amount || 0).toFixed(2)}).` };
+      return { success: true, message: `Factuur ${invoice.invoice_number} aangemaakt (€${(order.sales_total || 0).toFixed(2)}).` };
     }
 
     case "send_customer_email": {
-      // Log the email intent - actual sending via email infrastructure
       const { data: customer } = await supabase.from("customers")
-        .select("company_name, email").eq("id", payload.customer_id).eq("company_id", tenantId).single();
+        .select("company_name, email").eq("id", payload.customer_id).eq("tenant_id", tenantId).single();
 
       if (!customer?.email) return { success: false, message: "Klant heeft geen e-mailadres" };
-
-      // Store as a notification/communication log
-      await supabase.from("order_events").insert({
-        event_type: "email_sent",
-        description: `E-mail "${payload.subject}" gestuurd naar ${customer.company_name} (${customer.email}) via AI`,
-        created_by: userId,
-      });
 
       return { success: true, message: `E-mail "${payload.subject}" is klaargezet voor ${customer.company_name}.` };
     }
 
     case "bulk_update_orders": {
       const orderIds = payload.order_ids as string[];
-      const { error } = await supabase.from("orders")
+      const { error } = await supabase.from("trips")
         .update({ status: payload.new_status, updated_at: new Date().toISOString() })
         .eq("company_id", tenantId).in("id", orderIds);
 
       if (error) return { success: false, message: error.message };
 
-      // Log events for each order
       const events = orderIds.map(oid => ({
-        order_id: oid, event_type: "status_changed",
-        description: `Bulk status → ${payload.new_status} via AI${payload.reason ? `: ${payload.reason}` : ""}`,
-        created_by: userId,
+        order_id: oid,
+        event_type: "status_changed",
+        actor_user_id: userId,
+        payload: { new_status: payload.new_status, reason: payload.reason, source: "ai_assistant_bulk" },
       }));
       await supabase.from("order_events").insert(events);
 
@@ -1690,14 +1680,14 @@ async function executeConfirmedAction(
     }
 
     case "create_claim_case": {
-      const { data: claim, error } = await supabase.from("claim_cases").insert({
-        company_id: tenantId,
+      const { error } = await supabase.from("claim_cases").insert({
+        tenant_id: tenantId,
         order_id: payload.order_id as string,
         claim_type: payload.claim_type as string,
-        description: payload.description as string,
-        estimated_amount: (payload.estimated_amount as number) || null,
+        notes: payload.description as string,
+        claimed_amount: (payload.estimated_amount as number) || 0,
         status: "open",
-        reported_by: userId,
+        created_by: userId,
       }).select("id").single();
 
       if (error) return { success: false, message: error.message };
@@ -1705,8 +1695,8 @@ async function executeConfirmedAction(
       await supabase.from("order_events").insert({
         order_id: payload.order_id as string,
         event_type: "claim_created",
-        description: `Schadeclaim (${payload.claim_type}) aangemaakt via AI`,
-        created_by: userId,
+        actor_user_id: userId,
+        payload: { claim_type: payload.claim_type, source: "ai_assistant" },
       });
 
       return { success: true, message: `Schadeclaim aangemaakt (type: ${payload.claim_type}).` };
@@ -1820,22 +1810,18 @@ serve(async (req) => {
           chatMessages, supabase, tenantId, userId, LOVABLE_API_KEY, reasoning
         );
 
-        // Check if runToolLoop already produced a final assistant message
         const lastMsg = finalMessages[finalMessages.length - 1];
         const alreadyHasAssistantReply = lastMsg?.role === "assistant" && lastMsg?.content?.trim();
 
         if (alreadyHasAssistantReply) {
-          // ─── No second AI call needed — stream the existing reply as SSE ───
           const assistantContent = lastMsg.content;
 
-          // Save to DB
           await supabase.from("chatgpt_messages").insert({
             conversation_id: convId, role: "assistant", content: assistantContent,
             pending_confirmation: !!pendingConfirmation,
             confirmation_payload: pendingConfirmation as any,
           });
 
-          // Deduct credits AFTER successful response
           const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
             : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
             : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
@@ -1849,17 +1835,14 @@ serve(async (req) => {
             p_model: selectedModel.split("/").pop() || "gemini-3-flash",
           });
 
-          // Simulate SSE stream from existing content
           const encoder = new TextEncoder();
           const fakeStream = new ReadableStream({
             start(controller) {
-              // Send content as a single SSE chunk
               const ssePayload = {
                 choices: [{ delta: { content: assistantContent }, finish_reason: null }],
               };
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(ssePayload)}\n\n`));
 
-              // Send finish event with metadata
               const finishPayload: any = {
                 choices: [{ delta: {}, finish_reason: "stop" }],
               };
@@ -1877,7 +1860,7 @@ serve(async (req) => {
           });
         }
 
-        // ─── No assistant reply yet (e.g. only tool results) — do streaming AI call ───
+        // ─── No assistant reply yet — do streaming AI call ───
         const streamRes = await fetch(GATEWAY_URL, {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -1940,7 +1923,6 @@ serve(async (req) => {
                 }
               }
             } finally {
-              // Only save and deduct if we got actual content
               if (fullContent.trim()) {
                 await supabase.from("chatgpt_messages").insert({
                   conversation_id: convId, role: "assistant", content: fullContent,
