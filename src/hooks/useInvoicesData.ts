@@ -20,10 +20,11 @@ export function useInvoicesData(filters: InvoiceFilters = {}) {
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchInvoices(filters);
+      const data = await fetchInvoices({ ...filters, companyId: company.id });
       setInvoices(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden facturen';
