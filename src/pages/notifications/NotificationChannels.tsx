@@ -83,10 +83,10 @@ export default function NotificationChannels() {
   const [editingChannel, setEditingChannel] = useState<NotificationChannel | null>(null);
 
   const stats = {
-    sent24h: 156,
-    delivered: 148,
-    failed: 8,
-    deliveryRate: 95,
+    sent24h: logs.length,
+    delivered: logs.filter(l => l.status === 'delivered').length,
+    failed: logs.filter(l => l.status === 'failed').length,
+    deliveryRate: logs.length > 0 ? Math.round((logs.filter(l => l.status === 'delivered').length / logs.length) * 100) : 0,
   };
 
   const getChannelIcon = (type: NotificationChannel['type']) => {
