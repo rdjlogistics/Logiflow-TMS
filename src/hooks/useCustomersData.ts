@@ -5,15 +5,14 @@ import {
   type CustomerFilters,
 } from '@/services/customers';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering customers with automatic refresh.
- * Wraps the customers service with loading state, error handling, and refetch.
- *
- * Example:
- *   const { customers, loading, refetch } = useCustomersData({ isActive: true });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useCustomersData(filters: CustomerFilters = {}) {
+  const { company } = useCompany();
   const [customers, setCustomers] = useState<Awaited<ReturnType<typeof fetchCustomers>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
