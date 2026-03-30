@@ -384,13 +384,32 @@ export const B2BDashboard = ({
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 400, damping: 15 }}
                       >
-                        €{openInvoicesTotal.toFixed(2)}
+                        {formatEuro(openInvoicesTotal)}
                       </motion.p>
                       <p className="text-xs text-muted-foreground">{openInvoices.length} openstaand</p>
                     </div>
+                    {/* Payment progress bar */}
+                    {totalInvoicesAmount > 0 && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-muted-foreground">
+                          <span>Betaald</span>
+                          <span className="tabular-nums">{paymentProgress}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-emerald-500"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${paymentProgress}%` }}
+                            transition={{ type: "spring", stiffness: 80, damping: 20, delay: 0.2 }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="divide-y divide-border/20">
                       {openInvoices.slice(0, 3).map((inv, i) => {
                         const isOverdue = inv.status === 'overdue' || (inv.dueDate && new Date(inv.dueDate) < new Date());
+                        const outstanding = Math.max(0, inv.amount - (inv.amountPaid ?? 0));
+                        const daysOver = isOverdue && inv.dueDate ? getDaysOverdue(inv.dueDate) : 0;
                         return (
                           <motion.div
                             key={inv.id}
@@ -398,19 +417,29 @@ export const B2BDashboard = ({
                             variants={listItemVariants}
                             initial="hidden"
                             animate="visible"
-                            className="flex items-center justify-between py-2 text-sm"
                           >
-                            <div className="min-w-0">
-                              <span className="font-medium truncate block">{inv.number}</span>
-                              {inv.dueDate && (
-                                <span className={`text-[10px] ${isOverdue ? 'text-red-400' : 'text-muted-foreground'}`}>
-                                  {isOverdue ? '⚠ ' : ''}Verval: {format(new Date(inv.dueDate), "d MMM", { locale: nl })}
+                            <Link to="/portal/b2b/invoices" className="flex items-center justify-between py-2 text-sm group touch-manipulation">
+                              <div className="min-w-0">
+                                <span className="font-medium truncate block group-hover:text-primary transition-colors">{inv.number}</span>
+                                {inv.dueDate && (
+                                  <span className={`text-[10px] ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                    {isOverdue && daysOver > 0
+                                      ? `⚠ ${daysOver} dag${daysOver !== 1 ? 'en' : ''} verlopen`
+                                      : `Verval: ${format(new Date(inv.dueDate), "d MMM", { locale: nl })}`}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0 ml-2">
+                                <span className={`font-semibold tabular-nums text-sm ${isOverdue ? 'text-destructive' : ''}`}>
+                                  {formatEuro(outstanding)}
                                 </span>
-                              )}
-                            </div>
-                            <span className={`font-semibold tabular-nums ${isOverdue ? 'text-red-400' : ''}`}>
-                              €{inv.amount.toFixed(2)}
-                            </span>
+                                {(inv.amountPaid ?? 0) > 0 && (
+                                  <p className="text-[9px] text-muted-foreground tabular-nums">
+                                    van {formatEuro(inv.amount)}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
                           </motion.div>
                         );
                       })}
