@@ -303,6 +303,25 @@ export const BatchPurchaseInvoiceWizard = () => {
           isDownloading={isGenerating}
         />
       )}
+      {(() => {
+        const selected = carrierGroups.filter(g => g.selected);
+        const totalAmount = selected.reduce((sum, g) => sum + g.subtotal, 0);
+        return (
+          <ConfirmDialog
+            open={showConfirm}
+            title="Inkoopfacturen definitief aanmaken?"
+            description={`Er ${selected.length === 1 ? 'wordt 1 inkoopfactuur' : `worden ${selected.length} inkoopfacturen`} aangemaakt voor een totaalbedrag van ${formatCurrency(totalAmount)}. Deze actie kan niet ongedaan worden gemaakt.`}
+            confirmText="Facturen aanmaken"
+            variant="warning"
+            isLoading={createInvoicesMutation.isPending}
+            onConfirm={() => {
+              setShowConfirm(false);
+              createInvoicesMutation.mutate();
+            }}
+            onCancel={() => setShowConfirm(false)}
+          />
+        );
+      })()}
     </div>
   );
 };

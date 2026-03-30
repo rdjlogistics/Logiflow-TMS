@@ -1099,5 +1099,18 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
         </div>
       )}
     </div>
+      <ConfirmDialog
+        open={showConfirm}
+        title="Facturen definitief aanmaken?"
+        description={`Er ${selectedGroups.length === 1 ? 'wordt 1 factuur' : `worden ${selectedGroups.length} facturen`} aangemaakt voor ${totalOrders} orders met een totaalbedrag van ${formatCurrency(totalAmount + totalVat)} (incl. BTW). Deze actie kan niet ongedaan worden gemaakt.`}
+        confirmText="Facturen aanmaken"
+        variant="warning"
+        isLoading={batchInvoiceMutation.isPending}
+        onConfirm={() => {
+          batchInvoiceMutation.mutate();
+        }}
+        onCancel={() => setShowConfirm(false)}
+      />
+    </div>
   );
 }
