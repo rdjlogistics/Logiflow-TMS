@@ -42,6 +42,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
   const { lookupPostcode, loading: lookingUp } = usePostcodeLookup();
   
   const [currentStep, setCurrentStep] = useState<Step>('from');
+  const [lookupFromCity, setLookupFromCity] = useState('');
+  const [lookupToCity, setLookupToCity] = useState('');
+  const todayStr = new Date().toISOString().split('T')[0];
   const [formData, setFormData] = useState({
     fromPostcode: '',
     fromHouseNumber: '',
@@ -53,7 +56,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
     toCity: '',
     description: '',
     size: 'medium',
-    pickupDate: new Date().toISOString().split('T')[0],
+    pickupDate: todayStr,
   });
 
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
