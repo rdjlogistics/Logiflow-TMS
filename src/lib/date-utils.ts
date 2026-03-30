@@ -162,3 +162,11 @@ export function formatQuarter(value: string | Date | null | undefined): string {
   if (!d) return '—';
   return `Q${Math.ceil((d.getMonth() + 1) / 3)} ${d.getFullYear()}`;
 }
+
+/** Capitalize city name: "zaandam" → "Zaandam", "DEN HAAG" → "Den Haag" */
+export function capitalizeCity(name: string): string {
+  if (!name) return name;
+  return name
+    .toLowerCase()
+    .replace(/(^|\s|-)(\w)/g, (_, sep, char) => sep + char.toUpperCase());
+}

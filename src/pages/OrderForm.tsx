@@ -710,7 +710,7 @@ const OrderForm = () => {
         address: `${dest.street} ${dest.house_number}`.trim(),
         house_number: dest.house_number || null,
         postal_code: dest.postal_code,
-        city: dest.city,
+        city: capitalizeCity(dest.city),
         company_name: dest.company_name,
         contact_name: dest.contact_name,
         phone: dest.phone,

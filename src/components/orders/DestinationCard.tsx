@@ -473,15 +473,37 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={cn(labelClass, "flex items-center gap-1.5")}>
-                          <Calendar className="h-3 w-3" />
+                          <CalendarIcon className="h-3 w-3" />
                           {data.stop_type === 'delivery' ? 'Aflever' : 'Ophaal'} datum
                         </Label>
-                        <Input
-                          type="date"
-                          value={data.pickup_date}
-                          onChange={(e) => handleChange('pickup_date', e.target.value)}
-                          className={inputMobile}
-                        />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                inputMobile, "w-full justify-start text-left font-normal gap-2",
+                                !data.pickup_date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="h-3 w-3 text-muted-foreground shrink-0" />
+                              {data.pickup_date
+                                ? format(parse(data.pickup_date, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')
+                                : "Selecteer datum"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={data.pickup_date ? parse(data.pickup_date, 'yyyy-MM-dd', new Date()) : undefined}
+                              onSelect={(date) => {
+                                if (date) handleChange('pickup_date', format(date, 'yyyy-MM-dd'));
+                              }}
+                              locale={nl}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
 
                       <div className="space-y-1">
