@@ -31,7 +31,7 @@ export const CreditBadge = ({ creditInfo, subscription, compact }: CreditBadgePr
   return (
     <div className="p-3 space-y-2">
       <div className="flex items-center justify-between text-xs">
-        <span className={`font-semibold ${planColor}`}>{planLabel} Plan</span>
+        <span className={`font-semibold ${planColor}`}>{planLabel}</span>
         <span className="text-muted-foreground">{remaining}/{total}</span>
       </div>
       <Progress value={percent} className="h-1.5" />
