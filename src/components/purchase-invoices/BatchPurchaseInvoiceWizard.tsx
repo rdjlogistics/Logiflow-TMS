@@ -52,6 +52,7 @@ export const BatchPurchaseInvoiceWizard = () => {
   
   // Step 3 state
   const [createdInvoices, setCreatedInvoices] = useState<CreatedInvoice[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Calculate period dates based on preset
   const getPeriodDates = () => {
