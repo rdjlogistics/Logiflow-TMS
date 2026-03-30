@@ -338,6 +338,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                 onChange={(e) => updateField('toCity', e.target.value)}
                 className={cn("h-12 text-base", formData.toCity && "border-green-500/30 bg-green-500/5")}
               />
+              {toCityMismatch && (
+                <p className="text-xs text-yellow-600 mt-1">⚠ Postcode geeft stad "{lookupToCity}" aan, u heeft "{formData.toCity}" ingevuld</p>
+              )}
             </div>
           </>
         )}

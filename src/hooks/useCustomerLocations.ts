@@ -77,6 +77,22 @@ export const useCustomerLocations = (customerId?: string) => {
 
   const createLocation = async (input: CreateLocationInput): Promise<CustomerLocation | null> => {
     try {
+      // Duplicate check
+      const { data: existing } = await supabase
+        .from("customer_locations")
+        .select("id, label")
+        .eq("customer_id", input.customer_id)
+        .eq("address_line", input.address_line)
+        .eq("postcode", input.postcode)
+        .maybeSingle();
+
+      if (existing) {
+        const proceed = window.confirm(
+          `Er bestaat al een adres "${existing.label}" met dezelfde straat en postcode. Wil je toch doorgaan?`
+        );
+        if (!proceed) return null;
+      }
+
       const { data, error } = await supabase
         .from("customer_locations")
         .insert(input)

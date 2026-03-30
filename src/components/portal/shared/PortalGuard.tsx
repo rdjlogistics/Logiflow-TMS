@@ -82,7 +82,7 @@ const PortalGuard = ({ children, skipOnboardingCheck = false }: PortalGuardProps
     return <Navigate to="/" replace />;
   }
 
-  if (needsOnboarding && location.pathname !== "/portal/b2b/onboarding") {
+  if (needsOnboarding && location.pathname.startsWith("/portal/b2b") && location.pathname !== "/portal/b2b/onboarding") {
     return <Navigate to="/portal/b2b/onboarding" replace />;
   }
 

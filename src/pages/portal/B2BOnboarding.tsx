@@ -361,8 +361,14 @@ export default function B2BOnboarding() {
 
           {step < 2 ? (
             <Button
-              onClick={() => setStep((s) => s + 1)}
-              disabled={step === 0 && !canProceedStep0}
+              onClick={() => {
+                if (step === 0 && !canProceedStep0) {
+                  setAttempted(true);
+                  return;
+                }
+                setAttempted(false);
+                setStep((s) => s + 1);
+              }}
               className="gap-1"
             >
               Volgende <ArrowRight className="h-4 w-4" />
