@@ -491,6 +491,7 @@ export const B2BDashboard = ({
                     <div className="divide-y divide-border/20">
                       {activeShipments.slice(0, 3).map((s, i) => {
                         const st = statusConfig[s.status];
+                        const currentStep = getDeliveryStep(s.status);
                         return (
                           <motion.div
                             key={s.id}
@@ -499,19 +500,34 @@ export const B2BDashboard = ({
                             initial="hidden"
                             animate="visible"
                           >
-                            <Link to={`/portal/b2b/shipments/${s.id}`} className="flex items-center justify-between py-2.5 group touch-manipulation">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-medium truncate">{s.referenceNumber}</span>
-                                  <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px] shrink-0`}>{st.label}</Badge>
+                            <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 group touch-manipulation">
+                              <div className="flex items-center justify-between">
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">{s.referenceNumber}</span>
+                                    <Badge variant="outline" className={`${st.bgColor} ${st.color} border-0 text-[10px] shrink-0`}>{st.label}</Badge>
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</p>
                                 </div>
-                                <p className="text-[11px] text-muted-foreground truncate">{s.fromCity} → {s.toCity}</p>
+                                <div className="text-right shrink-0 ml-2">
+                                  {s.estimatedDelivery && (
+                                    <span className="text-[10px] text-muted-foreground block">
+                                      {format(new Date(s.estimatedDelivery), "d MMM", { locale: nl })}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {s.parcels} colli{s.weight ? ` · ${s.weight}kg` : ''}
+                                  </span>
+                                </div>
                               </div>
-                              {s.estimatedDelivery && (
-                                <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
-                                  {format(new Date(s.estimatedDelivery), "d MMM", { locale: nl })}
-                                </span>
-                              )}
+                              {/* Mini progress steps */}
+                              <div className="flex items-center gap-0.5 mt-1.5">
+                                {['Bevestigd', 'Opgehaald', 'Onderweg', 'Bezorgd'].map((step, idx) => (
+                                  <div key={step} className="flex items-center flex-1">
+                                    <div className={`h-1 w-full rounded-full ${idx <= currentStep ? 'bg-primary' : 'bg-muted'}`} />
+                                  </div>
+                                ))}
+                              </div>
                             </Link>
                           </motion.div>
                         );
