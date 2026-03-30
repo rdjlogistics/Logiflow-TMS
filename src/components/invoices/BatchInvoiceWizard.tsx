@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   ArrowLeft,
   ArrowRight,
