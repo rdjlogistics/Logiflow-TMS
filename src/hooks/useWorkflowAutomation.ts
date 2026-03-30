@@ -315,7 +315,7 @@ export const useWorkflowAutomation = () => {
   // Manually trigger a workflow
   const triggerWorkflow = async (workflowId: string, testData: Record<string, any> = {}) => {
     const { error } = await supabase
-      .from('workflow_runs' as any)
+      .from('workflow_runs')
       .insert({
         workflow_id: workflowId,
         trigger_event: testData,
