@@ -1,74 +1,44 @@
 
 
-# Fix: Ontbrekende Edge Functions & Redirect URL
+# Fix: Order Formulier — Datum, Prijzen & Stadsnaam
 
-## Status: Wat WERKT al correct
+## Probleem 1 — Datum "25-03-20"
 
-Na testen van alle 49 bestaande edge functions:
-- **CORS headers**: correct op alle functies (inclusief extended Supabase client headers)
-- **OPTIONS handlers**: aanwezig op alle functies
-- **`Deno.env.get()`**: gebruikt voor alle secrets (MOLLIE_API_KEY, RESEND_API_KEY, etc.)
-- **try/catch met JSON error responses**: aanwezig op alle functies
-- **Health check**: retourneert 200, alle services healthy (mollie, resend, mapbox, openai, vapid)
-- **Auth validatie**: correcte `getClaims()` pattern op alle authenticated functies
+De `<input type="date">` HTML element gebruikt het browser-native format. Dit wordt bepaald door de browser locale en geeft in sommige browsers/OS-combinaties een 2-cijferig jaar. Dit is niet iets wat we via CSS of HTML attributen kunnen sturen.
 
-## Wat GEFIXED moet worden
+**Fix:** Vervang de native `<input type="date">` door een Popover + Calendar (Shadcn datepicker pattern) met een expliciete `format(date, 'dd-MM-yyyy')` weergave. Dit garandeert altijd een 4-cijferig jaar.
 
-### 1. Redirect URL in `create-subscription-checkout` (1 regel)
-Huidige: `https://rdjlogistics.nl/settings?payment=success`
-Moet zijn: `https://rdjlogistics.nl/settings/subscription?payment=success`
+**Bestanden:**
+- `src/components/orders/OrderDetailsPanel.tsx` — regel 192-197: vervang `<Input type="date">` door Popover+Calendar
+- `src/components/orders/DestinationCard.tsx` — regel 473-477: zelfde fix voor pickup_date veld
 
-### 2. Zes ontbrekende Edge Functions
-De frontend roept deze functies aan maar ze bestaan niet (retourneren 404):
+## Probleem 2 — Prijzen altijd €0
 
-| Functie | Aangeroepen door | Doel |
-|---------|-----------------|------|
-| `smart-document-ocr` | SmartDocumentOCR.tsx | AI OCR van documenten |
-| `analyze-driver-document` | useDriverDocumentUpload.ts, DocumentVerification.tsx | AI verificatie rijbewijzen/documenten |
-| `portal-ai` | usePortalAI.ts | AI chat voor klant/chauffeur portals |
-| `ecommerce-sync` | useEcommerceIntegrations.ts | Sync met webshops |
-| `convert-ecommerce-order` | useEcommerceIntegrations.ts | Webshop order → TMS rit |
-| `process-email-queue` | config.toml verwijzing maar geen code | Email queue verwerking |
+De prices zijn €0 omdat `product_lines` standaard allemaal `is_active: false` starten (PricingPanel regel 122). Gebruikers moeten handmatig elke tariefregel activeren, maar doen dat niet.
 
-### 3. Config.toml — 5 ontbrekende function blocks
-De nieuwe functies moeten ook in `config.toml` met `verify_jwt = false`.
+**Fix:**
+- In `PricingPanel.tsx` (regel 116-128): wanneer product_lines voor het eerst worden geladen en er is precies 1 product, activeer dat product automatisch (`is_active: true`)
+- Voeg validatie toe in `OrderForm.tsx` (rond regel 592): check of `salesSubtotal > 0` voordat de order wordt opgeslagen. Toon foutmelding: "Voer een verkoopprijs in of activeer minimaal één tariefregel"
+- Voeg een optionele checkbox "Geen kosten (€0)" toe die de validatie overslaat
 
-## Aanpak per functie
+## Probleem 3 — Stadsnaam lowercase
 
-### `smart-document-ocr`
-- Accepteert `fileBase64`, `fileName`, `mimeType`
-- Gebruikt Lovable AI Gateway (Gemini) voor document parsing
-- Retourneert `{ success: true, extractedData: {...}, documentType, confidence }`
+De postcode-lookup API retourneert soms lowercase stadsnamen. 
 
-### `analyze-driver-document`
-- Accepteert `documentId`, `imageUrl`, `documentType`
-- Gebruikt Lovable AI Gateway voor document verificatie (geldigheid, vervaldatum)
-- Update `driver_documents` tabel met analyse resultaat
-
-### `portal-ai`
-- AI chatbot voor portals
-- Accepteert `conversationId`, `portalType`, `message`, etc.
-- Gebruikt Lovable AI Gateway
-- Retourneert `{ assistantMessage, actionDraft }`
-
-### `ecommerce-sync` & `convert-ecommerce-order`
-- Placeholder functies (e-commerce integratie is nog niet live)
-- Retourneren `{ success: true, message: "..." }` met beschrijvende melding
-
-### `process-email-queue`
-- Verwerkt email queue uit database
-- Haalt pending emails op en verstuurt via Resend
+**Fix:**
+- Maak een `capitalizeCity(name: string)` utility in een bestaand utils bestand
+- Pas toe in `DestinationCard.tsx` handlePostcodeLookup (regel 163) en handleChange voor 'city' veld
+- Pas toe in `OrderForm.tsx` bij het bouwen van `orderData` (regel 654, 657)
+- Database migratie: `UPDATE route_stops SET city = INITCAP(city)` en `UPDATE trips SET pickup_city = INITCAP(pickup_city), delivery_city = INITCAP(delivery_city)`
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Edit** | `supabase/functions/create-subscription-checkout/index.ts` (redirect URL) |
-| **Nieuw** | `supabase/functions/smart-document-ocr/index.ts` |
-| **Nieuw** | `supabase/functions/analyze-driver-document/index.ts` |
-| **Nieuw** | `supabase/functions/portal-ai/index.ts` |
-| **Nieuw** | `supabase/functions/ecommerce-sync/index.ts` |
-| **Nieuw** | `supabase/functions/convert-ecommerce-order/index.ts` |
-| **Nieuw** | `supabase/functions/process-email-queue/index.ts` |
-| **Edit** | `supabase/config.toml` (5 nieuwe function blocks) |
+| **Edit** | `src/components/orders/OrderDetailsPanel.tsx` — Popover datepicker |
+| **Edit** | `src/components/orders/DestinationCard.tsx` — Popover datepicker + capitalizeCity |
+| **Edit** | `src/components/orders/PricingPanel.tsx` — Auto-activate eerste product |
+| **Edit** | `src/pages/OrderForm.tsx` — Prijs validatie + capitalizeCity bij save |
+| **Edit** | `src/lib/date-utils.ts` — capitalizeCity utility |
+| **Migratie** | INITCAP op bestaande stadsnamen |
 
