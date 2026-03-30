@@ -37,48 +37,6 @@ interface AlertsWidgetProps {
   loading?: boolean;
 }
 
-const mockAlerts: Alert[] = [
-  {
-    id: '1',
-    type: 'sla_risk',
-    severity: 'critical',
-    title: 'SLA Breach Dreigend',
-    description: 'Order #2847 heeft nog 45 min voor deadline',
-    entityRef: 'ORD-2847',
-    timestamp: new Date(),
-    href: '/trips?id=2847'
-  },
-  {
-    id: '2',
-    type: 'delay',
-    severity: 'warning',
-    title: 'Vertraging Gedetecteerd',
-    description: 'Chauffeur Jan meldt 30 min vertraging A2',
-    entityRef: 'DRV-042',
-    timestamp: new Date(Date.now() - 15 * 60000),
-    href: '/track-chauffeurs'
-  },
-  {
-    id: '3',
-    type: 'gps_off',
-    severity: 'warning',
-    title: 'GPS Signaal Verloren',
-    description: 'Voertuig 12-AB-34 geen signaal sinds 10 min',
-    entityRef: 'VEH-1234',
-    timestamp: new Date(Date.now() - 10 * 60000),
-    href: '/fleet'
-  },
-  {
-    id: '4',
-    type: 'pod_missing',
-    severity: 'info',
-    title: 'POD Ontbreekt',
-    description: 'Levering #3921 wacht op handtekening',
-    entityRef: 'ORD-3921',
-    timestamp: new Date(Date.now() - 45 * 60000),
-    href: '/claims?pod=3921'
-  },
-];
 
 const getAlertConfig = (type: Alert['type']) => {
   switch (type) {
