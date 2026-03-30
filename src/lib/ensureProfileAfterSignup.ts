@@ -111,7 +111,7 @@ export async function ensureProfileAfterSignup(
         console.warn("[ensureProfile] tenant_settings insert warning:", settingsError.message);
       }
 
-      console.log(`[ensureProfile] Created company ${newCompany.id} for user ${userId}`);
+      logger.info(`[ensureProfile] Created company ${newCompany.id} for user ${userId}`);
     }
   } catch (err) {
     console.error("[ensureProfile] Company ensure failed:", err);

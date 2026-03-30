@@ -143,7 +143,7 @@ export const calculateRouteDistance = async (
     ]);
 
     if (!pickupGeo || !deliveryGeo) {
-      console.log("Could not geocode one or both addresses");
+      logger.debug("Could not geocode one or both addresses");
       return null;
     }
 
