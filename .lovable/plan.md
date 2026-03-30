@@ -1,38 +1,30 @@
 
 
-# AI Gebruik per Gebruiker — Tab toevoegen aan bestaande AIUsage pagina
+# Route Optimalisatie: Animatie verwijderen, solide lijn
 
-## Aanpak
+## Wat verandert
 
-De bestaande `/admin/ai-usage` pagina heeft al credit-overzichten en charts. We voegen een **"Per Gebruiker" sectie** toe onderaan (of als tab) die een tabel toont met per gebruiker: naam, model-verdeling, totale credits, aantal requests.
+In `src/components/route/RouteOptimizationMap.tsx`:
 
-## Data
+1. **Verwijder de dash-array animatie** (line 347-376) — het hele `useEffect` blok dat `requestAnimationFrame` gebruikt om de `line-dasharray` te animeren wordt verwijderd.
 
-De `ai_credit_transactions` tabel bevat alles wat we nodig hebben:
-- `user_id` — koppelen aan `profiles` voor naam
-- `model_used` — welk AI model
-- `credits_used` — kosten
-- `action_type` — type actie
-- `intent_complexity` — complexiteitsniveau
+2. **Verwijder de glow layer** (line 304-314) — de `addGlowAndDash` functie en de `route-glow` layer worden verwijderd. Te druk voor een professionele transport-kaart.
 
-## Plan
+3. **Solide lijn ipv dashed** — Beide `addLayer` calls (line 318-323 en line 334-338) krijgen een eenvoudige solide lijn:
+   - `"line-dasharray"` verwijderen
+   - `"line-width": 4`
+   - `"line-opacity": 0.85`
+   - `"line-color": "#2563eb"` (iets donkerder blauw, professioneler)
 
-### 1. Nieuw component: `AIUsagePerUser.tsx`
+4. **Cleanup vereenvoudigen** — de `route-glow` layer hoeft niet meer verwijderd te worden in de cleanup (line 300).
 
-- Query `ai_credit_transactions` gejoined met `profiles(full_name, email)` voor laatste 30 dagen
-- Groepeer client-side per user: totaal credits, totaal requests, meest gebruikte model
-- Toon als tabel met kolommen: **Gebruiker | Model (meest gebruikt) | Credits | Requests | Laatste activiteit**
-- Klikbaar voor detail-breakdown per model per gebruiker
-- Sorteerbaar op credits/requests
+## Resultaat
 
-### 2. Edit: `AIUsage.tsx`
+Een strakke, solide blauwe lijn tussen stops — zoals verwacht in professionele transport/logistics software.
 
-- Importeer en render `AIUsagePerUser` als nieuwe sectie onder de bestaande "Top Acties" card
-
-## Bestanden
+## Bestand
 
 | Actie | Bestand |
 |-------|---------|
-| **Create** | `src/components/admin/AIUsagePerUser.tsx` |
-| **Edit** | `src/pages/admin/AIUsage.tsx` — sectie toevoegen |
+| **Edit** | `src/components/route/RouteOptimizationMap.tsx` — animatie + glow verwijderen, solide lijn |
 
