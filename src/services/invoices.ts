@@ -8,6 +8,7 @@ export interface InvoiceFilters {
   dateFrom?: string;
   dateTo?: string;
   overdue?: boolean;
+  companyId?: string;
   limit?: number;
 }
 
