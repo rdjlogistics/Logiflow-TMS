@@ -229,8 +229,8 @@ export const useWorkflowAutomation = () => {
       const { actions, ...workflowData } = workflow;
       
       const { data: newWorkflow, error: workflowError } = await supabase
-        .from('workflow_automations' as any)
-        .insert(workflowData)
+        .from('workflow_automations')
+        .insert(workflowData as any)
         .select()
         .single();
       
