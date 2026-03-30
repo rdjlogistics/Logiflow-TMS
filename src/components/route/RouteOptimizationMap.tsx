@@ -297,31 +297,16 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
   // Draw route line
   useEffect(() => {
     if (!map.current || !mapLoaded || mapMode !== "interactive") return;
-    if (map.current.getLayer("route-glow")) map.current.removeLayer("route-glow");
     if (map.current.getLayer("optimized-route")) map.current.removeLayer("optimized-route");
     if (map.current.getSource("optimized-route")) map.current.removeSource("optimized-route");
-
-    const addGlowAndDash = () => {
-      if (!map.current?.getLayer("optimized-route")) return;
-      // Glow layer behind the route
-      if (!map.current.getLayer("route-glow")) {
-        map.current.addLayer({
-          id: "route-glow", type: "line",
-          source: "optimized-route",
-          layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#3b82f6", "line-width": 12, "line-opacity": 0.15, "line-blur": 6 },
-        }, "optimized-route");
-      }
-    };
 
     if (optimizationResult?.geometry) {
       map.current.addLayer({
         id: "optimized-route", type: "line",
         source: { type: "geojson", data: { type: "Feature", properties: {}, geometry: optimizationResult.geometry } },
         layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#3b82f6", "line-width": 5, "line-opacity": 0.75, "line-dasharray": [0, 4, 3] },
+        paint: { "line-color": "#2563eb", "line-width": 4, "line-opacity": 0.85 },
       });
-      addGlowAndDash();
     } else if (stops.length >= 2 && token) {
       const validStops = stops.filter((s) => s.latitude && s.longitude);
       if (validStops.length >= 2) {
@@ -335,45 +320,14 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
                 id: "optimized-route", type: "line",
                 source: { type: "geojson", data: { type: "Feature", properties: {}, geometry: data.routes[0].geometry } },
                 layout: { "line-join": "round", "line-cap": "round" },
-                paint: { "line-color": "#3b82f6", "line-width": 5, "line-opacity": 0.6, "line-dasharray": [0, 4, 3] },
+                paint: { "line-color": "#2563eb", "line-width": 4, "line-opacity": 0.85 },
               });
-              addGlowAndDash();
             }
           }).catch(console.error);
       }
     }
   }, [stops, optimizationResult, mapLoaded, token, mapMode]);
 
-  // Animate dash-array on optimized-route layer
-  useEffect(() => {
-    if (!map.current || !mapLoaded || mapMode !== "interactive") return;
-
-    const dashArraySequence: number[][] = [
-      [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5],
-      [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0], [0, 0.5, 3, 3.5],
-      [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2],
-      [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5],
-    ];
-
-    let step = 0;
-    let animationId: number;
-    let lastTime = 0;
-    const interval = 120;
-
-    const animate = (timestamp: number) => {
-      if (timestamp - lastTime >= interval) {
-        lastTime = timestamp;
-        if (map.current?.getLayer("optimized-route")) {
-          map.current.setPaintProperty("optimized-route", "line-dasharray", dashArraySequence[step]);
-          step = (step + 1) % dashArraySequence.length;
-        }
-      }
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, [mapLoaded, mapMode]);
 
   // ===== RENDER BASED ON MAP MODE =====
 
