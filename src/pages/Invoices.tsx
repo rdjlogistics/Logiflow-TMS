@@ -913,6 +913,48 @@ const Invoices = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Demo Cleanup Dialog */}
+      <AlertDialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Demo facturen opruimen</AlertDialogTitle>
+            <AlertDialogDescription>
+              {demoInvoices.length} oude concept/vervallen facturen gevonden (nooit verstuurd, ouder dan 30 dagen). Selecteer welke je wilt verwijderen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="max-h-60 overflow-y-auto space-y-2 py-2">
+            {demoInvoices.map(inv => (
+              <label key={inv.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer">
+                <Checkbox
+                  checked={selectedDemoIds.has(inv.id)}
+                  onCheckedChange={(checked) => {
+                    const next = new Set(selectedDemoIds);
+                    if (checked) next.add(inv.id); else next.delete(inv.id);
+                    setSelectedDemoIds(next);
+                  }}
+                />
+                <div className="flex-1 min-w-0">
+                  <span className="font-mono text-sm">{inv.invoice_number}</span>
+                  <span className="text-muted-foreground text-xs ml-2">{inv.customers?.company_name || "-"}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">{inv.status}</span>
+                <span className="text-sm font-medium tabular-nums">€{Number(inv.total_amount || 0).toLocaleString("nl-NL", { minimumFractionDigits: 0 })}</span>
+              </label>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCleaningUp}>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleCleanupConfirm(); }}
+              disabled={isCleaningUp || selectedDemoIds.size === 0}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isCleaningUp ? "Bezig..." : `${selectedDemoIds.size} facturen verwijderen`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
