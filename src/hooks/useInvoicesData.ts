@@ -33,7 +33,7 @@ export function useInvoicesData(filters: InvoiceFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filters), company?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 

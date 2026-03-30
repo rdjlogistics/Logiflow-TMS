@@ -24,6 +24,7 @@ export async function fetchInvoices(filters: InvoiceFilters = {}) {
     .select(INVOICE_SELECT)
     .order('invoice_date', { ascending: false });
 
+  if (filters.companyId) query = query.eq('company_id', filters.companyId);
   if (filters.status) query = query.eq('status', filters.status as any);
   if (filters.customerId) query = query.eq('customer_id', filters.customerId);
   if (filters.dateFrom) query = query.gte('invoice_date', filters.dateFrom);

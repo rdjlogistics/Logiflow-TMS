@@ -40,6 +40,7 @@ export async function fetchDrivers(filters: DriverFilters = {}) {
     .is('deleted_at', null)
     .order('name');
 
+  if (filters.companyId) query = query.eq('tenant_id', filters.companyId);
   if (filters.status) query = query.eq('status', filters.status);
   if (filters.isZzp !== undefined) query = query.eq('is_zzp', filters.isZzp);
   if (filters.vehicleId) query = query.eq('vehicle_id', filters.vehicleId);

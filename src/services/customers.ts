@@ -22,6 +22,7 @@ export async function fetchCustomers(filters: CustomerFilters = {}) {
     .is('deleted_at', null)
     .order('company_name');
 
+  if (filters.companyId) query = query.eq('tenant_id', filters.companyId);
   if (filters.isActive !== undefined) query = query.eq('is_active', filters.isActive);
   if (filters.creditBlocked !== undefined) query = query.eq('credit_blocked', filters.creditBlocked);
   if (filters.limit) query = query.limit(filters.limit);
