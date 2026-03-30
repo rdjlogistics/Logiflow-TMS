@@ -186,7 +186,7 @@ const RouteOptimization = () => {
   const [isLoadingTollFreeAlt, setIsLoadingTollFreeAlt] = useState(false);
   const { detectTolls, isDetecting: isTollDetecting } = useTollDetection();
   
-  const { optimizeRoute, isOptimizing, error } = useAIRouteOptimizer();
+  const { optimizeRoute, isOptimizing, error } = useAdvancedRouteOptimization();
 
   // Initialize from tenant settings
   useEffect(() => {
