@@ -49,7 +49,7 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
-import { useWorkflowAutomation, WORKFLOW_TRIGGERS, WORKFLOW_ACTIONS, type WorkflowAction } from "@/hooks/useWorkflowAutomation";
+import { useWorkflowAutomation, WORKFLOW_TRIGGERS, WORKFLOW_ACTIONS, WORKFLOW_TEMPLATES, type WorkflowAction } from "@/hooks/useWorkflowAutomation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
