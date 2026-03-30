@@ -111,12 +111,12 @@ export function usePortalData(customerId?: string | null) {
         const mappedInvoices: Invoice[] = invoicesData.map(inv => {
           const dueDate = inv.due_date || inv.created_at;
           const isPastDue = dueDate && new Date(dueDate) < today;
-          const isUnpaidStatus = ['verzonden', 'definitief'].includes(String(inv.status || ''));
+          const rawStatus = String(inv.status ?? 'concept');
           
           let status: 'draft' | 'sent' | 'paid' | 'overdue' = 'draft';
-          if (inv.status === 'betaald') status = 'paid';
-          else if (inv.status === 'vervallen' || (isUnpaidStatus && isPastDue)) status = 'overdue';
-          else if (inv.status === 'verzonden' || inv.status === 'definitief') status = 'sent';
+          if (rawStatus === 'betaald') status = 'paid';
+          else if (rawStatus === 'vervallen' || (['verzonden', 'definitief'].includes(rawStatus) && isPastDue)) status = 'overdue';
+          else if (rawStatus === 'verzonden' || rawStatus === 'definitief') status = 'sent';
 
           return {
             id: inv.id,
