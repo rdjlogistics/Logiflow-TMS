@@ -1,55 +1,48 @@
 
 
-# Polish: Onboarding Checklist Widget op Dashboard
+# Console Cleanup & Quality Check
 
-## Huidige situatie
+## Huidige staat — al goed
 
-Er is al een `DashboardEmptyState` component (line 591-604 in Dashboard.tsx), maar die checkt alleen orders/rates/bank — niet de kern-stappen (bedrijfsgegevens, voertuigen, chauffeurs, klanten). De widget verdwijnt ook niet permanent.
+De app is al grotendeels opgeschoond:
+- **Error Boundary**: ✅ App-level `ErrorBoundary` wrapping op line 569 van `App.tsx`, plus `IsolatedErrorBoundary` en `RouteErrorBoundary` varianten
+- **Tabellen**: ✅ 46 bestanden gebruiken al `overflow-x-auto` voor horizontale scroll
+- **aria-labels**: ✅ Al aanwezig op UI componenten (dialog, sheet, sidebar, theme-toggle, etc.)
+- **Logger utility**: ✅ `src/lib/logger.ts` bestaat al met DEV-only logging
+- **Console.log**: Slechts 6 bestanden, waarvan 4 al DEV-guarded zijn
 
-## Plan
+## Wat nog moet
 
-### 1. Nieuw component: `OnboardingChecklist.tsx`
+### 1. Laatste console.log's vervangen (2 bestanden)
 
-**File:** `src/components/dashboard/OnboardingChecklist.tsx`
+| Bestand | Probleem | Fix |
+|---------|---------|-----|
+| `src/lib/ensureProfileAfterSignup.ts` line 113 | Kale `console.log` in productie | → `logger.info(...)` |
+| `src/utils/geocoding.ts` line 145 | Kale `console.log` in productie | → `logger.debug(...)` |
 
-Een card widget bovenaan het dashboard met:
-- Welkomsttekst "Welkom bij LogiFlow!"
-- 5 stappen met live data-checks via Supabase queries:
-  - ✅ Account aangemaakt (altijd true)
-  - Bedrijfsgegevens invullen → `/settings/company` (check: `companies.name` niet leeg/default)
-  - Eerste voertuig → `/fleet` (check: `vehicles.count > 0`)
-  - Eerste chauffeur → `/drivers` (check: `drivers.count > 0`)
-  - Eerste klant → `/customers` (check: `customers.count > 0`)
-  - Eerste order → `/orders/edit` (check: `trips.count > 0`)
-- Voortgangsbalk (bestaande `Progress` component)
-- Minimaliseer-knop (state in localStorage)
-- Bij 6/6 voltooid: confetti-achtige "Gefeliciteerd!" melding, dan auto-hide na 5s en `onboarding_completed_at` updaten in `tenant_settings`
+De overige 4 bestanden zijn al correct (DEV-guarded of in de logger zelf).
 
-### 2. Hook: `useOnboardingChecklist.ts`
+### 2. Pagination check — al aanwezig
 
-**File:** `src/hooks/useOnboardingChecklist.ts`
+Orders, klanten, facturen gebruiken al `react-query` met server-side limits. Geen wijziging nodig.
 
-- Fetcht counts voor vehicles, drivers, customers, trips + company name
-- Returns `{ steps, completedCount, totalCount, allComplete, dismiss, isDismissed }`
-- Skip als `tenant_settings.onboarding_completed_at` al gezet is
+### 3. Afbeeldingen lazy loading
 
-### 3. Dashboard integratie
+Controleer of `loading="lazy"` wordt gebruikt op afbeeldingen. Voeg toe waar nodig (vooral in lijstweergaven).
 
-**File:** `src/pages/Dashboard.tsx`
+### 4. Icon-only buttons zonder aria-label
 
-- Vervang de huidige `DashboardEmptyState` (line 591-604) door `OnboardingChecklist`
-- Toon direct na de header/stats, vóór de widget grid
-- Alleen tonen als `!allComplete && !isDismissed`
-
-### 4. Bestaande DashboardEmptyState
-
-Wordt niet verwijderd maar niet meer gebruikt in Dashboard.tsx (de OnboardingChecklist vervangt het).
+Scan de belangrijkste pagina's (sidebar, header, actiebars) voor `<Button size="icon">` zonder `aria-label`. Voeg Nederlandse aria-labels toe waar ze ontbreken.
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Create** | `src/hooks/useOnboardingChecklist.ts` — data checks hook |
-| **Create** | `src/components/dashboard/OnboardingChecklist.tsx` — checklist widget |
-| **Edit** | `src/pages/Dashboard.tsx` — vervang DashboardEmptyState door OnboardingChecklist |
+| **Edit** | `src/lib/ensureProfileAfterSignup.ts` — console.log → logger.info |
+| **Edit** | `src/utils/geocoding.ts` — console.log → logger.debug |
+| **Scan + Edit** | Icon-only buttons — aria-labels toevoegen waar ontbrekend |
+
+## Conclusie
+
+De app is al in goede staat. Dit zijn de laatste 2-3 kleine verbeteringen, geen grote refactors nodig.
 
