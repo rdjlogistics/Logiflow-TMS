@@ -244,8 +244,8 @@ export const useWorkflowAutomation = () => {
         }));
         
         const { error: actionsError } = await supabase
-          .from('workflow_actions' as any)
-          .insert(actionsWithWorkflowId);
+          .from('workflow_actions')
+          .insert(actionsWithWorkflowId as any);
         
         if (actionsError) throw actionsError;
       }
