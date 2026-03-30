@@ -265,8 +265,8 @@ export const useWorkflowAutomation = () => {
   const updateWorkflow = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Workflow> & { id: string }) => {
       const { data, error } = await supabase
-        .from('workflow_automations' as any)
-        .update(updates)
+        .from('workflow_automations')
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();
