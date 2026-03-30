@@ -539,7 +539,11 @@ const Customers = () => {
               className="pl-10"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+              <Checkbox checked={hideTestData} onCheckedChange={(v) => setHideTestData(!!v)} />
+              Verberg test-data
+            </label>
             <Button variant="outline" onClick={handleExportCSV} className="gap-2">
               <Download className="h-4 w-4" />
               CSV
