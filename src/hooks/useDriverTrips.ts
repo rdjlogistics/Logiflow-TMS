@@ -359,7 +359,7 @@ export const useDriverTrips = () => {
 
       toast({
         title: 'Rit gestart',
-        description: 'GPS tracking is actief',
+        description: `Rit ${tripForNotif?.order_number ? '#' + tripForNotif.order_number : ''} is onderweg`,
       });
 
       await fetchTrips();

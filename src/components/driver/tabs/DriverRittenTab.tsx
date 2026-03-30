@@ -463,7 +463,6 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
               <Button 
                 className="w-full h-14 text-lg font-bold"
                 onClick={() => handleStartTrip(selectedTrip.id)}
-                disabled={!gpsEnabled}
               >
                 <Play className="h-5 w-5 mr-2" />
                 Start rit

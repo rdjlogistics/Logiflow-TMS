@@ -633,8 +633,8 @@ export const DriverStopCard = ({
           </div>
         )}
 
-        {/* Premium Action Buttons */}
-        {!isCompleted && (
+        {/* Premium Action Buttons — always show, read-only when completed */}
+        {(
           <div className="px-4 py-4 border-t border-border/40 bg-background/80 backdrop-blur-xl">
             {/* Disabled hint */}
             {!isActive && (
