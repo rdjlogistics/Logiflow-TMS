@@ -6,25 +6,25 @@ import {
   type InvoiceFilters,
 } from '@/services/invoices';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering invoices with automatic refresh.
- * Wraps the invoices service with loading state, error handling, and refetch.
- *
- * Example:
- *   const { invoices, loading, refetch } = useInvoicesData({ status: 'verzonden' });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useInvoicesData(filters: InvoiceFilters = {}) {
+  const { company } = useCompany();
   const [invoices, setInvoices] = useState<Awaited<ReturnType<typeof fetchInvoices>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchInvoices(filters);
+      const data = await fetchInvoices({ ...filters, companyId: company.id });
       setInvoices(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden facturen';
@@ -33,7 +33,7 @@ export function useInvoicesData(filters: InvoiceFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filters), company?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 

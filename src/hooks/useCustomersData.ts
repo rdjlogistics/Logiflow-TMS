@@ -5,25 +5,25 @@ import {
   type CustomerFilters,
 } from '@/services/customers';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering customers with automatic refresh.
- * Wraps the customers service with loading state, error handling, and refetch.
- *
- * Example:
- *   const { customers, loading, refetch } = useCustomersData({ isActive: true });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useCustomersData(filters: CustomerFilters = {}) {
+  const { company } = useCompany();
   const [customers, setCustomers] = useState<Awaited<ReturnType<typeof fetchCustomers>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchCustomers(filters);
+      const data = await fetchCustomers({ ...filters, companyId: company.id });
       setCustomers(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden klanten';
@@ -32,7 +32,7 @@ export function useCustomersData(filters: CustomerFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filters), company?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 

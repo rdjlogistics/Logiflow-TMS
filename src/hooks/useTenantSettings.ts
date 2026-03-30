@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/hooks/useCompany';
 
 export interface TenantSettings {
   id: string;
@@ -34,14 +35,21 @@ export interface TenantSettings {
 }
 
 export const useTenantSettings = () => {
+  const { company } = useCompany();
+  const companyId = company?.id;
+
   return useQuery({
-    queryKey: ['tenant-settings'],
+    queryKey: ['tenant-settings', companyId],
     queryFn: async (): Promise<TenantSettings | null> => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tenant_settings')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
+        .select('*');
+
+      if (companyId) {
+        query = query.eq('company_id', companyId);
+      }
+
+      const { data, error } = await query.limit(1).maybeSingle();
 
       if (error) {
         console.error('Error fetching tenant settings:', error);
@@ -50,5 +58,6 @@ export const useTenantSettings = () => {
 
       return data as TenantSettings | null;
     },
+    enabled: !!companyId,
   });
 };

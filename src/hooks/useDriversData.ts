@@ -5,24 +5,25 @@ import {
   type DriverFilters,
 } from '@/services/drivers';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/useCompany';
 
 /**
  * Hook for fetching and filtering drivers with automatic refresh.
- *
- * Example:
- *   const { drivers, loading, refetch } = useDriversData({ status: 'active' });
+ * Automatically injects companyId for defense-in-depth tenant isolation.
  */
 export function useDriversData(filters: DriverFilters = {}) {
+  const { company } = useCompany();
   const [drivers, setDrivers] = useState<Awaited<ReturnType<typeof fetchDrivers>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
+    if (!company?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchDrivers(filters);
+      const data = await fetchDrivers({ ...filters, companyId: company.id });
       setDrivers(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden chauffeurs';
@@ -31,7 +32,7 @@ export function useDriversData(filters: DriverFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filters), company?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(); }, [load]);
 
