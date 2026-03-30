@@ -47,9 +47,9 @@ const formatSize = (bytes: number | null) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, customerEmail, isDemo }: SendPodEmailDialogProps) {
+export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, customerEmail, defaultDocumentType, stopProofId, isDemo }: SendPodEmailDialogProps) {
   const [email, setEmail] = useState(customerEmail || '');
-  const [documentType, setDocumentType] = useState<string>('vrachtbrief');
+  const [documentType, setDocumentType] = useState<string>(defaultDocumentType || 'vrachtbrief');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
