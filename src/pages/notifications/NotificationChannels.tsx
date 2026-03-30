@@ -69,9 +69,9 @@ interface NotificationTemplate {
 const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 
 export default function NotificationChannels() {
-  const [channels, setChannels] = useState<NotificationChannel[]>(mockChannels);
-  const [logs] = useState<NotificationLog[]>(mockLogs);
-  const [templates, setTemplates] = useState<NotificationTemplate[]>(mockTemplates);
+  const [channels, setChannels] = useState<NotificationChannel[]>([]);
+  const [logs] = useState<NotificationLog[]>([]);
+  const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   
   // Template edit dialog state
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
