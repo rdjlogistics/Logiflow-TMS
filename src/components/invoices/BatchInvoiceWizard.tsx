@@ -390,8 +390,10 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
     }
   };
 
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const handleSubmit = () => {
-    batchInvoiceMutation.mutate();
+    setShowConfirm(true);
   };
 
   const toggleEmailInvoice = (invoiceId: string) => {
