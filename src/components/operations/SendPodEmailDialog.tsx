@@ -236,6 +236,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
+                    <SelectItem value="pod">Proof of Delivery (POD)</SelectItem>
                     <SelectItem value="vrachtbrief">Vrachtbrief</SelectItem>
                     <SelectItem value="transportopdracht">Transportopdracht</SelectItem>
                   </SelectContent>
