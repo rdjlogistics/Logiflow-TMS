@@ -1,1 +1,133 @@
 project_id = "spycblsfcktsnepsdssv"
+
+[functions.chatgpt]
+verify_jwt = false
+
+[functions.copilot]
+verify_jwt = false
+
+[functions.create-batch-invoices]
+verify_jwt = false
+
+[functions.create-batch-purchase-invoices]
+verify_jwt = false
+
+[functions.ensure-user-company]
+verify_jwt = false
+
+[functions.generate-invoice-pdf]
+verify_jwt = false
+
+[functions.generate-purchase-invoice-pdf]
+verify_jwt = false
+
+[functions.get-mapbox-token]
+verify_jwt = false
+
+[functions.mollie-create-payment]
+verify_jwt = false
+
+[functions.create-driver-portal-account]
+verify_jwt = false
+
+[functions.create-customer-portal-account]
+verify_jwt = false
+
+[functions.create-staff-account]
+verify_jwt = false
+
+[functions.remove-staff-account]
+verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = false
+
+[functions.send-invoice-reminder]
+verify_jwt = false
+
+[functions.generate-document-pdf]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
+
+[functions.get-vapid-key]
+verify_jwt = false
+
+[functions.send-purchase-invoice-email]
+verify_jwt = false
+
+[functions.send-order-confirmation]
+verify_jwt = false
+
+[functions.send-delivery-confirmation]
+verify_jwt = false
+
+[functions.send-document-email]
+verify_jwt = false
+
+[functions.send-carrier-credentials]
+verify_jwt = false
+
+[functions.send-submission-confirmation]
+verify_jwt = false
+
+[functions.send-audit-alert-email]
+verify_jwt = false
+
+[functions.manage-email-domain]
+verify_jwt = false
+
+[functions.auto-send-vrachtbrief]
+verify_jwt = false
+
+[functions.ai-dispatch-engine]
+verify_jwt = false
+
+[functions.calculate-price]
+verify_jwt = false
+
+[functions.rfq-parser]
+verify_jwt = false
+
+[functions.migration-api-sync]
+verify_jwt = false
+
+[functions.migration-field-mapper]
+verify_jwt = false
+
+[functions.live-eta]
+verify_jwt = false
+
+[functions.send-push-notification]
+verify_jwt = false
+
+[functions.notify-new-submission]
+verify_jwt = false
+
+[functions.bank-reconcile]
+verify_jwt = false
+
+[functions.exact-oauth-start]
+verify_jwt = false
+
+[functions.exact-sync-invoices]
+verify_jwt = false
+
+[functions.webauthn-auth]
+verify_jwt = false
+
+[functions.log-client-error]
+verify_jwt = false
+
+[functions.test-tenant-isolation]
+verify_jwt = false
+
+[functions.create-subscription-checkout]
+verify_jwt = false
+
+[functions.create-carrier-user]
+verify_jwt = false
+
+[functions.process-email-queue]
+verify_jwt = false
