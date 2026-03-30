@@ -17,6 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DocumentsSheet } from '@/components/driver/DocumentsSheet';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { 
   Route, 
   Clock, 
@@ -248,10 +249,20 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     });
   }, [selectedTrip, mapboxToken, startRouteAnimation]);
 
+  const [confirmStartTrip, setConfirmStartTrip] = useState<string | null>(null);
+
   const handleStartTrip = async (tripId: string) => {
+    // Show confirmation dialog instead of starting immediately
+    setConfirmStartTrip(tripId);
+  };
+
+  const executeStartTrip = async (tripId: string) => {
     if (!gpsEnabled) {
-      requestPermission();
-      return;
+      toast({
+        title: 'GPS niet beschikbaar',
+        description: 'Locatie wordt niet geregistreerd. Je kunt de rit wel starten.',
+        variant: 'default',
+      });
     }
     // Check if inspection is required
     if (inspectionRequired) {
@@ -266,6 +277,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     }
     await startTrip(tripId);
     onStartRoute?.(tripId);
+    setConfirmStartTrip(null);
   };
 
   const handleInspectionCompleted = async (passed: boolean) => {
@@ -300,7 +312,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
   const RouteListItem = ({ trip }: { trip: typeof trips[0] }) => {
     const stops = trip.route_stops || [];
     const completedStops = stops.filter(s => s.status === 'completed').length;
-    const isActive = trip.status === 'onderweg';
+    const isActive = ['onderweg', 'geladen'].includes(trip.status);
 
     return (
       <motion.div
@@ -378,7 +390,8 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     const stops = (selectedTrip.route_stops || []) as RouteStop[];
     const pendingStops = stops.filter(s => s.status !== 'completed');
     const completedStops = stops.filter(s => s.status === 'completed');
-    const isActive = selectedTrip.status === 'onderweg';
+    const isActive = ['onderweg', 'geladen'].includes(selectedTrip.status);
+    const isCompletedTrip = ['afgeleverd', 'afgerond', 'gecontroleerd', 'gefactureerd'].includes(selectedTrip.status);
 
     return (
       <div className="flex-1 flex flex-col">
@@ -428,14 +441,14 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
           />
         </div>
 
-        {/* GPS Warning */}
-        {!gpsEnabled && !isActive && (
+        {/* GPS Warning - informational only, not blocking */}
+        {!gpsEnabled && !isActive && !isCompletedTrip && (
           <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/30">
             <div className="flex items-center gap-3">
               <Navigation className="h-5 w-5 text-amber-500" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Locatie vereist</p>
-                <p className="text-xs text-muted-foreground">Activeer locatie om te starten</p>
+                <p className="text-sm font-medium">GPS niet actief</p>
+                <p className="text-xs text-muted-foreground">Locatie wordt niet geregistreerd. Je kunt de rit wel starten.</p>
               </div>
               <Button size="sm" onClick={requestPermission} className="bg-amber-500 hover:bg-amber-600">
                 Toestaan
@@ -451,7 +464,6 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
               <Button 
                 className="w-full h-14 text-lg font-bold"
                 onClick={() => handleStartTrip(selectedTrip.id)}
-                disabled={!gpsEnabled}
               >
                 <Play className="h-5 w-5 mr-2" />
                 Start rit
@@ -541,6 +553,18 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
           onOpenChange={setDocumentsOpen}
           tripId={selectedTrip.id}
           orderNumber={selectedTrip.order_number}
+        />
+
+        {/* Confirmation Dialog for Start Trip */}
+        <ConfirmDialog
+          open={!!confirmStartTrip}
+          title="Wil je deze rit starten?"
+          description={`${selectedTrip.order_number} — ${selectedTrip.pickup_city || ''} → ${selectedTrip.delivery_city || ''}`}
+          confirmText="Starten"
+          cancelText="Annuleren"
+          variant="default"
+          onConfirm={() => confirmStartTrip && executeStartTrip(confirmStartTrip)}
+          onCancel={() => setConfirmStartTrip(null)}
         />
       </div>
     );

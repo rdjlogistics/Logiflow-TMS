@@ -79,8 +79,8 @@ export function DriverHomeTab({
   const handleStartRoute = async () => {
     if (!nextRoute) return;
     if (!gpsEnabled) {
+      // Try to request permission but don't block
       requestPermission();
-      return;
     }
     await startTrip(nextRoute.id);
     onStartRoute(nextRoute.id);
