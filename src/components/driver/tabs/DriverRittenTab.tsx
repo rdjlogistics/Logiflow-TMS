@@ -389,7 +389,8 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     const stops = (selectedTrip.route_stops || []) as RouteStop[];
     const pendingStops = stops.filter(s => s.status !== 'completed');
     const completedStops = stops.filter(s => s.status === 'completed');
-    const isActive = selectedTrip.status === 'onderweg';
+    const isActive = ['onderweg', 'geladen'].includes(selectedTrip.status);
+    const isCompletedTrip = ['afgeleverd', 'afgerond', 'gecontroleerd', 'gefactureerd'].includes(selectedTrip.status);
 
     return (
       <div className="flex-1 flex flex-col">
