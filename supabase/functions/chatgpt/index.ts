@@ -1820,6 +1820,64 @@ serve(async (req) => {
           chatMessages, supabase, tenantId, userId, LOVABLE_API_KEY, reasoning
         );
 
+        // Check if runToolLoop already produced a final assistant message
+        const lastMsg = finalMessages[finalMessages.length - 1];
+        const alreadyHasAssistantReply = lastMsg?.role === "assistant" && lastMsg?.content?.trim();
+
+        if (alreadyHasAssistantReply) {
+          // ─── No second AI call needed — stream the existing reply as SSE ───
+          const assistantContent = lastMsg.content;
+
+          // Save to DB
+          await supabase.from("chatgpt_messages").insert({
+            conversation_id: convId, role: "assistant", content: assistantContent,
+            pending_confirmation: !!pendingConfirmation,
+            confirmation_payload: pendingConfirmation as any,
+          });
+
+          // Deduct credits AFTER successful response
+          const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
+            : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
+            : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
+            : toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
+            : toolsUsed.length > 0 ? 1 : 1;
+
+          await supabase.rpc("deduct_ai_credits", {
+            p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
+            p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
+            p_complexity: complexity !== "none" ? "complex" : "simple",
+            p_model: selectedModel.split("/").pop() || "gemini-3-flash",
+          });
+
+          // Simulate SSE stream from existing content
+          const encoder = new TextEncoder();
+          const fakeStream = new ReadableStream({
+            start(controller) {
+              // Send content as a single SSE chunk
+              const ssePayload = {
+                choices: [{ delta: { content: assistantContent }, finish_reason: null }],
+              };
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(ssePayload)}\n\n`));
+
+              // Send finish event with metadata
+              const finishPayload: any = {
+                choices: [{ delta: {}, finish_reason: "stop" }],
+              };
+              if (pendingConfirmation) finishPayload._pendingConfirmation = pendingConfirmation;
+              if (toolsUsed.length > 0) finishPayload._toolsUsed = toolsUsed;
+              finishPayload._conversationId = convId;
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(finishPayload)}\n\n`));
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              controller.close();
+            },
+          });
+
+          return new Response(fakeStream, {
+            headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+          });
+        }
+
+        // ─── No assistant reply yet (e.g. only tool results) — do streaming AI call ───
         const streamRes = await fetch(GATEWAY_URL, {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -1837,19 +1895,6 @@ serve(async (req) => {
           if (status === 402) return new Response(JSON.stringify({ error: "Credits op" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           throw new Error("Stream failed");
         }
-
-        const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
-          : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
-          : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
-          : toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
-          : toolsUsed.length > 0 ? 1 : 1;
-
-        await supabase.rpc("deduct_ai_credits", {
-          p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
-          p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
-          p_complexity: complexity !== "none" ? "complex" : "simple",
-          p_model: selectedModel.split("/").pop() || "gemini-3-flash",
-        });
 
         const reader = streamRes.body.getReader();
         const encoder = new TextEncoder();
@@ -1887,17 +1932,36 @@ serve(async (req) => {
                     if (toolsUsed.length > 0 && parsed.choices?.[0]?.finish_reason) {
                       parsed._toolsUsed = toolsUsed;
                     }
+                    if (parsed.choices?.[0]?.finish_reason) {
+                      parsed._conversationId = convId;
+                    }
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify(parsed)}\n\n`));
                   } catch {}
                 }
               }
             } finally {
-              if (fullContent) {
+              // Only save and deduct if we got actual content
+              if (fullContent.trim()) {
                 await supabase.from("chatgpt_messages").insert({
                   conversation_id: convId, role: "assistant", content: fullContent,
                   pending_confirmation: !!pendingConfirmation,
                   confirmation_payload: pendingConfirmation as any,
                 });
+
+                const creditCost = toolsUsed.some(t => ["generate_image"].includes(t)) ? 5
+                  : toolsUsed.some(t => ["smart_planning", "anomaly_detect", "draft_contract"].includes(t)) ? 4
+                  : toolsUsed.some(t => ["generate_report", "daily_briefing", "generate_chart"].includes(t)) ? 3
+                  : toolsUsed.some(t => ["assign_driver_to_order", "update_order_status", "create_invoice_for_order", "send_customer_email", "bulk_update_orders", "create_claim_case", "smart_order_entry"].includes(t)) ? 2
+                  : toolsUsed.length > 0 ? 1 : 1;
+
+                await supabase.rpc("deduct_ai_credits", {
+                  p_tenant_id: tenantId, p_user_id: userId, p_credits: creditCost,
+                  p_action_type: toolsUsed.length > 0 ? "tool_call" : "chat",
+                  p_complexity: complexity !== "none" ? "complex" : "simple",
+                  p_model: selectedModel.split("/").pop() || "gemini-3-flash",
+                });
+              } else {
+                console.error("[chatgpt] Stream ended with empty content — no credits deducted");
               }
               controller.close();
             }

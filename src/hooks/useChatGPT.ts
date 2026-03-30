@@ -37,7 +37,8 @@ export interface CreditInfo {
 async function parseSSEStream(
   response: Response,
   onDelta: (text: string) => void,
-  onConfirmation?: (data: any) => void
+  onConfirmation?: (data: any) => void,
+  onMeta?: (data: { conversationId?: string; toolsUsed?: string[] }) => void
 ): Promise<string> {
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
@@ -67,12 +68,13 @@ async function parseSSEStream(
           fullContent += content;
           onDelta(content);
         }
-        // Check for pending confirmation injected by backend
         if (parsed._pendingConfirmation && onConfirmation) {
           onConfirmation(parsed._pendingConfirmation);
         }
+        if (parsed._conversationId && onMeta) {
+          onMeta({ conversationId: parsed._conversationId, toolsUsed: parsed._toolsUsed });
+        }
       } catch {
-        // Partial JSON — put back and wait
         buffer = line + '\n' + buffer;
         break;
       }
@@ -206,7 +208,7 @@ export const useChatGPT = () => {
           id: assistantId, role: 'assistant', content: '', createdAt: new Date().toISOString(), isStreaming: true,
         }]);
 
-        await parseSSEStream(
+        const finalContent = await parseSSEStream(
           response,
           (delta) => {
             assistantContent += delta;
@@ -216,16 +218,25 @@ export const useChatGPT = () => {
           },
           (confirmation) => {
             setPendingConfirmation(confirmation);
+          },
+          (meta) => {
+            if (meta.conversationId && !conversationId) {
+              setConversationId(meta.conversationId);
+            }
           }
         );
+
+        // Guard: if stream ended with no content, treat as error
+        if (!finalContent.trim()) {
+          setMessages(prev => prev.filter(m => m.id !== assistantId));
+          toast({ title: 'AI Assistent', description: 'Geen antwoord ontvangen. Er zijn geen credits afgeschreven.', variant: 'destructive' });
+          return;
+        }
 
         // Mark streaming done
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, isStreaming: false } : m
         ));
-
-        // Extract conversationId from first SSE chunk or rely on backend
-        // The backend saves the message, so we just need to refresh conversations
 
       } else {
         // ─── Non-streaming fallback ───
