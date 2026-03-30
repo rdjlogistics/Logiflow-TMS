@@ -72,6 +72,16 @@ Deno.serve(async (req) => {
         return (trigger_data.delay_minutes as number) >= threshold;
       }
 
+      if (trigger_type === "invoice_overdue") {
+        const configDays = config.days_overdue || 0;
+        const actualDays = trigger_data.days_overdue as number;
+        // Match if days_overdue >= configured threshold
+        // But cap at next threshold to avoid duplicate reminders
+        const thresholds = [7, 14, 30, 9999];
+        const nextThreshold = thresholds.find((t) => t > configDays) || 9999;
+        return actualDays >= configDays && actualDays < nextThreshold;
+      }
+
       return true; // order_created, driver_assigned, invoice_created match all
     });
 
