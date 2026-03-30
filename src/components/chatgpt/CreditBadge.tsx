@@ -15,8 +15,8 @@ export const CreditBadge = ({ creditInfo, subscription, compact }: CreditBadgePr
   const plan = creditInfo?.plan ?? subscription?.plan?.slug ?? 'starter';
   const percent = Math.min(100, (remaining / total) * 100);
 
-  const planLabel = plan === 'enterprise' ? 'Enterprise' : plan === 'pro' ? 'Pro' : 'Starter';
-  const planColor = plan === 'enterprise' ? 'text-amber-500' : plan === 'pro' ? 'text-primary' : 'text-muted-foreground';
+  const planLabel = 'AI Credits';
+  const planColor = 'text-primary';
 
   if (compact) {
     return (

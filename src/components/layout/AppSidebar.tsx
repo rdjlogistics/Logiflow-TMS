@@ -437,7 +437,9 @@ const AppSidebar = () => {
             {!isCollapsed && (
               <div>
                 <h1 className="font-display font-bold text-sm text-sidebar-foreground tracking-tight">{company?.name || 'LogiFlow'}</h1>
-                <p className="text-[10px] text-sidebar-foreground/40">TMS Pro</p>
+                <p className="text-[10px] text-sidebar-foreground/40">
+                  {currentPlan?.name || 'TMS'}{isTrialing && trialDaysLeft > 0 ? ` · Trial ${trialDaysLeft}d` : ''}
+                </p>
               </div>
             )}
           </div>
