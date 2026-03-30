@@ -107,7 +107,28 @@ export const B2BDashboard = ({
   ];
 
   const openInvoices = invoices.filter(i => i.status !== 'paid');
+  const overdueInvoices = openInvoices.filter(i => i.status === 'overdue' || (i.dueDate && new Date(i.dueDate) < new Date()));
   const openInvoicesTotal = openInvoices.reduce((sum, i) => sum + i.amount, 0);
+
+  const activeStatuses = new Set(['pickup_scheduled', 'picked_up', 'in_transit', 'out_for_delivery'] as const);
+  const activeShipments = recentShipments
+    .filter(s => activeStatuses.has(s.status as any))
+    .sort((a, b) => (a.estimatedDelivery ?? '').localeCompare(b.estimatedDelivery ?? ''));
+
+  const recentUpdates = recentShipments
+    .filter(s => s.status !== 'pending')
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 5);
+
+  const getRelativeTime = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m geleden`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}u geleden`;
+    const days = Math.floor(hours / 24);
+    return `${days}d geleden`;
+  };
 
   return (
     <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerVariants}>
