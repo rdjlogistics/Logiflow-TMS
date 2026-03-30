@@ -1,54 +1,50 @@
 
 
-# Fix RLS Policies — WITH CHECK op Workflow Tabellen
+# Bulk Acties op Trips Pagina
 
-## Probleem
+## Overzicht
 
-Alle drie workflow tabellen hebben `FOR ALL` policies met alleen een `USING` clausule maar **geen `WITH CHECK`** clausule. Dit betekent dat `SELECT` en `DELETE` werken, maar `INSERT` en `UPDATE` falen met "new row violates row-level security policy".
+Voeg multi-select functionaliteit toe aan de trips pagina (desktop en mobiel) met een bulk action bar voor status wijzigen en chauffeur toewijzen.
 
-## Huidige staat
+## Stappen
 
-| Tabel | Policy | USING | WITH CHECK |
-|-------|--------|-------|------------|
-| `workflow_automations` | Users can manage own workflows | ✅ tenant_id check | ❌ NULL |
-| `workflow_actions` | Users can manage workflow actions | ✅ workflow_id subquery | ❌ NULL |
-| `workflow_runs` | Users can view workflow runs | ✅ workflow_id subquery | ❌ NULL |
+### Stap 1: State & selectie-logica in Trips.tsx
 
-## Fix
+- Nieuwe state: `selectedIds: Set<string>`, `bulkActionOpen: string | null`
+- "Select all" checkbox in table header, individuele checkboxes per rij
+- Op mobiel: long-press of checkbox-icon om selectiemodus te activeren
 
-Eén database migratie die de 3 bestaande policies dropt en opnieuw aanmaakt met identieke `WITH CHECK` clausules:
+### Stap 2: Bulk Action Bar component
 
-```sql
--- workflow_automations: DROP + CREATE met WITH CHECK
-DROP POLICY "Users can manage own workflows" ON workflow_automations;
-CREATE POLICY "Users can manage own workflows" ON workflow_automations
-  FOR ALL TO authenticated
-  USING (tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid()))
-  WITH CHECK (tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid()));
+Nieuw component `src/components/trips/BulkActionBar.tsx`:
+- Sticky bar onderaan het scherm, verschijnt wanneer ≥1 trip geselecteerd is
+- Toont: aantal geselecteerd, "Status wijzigen" dropdown, "Chauffeur toewijzen" dropdown, "Deselecteer alles" knop
+- Status dropdown: alle TripStatus opties
+- Chauffeur dropdown: haalt actieve chauffeurs op uit `drivers` tabel
+- Bevestigingsknop voert batch update uit via `supabase.from('trips').update(...).in('id', [...selectedIds])`
 
--- workflow_actions: DROP + CREATE met WITH CHECK
-DROP POLICY "Users can manage workflow actions" ON workflow_actions;
-CREATE POLICY "Users can manage workflow actions" ON workflow_actions
-  FOR ALL TO authenticated
-  USING (workflow_id IN (SELECT id FROM workflow_automations WHERE tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid())))
-  WITH CHECK (workflow_id IN (SELECT id FROM workflow_automations WHERE tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid())));
+### Stap 3: Desktop tabel aanpassen
 
--- workflow_runs: DROP + CREATE met WITH CHECK
-DROP POLICY "Users can view workflow runs" ON workflow_runs;
-CREATE POLICY "Users can manage workflow runs" ON workflow_runs
-  FOR ALL TO authenticated
-  USING (workflow_id IN (SELECT id FROM workflow_automations WHERE tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid())))
-  WITH CHECK (workflow_id IN (SELECT id FROM workflow_automations WHERE tenant_id IN (SELECT company_id FROM user_companies WHERE user_id = auth.uid())));
-```
+- Extra `<TableHead>` met select-all checkbox als eerste kolom
+- Extra `<TableCell>` met individuele checkbox per rij
+- Checkbox styling met Checkbox component uit shadcn/ui
+
+### Stap 4: Mobiel aanpassen
+
+- Checkbox overlay linksboven op elke kaart wanneer selectiemodus actief is
+- Selectiemodus activeren via een "Selecteer" knop in de header naast de refresh/CSV knoppen
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Migratie** | DROP + CREATE policies met WITH CHECK |
+| **Nieuw** | `src/components/trips/BulkActionBar.tsx` |
+| **Edit** | `src/pages/Trips.tsx` — selectie state, checkboxes, BulkActionBar integratie |
 
 ## Resultaat
 
-- INSERT en UPDATE op alle 3 workflow tabellen werken correct
-- Geen code-wijzigingen nodig — alleen database policies
+- Gebruikers kunnen meerdere ritten selecteren via checkboxes (desktop) of selectiemodus (mobiel)
+- Bulk status wijzigen naar elke status in één klik
+- Bulk chauffeur toewijzen uit lijst actieve chauffeurs
+- Floating action bar toont geselecteerd aantal en beschikbare acties
 
