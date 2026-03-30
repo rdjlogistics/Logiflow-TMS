@@ -1,84 +1,89 @@
 
 
-# Finale Verificatie — Complete App Doorloop
+# Fix: AI Assistent kan geen data ophalen — verkeerde tabelnamen en kolommen
 
-## Resultaten per Punt
+## Root Cause
 
-### 1. REGISTRATIE → ONBOARDING ✅ WERKT
+De `chatgpt` edge function bevat **134+ queries naar een tabel genaamd `orders` die niet bestaat**. De echte tabel heet `trips`. Daarnaast worden verkeerde kolomnamen en status-waarden gebruikt door de hele functie heen.
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Company aanmaken na signup | ✅ | `ensureProfileAfterSignup.ts` + `ensure-user-company` edge function beide actief als fallback |
-| Onboarding checklist op dashboard | ✅ | `OnboardingChecklist.tsx` geïmporteerd in `Dashboard.tsx` (line 39), 6 stappen met live data checks |
-| Geen placeholder/undefined | ✅ | Steps checken real counts via Supabase (vehicles, drivers, customers, trips) |
-| tenant_settings tracking | ✅ | `onboarding_completed_at` wordt gezet bij voltooiing (line 87-93 useOnboardingChecklist) |
+Dit is waarom elke tool-aanroep (search_orders, list_drivers, get_kpis, etc.) een database-fout retourneert en de AI meldt "technische storing bij het ophalen".
 
-### 2. ORDER FLOW ✅ WERKT
+## Concrete mapping-fouten
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Order aanmaken + opslaan | ✅ | `OrderForm.tsx` (1438 lines) — volledige CRUD flow |
-| Marge berekening | ✅ | `trip-utils.ts` `berekenMarge()` + `PricingPanel` |
-| Datum format DD-MM-YYYY (4 cijfers) | ✅ | `DestinationCard.tsx` line 517: `format(date, 'yyyy-MM-dd')`, Calendar disabled past dates (line 519) |
-| capitalizeCity | ✅ | Geïmporteerd in OrderForm.tsx (line 36), toegepast bij opslaan |
+| Wat de code nu doet | Wat het moet zijn |
+|---|---|
+| `from("orders")` | `from("trips")` |
+| `.eq("company_id", tenantId)` op drivers | `.eq("tenant_id", tenantId)` |
+| `.eq("is_active", true)` op drivers | `.is("deleted_at", null)` (geen `is_active` kolom) |
+| `drivers.city` | `drivers.current_city` |
+| `vehicles.plate_number` | `vehicles.license_plate` |
+| `vehicles.type`, `vehicles.make`, `vehicles.year` | `vehicles.vehicle_type`, `vehicles.brand`, `vehicles.year_of_manufacture` |
+| `orders.total_amount` | `trips.sales_total` |
+| `orders.purchase_amount` | `trips.purchase_total` |
+| `orders.pickup_date` | `trips.trip_date` |
+| `orders.delivery_date` | `trips.estimated_arrival` |
+| `orders.reference` | `trips.customer_reference` |
+| Status: `draft, pending, confirmed, in_transit, delivered, cancelled` | Status: `aanvraag, gepland, geladen, onderweg, afgeleverd, afgerond, gecontroleerd, gefactureerd, geannuleerd, offerte, draft` |
+| `from("order_stops")` | `from("route_stops")` |
+| `from("order_events")` | `from("order_events")` (checken of deze tabel bestaat) |
+| `invoices.company_id` | `invoices.tenant_id` |
+| `invoices.status = "pending"/"overdue"/"paid"` | `invoices.status = "concept"/"verzonden"/"betaald"/"vervallen"` |
+| `customers.company_id` | `customers.tenant_id` |
+| `finance_transactions.company_id` | `finance_transactions.company_id` (bevestigen) |
 
-### 3. CHAUFFEUR FLOW ✅ WERKT
+## Wat er moet gebeuren
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Rit zien + starten | ✅ | Driver portal met status flow support |
-| GPS fallback | ✅ | `useDriverGPS` hook met throttled updates |
-| Status doorwerking | ✅ | Realtime subscriptions op trips tabel |
+### 1. Volledige herschrijving van `executeTool()` in `chatgpt/index.ts`
 
-### 4. POD FLOW ✅ WERKT
+Elke tool-case moet worden herschreven met de correcte tabel- en kolomnamen:
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| POD status tracking | ✅ | `usePODClaims.ts` met `ProofOfDelivery` type, `DigitalPOD.tsx` met StatusBadge |
-| Dashboard POD count | ✅ | `useDashboardData.ts` line 136: filtert op afgerond/gecontroleerd + pod_available === false |
-| PDF download | ✅ | `usePurchaseInvoicePdf.ts` — base64 PDF + HTML fallback |
+**search_orders**: `from("trips")` met `.eq("company_id", tenantId)`, select `sales_total` ipv `total_amount`, `trip_date` ipv `pickup_date`, `customer_reference` ipv `reference`
 
-### 5. KAARTEN ✅ WERKT
+**list_drivers**: `from("drivers")` met `.eq("tenant_id", tenantId)` en `.is("deleted_at", null)` ipv `.eq("is_active", true)`, `current_city` ipv `city`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Mapbox laden | ✅ | Dynamic import via `mapbox-loader.ts` met CSS lazy load |
-| Token provisioning | ✅ | `get-mapbox-token` edge function, `useMapboxToken` hook |
-| Geen mapbox_gl_exports errors | ✅ | Niet gevonden in codebase — opgelost |
+**get_kpis**: Alle `from("orders")` → `from("trips")`, `total_amount` → `sales_total`, `purchase_amount` → `purchase_total`. Invoices: `company_id` → `tenant_id`, statussen naar NL.
 
-### 6. FACTURATIE ✅ WERKT
+**explain_order**: `from("orders")` → `from("trips")`, `order_stops` → `route_stops`, `order_events` checken
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Sequentieel nummer | ✅ | Edge function `create-batch-invoices` genereert nummers server-side |
-| Factuuroverzicht | ✅ | `Invoices.tsx` met search, filters, KPI cards, PDF download |
-| Upgrade pagina | ✅ | Geen aparte `/upgrade` route in App.tsx — credits weergave in CreditBadge.tsx (line 38) zonder undefined |
+**assign_driver_to_order, update_order_status, create_invoice_for_order, bulk_update_orders, create_claim_case**: Allemaal `from("orders")` → `from("trips")`, kolommen mappen
 
-### 7. PORTALEN ✅ WERKT
+**fleet_overview**: `vehicles.plate_number` → `license_plate`, `make` → `brand`, `year` → `year_of_manufacture`
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| B2B wizard stap 1→2→3 | ✅ | `B2BBook.tsx` — 3 stappen (route, options, confirm) met `currentStep` state, prevStep/nextStep navigatie |
-| B2C geen redirect naar B2B | ✅ | `B2CPortal.tsx` is standalone component met eigen `B2CLayout`, geen B2B referenties |
+**route_suggest, daily_briefing, generate_report, margin_analysis, cashflow_forecast, customer_analysis, driver_performance, invoice_status, compare_periods, generate_chart, smart_planning, anomaly_detect**: Allemaal dezelfde mapping
 
-### 8. MESSENGER & AI ✅ WERKT
+### 2. Status enum mapping
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| Messenger empty state | ✅ | `Messenger.tsx` line 131-139: "Geen gesprekken" met icoon en beschrijving, geen eindeloze spinner |
-| AI Assistent foutmelding | ✅ | `useChatGPT.ts` line 229-233: guard voor lege stream → toast "Geen antwoord ontvangen" + bubble verwijderen |
+Tool-definities bovenaan moeten ook de Nederlandse statussen gebruiken:
 
-### 9. NAVIGATIE ✅ WERKT
+```
+"aanvraag" | "gepland" | "geladen" | "onderweg" | "afgeleverd" | "afgerond" | "gecontroleerd" | "gefactureerd" | "geannuleerd" | "offerte" | "draft"
+```
 
-| Check | Status | Detail |
-|-------|--------|--------|
-| /planning redirect | ✅ | `App.tsx` line 374: `<Navigate to="/planning/program" replace />` |
-| 404 pagina | ✅ | `NotFound.tsx` — professioneel design met truck animatie, zoekbalk, quicklinks. Geen telefoonnummer, alleen `support@rdjlogistics.nl` email |
-| Sidebar links | ✅ | Alle routes gedefinieerd in App.tsx met lazy loading |
+ipv
 
-## Conclusie
+```
+"draft" | "pending" | "confirmed" | "in_transit" | "delivered" | "cancelled"
+```
 
-**Alle 9 gebieden zijn correct geïmplementeerd. Geen problemen gevonden. Geen code wijzigingen nodig.**
+### 3. Invoice status mapping
 
-De app is klaar voor lancering vanuit code-perspectief. Aanbeveling: doe één handmatige end-to-end test met een echt account op de productie URL (rdjlogistics.lovable.app) om ook runtime-gedrag te bevestigen.
+`"concept" | "verzonden" | "betaald" | "vervallen" | "gedeeltelijk_betaald"` ipv `"pending" | "overdue" | "paid" | "draft"`
+
+## Omvang
+
+Dit is een grote wijziging in één bestand: `supabase/functions/chatgpt/index.ts`. Ongeveer 30+ queries moeten worden herschreven. De tool-definities (TMS_TOOLS array bovenaan) moeten ook de correcte status-enums bevatten.
+
+## Bestanden
+
+| Actie | Bestand |
+|---|---|
+| **Edit (groot)** | `supabase/functions/chatgpt/index.ts` — alle 30+ queries herschrijven naar correcte tabellen/kolommen/statussen |
+
+## Verwacht resultaat
+
+Na deze fix:
+- AI kan orders ophalen, chauffeurs tonen, KPIs berekenen
+- Alle tool-calls werken tegen de echte database
+- Credits worden alleen afgeschreven bij succesvolle data-ophalingen
+- De modellen (Gemini 2.5 Pro, Gemini 3 Flash, etc.) werken al correct — het probleem zat puur in de database queries
 
