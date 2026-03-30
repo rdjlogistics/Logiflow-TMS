@@ -6,6 +6,7 @@ export interface CustomerFilters {
   search?: string;
   isActive?: boolean;
   creditBlocked?: boolean;
+  companyId?: string;
   limit?: number;
 }
 
