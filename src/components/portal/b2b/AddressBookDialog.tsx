@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { usePostcodeLookup, formatDutchPostcode } from '@/hooks/usePostcodeLookup';
+import { capitalizeCity } from '@/lib/date-utils';
 import type { CustomerLocation, CreateLocationInput } from '@/hooks/useCustomerLocations';
 
 interface AddressBookDialogProps {
