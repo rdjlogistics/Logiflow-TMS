@@ -910,7 +910,7 @@ const Customers = () => {
                                     variant="ghost"
                                     size="icon"
                                     className="min-h-[44px] min-w-[44px] ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    onClick={() => setDeleteTarget(customer)}
+                                    onClick={() => handleDeleteRequest(customer)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
