@@ -467,8 +467,14 @@ const Trips = () => {
                 /* Desktop table view */
                 <div className="overflow-x-auto rounded-xl">
                   <Table>
-                    <TableHeader>
+                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[40px]">
+                          <Checkbox
+                            checked={filteredTrips.length > 0 && selectedIds.size === filteredTrips.length}
+                            onCheckedChange={toggleSelectAll}
+                          />
+                        </TableHead>
                         <TableHead>Datum</TableHead>
                         <TableHead>Klant</TableHead>
                         <TableHead>Referentie</TableHead>
@@ -482,7 +488,13 @@ const Trips = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredTrips.map((trip) => (
-                        <TableRow key={trip.id}>
+                        <TableRow key={trip.id} data-state={selectedIds.has(trip.id) ? "selected" : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.has(trip.id)}
+                              onCheckedChange={() => toggleSelect(trip.id)}
+                            />
+                          </TableCell>
                           <TableCell>
                             {format(new Date(trip.trip_date), "d MMM yyyy", { locale: nl })}
                           </TableCell>
