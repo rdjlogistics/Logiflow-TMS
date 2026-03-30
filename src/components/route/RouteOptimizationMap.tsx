@@ -328,36 +328,6 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
     }
   }, [stops, optimizationResult, mapLoaded, token, mapMode]);
 
-  // Animate dash-array on optimized-route layer
-  useEffect(() => {
-    if (!map.current || !mapLoaded || mapMode !== "interactive") return;
-
-    const dashArraySequence: number[][] = [
-      [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5],
-      [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0], [0, 0.5, 3, 3.5],
-      [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2],
-      [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5],
-    ];
-
-    let step = 0;
-    let animationId: number;
-    let lastTime = 0;
-    const interval = 120;
-
-    const animate = (timestamp: number) => {
-      if (timestamp - lastTime >= interval) {
-        lastTime = timestamp;
-        if (map.current?.getLayer("optimized-route")) {
-          map.current.setPaintProperty("optimized-route", "line-dasharray", dashArraySequence[step]);
-          step = (step + 1) % dashArraySequence.length;
-        }
-      }
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, [mapLoaded, mapMode]);
 
   // ===== RENDER BASED ON MAP MODE =====
 
