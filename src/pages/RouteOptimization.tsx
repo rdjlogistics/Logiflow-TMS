@@ -1558,9 +1558,12 @@ const RouteOptimization = () => {
                           return;
                         }
                         // Get available drivers
-                        const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", (await supabase.auth.getUser()).data.user?.id || "").eq("is_primary", true).single();
+                        const userRes = await supabase.auth.getUser();
+                        const userId = userRes.data.user?.id || "";
+                        const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", userId).eq("is_primary", true).single();
                         if (!uc?.company_id) return;
-                        const { data: drivers } = await supabase.from("drivers").select("id, name").eq("tenant_id", uc.company_id).eq("is_active", true).limit(50) as any;
+                        const driversRes = await supabase.from("drivers").select("id, name").eq("tenant_id", uc.company_id).eq("is_active", true).limit(50);
+                        const drivers = driversRes.data as any[] | null;
                         if (!drivers || drivers.length === 0) {
                           toast({ title: "Geen chauffeurs", description: "Er zijn geen beschikbare chauffeurs", variant: "destructive" });
                           return;
