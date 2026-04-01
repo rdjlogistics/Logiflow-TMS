@@ -893,13 +893,13 @@ const OrderOverview = () => {
                 )}
               </TabsTrigger>
             </TabsList>
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
               <ThemeToggle variant="icon" className="h-9 w-9" />
               <Button
                 variant={showLocationMap ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowLocationMap(v => !v)}
-                className="hidden sm:flex gap-2"
+                className="gap-2"
               >
                 <Map className="h-4 w-4" />
                 Kaart
@@ -907,7 +907,7 @@ const OrderOverview = () => {
               {canEdit && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="hidden sm:flex">
+                    <Button variant="outline" size="sm">
                       <Repeat className="mr-2 h-4 w-4" />
                       Herhaalorder
                     </Button>
@@ -925,63 +925,20 @@ const OrderOverview = () => {
                 </DropdownMenu>
               )}
               {canEdit && (
-                <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)} className="hidden sm:flex">
+                <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)}>
                   <Upload className="mr-2 h-4 w-4" />
                   Import
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)} className="hidden sm:flex">
+              <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)}>
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              {/* Mobile "More" menu — groups all secondary actions */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="sm:hidden h-9 w-9">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowLocationMap(v => !v)}>
-                    <Map className="h-4 w-4 mr-2" />
-                    {showLocationMap ? 'Kaart verbergen' : 'Kaart tonen'}
-                  </DropdownMenuItem>
-                  {canEdit && (
-                    <>
-                      <DropdownMenuItem onClick={() => setRecurringDialogOpen(true)}>
-                        <Repeat className="h-4 w-4 mr-2" />
-                        Nieuwe Herhaalorder
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/orders/recurring')}>
-                        <Repeat className="h-4 w-4 mr-2" />
-                        Alle Herhaalorders
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setImportDialogOpen(true)}>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Import
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </DropdownMenuItem>
-                  {canEdit && selectedOrders.size === 0 && (
-                    <DropdownMenuItem onClick={() => setSelectionMode(prev => !prev)}>
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
-                      {selectionMode ? 'Selectie uit' : 'Selecteren'}
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
               {canEdit && (
-                <>
-                  {/* Desktop button */}
-                  <Button onClick={() => navigate("/orders/edit")} className="hidden sm:flex bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nieuwe order
-                  </Button>
-                </>
+                <Button onClick={() => navigate("/orders/edit")} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nieuwe order
+                </Button>
               )}
             </div>
           </div>
