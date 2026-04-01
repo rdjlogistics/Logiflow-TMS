@@ -51,13 +51,13 @@ export const useLearningSystemDB = () => {
       const [patternsRes, eventsRes] = await Promise.all([
         supabase
           .from('learned_patterns')
-          .select('*')
+          .select('id, pattern_type, conditions, recommended_action, confidence, occurrences, success_rate, is_active')
           .eq('tenant_id', currentCompany.id)
           .eq('is_active', true)
           .order('confidence', { ascending: false }),
         supabase
           .from('learning_events')
-          .select('*')
+          .select('id, event_type, context, decision, outcome, feedback_score, created_at')
           .eq('tenant_id', currentCompany.id)
           .order('created_at', { ascending: false })
           .limit(100),
@@ -152,10 +152,10 @@ export const useLearningSystemDB = () => {
       // Get recent events for analysis
       const { data: events } = await supabase
         .from('learning_events')
-        .select('*')
+        .select('id, event_type, context, decision, outcome, created_at')
         .eq('tenant_id', currentCompany.id)
         .order('created_at', { ascending: false })
-        .limit(200);
+        .limit(100);
 
       if (!events || events.length < 3) {
         setIsLearning(false);

@@ -130,6 +130,7 @@ export default function EmailDashboard() {
       return (data ?? []) as EmailLogRow[];
     },
     refetchInterval: autoRefresh ? 10000 : false,
+    refetchIntervalInBackground: false,
   });
 
   // Deduplicated logs

@@ -27,7 +27,8 @@ const LiveBoard = () => {
       return data ?? [];
     },
     enabled: !!user,
-    refetchInterval: 30000, // Refresh every 30s
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
   const statusColor = (s: string) => {

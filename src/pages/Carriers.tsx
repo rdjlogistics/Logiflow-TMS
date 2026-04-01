@@ -716,7 +716,7 @@ const Carriers = () => {
     const [carriersRes, portalRes] = await Promise.all([
       supabase
         .from('carriers')
-        .select('*')
+        .select('id, company_name, contact_name, email, phone, address, postal_code, city, country, vat_number, iban, bic, notes, is_active, rating, vehicle_types, permits, vat_liable_eu, vat_liable_non_eu, payment_terms_days, payment_method, credit_limit, kvk_number, created_at, deleted_at')
         .eq('tenant_id', company.id)
         .is('deleted_at', null)
         .order('company_name', { ascending: true }),
@@ -742,7 +742,7 @@ const Carriers = () => {
   const fetchContacts = useCallback(async (carrierId: string) => {
     const { data } = await supabase
       .from('carrier_contacts')
-      .select('*')
+      .select('id, name, role, email, phone, is_primary, notes')
       .eq('carrier_id', carrierId)
       .order('is_primary', { ascending: false });
     setContacts((data as unknown as CarrierContact[]) || []);
@@ -871,7 +871,7 @@ const Carriers = () => {
     setTrashLoading(true);
     const { data, error } = await supabase
       .from('carriers')
-      .select('*')
+      .select('id, company_name, contact_name, email, phone, city, country, is_active, rating, deleted_at')
       .eq('tenant_id', company.id)
       .not('deleted_at', 'is', null)
       .order('deleted_at', { ascending: false });
@@ -1021,7 +1021,7 @@ const Carriers = () => {
     const carrierIds = exportCarriers.map(c => c.id);
     const { data: contactsData } = await supabase
       .from('carrier_contacts')
-      .select('*')
+      .select('id, carrier_id, name, role, email, phone, is_primary')
       .in('carrier_id', carrierIds)
       .eq('tenant_id', company.id);
 

@@ -305,7 +305,7 @@ export const usePredictiveDispatch = () => {
           .select('driver_id, pickup_city, delivery_city, customer_id')
           .in('driver_id', driverIds)
           .eq('status', 'afgeleverd')
-          .limit(500);
+          .limit(50);
 
         (pastTrips || []).forEach((pt: any) => {
           const routeKey = `${pt.driver_id}_${(pt.pickup_city || '').toLowerCase()}_${(pt.delivery_city || '').toLowerCase()}`;

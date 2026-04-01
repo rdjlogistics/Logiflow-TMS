@@ -116,6 +116,7 @@ const CustomerTrackTrace = () => {
     },
     enabled: !!token,
     refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
   const trip = trackingData?.trip;

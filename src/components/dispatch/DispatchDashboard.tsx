@@ -73,6 +73,7 @@ export function DispatchDashboard() {
       };
     },
     refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
   return (

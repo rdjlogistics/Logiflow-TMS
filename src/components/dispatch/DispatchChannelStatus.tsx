@@ -100,7 +100,8 @@ export function DispatchChannelStatus() {
         channelStats,
       };
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
+    refetchIntervalInBackground: false,
   });
 
   const getChannelStatus = (channelId: string) => {

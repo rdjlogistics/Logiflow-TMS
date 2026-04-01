@@ -113,7 +113,7 @@ const Procurement = () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from("rfq_requests" as any)
-        .select("*")
+        .select("id, titel, omschrijving, ophaaladres, afleveradres, datum, gewicht_kg, deadline_offerte, status, created_at, company_id")
         .eq("company_id", company.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -129,7 +129,7 @@ const Procurement = () => {
       if (!selectedRFQ?.id) return [];
       const { data, error } = await supabase
         .from("rfq_offertes" as any)
-        .select("*")
+        .select("id, rfq_id, carrier_naam, carrier_email, prijs, doorlooptijd_uren, notities, status, created_at")
         .eq("rfq_id", selectedRFQ.id)
         .order("prijs", { ascending: true });
       if (error) throw error;
