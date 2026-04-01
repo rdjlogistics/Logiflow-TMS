@@ -2,66 +2,18 @@ import { useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, subMonths, format, startOfWeek, endOfWeek, eachWeekOfInterval, subWeeks, startOfDay, endOfDay } from "date-fns";
-import { getNlLocale, getNlLocaleSync } from "@/lib/locale";
+import { getNlLocale } from "@/lib/locale";
+import { useCompany } from "@/hooks/useCompany";
 
-interface RevenueData {
-  month: string;
-  revenue: number;
-  costs: number;
-}
+// --- Types ---
 
-interface TripStatusData {
-  status: string;
-  count: number;
-  label: string;
-}
-
-interface WeeklyTripsData {
-  week: string;
-  trips: number;
-}
-
-interface DashboardStats {
-  customers: number;
-  vehicles: number;
-  tripsThisMonth: number;
-  openInvoices: number;
-  totalRevenue: number;
-  pendingPayments: number;
-  pendingSubmissions: number;
-}
-
-interface OpsStats {
-  chauffeurNodig: number;
-  onderweg: number;
-  afgeleverd: number;
-  atRisk: number;
-  podMissing: number;
-  waitingTime: number;
-  gpsOff: number;
-  etaRisk: number;
-  hold: number;
-}
-
-interface FinanceStats {
-  openstaand: number;
-  openFacturen: number;
-  payoutsGepland: number;
-  cashRunway: number;
-  readyToInvoice: number;
-}
-
-interface ActionItem {
-  id: string;
-  orderId?: string;
-  orderRef: string;
-  issueLabel: string;
-  issueType: "driver" | "pod" | "waiting" | "eta" | "hold" | "submission";
-  severity: "critical" | "warning" | "info";
-  href: string;
-  pickupCity?: string;
-  deliveryCity?: string;
-}
+interface RevenueData { month: string; revenue: number; costs: number }
+interface TripStatusData { status: string; count: number; label: string }
+interface WeeklyTripsData { week: string; trips: number }
+interface DashboardStats { customers: number; vehicles: number; tripsThisMonth: number; openInvoices: number; totalRevenue: number; pendingPayments: number; pendingSubmissions: number }
+interface OpsStats { chauffeurNodig: number; onderweg: number; afgeleverd: number; atRisk: number; podMissing: number; waitingTime: number; gpsOff: number; etaRisk: number; hold: number }
+interface FinanceStats { openstaand: number; openFacturen: number; payoutsGepland: number; cashRunway: number; readyToInvoice: number }
+interface ActionItem { id: string; orderId?: string; orderRef: string; issueLabel: string; issueType: "driver" | "pod" | "waiting" | "eta" | "hold" | "submission"; severity: "critical" | "warning" | "info"; href: string; pickupCity?: string; deliveryCity?: string }
 
 interface DashboardData {
   stats: DashboardStats;
@@ -87,17 +39,17 @@ const EMPTY_DATA: DashboardData = {
   unreadEmailCount: 0,
 };
 
-async function fetchDashboardData(): Promise<DashboardData> {
+// --- Data fetcher (tenant-scoped) ---
+
+async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   const now = new Date();
   const sixMonthsAgo = subMonths(startOfMonth(now), 5);
   const todayStart = startOfDay(now);
   const todayEnd = endOfDay(now);
   const monthStart = startOfMonth(now);
 
-  // Preload locale in background
   const nlLocalePromise = getNlLocale();
 
-  // CONSOLIDATED: 5 queries instead of 12
   const [
     countsResult,
     { data: invoicesData },
@@ -106,21 +58,19 @@ async function fetchDashboardData(): Promise<DashboardData> {
     { data: submissions },
     unreadEmailResult,
   ] = await Promise.all([
-    // 1. Single RPC for all counts (replaces 5 separate count queries)
     supabase.rpc('get_dashboard_counts', { p_month_start: monthStart.toISOString() }),
-    // 2. Invoices
-    supabase.from("invoices").select("status, total_amount, amount_paid, created_at").limit(1000),
-    // 3. Trips for revenue chart (6 months)
-    supabase.from("trips").select("trip_date, sales_total, purchase_total, created_at, status, driver_id, vehicle_id, pickup_city, delivery_city, pod_available, id, order_number").is("deleted_at", null).gte("created_at", sixMonthsAgo.toISOString()),
-    // 4. All recent trips for status/weekly/ops (6 weeks) — combined with today filter client-side
-    supabase.from("trips").select("id, order_number, status, trip_date, driver_id, vehicle_id, pickup_city, delivery_city, pod_available").is("deleted_at", null).gte("trip_date", subWeeks(now, 6).toISOString()),
-    // 5. Pending submissions
+    // Invoices — tenant-scoped
+    supabase.from("invoices").select("status, total_amount, amount_paid, created_at").eq("company_id", companyId).limit(1000),
+    // Trips for revenue chart (6 months) — tenant-scoped
+    supabase.from("trips").select("trip_date, sales_total, purchase_total, created_at, status, driver_id, vehicle_id, pickup_city, delivery_city, pod_available, id, order_number").is("deleted_at", null).eq("company_id", companyId).gte("created_at", sixMonthsAgo.toISOString()),
+    // Recent trips for status/weekly/ops (6 weeks) — tenant-scoped
+    supabase.from("trips").select("id, order_number, status, trip_date, driver_id, vehicle_id, pickup_city, delivery_city, pod_available").is("deleted_at", null).eq("company_id", companyId).gte("trip_date", subWeeks(now, 6).toISOString()),
+    // Pending submissions
     supabase.from("customer_submissions").select("id, pickup_company, delivery_company, status, created_at").eq("status", "pending").order("created_at", { ascending: false }).limit(10),
-    // 6. Unread emails
+    // Unread emails
     (supabase as any).from("inbound_emails").select("id", { count: "exact", head: true }).eq("read", false).then((r: any) => r).catch(() => ({ count: 0 })),
   ]);
 
-  // Extract counts from RPC result
   const counts = (countsResult.data as any) || {};
   const customersCount = counts.customers || 0;
   const vehiclesCount = counts.vehicles || 0;
@@ -178,7 +128,6 @@ async function fetchDashboardData(): Promise<DashboardData> {
   });
   actions.sort((a, b) => ({ critical: 0, warning: 1, info: 2 }[a.severity] - { critical: 0, warning: 1, info: 2 }[b.severity]));
 
-  // Wait for locale
   const nl = await nlLocalePromise;
 
   // Revenue by month
@@ -241,14 +190,21 @@ async function fetchDashboardData(): Promise<DashboardData> {
   };
 }
 
+// --- Hook ---
+
 export const useDashboardData = () => {
+  const { company } = useCompany();
+  const companyId = company?.id;
+
   const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
-    queryKey: ['dashboard-data'],
-    queryFn: fetchDashboardData,
-    staleTime: 30 * 1000,            // 30s before refetch in background
-    gcTime: 10 * 60 * 1000,          // 10 min cache
+    queryKey: ['dashboard-data', companyId],
+    queryFn: () => fetchDashboardData(companyId!),
+    enabled: !!companyId,
+    staleTime: 30 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
-    refetchInterval: 60 * 1000,      // Auto-refresh every 60s
+    refetchInterval: 60 * 1000,
+    refetchIntervalInBackground: false,   // Fix 5: stop polling in background tabs
     retry: 2,
     placeholderData: EMPTY_DATA,
   });

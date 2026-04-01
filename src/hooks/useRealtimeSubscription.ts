@@ -10,6 +10,8 @@ interface RealtimeSubscriptionOptions {
   enabled?: boolean;
 }
 
+const DEBOUNCE_MS = 500;
+
 export function useRealtimeSubscription<TData extends { id: string }>({
   table,
   schema = 'public',
@@ -23,16 +25,20 @@ export function useRealtimeSubscription<TData extends { id: string }>({
   const [recentlyUpdatedIds, setRecentlyUpdatedIds] = useState<Set<string>>(new Set());
   const timeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
+  // Debounce buffer: accumulate changes, flush once after DEBOUNCE_MS
+  const pendingChangesRef = useRef<Map<string, { type: string; item: TData }>>(new Map());
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       timeoutsRef.current.forEach((t) => clearTimeout(t));
       timeoutsRef.current.clear();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, []);
 
   const markRecentlyUpdated = useCallback((id: string) => {
-    // Clear existing timeout for this id
     const existing = timeoutsRef.current.get(id);
     if (existing) clearTimeout(existing);
 
@@ -50,69 +56,73 @@ export function useRealtimeSubscription<TData extends { id: string }>({
     timeoutsRef.current.set(id, timeout);
   }, []);
 
+  // Flush all pending changes in one batch update
+  const flushChanges = useCallback(() => {
+    const changes = new Map(pendingChangesRef.current);
+    pendingChangesRef.current.clear();
+    debounceTimerRef.current = null;
+
+    if (changes.size === 0) return;
+
+    const currentData = queryClient.getQueryData<TData[]>(queryKey);
+    if (!currentData) return;
+
+    let updatedData = [...currentData];
+    const deletedIds = new Set<string>();
+
+    changes.forEach(({ type, item }, id) => {
+      if (type === 'DELETE') {
+        deletedIds.add(id);
+        return;
+      }
+      if (type === 'INSERT') {
+        if (!updatedData.some((d) => d.id === id)) {
+          updatedData.push(item);
+        }
+        markRecentlyUpdated(id);
+      } else if (type === 'UPDATE') {
+        updatedData = updatedData.map((d) => (d.id === id ? item : d));
+        markRecentlyUpdated(id);
+      }
+    });
+
+    if (deletedIds.size > 0) {
+      updatedData = updatedData.filter((d) => !deletedIds.has(d.id));
+    }
+
+    queryClient.setQueryData(queryKey, updatedData);
+    const lastType = Array.from(changes.values()).pop()?.type ?? 'UPDATE';
+    setLastEvent({ type: lastType, timestamp: new Date() });
+  }, [queryClient, queryKey, markRecentlyUpdated]);
+
   const handleChange = useCallback(
     (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
       const eventType = payload.eventType;
-      setLastEvent({ type: eventType, timestamp: new Date() });
+      const item = (eventType === 'DELETE' ? payload.old : payload.new) as TData;
+      if (!item?.id) return;
 
-      const currentData = queryClient.getQueryData<TData[]>(queryKey);
-      if (!currentData) return;
+      pendingChangesRef.current.set(item.id, { type: eventType, item });
 
-      let updatedData: TData[];
-
-      switch (eventType) {
-        case 'INSERT': {
-          const newItem = payload.new as TData;
-          if (newItem?.id) {
-            const exists = currentData.some((item) => item.id === newItem.id);
-            updatedData = exists ? currentData : [...currentData, newItem];
-            markRecentlyUpdated(newItem.id);
-          } else {
-            updatedData = currentData;
-          }
-          break;
-        }
-        case 'UPDATE': {
-          const updatedItem = payload.new as TData;
-          if (updatedItem?.id) {
-            updatedData = currentData.map((item) =>
-              item.id === updatedItem.id ? updatedItem : item
-            );
-            markRecentlyUpdated(updatedItem.id);
-          } else {
-            updatedData = currentData;
-          }
-          break;
-        }
-        case 'DELETE': {
-          const deletedId = (payload.old as TData)?.id;
-          updatedData = deletedId
-            ? currentData.filter((item) => item.id !== deletedId)
-            : currentData;
-          break;
-        }
-        default:
-          updatedData = currentData;
-      }
-
-      queryClient.setQueryData(queryKey, updatedData);
+      // Reset debounce timer
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = setTimeout(flushChanges, DEBOUNCE_MS);
     },
-    [queryClient, queryKey, markRecentlyUpdated]
+    [flushChanges]
   );
 
   // Stabilize queryKey reference
   const queryKeyStr = JSON.stringify(queryKey);
-  
+
   useEffect(() => {
     if (!enabled) return;
 
     const stableQueryKey = JSON.parse(queryKeyStr) as string[];
     const channelName = `realtime-${table}-${stableQueryKey.join('-')}-${Date.now()}`;
-    
+
     const subscriptionConfig = filter
       ? { event: '*' as const, schema, table, filter }
       : { event: '*' as const, schema, table };
-    
+
     const channel = supabase
       .channel(channelName)
       .on(
@@ -129,6 +139,10 @@ export function useRealtimeSubscription<TData extends { id: string }>({
     return () => {
       supabase.removeChannel(channel);
       setIsConnected(false);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
     };
   }, [table, schema, filter, enabled, handleChange, queryKeyStr]);
 
@@ -141,43 +155,21 @@ export function useRealtimeSubscription<TData extends { id: string }>({
 
 // Preset for common tables
 export function useRealtimeTrips(queryKey: string[], enabled = true) {
-  return useRealtimeSubscription({
-    table: 'trips',
-    queryKey,
-    enabled,
-  });
+  return useRealtimeSubscription({ table: 'trips', queryKey, enabled });
 }
 
 export function useRealtimeOrders(queryKey: string[], enabled = true) {
-  return useRealtimeSubscription({
-    table: 'trips',
-    filter: 'trip_type=eq.order',
-    queryKey,
-    enabled,
-  });
+  return useRealtimeSubscription({ table: 'trips', filter: 'trip_type=eq.order', queryKey, enabled });
 }
 
 export function useRealtimeMessages(channelId: string, queryKey: string[], enabled = true) {
-  return useRealtimeSubscription({
-    table: 'chat_messages',
-    filter: `channel_id=eq.${channelId}`,
-    queryKey,
-    enabled,
-  });
+  return useRealtimeSubscription({ table: 'chat_messages', filter: `channel_id=eq.${channelId}`, queryKey, enabled });
 }
 
 export function useRealtimeInvoices(queryKey: string[], enabled = true) {
-  return useRealtimeSubscription({
-    table: 'invoices',
-    queryKey,
-    enabled,
-  });
+  return useRealtimeSubscription({ table: 'invoices', queryKey, enabled });
 }
 
 export function useRealtimePurchaseInvoices(queryKey: string[], enabled = true) {
-  return useRealtimeSubscription({
-    table: 'purchase_invoices',
-    queryKey,
-    enabled,
-  });
+  return useRealtimeSubscription({ table: 'purchase_invoices', queryKey, enabled });
 }
