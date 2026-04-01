@@ -591,8 +591,6 @@ const Dashboard = () => {
         </motion.section>
 
 
-        {/* Onboarding Checklist */}
-        <OnboardingChecklist />
       </motion.div>
 
       {/* Widget Customizer + Presets — unified panel */}
