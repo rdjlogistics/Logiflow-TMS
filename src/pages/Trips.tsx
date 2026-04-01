@@ -323,13 +323,7 @@ const Trips = () => {
             </CardHeader>
             <CardContent className="relative p-2 sm:p-6">
               {loading ? (
-                <div className="flex justify-center py-12">
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center animate-pulse">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  </div>
-                </div>
+                <TableSkeleton rows={6} columns={5} />
               ) : filteredTrips.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/50 flex items-center justify-center">
