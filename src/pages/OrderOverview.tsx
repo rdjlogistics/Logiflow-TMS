@@ -823,85 +823,25 @@ const OrderOverview = () => {
 
   return (
     <DashboardLayout title="Orderoverzicht">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 animate-fade-in">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
-              <Package className="h-6 w-6 text-primary-foreground" />
+        <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between sm:justify-start gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
+                <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+              </div>
+              <h1 className="font-display text-xl sm:text-3xl font-bold tracking-tight">Orders</h1>
             </div>
-            <div>
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">Orders</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block">
-                Beheer en volg al je transport orders
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <TabsList className="bg-muted/60 backdrop-blur-sm border border-border/30 p-1">
-              <TabsTrigger value="orders" className="flex items-center gap-2 text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
-                <Truck className="h-4 w-4" />
-                <span className="hidden xs:inline">Orders</span>
-              </TabsTrigger>
-              <TabsTrigger value="submissions" className="flex items-center gap-2 text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
-                <Inbox className="h-4 w-4" />
-                <span className="hidden xs:inline">Aanvragen</span>
-                {pendingSubmissionsCount > 0 && (
-                  <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs animate-pulse shadow-lg shadow-destructive/30">
-                    {pendingSubmissionsCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-            <div className="flex items-center gap-2">
-              <ThemeToggle variant="icon" className="h-9 w-9" />
-              <Button
-                variant={showLocationMap ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowLocationMap(v => !v)}
-                className="hidden sm:flex gap-2"
-              >
-                <Map className="h-4 w-4" />
-                Kaart
-              </Button>
-              {canEdit && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="hidden sm:flex">
-                      <Repeat className="mr-2 h-4 w-4" />
-                      Herhaalorder
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setRecurringDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Nieuwe Template
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/orders/recurring')}>
-                      <Repeat className="h-4 w-4 mr-2" />
-                      Alle Templates Bekijken
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              {canEdit && (
-                <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)} className="hidden sm:flex">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)} className="hidden sm:flex">
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              {/* Mobile "More" menu — groups all secondary actions */}
+            <div className="flex items-center gap-1.5 sm:hidden">
+              <ThemeToggle variant="icon" className="h-8 w-8" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="sm:hidden h-9 w-9">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuContent align="end" className="w-52 backdrop-blur-xl bg-popover/95">
                   <DropdownMenuItem onClick={() => setShowLocationMap(v => !v)}>
                     <Map className="h-4 w-4 mr-2" />
                     {showLocationMap ? 'Kaart verbergen' : 'Kaart tonen'}
@@ -934,20 +874,77 @@ const OrderOverview = () => {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
+            </div>
+          </div>
+          {/* iOS Segmented Control Tabs */}
+          <div className="flex items-center gap-3">
+            <TabsList className="w-full sm:w-auto bg-white/[0.06] dark:bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] dark:border-white/[0.08] rounded-2xl p-1 h-11">
+              <TabsTrigger value="orders" className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs sm:text-sm rounded-xl h-9 px-4 data-[state=active]:bg-white/[0.1] dark:data-[state=active]:bg-white/[0.1] data-[state=active]:backdrop-blur-xl data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.05)] data-[state=active]:text-foreground transition-all duration-300">
+                <Truck className="h-3.5 w-3.5" />
+                Orders
+              </TabsTrigger>
+              <TabsTrigger value="submissions" className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs sm:text-sm rounded-xl h-9 px-4 data-[state=active]:bg-white/[0.1] dark:data-[state=active]:bg-white/[0.1] data-[state=active]:backdrop-blur-xl data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.05)] data-[state=active]:text-foreground transition-all duration-300">
+                <Inbox className="h-3.5 w-3.5" />
+                Aanvragen
+                {pendingSubmissionsCount > 0 && (
+                  <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px] animate-pulse shadow-lg shadow-destructive/30">
+                    {pendingSubmissionsCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            <div className="hidden sm:flex items-center gap-2">
+              <ThemeToggle variant="icon" className="h-9 w-9" />
+              <Button
+                variant={showLocationMap ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowLocationMap(v => !v)}
+                className="gap-2"
+              >
+                <Map className="h-4 w-4" />
+                Kaart
+              </Button>
               {canEdit && (
-                <>
-                  {/* Desktop button */}
-                  <Button onClick={() => navigate("/orders/edit")} className="hidden sm:flex bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nieuwe order
-                  </Button>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Repeat className="mr-2 h-4 w-4" />
+                      Herhaalorder
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setRecurringDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nieuwe Template
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/orders/recurring')}>
+                      <Repeat className="h-4 w-4 mr-2" />
+                      Alle Templates Bekijken
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {canEdit && (
+                <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)}>
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              {canEdit && (
+                <Button onClick={() => navigate("/orders/edit")} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nieuwe order
+                </Button>
               )}
             </div>
           </div>
         </div>
 
-        <TabsContent value="orders" className="mt-0 space-y-6">
+        <TabsContent value="orders" className="mt-0 space-y-4 sm:space-y-6">
           {/* Quick Stats Header - Interactive with animations */}
           <QuickStatsHeader
             stats={quickStats}
@@ -1050,13 +1047,13 @@ const OrderOverview = () => {
             
             {/* Search bar */}
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
               <Input
                 ref={searchInputRef}
                 placeholder="Zoeken... (druk /)"
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="pl-9 h-10 text-sm bg-background/80 backdrop-blur-sm border-border/50 shadow-sm hover:shadow-md transition-shadow"
+                className="pl-9 h-10 text-sm rounded-2xl bg-white/[0.04] dark:bg-white/[0.04] backdrop-blur-xl border-white/[0.08] dark:border-white/[0.08] placeholder:text-muted-foreground/40 focus:bg-white/[0.08] focus:border-white/[0.12] transition-all duration-300"
               />
             </div>
           </div>

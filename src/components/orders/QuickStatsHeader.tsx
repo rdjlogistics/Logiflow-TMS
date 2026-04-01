@@ -123,13 +123,13 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <TooltipTrigger asChild>
                 <Card 
                   className={cn(
-                    "relative overflow-hidden border-border/50 bg-card/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group h-full",
+                    "relative overflow-hidden border-white/[0.06] dark:border-white/[0.06] bg-white/[0.04] dark:bg-white/[0.04] backdrop-blur-xl shadow-none hover:bg-white/[0.07] dark:hover:bg-white/[0.07] transition-all duration-500 group h-full",
                     card.onClick && "cursor-pointer",
-                    card.pulse && "ring-2 ring-destructive/30 ring-offset-2 ring-offset-background"
+                    card.pulse && "ring-1 ring-destructive/20 ring-offset-1 ring-offset-background"
                   )}
                   onClick={card.onClick}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] opacity-50" />
                   <CardContent className="relative p-3 sm:p-5 h-full flex flex-col">
                     <div className="flex items-center justify-between mb-1.5 sm:mb-3">
                       <span className="text-[11px] sm:text-sm font-medium text-muted-foreground">{card.title}</span>
@@ -140,7 +140,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                         <card.icon className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", card.iconColor)} />
                       </div>
                     </div>
-                    <div className={cn("text-xl sm:text-3xl font-bold tracking-tight", card.valueClass)}>
+                    <div className={cn("text-lg sm:text-3xl font-bold tracking-tight", card.valueClass)}>
                       {card.value}
                     </div>
                     <div className="min-h-[24px] sm:min-h-[28px] mt-1.5 sm:mt-2 mt-auto">
@@ -181,7 +181,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
           <span className="font-medium">Status verdeling</span>
           <span className="text-muted-foreground/60">({stats.totalOrders} totaal)</span>
         </div>
-        <div className="flex h-2 rounded-full overflow-hidden bg-muted/50">
+        <div className="flex h-1.5 rounded-full overflow-hidden bg-white/[0.06] dark:bg-white/[0.06]">
           {stats.totalOrders > 0 && (
             <>
               <Tooltip>
