@@ -18,7 +18,7 @@ export interface TripFilters {
 
 // Explicit columns instead of * to reduce payload
 const TRIP_COLUMNS = `
-  id, order_number, trip_date, status, trip_type,
+  id, order_number, trip_date, status,
   pickup_address, pickup_city, pickup_postal_code, pickup_country, pickup_date, pickup_time_from, pickup_time_to, pickup_reference, pickup_contact, pickup_phone, pickup_instructions,
   delivery_address, delivery_city, delivery_postal_code, delivery_country, delivery_date, delivery_time_from, delivery_time_to, delivery_reference, delivery_contact, delivery_phone, delivery_instructions,
   customer_id, driver_id, vehicle_id, carrier_id, invoice_id, company_id,

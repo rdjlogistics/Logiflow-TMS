@@ -5,12 +5,10 @@ import { useToast } from '@/hooks/use-toast';
 /**
  * Hook for fetching and filtering trips with automatic refresh.
  * Wraps the trips service with loading state, error handling, and refetch.
- *
- * Example:
- *   const { trips, loading, refetch } = useTripsData({ status: 'gepland' });
  */
 export function useTripsData(filters: TripFilters = {}) {
-  const [trips, setTrips] = useState<Awaited<ReturnType<typeof fetchTrips>>>([]);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -19,8 +17,9 @@ export function useTripsData(filters: TripFilters = {}) {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchTrips(filters);
+      const { data, count } = await fetchTrips(filters);
       setTrips(data);
+      setTotalCount(count);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Fout bij laden ritten';
       setError(msg);
@@ -32,7 +31,7 @@ export function useTripsData(filters: TripFilters = {}) {
 
   useEffect(() => { load(); }, [load]);
 
-  return { trips, loading, error, refetch: load };
+  return { trips, totalCount, loading, error, refetch: load };
 }
 
 /**
