@@ -823,31 +823,71 @@ const OrderOverview = () => {
 
   return (
     <DashboardLayout title="Orderoverzicht">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 animate-fade-in">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
-              <Package className="h-6 w-6 text-primary-foreground" />
+        <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between sm:justify-start gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
+                <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+              </div>
+              <h1 className="font-display text-xl sm:text-3xl font-bold tracking-tight">Orders</h1>
             </div>
-            <div>
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">Orders</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block">
-                Beheer en volg al je transport orders
-              </p>
+            <div className="flex items-center gap-1.5 sm:hidden">
+              <ThemeToggle variant="icon" className="h-8 w-8" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52 backdrop-blur-xl bg-popover/95">
+                  <DropdownMenuItem onClick={() => setShowLocationMap(v => !v)}>
+                    <Map className="h-4 w-4 mr-2" />
+                    {showLocationMap ? 'Kaart verbergen' : 'Kaart tonen'}
+                  </DropdownMenuItem>
+                  {canEdit && (
+                    <>
+                      <DropdownMenuItem onClick={() => setRecurringDialogOpen(true)}>
+                        <Repeat className="h-4 w-4 mr-2" />
+                        Nieuwe Herhaalorder
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/orders/recurring')}>
+                        <Repeat className="h-4 w-4 mr-2" />
+                        Alle Herhaalorders
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setImportDialogOpen(true)}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Import
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </DropdownMenuItem>
+                  {canEdit && selectedOrders.size === 0 && (
+                    <DropdownMenuItem onClick={() => setSelectionMode(prev => !prev)}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      {selectionMode ? 'Selectie uit' : 'Selecteren'}
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
+          {/* iOS Segmented Control Tabs */}
           <div className="flex items-center gap-3">
-            <TabsList className="bg-muted/60 backdrop-blur-sm border border-border/30 p-1">
-              <TabsTrigger value="orders" className="flex items-center gap-2 text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
-                <Truck className="h-4 w-4" />
-                <span className="hidden xs:inline">Orders</span>
+            <TabsList className="w-full sm:w-auto bg-white/[0.06] dark:bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] dark:border-white/[0.08] rounded-2xl p-1 h-11">
+              <TabsTrigger value="orders" className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs sm:text-sm rounded-xl h-9 px-4 data-[state=active]:bg-white/[0.1] dark:data-[state=active]:bg-white/[0.1] data-[state=active]:backdrop-blur-xl data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.05)] data-[state=active]:text-foreground transition-all duration-300">
+                <Truck className="h-3.5 w-3.5" />
+                Orders
               </TabsTrigger>
-              <TabsTrigger value="submissions" className="flex items-center gap-2 text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
-                <Inbox className="h-4 w-4" />
-                <span className="hidden xs:inline">Aanvragen</span>
+              <TabsTrigger value="submissions" className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs sm:text-sm rounded-xl h-9 px-4 data-[state=active]:bg-white/[0.1] dark:data-[state=active]:bg-white/[0.1] data-[state=active]:backdrop-blur-xl data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.05)] data-[state=active]:text-foreground transition-all duration-300">
+                <Inbox className="h-3.5 w-3.5" />
+                Aanvragen
                 {pendingSubmissionsCount > 0 && (
-                  <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs animate-pulse shadow-lg shadow-destructive/30">
+                  <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px] animate-pulse shadow-lg shadow-destructive/30">
                     {pendingSubmissionsCount}
                   </Badge>
                 )}
