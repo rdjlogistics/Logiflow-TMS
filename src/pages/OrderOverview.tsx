@@ -1047,13 +1047,13 @@ const OrderOverview = () => {
             
             {/* Search bar */}
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
               <Input
                 ref={searchInputRef}
                 placeholder="Zoeken... (druk /)"
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="pl-9 h-10 text-sm bg-background/80 backdrop-blur-sm border-border/50 shadow-sm hover:shadow-md transition-shadow"
+                className="pl-9 h-10 text-sm rounded-2xl bg-white/[0.04] dark:bg-white/[0.04] backdrop-blur-xl border-white/[0.08] dark:border-white/[0.08] placeholder:text-muted-foreground/40 focus:bg-white/[0.08] focus:border-white/[0.12] transition-all duration-300"
               />
             </div>
           </div>

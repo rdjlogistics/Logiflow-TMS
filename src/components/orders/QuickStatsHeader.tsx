@@ -181,7 +181,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
           <span className="font-medium">Status verdeling</span>
           <span className="text-muted-foreground/60">({stats.totalOrders} totaal)</span>
         </div>
-        <div className="flex h-2 rounded-full overflow-hidden bg-muted/50">
+        <div className="flex h-1.5 rounded-full overflow-hidden bg-white/[0.06] dark:bg-white/[0.06]">
           {stats.totalOrders > 0 && (
             <>
               <Tooltip>
