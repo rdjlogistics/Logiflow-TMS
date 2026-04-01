@@ -1,63 +1,124 @@
 
 
-# Test Workflow Automation Aanmaken
+# App-brede Verbeteringen — Performance, UX, Functionaliteit & UI
 
-## Wat we doen
+## Overzicht
 
-Een test workflow "Statuswijziging Notificatie" aanmaken via een database insert voor het bedrijf "Bedrijf van Rayan test" (tenant `78bccc6c-...`). De workflow triggert bij elke statuswijziging naar "onderweg" en voert twee acties uit:
-1. **E-mail notificatie** naar de klant
-2. **Log event** voor audit trail
+Een breed pakket verbeteringen gegroepeerd in 4 categorieën. Elk onderdeel is onafhankelijk en levert direct merkbare waarde.
 
-## Stappen
+---
 
-### Stap 1: Insert workflow + acties via SQL
+## 1. Performance
 
-Eén migratie met:
+### 1a. Fix React ref warnings (Auth + LegalConsentBanner)
+De console toont `Function components cannot be given refs` warnings voor `Auth` en `LegalConsentBanner`. Beide worden via `lazyWithRetry` geladen maar missen `forwardRef` wrapping.
 
-```sql
--- Workflow: notificatie bij status → onderweg
-INSERT INTO workflow_automations (tenant_id, name, description, trigger_type, trigger_config, is_active)
-VALUES (
-  '78bccc6c-eecd-4a4a-9b71-23e79b754ef6',
-  'Statuswijziging → Onderweg Notificatie',
-  'Stuurt automatisch een e-mail wanneer een order op onderweg wordt gezet',
-  'order_status_changed',
-  '{"to_status": "onderweg"}'::jsonb,
-  true
-);
+- **Auth.tsx**: Wrap de default export met `React.forwardRef`
+- **LegalConsentBanner.tsx**: Wrap `Dialog` usage correct (of suppress ref passing)
 
--- Actie 1: E-mail versturen
-INSERT INTO workflow_actions (workflow_id, action_type, action_config, sequence_order, delay_minutes, is_active)
-VALUES (
-  (SELECT id FROM workflow_automations WHERE name = 'Statuswijziging → Onderweg Notificatie' LIMIT 1),
-  'send_email',
-  '{"to": "{{customer.email}}", "subject": "Uw zending is onderweg", "body": "Beste klant, uw zending is zojuist opgehaald en is nu onderweg naar het afleveradres."}'::jsonb,
-  0, 0, true
-);
+### 1b. Sidebar icon imports optimaliseren
+`AppSidebar.tsx` importeert 60+ icons individueel uit lucide-react. Hoewel tree-shaking dit normaal afhandelt, is de import-lijst onnodig lang.
 
--- Actie 2: Log event
-INSERT INTO workflow_actions (workflow_id, action_type, action_config, sequence_order, delay_minutes, is_active)
-VALUES (
-  (SELECT id FROM workflow_automations WHERE name = 'Statuswijziging → Onderweg Notificatie' LIMIT 1),
-  'log_event',
-  '{"message": "Klant genotificeerd over status onderweg"}'::jsonb,
-  1, 0, true
-);
-```
+- Groepeer imports en verwijder ongebruikte icons (er zijn er ~10 geïmporteerd maar nergens gebruikt in het bestand)
 
-### Geen code-wijzigingen nodig
+### 1c. OrderOverview.tsx splitsen
+Dit bestand is 1596 regels lang — de grootste pagina. Dit vertraagt HMR en is moeilijk te onderhouden.
 
-De workflow UI en execute-workflow edge function bestaan al. De workflow wordt direct zichtbaar op de Workflow Automatie pagina en wordt automatisch getriggerd wanneer een rit-status naar "onderweg" wijzigt.
+- Extract mobiele kaartweergave naar `OrderMobileCard.tsx`
+- Extract tabelrij naar `OrderTableRow.tsx`
+- Extract filter-bar naar `OrderFilters.tsx`
+
+---
+
+## 2. UX / Navigatie
+
+### 2a. MobileBottomNav uitbreiden met Ritten tab
+De huidige mobiele nav heeft Home, Orders, Nieuw, Meldingen, Instellingen. "Ritten" (de dagelijkse kern-workflow) ontbreekt.
+
+- Vervang "Meldingen" door "Ritten" (pad: `/trips`)
+- Verplaats meldingen naar de header NotificationBell (die al bestaat)
+
+### 2b. Breadcrumbs op dieper gelegen pagina's
+Pagina's als `/invoices/123`, `/carriers/detail/xyz` hebben geen breadcrumb-navigatie. Gebruikers moeten via sidebar terugnavigeren.
+
+- Voeg een lichtgewicht `Breadcrumb` component toe
+- Toon op detail-pagina's: `Home > Facturen > FA-2026-001`
+
+### 2c. Keyboard shortcut hints in sidebar
+De app heeft al een command palette (⌘K), maar sidebar items tonen geen shortcut hints.
+
+- Voeg tooltips toe met shortcuts voor de 5 meest gebruikte items (bijv. `G dan O` voor Orders, `G dan R` voor Ritten)
+
+---
+
+## 3. Functionaliteit
+
+### 3a. Globale zoekbalk in de header
+De header heeft alleen een Copilot knop. Een snelle zoekbalk die orders, klanten en ritten doorzoekt ontbreekt.
+
+- Voeg een compact zoekveld toe in de header (desktop) dat opent als de command palette maar met data-resultaten
+- Zoek over orders (order_number), klanten (company_name), en ritten (pickup/delivery city)
+- Toon max 5 resultaten per categorie met directe navigatie
+
+### 3b. Recent bezochte pagina's
+Geen "recents" functionaliteit — gebruikers moeten steeds opnieuw navigeren.
+
+- Track de laatste 5 bezochte routes in localStorage
+- Toon als "Recent" sectie bovenaan de sidebar (collapsed by default)
+
+### 3c. Dashboard auto-refresh indicator
+Het dashboard toont "Live" badge maar ververst niet automatisch.
+
+- Voeg een 60-seconden auto-refresh toe aan `useDashboardData` met een subtiele refresh-indicator
+- Toon "Bijgewerkt 30s geleden" tekst
+
+---
+
+## 4. UI / Design
+
+### 4a. Consistente lege-staat illustraties
+Diverse pagina's tonen geen feedback bij lege data (geen ritten, geen facturen). Sommige gebruiken `EmptyState`, andere tonen gewoon een lege tabel.
+
+- Audit alle overzichtspagina's en voeg `EmptyState` component toe waar deze ontbreekt
+- Gebruik consistente iconen en CTA-tekst per pagina
+
+### 4b. Skeleton loading states voor alle tabs
+Dashboard heeft skeletons, maar Trips, Orders en andere pagina's tonen alleen een `Loader2` spinner.
+
+- Voeg tabel-specifieke skeleton loaders toe aan Trips en OrderOverview
+- Toon skeleton rijen i.p.v. een centered spinner
+
+### 4c. Mobiele kaarten: swipe-hints
+De app heeft `SwipeableCard` maar nieuwe gebruikers weten niet dat ze kunnen swipen.
+
+- Voeg een eenmalige "swipe hint" animatie toe (subtiele horizontale beweging) bij eerste gebruik
+- Bewaar in localStorage of de hint al getoond is
+
+---
 
 ## Bestanden
 
 | Actie | Bestand |
 |-------|---------|
-| **Migratie** | INSERT workflow + 2 acties |
+| **Edit** | `src/pages/Auth.tsx` — forwardRef fix |
+| **Edit** | `src/components/legal/LegalConsentBanner.tsx` — ref warning fix |
+| **Edit** | `src/components/layout/AppSidebar.tsx` — unused imports + recent pages + shortcut hints |
+| **Edit** | `src/components/layout/MobileBottomNav.tsx` — Ritten tab toevoegen |
+| **Edit** | `src/components/layout/DashboardLayout.tsx` — zoekbalk in header + breadcrumbs |
+| **Nieuw** | `src/components/common/Breadcrumbs.tsx` |
+| **Nieuw** | `src/components/common/GlobalSearch.tsx` |
+| **Nieuw** | `src/hooks/useRecentPages.ts` |
+| **Edit** | `src/hooks/useDashboardData.ts` — auto-refresh met interval |
+| **Edit** | `src/pages/Trips.tsx` — skeleton loading states |
+| **Edit** | `src/pages/OrderOverview.tsx` — skeleton loading + component extractie |
+| **Nieuw** | `src/components/orders/OrderMobileCard.tsx` |
+| **Nieuw** | `src/components/orders/OrderTableRow.tsx` |
+| **Nieuw** | `src/components/orders/OrderFilters.tsx` |
 
-## Resultaat
+## Aanpak
 
-- Eerste actieve workflow zichtbaar in het systeem
-- Automatische e-mail bij statuswijziging naar "onderweg"
-- Testbaar door een rit-status te wijzigen via de trips pagina
+Gezien de omvang pakken we dit in 3 batches aan:
+1. **Batch 1**: Performance fixes (ref warnings, sidebar cleanup) + MobileBottomNav Ritten tab
+2. **Batch 2**: Globale zoekbalk + Breadcrumbs + Recent pages + Dashboard auto-refresh
+3. **Batch 3**: Skeleton states + OrderOverview splitsen + Swipe hints + Empty states
 
