@@ -184,7 +184,7 @@ export function useFuelStations() {
     };
 
     loadStations();
-  }, [userLocation, generateLocalMockStations]);
+  }, [userLocation]);
 
   // Add distance to stations and sort
   const stationsWithDistance = stations.map(station => ({
