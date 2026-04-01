@@ -51,7 +51,7 @@ export const useLearningSystemDB = () => {
       const [patternsRes, eventsRes] = await Promise.all([
         supabase
           .from('learned_patterns')
-          .select('*')
+          .select('id, pattern_type, conditions, recommended_action, confidence, occurrences, success_rate, is_active')
           .eq('tenant_id', currentCompany.id)
           .eq('is_active', true)
           .order('confidence', { ascending: false }),
