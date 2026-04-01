@@ -140,7 +140,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                         <card.icon className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", card.iconColor)} />
                       </div>
                     </div>
-                    <div className={cn("text-xl sm:text-3xl font-bold tracking-tight", card.valueClass)}>
+                    <div className={cn("text-lg sm:text-3xl font-bold tracking-tight", card.valueClass)}>
                       {card.value}
                     </div>
                     <div className="min-h-[24px] sm:min-h-[28px] mt-1.5 sm:mt-2 mt-auto">
