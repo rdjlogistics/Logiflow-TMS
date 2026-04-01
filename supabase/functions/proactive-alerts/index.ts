@@ -16,7 +16,6 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { global: { headers: { Authorization: authHeader } } });
 
-    // Verify user
     const anonClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authErr } = await anonClient.auth.getUser();
     if (authErr || !user) {
@@ -25,37 +24,43 @@ Deno.serve(async (req) => {
 
     const { action, alertId, notes, actionName, params } = await req.json();
 
-    // Get user's company
     const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle();
     const tenantId = profile?.company_id;
 
     if (action === "dismiss" || action === "resolve" || action === "execute") {
-      // These are client-side only actions for now, acknowledge them
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Default action: fetch alerts
-    const alerts = [];
+    const alerts: any[] = [];
     const now = new Date();
 
     if (tenantId) {
-      // 1. Delayed trips: trips with status 'in_transit' where pickup was > 30 min ago
-      const thirtyMinAgo = new Date(now.getTime() - 30 * 60 * 1000).toISOString();
-      const { data: delayedTrips } = await supabase
+      // 1. Delayed trips: status 'onderweg' where trip_date + pickup_time is > 30 min ago
+      const { data: inTransitTrips } = await supabase
         .from("trips")
-        .select("id, reference, status, pickup_time_from, pickup_city, delivery_city")
+        .select("id, order_number, status, trip_date, pickup_time_from, pickup_city, delivery_city")
         .eq("company_id", tenantId)
-        .eq("status", "in_transit")
-        .lt("pickup_time_from", thirtyMinAgo)
+        .eq("status", "onderweg")
         .limit(10);
 
-      if (delayedTrips) {
-        for (const trip of delayedTrips) {
-          const pickupTime = new Date(trip.pickup_time_from);
-          const delayMin = Math.round((now.getTime() - pickupTime.getTime()) / 60000);
+      if (inTransitTrips) {
+        for (const trip of inTransitTrips) {
+          if (!trip.trip_date) continue;
+          // Combine trip_date with pickup_time_from for accurate delay calc
+          let pickupDateTime: Date;
+          if (trip.pickup_time_from) {
+            pickupDateTime = new Date(`${trip.trip_date}T${trip.pickup_time_from}`);
+          } else {
+            pickupDateTime = new Date(`${trip.trip_date}T00:00:00`);
+          }
+          
+          const delayMin = Math.round((now.getTime() - pickupDateTime.getTime()) / 60000);
+          if (delayMin < 30) continue; // Only alert if > 30 min
+
+          const label = trip.order_number || trip.id.slice(0, 8);
           alerts.push({
             id: `delay-${trip.id}`,
-            title: `Rit ${trip.reference || trip.id.slice(0, 8)} vertraagd`,
+            title: `Rit ${label} vertraagd`,
             description: `${trip.pickup_city || "?"} → ${trip.delivery_city || "?"} is ${delayMin} min vertraagd`,
             severity: delayMin > 60 ? "critical" : "warning",
             category: "delay",
@@ -79,12 +84,13 @@ Deno.serve(async (req) => {
         .from("invoices")
         .select("id, invoice_number, total_amount, due_date, customer_id")
         .eq("company_id", tenantId)
-        .in("status", ["sent", "overdue"])
+        .in("status", ["verzonden", "herinnering"])
         .lt("due_date", fourteenDaysAgo)
         .limit(10);
 
       if (overdueInvoices) {
         for (const inv of overdueInvoices) {
+          if (!inv.due_date) continue;
           const daysOverdue = Math.round((now.getTime() - new Date(inv.due_date).getTime()) / (24 * 60 * 60 * 1000));
           alerts.push({
             id: `overdue-${inv.id}`,
@@ -105,54 +111,62 @@ Deno.serve(async (req) => {
         }
       }
 
-      // 3. Expiring driver documents (within 14 days)
-      const fourteenDaysFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: expiringDocs } = await supabase
-        .from("driver_documents")
-        .select("id, driver_id, document_type, expiry_date")
+      // 3. Expiring driver documents (within 14 days) — filter via profiles for tenant
+      const { data: tenantDrivers } = await supabase
+        .from("profiles")
+        .select("id")
         .eq("company_id", tenantId)
-        .lt("expiry_date", fourteenDaysFromNow)
-        .gt("expiry_date", now.toISOString())
-        .limit(10);
+        .eq("role", "driver");
 
-      if (expiringDocs) {
-        for (const doc of expiringDocs) {
-          const daysLeft = Math.round((new Date(doc.expiry_date).getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
-          alerts.push({
-            id: `doc-${doc.id}`,
-            title: `Document verloopt over ${daysLeft} dagen`,
-            description: `${doc.document_type || "Document"} voor chauffeur verloopt op ${new Date(doc.expiry_date).toLocaleDateString("nl-NL")}`,
-            severity: daysLeft <= 3 ? "critical" : daysLeft <= 7 ? "warning" : "info",
-            category: "compliance",
-            createdAt: now.toISOString(),
-            entityType: "driver",
-            entityId: doc.driver_id,
-            actionRequired: daysLeft <= 7,
-            suggestedActions: [
-              { label: "Document vernieuwen", action: "renew_document", params: { docId: doc.id } },
-            ],
-            aiConfidence: 1.0,
-            dismissed: false,
-          });
+      if (tenantDrivers && tenantDrivers.length > 0) {
+        const driverIds = tenantDrivers.map(d => d.id);
+        const fourteenDaysFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
+        const { data: expiringDocs } = await supabase
+          .from("driver_documents")
+          .select("id, user_id, document_type, expiry_date")
+          .in("user_id", driverIds)
+          .lt("expiry_date", fourteenDaysFromNow)
+          .gt("expiry_date", now.toISOString())
+          .limit(10);
+
+        if (expiringDocs) {
+          for (const doc of expiringDocs) {
+            const daysLeft = Math.round((new Date(doc.expiry_date).getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+            alerts.push({
+              id: `doc-${doc.id}`,
+              title: `Document verloopt over ${daysLeft} dagen`,
+              description: `${doc.document_type || "Document"} voor chauffeur verloopt op ${new Date(doc.expiry_date).toLocaleDateString("nl-NL")}`,
+              severity: daysLeft <= 3 ? "critical" : daysLeft <= 7 ? "warning" : "info",
+              category: "compliance",
+              createdAt: now.toISOString(),
+              entityType: "driver",
+              entityId: doc.user_id,
+              actionRequired: daysLeft <= 7,
+              suggestedActions: [
+                { label: "Document vernieuwen", action: "renew_document", params: { docId: doc.id } },
+              ],
+              aiConfidence: 1.0,
+              dismissed: false,
+            });
+          }
         }
       }
 
       // 4. Capacity: trips planned for today without a driver assigned
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
+      const todayStr = now.toISOString().slice(0, 10);
       const { data: unassigned } = await supabase
         .from("trips")
-        .select("id, reference, pickup_city, delivery_city")
+        .select("id, order_number, pickup_city, delivery_city")
         .eq("company_id", tenantId)
-        .in("status", ["pending", "confirmed"])
+        .in("status", ["gepland", "aanvraag"])
         .is("driver_id", null)
-        .gte("pickup_time_from", todayStart)
-        .lt("pickup_time_from", todayEnd)
+        .eq("trip_date", todayStr)
         .limit(10);
 
       if (unassigned && unassigned.length > 0) {
         alerts.push({
-          id: `capacity-${todayStart}`,
+          id: `capacity-${todayStr}`,
           title: `${unassigned.length} rit(ten) zonder chauffeur vandaag`,
           description: `Er zijn ${unassigned.length} geplande ritten vandaag zonder toegewezen chauffeur`,
           severity: unassigned.length >= 3 ? "critical" : "warning",
@@ -170,9 +184,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Sort: critical first, then warning, then info
-    const severityOrder = { critical: 0, warning: 1, info: 2 };
-    alerts.sort((a, b) => (severityOrder[a.severity] || 2) - (severityOrder[b.severity] || 2));
+    const severityOrder: Record<string, number> = { critical: 0, warning: 1, info: 2 };
+    alerts.sort((a, b) => (severityOrder[a.severity] ?? 2) - (severityOrder[b.severity] ?? 2));
 
     return new Response(JSON.stringify({ alerts }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
