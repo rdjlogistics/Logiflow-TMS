@@ -101,7 +101,7 @@ export function usePortalData(customerId?: string | null) {
       // Fetch invoices from database
       const { data: invoicesData } = await supabase
         .from('invoices')
-        .select('*')
+        .select('id, invoice_number, status, total_amount, amount_paid, due_date, paid_at, created_at')
         .eq('customer_id', customerId!)
         .order('created_at', { ascending: false })
         .limit(50);
