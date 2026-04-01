@@ -1,86 +1,68 @@
 
 
-# Performance & Schaalbaarheidsplan — RDJ Logistics TMS
+# Performance & Schaalbaarheid — Volgende Stap
 
-## Eerlijke Diagnose
+## Wat al gedaan is (goed)
+- Dashboard queries: tenant-scoped met `company_id` filter ✅
+- Trips service: limit 100, server-side search, expliciete kolommen ✅
+- Realtime: 500ms debounce ✅
+- Dashboard: `refetchIntervalInBackground: false` ✅
+- Lazy loading: 100+ pagina's via `lazyWithRetry` ✅
+- Vite: `manualChunks` voor vendor splitting ✅
+- Database: 16 compound indexes ✅
+- Dashboard: geconsolideerde RPC `get_dashboard_counts` ✅
 
-De app heeft 100+ lazy-loaded pagina's, goede caching (staleTime 5min), een geconsolideerd dashboard (5 queries i.p.v. 12), en compound database indexes. Dat is een solide basis. Maar er zijn concrete bottlenecks die bij 50-500+ gelijktijdige gebruikers problemen gaan veroorzaken:
+## Wat nog open staat
+
+### 1. HOOG: 6 andere polling hooks missen `refetchIntervalInBackground: false`
+Elke hook met `refetchInterval` die GEEN `refetchIntervalInBackground: false` heeft, veroorzaakt onnodige server-calls als de tab niet actief is. Bij 200 gebruikers met elk 3-4 tabbladen open is dit een serieuze load multiplier.
+
+**Bestanden:**
+- `src/hooks/useClientErrorLogs.ts` — 2x (30s interval)
+- `src/pages/EmailDashboard.tsx` — (10s interval!)
+- `src/pages/CustomerTrackTrace.tsx` — (30s interval)
+- `src/components/dispatch/DispatchDashboard.tsx` — (30s interval)
+- `src/components/dispatch/DispatchChannelStatus.tsx` — (60s interval)
+- `src/pages/enterprise/LiveBoard.tsx` — (30s interval)
+- `src/pages/integrations/TelematicsIntegration.tsx` — (30s interval)
+
+**Fix**: Voeg `refetchIntervalInBackground: false` toe aan alle 8 useQuery calls.
+
+### 2. HOOG: 125 bestanden gebruiken `select('*')` — top-10 ergste cases
+De meeste `select('*')` calls zijn op kleine tabellen (settings, plans) en niet erg. Maar er zijn high-traffic tabellen die te veel data sturen:
+
+**Kritieke cases om te fixen:**
+- `src/pages/Carriers.tsx` — 5x `select('*')` op carriers + carrier_contacts (kan 50+ kolommen zijn)
+- `src/pages/Procurement.tsx` — `select('*')` op rfq_requests + rfq_offertes
+- `src/hooks/useLearningSystemDB.ts` — `limit(200)` met `select('*')` op events
+
+**Fix**: Vervang `select('*')` door expliciete kolommen op deze 3 high-traffic bestanden.
+
+### 3. MIDDEL: Predictive dispatch laadt 500 historische trips
+`src/hooks/usePredictiveDispatch.ts` doet `.limit(500)` op past trips voor driver matching. Dit is veel data die bij elke dispatch-opening wordt geladen.
+
+**Fix**: Verlaag naar `.limit(50)` — de meest recente 50 trips per driver is genoeg voor patroonherkenning.
+
+### 4. MIDDEL: Cloud instance sizing bewustzijn
+Bij 50+ gelijktijdige gebruikers kan de database-instance de bottleneck worden, ongeacht code-optimalisaties. De huidige instance size moet geëvalueerd worden.
+
+**Actie**: Adviseer de gebruiker over instance upgrade via Backend > Advanced Settings als de load toeneemt.
+
+### 5. LAAG: Service Worker API cache te agressief
+`vite.config.ts` cached Supabase API responses voor 5 minuten (`maxAgeSeconds: 300`). Dit kan stale data tonen na schrijf-operaties.
+
+**Fix**: Verlaag `maxAgeSeconds` naar 30 en gebruik `StaleWhileRevalidate` i.p.v. `NetworkFirst` voor een betere balans.
 
 ---
 
-## Kritieke Issues
+## Concrete wijzigingen
 
-### 1. Dashboard laadt ALLE trips + invoices zonder tenant-filter
-**Ernst**: Kritiek bij multi-tenant gebruik
+| # | Fix | Bestanden | Impact |
+|---|-----|-----------|--------|
+| 1 | `refetchIntervalInBackground: false` op 8 polling hooks | 7 bestanden | Hoog |
+| 2 | `select('*')` → expliciete kolommen op Carriers, Procurement, LearningSystem | 3 bestanden | Hoog |
+| 3 | Predictive dispatch limit 500 → 50 | `usePredictiveDispatch.ts` | Middel |
+| 4 | SW cache 300s → 30s + StaleWhileRevalidate | `vite.config.ts` | Laag |
 
-`useDashboardData.ts` regel 112-116 doet:
-- `invoices` → select ALL, limit 1000 (geen company_id filter)
-- `trips` → select ALL van 6 maanden (geen company_id filter)
-- `allTrips` → select ALL van 6 weken
-
-Bij 10 bedrijven met elk 500 trips/maand = 30.000 rijen per dashboard load. Dit is de hoofdoorzaak van traagheid.
-
-**Fix**: Voeg `company_id` filter toe aan alle 4 queries in `fetchDashboardData`. Gebruik de huidige user's company_id uit de auth context.
-
-### 2. Trips service default limit = 5000
-**Ernst**: Hoog
-
-`src/services/trips.ts` regel 46: `query.limit(5000)` — dit stuurt potentieel megabytes aan data over het netwerk per page load.
-
-**Fix**: Verlaag default naar 100, implementeer server-side pagination met cursor-based paging.
-
-### 3. Geen server-side search — client-side filter op 5000 rijen
-**Ernst**: Hoog
-
-`src/services/trips.ts` regel 52-61: zoekfilter draait client-side na het ophalen van alle data. Bij 5000 trips is dit traag en verspilt bandbreedte.
-
-**Fix**: Verplaats search naar Supabase met `.or()` en `ilike` filters.
-
-### 4. Realtime subscriptions zonder cleanup throttle
-**Ernst**: Middel
-
-`useRealtimeSubscription.ts` doet `queryClient.setQueryData` bij elke DB change. Bij 50 gelijktijdige users die trips updaten = cascade van re-renders.
-
-**Fix**: Debounce realtime updates met 500ms window — batch meerdere changes in één state update.
-
-### 5. Dashboard auto-refresh elke 60s zonder visibility check
-**Ernst**: Middel
-
-`useDashboardData.ts` regel 251: `refetchInterval: 60 * 1000` — dit vuurt ook als de browser tab niet actief is, wat onnodige server load genereert.
-
-**Fix**: Voeg `refetchIntervalInBackground: false` toe (React Query built-in optie).
-
----
-
-## Concrete Wijzigingen
-
-| # | Fix | Bestand | Impact |
-|---|-----|---------|--------|
-| 1 | Company_id filter op dashboard queries | `src/hooks/useDashboardData.ts` | Kritiek |
-| 2 | Default trip limit 5000 → 100 + pagination | `src/services/trips.ts` | Hoog |
-| 3 | Server-side search met ilike | `src/services/trips.ts` | Hoog |
-| 4 | Debounce realtime updates (500ms) | `src/hooks/useRealtimeSubscription.ts` | Middel |
-| 5 | Stop background refetching inactive tabs | `src/hooks/useDashboardData.ts` | Middel |
-| 6 | Trips select: specifieke kolommen i.p.v. `*` | `src/services/trips.ts` | Middel |
-
-### Detail per fix:
-
-**Fix 1** — `useDashboardData.ts`:
-- Accept `companyId` parameter
-- Add `.eq('company_id', companyId)` to all 4 Supabase queries
-- Add `refetchIntervalInBackground: false`
-
-**Fix 2+3** — `src/services/trips.ts`:
-- Change default limit from 5000 to 100
-- Move search filter to server: replace client-side filter with `.or(`order_number.ilike.%${q}%,pickup_city.ilike.%${q}%,delivery_city.ilike.%${q}%`)`
-- Return `{ data, count }` for pagination support
-
-**Fix 4** — `useRealtimeSubscription.ts`:
-- Add a 500ms debounce timer before calling `queryClient.setQueryData`
-- Batch multiple rapid changes into one update
-
-**Fix 5** — Already in fix 1 (`refetchIntervalInBackground: false`)
-
-**Fix 6** — `src/services/trips.ts`:
-- Replace `*` in TRIP_SELECT with explicit columns needed
+Totaal: ~11 bestanden, geen database migraties nodig, geen breaking changes.
 
