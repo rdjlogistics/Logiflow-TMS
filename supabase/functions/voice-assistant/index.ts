@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
                   type: "input_audio",
                   input_audio: {
                     data: audio,
-                    format: "wav"
+                    format: "webm"
                   }
                 },
                 {

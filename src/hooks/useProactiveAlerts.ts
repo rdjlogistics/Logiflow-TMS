@@ -71,7 +71,7 @@ export function useProactiveAlerts() {
 
       if (error) throw error;
 
-      const newAlerts = data.alerts as ProactiveAlert[];
+      const newAlerts = (data?.alerts || []) as ProactiveAlert[];
       
       // Check for new critical alerts
       const newCritical = newAlerts.filter(
