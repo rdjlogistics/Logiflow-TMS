@@ -975,9 +975,9 @@ const RouteOptimization = () => {
                       )}
                     </div>
                     <CardDescription className="mt-1">
-                      {hasRealData 
+                      {stops.length > 0 
                         ? `${stops.length} stops uit geplande orders` 
-                        : "Sleep om handmatig te herschikken of gebruik AI optimalisatie"}
+                        : "Voeg stops toe of maak orders aan voor vandaag"}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap shrink-0">
