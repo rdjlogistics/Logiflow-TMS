@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     // Find eligible trips
     const { data: trips, error: tripsError } = await supabase
       .from("trips")
-      .select("id, order_number, purchase_total, carrier_id, carriers!inner(company_name)")
+      .select("id, order_number, purchase_total, carrier_id, carriers!inner(company_name, country, vat_number)")
       .eq("company_id", companyId)
       .eq("carrier_id", carrier_id)
       .in("status", ["afgerond", "gecontroleerd"])
@@ -90,11 +90,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    const carrierName = (trips[0].carriers as any)?.company_name || "Onbekend";
+    const carrier = trips[0].carriers as any;
+    const carrierName = carrier?.company_name || "Onbekend";
+
+    // Smart VAT calculation based on carrier country
+    const carrierCountry = carrier?.country || "NL";
+    const carrierVat = carrier?.vat_number || null;
+    const btwResult = berekenBTW(carrierCountry, carrierVat);
+    const vatPercentage = btwResult.tarief;
 
     // Calculate totals
     const subtotal = trips.reduce((sum, t) => sum + Number(t.purchase_total || 0), 0);
-    const vatPercentage = 21;
     const vatAmount = Math.round(subtotal * (vatPercentage / 100) * 100) / 100;
     const totalAmount = Math.round((subtotal + vatAmount) * 100) / 100;
 
