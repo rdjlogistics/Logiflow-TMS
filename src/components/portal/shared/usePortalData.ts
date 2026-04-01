@@ -25,9 +25,10 @@ export function usePortalData(customerId?: string | null) {
       // Fetch customer submissions filtered by customer_id
       const { data: submissions, error } = await supabase
         .from('customer_submissions')
-        .select('*')
+        .select('id, customer_id, reference_number, status, pickup_city, delivery_city, pickup_address, house_number_pickup, delivery_address, house_number_delivery, delivery_date, quantity, weight_kg, estimated_price, converted_trip_id, created_at')
         .eq('customer_id', customerId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       if (error) throw error;
 
