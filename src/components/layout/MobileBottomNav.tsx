@@ -17,7 +17,7 @@ const tabs: NavTab[] = [
   { id: "home", icon: Home, label: "Home", path: "/" },
   { id: "orders", icon: FileText, label: "Orders", path: "/orders" },
   { id: "new", icon: Plus, label: "Nieuw", path: "/orders/edit", isCta: true },
-  { id: "meldingen", icon: Bell, label: "Meldingen", path: "/admin/settings", search: "?tab=notificaties" },
+  { id: "ritten", icon: Route, label: "Ritten", path: "/trips" },
   { id: "instellingen", icon: Settings, label: "Instellingen", path: "/admin/settings" },
 ];
 
