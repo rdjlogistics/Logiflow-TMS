@@ -66,13 +66,62 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
     }
   };
 
+  const [enrolling2FA, setEnrolling2FA] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [verifyCode, setVerifyCode] = useState('');
+  const [factorId, setFactorId] = useState<string | null>(null);
+
   const handleToggle2FA = async (enabled: boolean) => {
-    // 2FA requires additional infrastructure (TOTP setup)
-    // For now, show informative message
     if (enabled) {
-      toast.info("Twee-factor authenticatie wordt binnenkort ondersteund. We werken aan deze functie.");
+      setEnrolling2FA(true);
+      try {
+        const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
+        if (error) throw error;
+        if (data) {
+          setFactorId(data.id);
+          setQrCode(data.totp.qr_code);
+        }
+      } catch (err: any) {
+        toast.error(`2FA activeren mislukt: ${err.message}`);
+        setEnrolling2FA(false);
+      }
+    } else {
+      // Unenroll
+      try {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factors?.totp?.[0];
+        if (totpFactor) {
+          await supabase.auth.mfa.unenroll({ factorId: totpFactor.id });
+          setTwoFAEnabled(false);
+          toast.success("2FA uitgeschakeld");
+        }
+      } catch (err: any) {
+        toast.error(`2FA uitschakelen mislukt: ${err.message}`);
+      }
     }
-    // Don't toggle the switch since it's not yet implemented
+  };
+
+  const handleVerify2FA = async () => {
+    if (!factorId || !verifyCode) return;
+    setSaving(true);
+    try {
+      const { data: challengeData, error: challengeErr } = await supabase.auth.mfa.challenge({ factorId });
+      if (challengeErr) throw challengeErr;
+      
+      const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId, challengeId: challengeData.id, code: verifyCode });
+      if (verifyErr) throw verifyErr;
+      
+      setTwoFAEnabled(true);
+      setEnrolling2FA(false);
+      setQrCode(null);
+      setVerifyCode('');
+      setFactorId(null);
+      toast.success("2FA succesvol geactiveerd!");
+    } catch (err: any) {
+      toast.error(`Verificatie mislukt: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSignOutAllSessions = async () => {
