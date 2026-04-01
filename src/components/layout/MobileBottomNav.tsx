@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, FileText, Plus, Bell, Settings, LucideIcon } from "lucide-react";
+import { Home, FileText, Plus, Route, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
@@ -17,19 +17,17 @@ const tabs: NavTab[] = [
   { id: "home", icon: Home, label: "Home", path: "/" },
   { id: "orders", icon: FileText, label: "Orders", path: "/orders" },
   { id: "new", icon: Plus, label: "Nieuw", path: "/orders/edit", isCta: true },
-  { id: "meldingen", icon: Bell, label: "Meldingen", path: "/admin/settings", search: "?tab=notificaties" },
+  { id: "ritten", icon: Route, label: "Ritten", path: "/trips" },
   { id: "instellingen", icon: Settings, label: "Instellingen", path: "/admin/settings" },
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  if (pathname === "/admin/settings" && search.includes("tab=notificaties")) {
-    return "meldingen";
-  }
   if (pathname.startsWith("/admin/settings")) {
     return "instellingen";
   }
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
+  if (pathname.startsWith("/trips")) return "ritten";
   return "home";
 }
 

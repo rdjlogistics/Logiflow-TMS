@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useLocation, Link, Navigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,7 +55,7 @@ const getErrorMessage = (error: { message: string }) => {
   return `Er is een fout opgetreden: ${error.message}`;
 };
 
-const Auth = () => {
+const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
   const { user, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
@@ -735,6 +735,6 @@ const Auth = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Auth;

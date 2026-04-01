@@ -11,3 +11,4 @@ export type { FilterField, FilterOption, ActiveFilter } from './FilterBar';
 export { OfflineBanner } from './OfflineBanner';
 export { PrintButton } from './PrintButton';
 export { ExportDropdown } from './ExportDropdown';
+export { GlobalSearch } from './GlobalSearch';

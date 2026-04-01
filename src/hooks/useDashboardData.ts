@@ -242,12 +242,13 @@ async function fetchDashboardData(): Promise<DashboardData> {
 }
 
 export const useDashboardData = () => {
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['dashboard-data'],
     queryFn: fetchDashboardData,
-    staleTime: 60 * 1000,        // 1 min before refetch in background
-    gcTime: 10 * 60 * 1000,      // 10 min cache
+    staleTime: 30 * 1000,            // 30s before refetch in background
+    gcTime: 10 * 60 * 1000,          // 10 min cache
     refetchOnWindowFocus: true,
+    refetchInterval: 60 * 1000,      // Auto-refresh every 60s
     retry: 2,
     placeholderData: EMPTY_DATA,
   });
@@ -277,7 +278,7 @@ export const useDashboardData = () => {
     hasEnoughData,
     loading: isLoading,
     error: error instanceof Error ? error : null,
-    lastRefresh: new Date(),
+    lastRefresh: dataUpdatedAt ? new Date(dataUpdatedAt) : new Date(),
     refetch: handleRefetch,
   };
 };

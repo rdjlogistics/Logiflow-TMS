@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -62,7 +62,7 @@ export function useLegalConsent() {
   return { consent, showBanner, acceptConsent, revokeConsent };
 }
 
-export function LegalConsentBanner() {
+export const LegalConsentBanner = React.forwardRef<HTMLDivElement>(function LegalConsentBanner(_props, _ref) {
   const { showBanner, acceptConsent } = useLegalConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [acceptances, setAcceptances] = useState({
@@ -239,7 +239,7 @@ export function LegalConsentBanner() {
       </Dialog>
     </>
   );
-}
+});
 
 interface ConsentItemProps {
   icon: React.ElementType;
