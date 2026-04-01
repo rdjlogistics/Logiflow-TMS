@@ -43,6 +43,8 @@ export async function fetchTrips(filters: TripFilters = {}) {
   if (filters.limit) query = query.limit(filters.limit);
   if (filters.offset) query = query.range(filters.offset, filters.offset + (filters.limit ?? 50) - 1);
 
+  if (!filters.limit) query = query.limit(5000);
+
   const { data, error } = await query;
   if (error) throw error;
 

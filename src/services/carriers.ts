@@ -102,11 +102,15 @@ export interface CarrierStats {
   avgRating: number;
 }
 
-export async function fetchCarrierStats(): Promise<CarrierStats> {
-  const { data, error } = await supabase
+export async function fetchCarrierStats(companyId?: string): Promise<CarrierStats> {
+  let query = supabase
     .from('carriers')
     .select('is_active, rating')
     .is('deleted_at', null);
+
+  if (companyId) query = query.eq('tenant_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

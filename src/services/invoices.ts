@@ -88,23 +88,31 @@ export async function markInvoicePaid(id: string, amountPaid: number) {
   });
 }
 
-export async function fetchOverdueInvoices() {
+export async function fetchOverdueInvoices(companyId?: string) {
   const today = new Date().toISOString().split('T')[0];
-  const { data, error } = await supabase
+  let query = supabase
     .from('invoices')
     .select(`id, invoice_number, invoice_date, due_date, status, total_amount, amount_paid, customers(company_name, email)`)
     .not('status', 'in', '("betaald","gedeeltelijk_betaald")')
     .lt('due_date', today)
     .order('due_date', { ascending: true });
 
+  if (companyId) query = query.eq('company_id', companyId);
+
+  const { data, error } = await query;
+
   if (error) throw error;
   return data ?? [];
 }
 
-export async function fetchInvoiceStats() {
-  const { data, error } = await supabase
+export async function fetchInvoiceStats(companyId?: string) {
+  let query = supabase
     .from('invoices')
     .select('status, total_amount, amount_paid, due_date');
+
+  if (companyId) query = query.eq('company_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

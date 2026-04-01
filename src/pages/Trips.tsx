@@ -202,7 +202,7 @@ const Trips = () => {
     if (!tripToDelete) return;
 
     try {
-      const { error } = await supabase.from("trips").delete().eq("id", tripToDelete);
+      const { error } = await supabase.from("trips").update({ deleted_at: new Date().toISOString() }).eq("id", tripToDelete);
       if (error) throw error;
       toast({ title: "Rit verwijderd" });
       fetchData();

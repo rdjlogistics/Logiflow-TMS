@@ -27,6 +27,8 @@ export async function fetchCustomers(filters: CustomerFilters = {}) {
   if (filters.creditBlocked !== undefined) query = query.eq('credit_blocked', filters.creditBlocked);
   if (filters.limit) query = query.limit(filters.limit);
 
+  if (!filters.limit) query = query.limit(5000);
+
   const { data, error } = await query;
   if (error) throw error;
 
@@ -89,11 +91,15 @@ export async function softDeleteCustomer(id: string) {
   if (error) throw error;
 }
 
-export async function fetchCustomerStats() {
-  const { data, error } = await supabase
+export async function fetchCustomerStats(companyId?: string) {
+  let query = supabase
     .from('customers')
     .select('is_active, credit_blocked, credit_limit')
     .is('deleted_at', null);
+
+  if (companyId) query = query.eq('tenant_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
