@@ -57,7 +57,7 @@ export const useLearningSystemDB = () => {
           .order('confidence', { ascending: false }),
         supabase
           .from('learning_events')
-          .select('*')
+          .select('id, event_type, context, decision, outcome, feedback_score, created_at')
           .eq('tenant_id', currentCompany.id)
           .order('created_at', { ascending: false })
           .limit(100),
