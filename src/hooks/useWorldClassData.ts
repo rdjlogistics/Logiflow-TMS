@@ -204,7 +204,8 @@ export const useAuthorityRules = () => {
         .from('authority_rules')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('role');
+        .order('role')
+        .limit(100);
       if (error) throw error;
       return (data || []) as AuthorityRule[];
     },
