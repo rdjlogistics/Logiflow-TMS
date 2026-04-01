@@ -1,26 +1,23 @@
 
 
-# Analyse: "Binnenkort" Placeholders
+# Fix: `send-sms` deploy error
 
-## Resultaat: Alles is al werkend ✅
+## Probleem
 
-Na doorzoeken van de volledige codebase zijn er **0 placeholder "binnenkort" items** gevonden die nog geïmplementeerd moeten worden.
+De import `import { corsHeaders } from "@supabase/supabase-js/cors"` werkt niet in Deno edge functions — dit is een bare specifier die Deno niet kan resolven.
 
-Alle 35 voorkomens van "binnenkort" zijn **legitieme, contextgebonden labels**:
+## Fix
 
-| Context | Voorbeeld | Status |
-|---------|-----------|--------|
-| Document vervaldatums | "Verloopt binnenkort" bij rijbewijs/kenteken | ✅ Werkend — toont echte vervaldatum |
-| Sessie timeout | "Sessie verloopt binnenkort" | ✅ Werkend — waarschuwt bij inactiviteit |
-| Predictief onderhoud | "Verwacht: Binnenkort" (als geen datum) | ✅ Werkend — fallback tekst |
-| WMS voorraadfilter | "Verloopt binnenkort" filteroptie | ✅ Werkend — filtert op expiry |
-| Voertuigdocumenten | Status "Verloopt binnenkort" | ✅ Werkend — badge bij <14 dagen |
+Vervang regel 1 in `supabase/functions/send-sms/index.ts` met een handmatige CORS headers definitie, zoals alle andere edge functions in het project al doen:
 
-Er zijn ook **geen "coming soon"**, **"nog niet beschikbaar"** of **"wordt later"** placeholders meer aanwezig. Alle knoppen die disabled zijn, zijn dat alleen tijdens laadstaten (loading spinners).
+```typescript
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version"
+};
+```
 
----
-
-## Conclusie
-
-Alle eerdere audit-rondes hebben elk placeholder-item succesvol geïmplementeerd. De app is volledig functioneel — er zijn geen wijzigingen nodig.
+| # | Actie | Bestand |
+|---|-------|---------|
+| 1 | Vervang import door handmatige corsHeaders | `supabase/functions/send-sms/index.ts` regel 1 |
 
