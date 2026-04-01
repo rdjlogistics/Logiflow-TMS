@@ -358,7 +358,8 @@ export const useLegalHolds = () => {
         .from('legal_holds')
         .select('*')
         .eq('company_id', company.id)
-        .order('applied_at', { ascending: false });
+        .order('applied_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as LegalHold[];
     },
