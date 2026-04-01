@@ -184,7 +184,8 @@ export const useDuplicateCandidates = () => {
         .select('*')
         .eq('tenant_id', company.id)
         .eq('status', 'pending')
-        .order('confidence', { ascending: false });
+        .order('confidence', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as DuplicateCandidate[];
     },
