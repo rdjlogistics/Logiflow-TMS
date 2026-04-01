@@ -742,7 +742,7 @@ const Carriers = () => {
   const fetchContacts = useCallback(async (carrierId: string) => {
     const { data } = await supabase
       .from('carrier_contacts')
-      .select('*')
+      .select('id, name, role, email, phone, is_primary, notes')
       .eq('carrier_id', carrierId)
       .order('is_primary', { ascending: false });
     setContacts((data as unknown as CarrierContact[]) || []);
