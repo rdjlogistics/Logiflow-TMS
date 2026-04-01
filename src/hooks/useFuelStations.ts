@@ -146,50 +146,7 @@ export function useFuelStations() {
     requestLocation();
   }, [requestLocation]);
 
-  // Generate mock stations around user location
-  const generateLocalMockStations = useCallback((centerLat: number, centerLng: number): FuelStation[] => {
-    const brands = ['Shell', 'BP', 'Esso', 'Total', 'TinQ', 'Texaco', 'Gulf', 'Q8', 'Tango', 'Avia'];
-    const facilities = ['Shop', 'Toilet', 'Wasstraat', 'AdBlue', 'Truckparking'];
-    const stations: FuelStation[] = [];
-
-    // Generate 30 stations around user location within 30km
-    for (let i = 0; i < 30; i++) {
-      const brand = brands[Math.floor(Math.random() * brands.length)];
-      // Random offset within ~30km (0.27 degrees ≈ 30km at NL latitude)
-      const latOffset = (Math.random() - 0.5) * 0.54;
-      const lngOffset = (Math.random() - 0.5) * 0.54;
-      
-      const dieselPrice = 1.65 + (Math.random() - 0.5) * 0.20;
-      const euro95Price = 2.05 + (Math.random() - 0.5) * 0.18;
-      
-      const stationFacilities = facilities
-        .filter(() => Math.random() > 0.5)
-        .slice(0, 2 + Math.floor(Math.random() * 2));
-      
-      stations.push({
-        id: `local-${i}`,
-        name: `${brand} ${i + 1}`,
-        brand,
-        address: `Hoofdweg ${Math.floor(Math.random() * 200) + 1}`,
-        city: 'Lokaal',
-        country: 'NL',
-        latitude: centerLat + latOffset,
-        longitude: centerLng + lngOffset,
-        prices: {
-          diesel: Math.round(dieselPrice * 1000) / 1000,
-          euro95: Math.round(euro95Price * 1000) / 1000,
-          euro98: Math.round((euro95Price + 0.08) * 1000) / 1000,
-          lpg: Math.random() > 0.6 ? Math.round((0.85 + Math.random() * 0.12) * 1000) / 1000 : null,
-        },
-        isOpen: Math.random() > 0.1,
-        openingHours: Math.random() > 0.3 ? '24/7' : '06:00 - 22:00',
-        facilities: stationFacilities,
-        lastUpdated: new Date().toISOString(),
-      });
-    }
-    
-    return stations;
-  }, []);
+  // No mock fallback — return empty if API fails
 
   // Load REAL stations from OpenStreetMap
   useEffect(() => {
