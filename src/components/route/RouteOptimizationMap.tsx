@@ -86,13 +86,43 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
     }
   }, [error, mapMode, escalate]);
 
+  const mapInitFailed = useRef(false);
+
+  // Pixel check helper — returns true if canvas has rendered content
+  const checkCanvasRendered = useCallback((): boolean => {
+    if (!map.current) return false;
+    try {
+      const mapCanvas = map.current.getCanvas();
+      const gl = mapCanvas.getContext("webgl2") || mapCanvas.getContext("webgl");
+      if (!gl) return false;
+      const pixels = new Uint8Array(4);
+      const cx = Math.floor(mapCanvas.width / 2);
+      const cy = Math.floor(mapCanvas.height / 2);
+      gl.readPixels(cx, cy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      return pixels[3] > 0;
+    } catch {
+      return false;
+    }
+  }, []);
+
   // Initialize interactive map
   useEffect(() => {
     if (mapMode !== "interactive") return;
-    if (!mapContainer.current || !token || map.current) return;
+    if (!mapContainer.current || !token) return;
+    // Allow re-init if previous attempt failed
+    if (map.current && !mapInitFailed.current) return;
+
+    // Clean up failed previous attempt
+    if (map.current && mapInitFailed.current) {
+      map.current.remove();
+      map.current = null;
+      mapInitFailed.current = false;
+    }
 
     let cancelled = false;
     let renderTimeout: ReturnType<typeof setTimeout> | undefined;
+    let pixelCheck2: ReturnType<typeof setTimeout> | undefined;
+    let pixelCheck5: ReturnType<typeof setTimeout> | undefined;
     let resizeObserver: ResizeObserver | undefined;
     let intersectionObserver: IntersectionObserver | undefined;
 
@@ -116,16 +146,21 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
 
       renderTimeout = setTimeout(() => {
         if (!mapLoadedRef.current) {
+          mapInitFailed.current = true;
           escalate("static", "map_load_timeout_8s");
         }
       }, 8000);
 
       map.current.addControl(new mb.NavigationControl(), "top-right");
       map.current.addControl(new mb.FullscreenControl(), "top-right");
+
       map.current.on("load", () => {
         mapLoadedRef.current = true;
         clearTimeout(renderTimeout);
         setMapLoaded(true);
+
+        // iOS fix: force repaint + resize
+        map.current?.triggerRepaint();
         requestAnimationFrame(forceResize);
         setTimeout(forceResize, 180);
 
@@ -146,27 +181,36 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
           minzoom: 6,
         });
 
-        setTimeout(() => {
-          if (!map.current) return;
-          try {
-            const mapCanvas = map.current.getCanvas();
-            const gl = mapCanvas.getContext("webgl2") || mapCanvas.getContext("webgl");
-            if (gl) {
-              const pixels = new Uint8Array(4);
-              const cx = Math.floor(mapCanvas.width / 2);
-              const cy = Math.floor(mapCanvas.height / 2);
-              gl.readPixels(cx, cy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-              if (pixels[3] === 0) {
-                escalate("static", "canvas_blank_post_render");
-              }
-            }
-          } catch { /* ignore */ }
+        // Dual pixel check: 2s and 5s
+        pixelCheck2 = setTimeout(() => {
+          if (cancelled || !map.current) return;
+          if (!checkCanvasRendered()) {
+            // Not rendered yet — force repaint and wait for second check
+            map.current?.triggerRepaint();
+            map.current?.resize();
+          }
         }, 2000);
+
+        pixelCheck5 = setTimeout(() => {
+          if (cancelled || !map.current) return;
+          if (!checkCanvasRendered()) {
+            mapInitFailed.current = true;
+            escalate("static", "canvas_blank_post_render_5s");
+          }
+        }, 5000);
+      });
+
+      // idle event — all tiles loaded
+      map.current.on("idle", () => {
+        if (cancelled || !map.current) return;
+        map.current.resize();
+        map.current.triggerRepaint();
       });
 
       map.current.on("error", (event) => {
         const errMsg = event?.error?.message || "Map rendering fout";
         if (/webgl|context|canvas|gpu|render/i.test(errMsg)) {
+          mapInitFailed.current = true;
           escalate("static", "webgl_error: " + errMsg);
         } else {
           setMapRuntimeError(errMsg);
@@ -174,7 +218,10 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
       });
 
       const canvas = mapContainer.current!.querySelector("canvas");
-      const handleContextLost = () => escalate("static", "webgl_context_lost");
+      const handleContextLost = () => {
+        mapInitFailed.current = true;
+        escalate("static", "webgl_context_lost");
+      };
       canvas?.addEventListener("webglcontextlost", handleContextLost);
 
       resizeObserver = new ResizeObserver(() => forceResize());
@@ -190,13 +237,15 @@ const RouteOptimizationMap: React.FC<RouteOptimizationMapProps> = ({
     return () => {
       cancelled = true;
       if (renderTimeout) clearTimeout(renderTimeout);
+      if (pixelCheck2) clearTimeout(pixelCheck2);
+      if (pixelCheck5) clearTimeout(pixelCheck5);
       window.removeEventListener("resize", () => map.current?.resize());
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
       clearMarkers();
       if (map.current) { map.current.remove(); map.current = null; }
     };
-  }, [token, clearMarkers, mapMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token, clearMarkers, mapMode, checkCanvasRendered]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Switch map style
   useEffect(() => {
