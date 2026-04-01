@@ -716,7 +716,7 @@ const Carriers = () => {
     const [carriersRes, portalRes] = await Promise.all([
       supabase
         .from('carriers')
-        .select('*')
+        .select('id, company_name, contact_name, email, phone, address, postal_code, city, country, vat_number, iban, bic, notes, is_active, rating, vehicle_types, permits, vat_liable_eu, vat_liable_non_eu, payment_terms_days, payment_method, credit_limit, kvk_number, created_at, deleted_at')
         .eq('tenant_id', company.id)
         .is('deleted_at', null)
         .order('company_name', { ascending: true }),
