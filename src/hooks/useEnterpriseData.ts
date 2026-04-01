@@ -378,7 +378,8 @@ export const useFinanceHolds = () => {
         .from('finance_holds')
         .select('*')
         .eq('company_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as FinanceHold[];
     },
