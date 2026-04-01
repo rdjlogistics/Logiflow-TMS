@@ -104,8 +104,6 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
 };
 
-// Empty default (no demo data for new accounts)
-const demoStops: Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: "high" | "medium" | "low" }> = [];
 
 const providerLabels: Record<string, string> = {
   smartroute: "SmartRoute",
