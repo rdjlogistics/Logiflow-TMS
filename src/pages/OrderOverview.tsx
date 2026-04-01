@@ -944,7 +944,7 @@ const OrderOverview = () => {
           </div>
         </div>
 
-        <TabsContent value="orders" className="mt-0 space-y-6">
+        <TabsContent value="orders" className="mt-0 space-y-4 sm:space-y-6">
           {/* Quick Stats Header - Interactive with animations */}
           <QuickStatsHeader
             stats={quickStats}
