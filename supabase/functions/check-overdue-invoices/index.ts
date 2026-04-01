@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
     console.log(`[check-overdue-invoices] Found ${invoices.length} overdue invoices`);
 
     let triggered = 0;
+    const thresholds = [7, 14, 30];
 
     for (const invoice of invoices) {
       const dueDate = new Date(invoice.due_date);
@@ -53,28 +54,26 @@ Deno.serve(async (req) => {
       // Only process at meaningful thresholds (7, 14, 30+ days)
       if (daysOverdue < 7) continue;
 
-      const customer = invoice.customers as any;
-
-      // Check deduplication: has this invoice+threshold already been triggered today?
-      const todayStart = new Date().toISOString().split("T")[0];
-      const { data: existingRuns } = await supabase
-        .from("workflow_runs")
-        .select("id")
-        .gte("started_at", todayStart)
-        .contains("trigger_event", { invoice_id: invoice.id } as any);
-
       // Find the current threshold bucket
-      const thresholds = [7, 14, 30];
       const currentThreshold = [...thresholds].reverse().find((t) => daysOverdue >= t) || 7;
 
+      const customer = invoice.customers as any;
+
+      // Check deduplication: has this invoice+threshold already been triggered?
+      const { data: existingRuns } = await supabase
+        .from("workflow_runs")
+        .select("id, trigger_event")
+        .eq("status", "completed")
+        .contains("trigger_event", { invoice_id: invoice.id } as any);
+
       // Check if this specific threshold was already triggered for this invoice
-      const alreadyTriggered = existingRuns?.some((run: any) => {
-        // Already triggered today for this invoice
-        return true;
+      const alreadyTriggeredForThreshold = existingRuns?.some((run: any) => {
+        const event = run.trigger_event || {};
+        return event.threshold === currentThreshold;
       });
 
-      if (existingRuns && existingRuns.length > 0) {
-        console.log(`[check-overdue-invoices] Skipping invoice ${invoice.invoice_number} — already triggered today`);
+      if (alreadyTriggeredForThreshold) {
+        console.log(`[check-overdue-invoices] Skipping invoice ${invoice.invoice_number} — threshold ${currentThreshold}d already triggered`);
         continue;
       }
 
@@ -112,7 +111,7 @@ Deno.serve(async (req) => {
       if (resp.ok) {
         triggered++;
         const result = await resp.json();
-        console.log(`[check-overdue-invoices] Triggered for ${invoice.invoice_number}: ${result.matched} workflows matched`);
+        console.log(`[check-overdue-invoices] Triggered for ${invoice.invoice_number} (${currentThreshold}d threshold): ${result.matched} workflows matched`);
       } else {
         const errText = await resp.text();
         console.error(`[check-overdue-invoices] Failed for ${invoice.invoice_number}: ${errText}`);
