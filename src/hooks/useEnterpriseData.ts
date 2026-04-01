@@ -292,7 +292,8 @@ export const useAuthorityDelegations = () => {
         .from('authority_delegations')
         .select('*')
         .eq('company_id', company.id)
-        .order('role');
+        .order('role')
+        .limit(50);
       if (error) throw error;
       return (data || []) as AuthorityDelegation[];
     },
