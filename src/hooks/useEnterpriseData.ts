@@ -399,7 +399,8 @@ export const useAIRecommendations = () => {
         .select('*')
         .eq('company_id', company.id)
         .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
       if (error) throw error;
       return (data || []) as AIRecommendation[];
     },

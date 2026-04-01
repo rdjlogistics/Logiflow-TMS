@@ -296,7 +296,8 @@ export const useFeatureFlags = () => {
         .from('feature_flags')
         .select('*')
         .or(`tenant_id.eq.${company.id},tenant_id.is.null`)
-        .order('feature_key');
+        .order('feature_key')
+        .limit(100);
       if (error) throw error;
       return (data || []) as FeatureFlag[];
     },

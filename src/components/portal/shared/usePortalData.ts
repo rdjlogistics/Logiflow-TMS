@@ -144,7 +144,7 @@ export function usePortalData(customerId?: string | null) {
       if (tripIdsForClaims.length > 0) {
         const { data } = await supabase
           .from('claim_cases')
-          .select('*')
+          .select('id, order_id, claim_type, status, notes, created_at, updated_at')
           .in('order_id', tripIdsForClaims)
           .order('created_at', { ascending: false })
           .limit(50);

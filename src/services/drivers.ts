@@ -44,25 +44,20 @@ export async function fetchDrivers(filters: DriverFilters = {}) {
   if (filters.status) query = query.eq('status', filters.status);
   if (filters.isZzp !== undefined) query = query.eq('is_zzp', filters.isZzp);
   if (filters.vehicleId) query = query.eq('vehicle_id', filters.vehicleId);
+
+  // Server-side search
+  if (filters.search) {
+    const q = `%${filters.search}%`;
+    query = query.or(`name.ilike.${q},email.ilike.${q},phone.ilike.${q},license_number.ilike.${q}`);
+  }
+
   if (filters.limit) query = query.limit(filters.limit);
   else query = query.limit(200);
 
   const { data, error } = await query;
   if (error) throw error;
 
-  let result = data ?? [];
-
-  if (filters.search) {
-    const q = filters.search.toLowerCase();
-    result = result.filter(d =>
-      d.name?.toLowerCase().includes(q) ||
-      d.email?.toLowerCase().includes(q) ||
-      d.phone?.toLowerCase().includes(q) ||
-      d.license_number?.toLowerCase().includes(q)
-    );
-  }
-
-  return result;
+  return data ?? [];
 }
 
 export async function fetchDriverById(id: string) {
