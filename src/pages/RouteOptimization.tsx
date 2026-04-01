@@ -965,13 +965,11 @@ const RouteOptimization = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <CardTitle>Route Stops</CardTitle>
-                      {hasRealData ? (
+                      {hasRealData && (
                         <Badge variant="outline" className="text-emerald-600 border-emerald-600/30 bg-emerald-500/10 text-[10px]">
                           <Database className="h-3 w-3 mr-1" />
                           Live Data
                         </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-[10px]">Demo Data</Badge>
                       )}
                     </div>
                     <CardDescription className="mt-1">
