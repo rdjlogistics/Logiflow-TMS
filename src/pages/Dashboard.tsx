@@ -509,6 +509,9 @@ const Dashboard = () => {
           )}
         </motion.section>
 
+        {/* Onboarding Checklist */}
+        <OnboardingChecklist />
+
         {/* Customizable Widget Grid */}
         <motion.section variants={itemVariants}>
           <div className="flex items-center justify-between mb-3 sm:mb-4">
