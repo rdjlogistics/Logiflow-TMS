@@ -129,7 +129,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                   )}
                   onClick={card.onClick}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] opacity-50" />
                   <CardContent className="relative p-3 sm:p-5 h-full flex flex-col">
                     <div className="flex items-center justify-between mb-1.5 sm:mb-3">
                       <span className="text-[11px] sm:text-sm font-medium text-muted-foreground">{card.title}</span>
