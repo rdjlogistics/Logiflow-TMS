@@ -1,58 +1,67 @@
 
 
-# Audit Resultaat — 1 Kritiek Issue Gevonden
+# Kritieke Waterdichting — TMS Software Audit
 
-## Methode
-
-Alle 66 edge functions vergeleken met alle frontend `invoke()` aanroepen. Alle "binnenkort" labels gecontroleerd. Alle disabled knoppen gecontroleerd. Alle eerder gefixte items geverifieerd.
+## Gevonden Issues (op volgorde van ernst)
 
 ---
 
-## Status Verificatie ✅
-
-Alles uit alle vorige audits is correct geïmplementeerd:
-- ✅ Alle 66 edge functions bestaan en worden correct aangeroepen
-- ✅ Geen ontbrekende edge functions meer
-- ✅ Alle "binnenkort" labels zijn alleen bij legitieme contexten (verlopen documenten, sessie-warnings)
-- ✅ Alle knoppen in de app hebben werkende onClick handlers
-- ✅ `freight-matching`, `send-push-notification-to-planners`, `proactive-alerts` — allemaal aanwezig
-- ✅ Voice assistant audio format — correct
-- ✅ Demo data verwijderd
-- ✅ Route Optimization opslaan + chauffeur toewijzen — werkend
-- ✅ B2C 2FA, geo-polygon editor — werkend
+### 1. KRITIEK: `send-sms` edge function bestaat NIET
+**Impact**: SMS-knop bij chauffeurs (`DriverSmsButton`) faalt altijd silently.
+**Fix**: Maak `supabase/functions/send-sms/index.ts` met MessageBird API integratie. Graceful fallback als `MESSAGEBIRD_API_KEY` niet geconfigureerd is.
 
 ---
 
-## Kritiek: `proactive-alerts` edge function gebruikt verkeerde database waarden
+### 2. KRITIEK: Stats-functies negeren tenant-isolatie
+Vier functies halen data op ZONDER `company_id`/`tenant_id` filter — ze tellen data van ALLE bedrijven:
 
-**Bestand**: `supabase/functions/proactive-alerts/index.ts`
+| Functie | Bestand | Probleem |
+|---------|---------|----------|
+| `fetchInvoiceStats()` | `src/services/invoices.ts` | Geen `company_id` filter |
+| `fetchOverdueInvoices()` | `src/services/invoices.ts` | Geen `company_id` filter |
+| `fetchCustomerStats()` | `src/services/customers.ts` | Geen `tenant_id` filter |
+| `fetchDriverStats()` | `src/services/drivers.ts` | Geen `tenant_id` filter |
+| `fetchCarrierStats()` | `src/services/carriers.ts` | Geen `tenant_id` filter |
 
-De functie zal **nooit resultaten opleveren** door 3 fouten:
+**Impact**: Dashboard-statistieken tonen data van andere bedrijven. Hoewel RLS dit op database-niveau blokkeert, is het best practice om altijd te filteren op tenant.
+**Fix**: Voeg `companyId` parameter toe aan alle stats-functies en pas de aanroepende hooks aan.
 
-### Fout 1: Verkeerde trip statussen (regel 48)
-De functie zoekt `.eq("status", "in_transit")` en `.in("status", ["pending", "confirmed"])`, maar de `trips` tabel gebruikt Nederlandse statussen: `onderweg`, `gepland`, `aanvraag`, `geladen`, etc.
+---
 
-### Fout 2: Verkeerde kolomnaam `reference` (regel 46)
-De trips tabel heeft geen `reference` kolom. De juiste kolom is `order_number`.
+### 3. HOOG: Invoices delete zonder tenant-check cascade
+**Bestand**: `src/pages/Invoices.tsx` regel 274-278
+```
+await supabase.from("invoice_lines").delete().in("invoice_id", ids);
+await supabase.from("invoices").delete().in("id", ids);
+```
+De batch-delete filtert alleen op ID's zonder status-check (alleen `concept` mag verwijderd worden). De enkele delete heeft wél die guard (regel 234), maar de batch niet.
+**Fix**: Voeg `.eq("status", "concept")` toe aan de batch-delete.
 
-### Fout 3: `driver_documents` heeft geen `company_id` kolom (regel 113)
-De `driver_documents` tabel heeft alleen `user_id`, geen `company_id`. De query `.eq("company_id", tenantId)` zal altijd een leeg resultaat geven. Fix: join via `profiles` tabel om documenten per tenant te filteren.
+---
 
-### Fout 4: `pickup_time_from` als timestamp behandeld (regel 49)
-`pickup_time_from` is een time string (bijv. "09:00"), geen datetime. Voor vertragingsdetectie moet je `trip_date` combineren met `pickup_time_from`.
+### 4. HOOG: Trips hard-delete i.p.v. soft-delete
+**Bestand**: `src/pages/Trips.tsx` regel 205
+```
+await supabase.from("trips").delete().eq("id", tripToDelete);
+```
+Terwijl `src/services/trips.ts` een `softDeleteTrip()` functie heeft, gebruikt de Trips-pagina een harde delete. Dit is onherstelbaar.
+**Fix**: Vervang door `softDeleteTrip(tripToDelete)`.
+
+---
+
+### 5. MIDDEL: Supabase 1000-row default limiet niet afgehandeld
+De `fetchTrips()` en `fetchCustomers()` functies hebben geen expliciete limiet als `filters.limit` niet meegegeven wordt. Bij >1000 records worden resultaten stilletjes afgekapt.
+**Fix**: Voeg `.limit(5000)` toe als default of documenteer de beperking.
 
 ---
 
 ## Plan van Aanpak
 
-| # | Fix | Bestand |
-|---|-----|---------|
-| 1 | Fix alle 4 fouten in proactive-alerts | `supabase/functions/proactive-alerts/index.ts` |
-
-### Specifieke wijzigingen:
-
-1. **Trip statussen**: `in_transit` → `onderweg`; `pending`/`confirmed` → `gepland`/`aanvraag`
-2. **Kolomnaam**: `reference` → `order_number`
-3. **Driver documents**: Verwijder `.eq("company_id", tenantId)`, gebruik een subquery via `profiles` tabel om `user_id`'s van de tenant op te halen
-4. **Vertragingsdetectie**: Combineer `trip_date` met `pickup_time_from` voor correcte tijdsberekening; fallback naar `trip_date` als er geen `pickup_time_from` is
+| # | Fix | Bestand | Ernst |
+|---|-----|---------|-------|
+| 1 | Maak `send-sms` edge function | **Nieuw**: `supabase/functions/send-sms/index.ts` | Kritiek |
+| 2 | Tenant-filter toevoegen aan 5 stats-functies | **Edit**: `invoices.ts`, `customers.ts`, `drivers.ts`, `carriers.ts` + hun hooks | Kritiek |
+| 3 | Batch-delete invoice status guard | **Edit**: `src/pages/Invoices.tsx` | Hoog |
+| 4 | Trips hard-delete → soft-delete | **Edit**: `src/pages/Trips.tsx` | Hoog |
+| 5 | Default query limiet verhogen | **Edit**: `src/services/trips.ts`, `customers.ts` | Middel |
 
