@@ -157,7 +157,8 @@ export const useHolds = (status?: string) => {
         .from('holds')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       
       if (status) {
         query = query.eq('status', status);
