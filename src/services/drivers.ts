@@ -113,11 +113,15 @@ export interface DriverStats {
   expiringSoon: number; // license/compliance expiring within 30 days
 }
 
-export async function fetchDriverStats(): Promise<DriverStats> {
-  const { data, error } = await supabase
+export async function fetchDriverStats(companyId?: string): Promise<DriverStats> {
+  let query = supabase
     .from('drivers')
     .select('status, is_zzp, license_expiry, adr_expiry, cpc_expiry')
     .is('deleted_at', null);
+
+  if (companyId) query = query.eq('tenant_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

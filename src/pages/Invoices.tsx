@@ -271,10 +271,10 @@ const Invoices = () => {
     try {
       const ids = Array.from(selectedDemoIds);
 
-      // Delete all selected demo invoices (lines first, then invoices)
+      // Delete all selected demo invoices (lines first, then only concept invoices)
       if (ids.length > 0) {
         await supabase.from("invoice_lines").delete().in("invoice_id", ids);
-        await supabase.from("invoices").delete().in("id", ids);
+        await supabase.from("invoices").delete().in("id", ids).eq("status", "concept");
       }
 
       toast({ title: `${ids.length} demo facturen verwijderd` });

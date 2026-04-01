@@ -105,10 +105,14 @@ export async function fetchOverdueInvoices(companyId?: string) {
   return data ?? [];
 }
 
-export async function fetchInvoiceStats() {
-  const { data, error } = await supabase
+export async function fetchInvoiceStats(companyId?: string) {
+  let query = supabase
     .from('invoices')
     .select('status, total_amount, amount_paid, due_date');
+
+  if (companyId) query = query.eq('company_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

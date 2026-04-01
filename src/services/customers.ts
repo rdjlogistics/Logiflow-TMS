@@ -27,6 +27,8 @@ export async function fetchCustomers(filters: CustomerFilters = {}) {
   if (filters.creditBlocked !== undefined) query = query.eq('credit_blocked', filters.creditBlocked);
   if (filters.limit) query = query.limit(filters.limit);
 
+  if (!filters.limit) query = query.limit(5000);
+
   const { data, error } = await query;
   if (error) throw error;
 
