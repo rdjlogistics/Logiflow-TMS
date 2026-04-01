@@ -104,8 +104,6 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
 };
 
-// Empty default (no demo data for new accounts)
-const demoStops: Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: "high" | "medium" | "low" }> = [];
 
 const providerLabels: Record<string, string> = {
   smartroute: "SmartRoute",
@@ -156,7 +154,7 @@ const RouteOptimization = () => {
   const { data: tenantSettings } = useTenantSettings();
   useGeocodeBackfill();
   
-  const [stops, setStops] = useState<Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: string; tripId?: string; orderNumber?: string; stopType?: string; houseNumber?: string; notes?: string; documentUrl?: string; documentName?: string; country?: string }>>(demoStops);
+  const [stops, setStops] = useState<Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: string; tripId?: string; orderNumber?: string; stopType?: string; houseNumber?: string; notes?: string; documentUrl?: string; documentName?: string; country?: string }>>([]);
   const [optimizationResult, setOptimizationResult] = useState<any>(null);
   const [respectTimeWindows, setRespectTimeWindows] = useState(true);
   const [avoidTolls, setAvoidTolls] = useState(false);
@@ -531,7 +529,7 @@ const RouteOptimization = () => {
     if (hasRealData && dbStops.length > 0) {
       setStops(dbStops);
     } else {
-      setStops(demoStops);
+      setStops([]);
     }
     setOptimizationResult(null);
     setTollResult(null);
@@ -967,19 +965,17 @@ const RouteOptimization = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <CardTitle>Route Stops</CardTitle>
-                      {hasRealData ? (
+                      {hasRealData && (
                         <Badge variant="outline" className="text-emerald-600 border-emerald-600/30 bg-emerald-500/10 text-[10px]">
                           <Database className="h-3 w-3 mr-1" />
                           Live Data
                         </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-[10px]">Demo Data</Badge>
                       )}
                     </div>
                     <CardDescription className="mt-1">
-                      {hasRealData 
+                      {stops.length > 0 
                         ? `${stops.length} stops uit geplande orders` 
-                        : "Sleep om handmatig te herschikken of gebruik AI optimalisatie"}
+                        : "Voeg stops toe of maak orders aan voor vandaag"}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap shrink-0">
