@@ -529,7 +529,7 @@ const RouteOptimization = () => {
     if (hasRealData && dbStops.length > 0) {
       setStops(dbStops);
     } else {
-      setStops(demoStops);
+      setStops([]);
     }
     setOptimizationResult(null);
     setTollResult(null);
