@@ -89,11 +89,15 @@ export async function softDeleteCustomer(id: string) {
   if (error) throw error;
 }
 
-export async function fetchCustomerStats() {
-  const { data, error } = await supabase
+export async function fetchCustomerStats(companyId?: string) {
+  let query = supabase
     .from('customers')
     .select('is_active, credit_blocked, credit_limit')
     .is('deleted_at', null);
+
+  if (companyId) query = query.eq('tenant_id', companyId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
