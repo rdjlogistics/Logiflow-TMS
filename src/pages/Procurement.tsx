@@ -113,7 +113,7 @@ const Procurement = () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
         .from("rfq_requests" as any)
-        .select("*")
+        .select("id, titel, omschrijving, ophaaladres, afleveradres, datum, gewicht_kg, deadline_offerte, status, created_at, company_id")
         .eq("company_id", company.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
