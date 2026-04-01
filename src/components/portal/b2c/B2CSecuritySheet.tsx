@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Shield, Key, Smartphone, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -169,12 +170,13 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-sm">Twee-factor authenticatie</p>
-                    <p className="text-xs text-muted-foreground">Extra beveiliging bij inloggen (binnenkort)</p>
+                    <p className="text-xs text-muted-foreground">Extra beveiliging bij inloggen</p>
+                    <Badge variant="outline" className="text-[10px] mt-0.5 text-muted-foreground">Binnenkort</Badge>
                   </div>
                   <Switch 
-                    checked={twoFAEnabled}
-                    onCheckedChange={handleToggle2FA}
+                    checked={false}
                     disabled
+                    className="opacity-50"
                   />
                 </div>
               </CardContent>

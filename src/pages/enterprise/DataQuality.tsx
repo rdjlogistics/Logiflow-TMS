@@ -39,7 +39,7 @@ const DataQuality = () => {
       await refetch();
       await queryClient.invalidateQueries({ queryKey: ['duplicateCandidates'] });
       setIsScanning(false);
-      toast({ title: "Scan voltooid ✓", description: `${duplicates?.length || 3} potentiële duplicaten gevonden.` });
+      toast({ title: "Scan voltooid ✓", description: `${duplicates?.length || 0} potentiële duplicaten gevonden.` });
     }, 2000);
   };
 

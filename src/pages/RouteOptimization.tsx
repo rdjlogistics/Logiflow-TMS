@@ -1439,11 +1439,9 @@ const RouteOptimization = () => {
                             <RotateCcw className="h-3.5 w-3.5 mr-1" />
                             Reset
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" disabled={true}
-                            title="Route opslaan wordt binnenkort beschikbaar"
-                          >
+                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs opacity-50" disabled={true}>
                             <Save className="h-3.5 w-3.5 mr-1" />
-                            Opslaan
+                            Opslaan (binnenkort)
                           </Button>
                         </div>
                       </div>
@@ -1531,11 +1529,9 @@ const RouteOptimization = () => {
                         </Button>
                       </div>
                     )}
-                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px]" disabled={true}
-                      title="Chauffeur toewijzen wordt binnenkort beschikbaar"
-                    >
+                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px] opacity-50" disabled={true}>
                       <Truck className="h-3 w-3 mr-1" />
-                      Toewijzen aan chauffeur
+                      Toewijzen aan chauffeur (binnenkort)
                     </Button>
                   </CardContent>
                 </Card>

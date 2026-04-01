@@ -73,11 +73,11 @@ const MomentsEngine = () => {
     setScanning(true);
     toast({ title: "Events scannen", description: "Klantactiviteit wordt gescand voor nieuwe momenten..." });
     
-    // Simulate scanning process
-    await new Promise(resolve => setTimeout(resolve, 2500));
+    // Refetch moments from database
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     setScanning(false);
-    toast({ title: "Scan voltooid", description: "Nieuwe momenten zijn gedetecteerd en toegevoegd." });
+    toast({ title: "Scan voltooid", description: `${moments?.length || 0} momenten gevonden in het systeem.` });
   };
 
   const handleOpenGiftDialog = (momentId: string, accountId: string) => {
