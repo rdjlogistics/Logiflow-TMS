@@ -168,21 +168,16 @@ export function useFuelStations() {
         const realStations = await fetchRealFuelStations(centerLat, centerLng, 30);
         
         if (realStations.length > 0) {
-          // Convert real stations to our format
           const convertedStations = realStations.map(convertToFuelStation);
           logger.log(`[useFuelStations] Loaded ${convertedStations.length} real stations from OpenStreetMap`);
           setStations(convertedStations);
         } else {
-          // Fallback to local mock data around user
-          logger.log('[useFuelStations] No real stations found, generating local mock data');
-          const localStations = generateLocalMockStations(centerLat, centerLng);
-          setStations(localStations);
+          logger.log('[useFuelStations] No real stations found');
+          setStations([]);
         }
       } catch (error) {
         logger.error('[useFuelStations] Error loading stations:', error);
-        // Fallback to local mock data
-        const localStations = generateLocalMockStations(centerLat, centerLng);
-        setStations(localStations);
+        setStations([]);
       }
       
       setLoading(false);

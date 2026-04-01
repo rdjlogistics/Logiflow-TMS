@@ -28,12 +28,11 @@ export function LogDetailDialog({ open, onOpenChange, log, onRetry }: LogDetailD
   const mockRequestDetails = {
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer ***",
       "X-Request-ID": log.id
     },
     body: log.type === "Webhook" ? {
       event: log.endpoint,
-      data: { order_id: "2025-00156", status: "delivered" }
+      data: log.payload ? JSON.parse(log.payload) : null
     } : null,
     response: log.status === "success" 
       ? { status: 200, message: "OK", data: log.payload }

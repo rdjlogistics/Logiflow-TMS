@@ -60,7 +60,7 @@ interface PlanAssignment {
 const AIPlanView: React.FC = () => {
   const [isAutoPlanning, setIsAutoPlanning] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [planRevisions, setPlanRevisions] = useState(demoPlanRevisions);
+  const [planRevisions, setPlanRevisions] = useState<Array<{ id: string; time: string; trigger: string; description: string; impact: string; status: string }>>([]);
   const { openPanel } = useCopilotContext();
   const { toast } = useToast();
 

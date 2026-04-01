@@ -126,7 +126,7 @@ const DataQuality = () => {
     }
   };
 
-  const displayDuplicates = duplicates?.length ? duplicates : demoDuplicates;
+  const displayDuplicates = duplicates || [];
 
   return (
     <DashboardLayout 

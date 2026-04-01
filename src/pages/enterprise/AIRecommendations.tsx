@@ -53,73 +53,7 @@ const AIRecommendations = () => {
   const [automationTrigger, setAutomationTrigger] = useState("");
   const [dismissedRecs, setDismissedRecs] = useState<string[]>([]);
 
-  // Demo recommendations with full evidence format
-  const demoRecommendations = [
-    {
-      id: '1',
-      recommendation_type: 'cost_saving',
-      claim: 'Tankpaskosten zijn 23% hoger dan benchmark',
-      evidence: [
-        { type: 'data', label: 'Gem. €/liter', value: '€1.89', link: '/finance/fuel-cards' },
-        { type: 'data', label: 'Benchmark', value: '€1.54', link: null },
-        { type: 'trend', label: 'Trend laatste 3 maanden', value: '+12%', link: '/finance/costs' },
-      ],
-      risk: 'Bij ongewijzigd beleid €4.200 extra kosten per kwartaal',
-      estimated_impact_eur: 16800,
-      confidence: 0.87,
-      suggested_actions: [
-        { label: 'Bekijk tankpas analyse', action: 'navigate', target: '/finance/fuel-cards' },
-        { label: 'Maak besparing taak', action: 'create_task', params: { type: 'cost_reduction' } },
-        { label: 'Stel alert in', action: 'create_automation', params: { trigger: 'fuel_cost_threshold' } },
-      ],
-      status: 'pending',
-      created_at: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: '2',
-      recommendation_type: 'margin_leak',
-      claim: 'Klant "ABC Logistics" heeft 15 facturen zonder wachttijd vergoeding',
-      evidence: [
-        { type: 'data', label: 'Gemiste omzet', value: '€2.340', link: '/customers' },
-        { type: 'data', label: 'Gem. wachttijd', value: '47 min', link: null },
-        { type: 'pattern', label: 'Patroon', value: 'Elke vrijdag', link: '/orders' },
-      ],
-      risk: 'Structurele margin leak van €780/maand als dit patroon doorgaat',
-      estimated_impact_eur: 9360,
-      confidence: 0.92,
-      suggested_actions: [
-        { label: 'Open dispute', action: 'create_dispute', params: { customer_id: 'abc-123' } },
-        { label: 'Pas klantinstelling aan', action: 'navigate', target: '/customers' },
-        { label: 'Stel reminder in', action: 'create_automation', params: { trigger: 'waiting_time' } },
-      ],
-      status: 'pending',
-      created_at: new Date(Date.now() - 172800000).toISOString(),
-    },
-    {
-      id: '3',
-      recommendation_type: 'cash_flow',
-      claim: 'Cashflow zakt onder minimum buffer binnen 12 dagen',
-      evidence: [
-        { type: 'forecast', label: 'Verwacht saldo', value: '€3.200', link: '/finance/cashflow' },
-        { type: 'data', label: 'Min buffer', value: '€5.000', link: '/enterprise/policies' },
-        { type: 'data', label: 'Openstaande facturen', value: '€18.500', link: '/invoices' },
-      ],
-      risk: 'Payouts worden automatisch geblokkeerd bij buffer breach',
-      estimated_impact_eur: 5000,
-      confidence: 0.78,
-      suggested_actions: [
-        { label: 'Stuur herinneringen', action: 'send_reminders', params: { filter: 'overdue' } },
-        { label: 'Bekijk cashflow forecast', action: 'navigate', target: '/finance/cashflow' },
-        { label: 'Pas payout schema aan', action: 'navigate', target: '/enterprise/policies' },
-      ],
-      status: 'pending',
-      created_at: new Date(Date.now() - 3600000).toISOString(),
-    },
-  ].filter(r => !dismissedRecs.includes(r.id));
-
-  const displayRecommendations = recommendations?.length 
-    ? recommendations.filter((r: any) => !dismissedRecs.includes(r.id)) 
-    : demoRecommendations;
+  const displayRecommendations = (recommendations || []).filter((r: any) => !dismissedRecs.includes(r.id));
 
   const getTypeIcon = (type: string) => {
     switch (type) {

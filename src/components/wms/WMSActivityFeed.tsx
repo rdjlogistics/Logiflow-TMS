@@ -128,59 +128,7 @@ export function WMSActivityFeed({
   );
 }
 
-// Demo data generator
+// Returns empty array — activities come from database
 export function generateDemoActivities(): ActivityItem[] {
-  const now = new Date();
-  return [
-    {
-      id: "1",
-      type: "inbound",
-      title: "Ontvangst verwerkt",
-      description: "120 stuks SKU-4521 ontvangen in magazijn Amsterdam",
-      timestamp: new Date(now.getTime() - 5 * 60 * 1000),
-      user: "Jan Peters",
-      meta: "INB-2024-0156",
-    },
-    {
-      id: "2",
-      type: "pick",
-      title: "Wave picking gestart",
-      description: "Wave WV-0089 met 24 orders gestart",
-      timestamp: new Date(now.getTime() - 15 * 60 * 1000),
-      user: "Maria Jansen",
-      meta: "WV-0089",
-    },
-    {
-      id: "3",
-      type: "alert",
-      title: "Lage voorraad alert",
-      description: "SKU-1287 onder minimumniveau in Rotterdam",
-      timestamp: new Date(now.getTime() - 32 * 60 * 1000),
-    },
-    {
-      id: "4",
-      type: "outbound",
-      title: "Verzending afgerond",
-      description: "Order voor Philips B.V. verzonden",
-      timestamp: new Date(now.getTime() - 45 * 60 * 1000),
-      user: "Peter de Vries",
-      meta: "OUT-2024-0342",
-    },
-    {
-      id: "5",
-      type: "transfer",
-      title: "Transfer onderweg",
-      description: "250 pallets van Amsterdam naar Rotterdam",
-      timestamp: new Date(now.getTime() - 90 * 60 * 1000),
-      meta: "TRF-0067",
-    },
-    {
-      id: "6",
-      type: "complete",
-      title: "Cycle count voltooid",
-      description: "Zone A-3 geteld, 99.2% nauwkeurigheid",
-      timestamp: new Date(now.getTime() - 120 * 60 * 1000),
-      user: "Henk Bakker",
-    },
-  ];
+  return [];
 }

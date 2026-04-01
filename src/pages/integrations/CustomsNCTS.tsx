@@ -29,58 +29,20 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { toast } from "sonner";
 
-const mockDeclarations = [
-  {
-    id: '1',
-    lrn: 'NL240115001234',
-    mrn: '24NL0000001234567',
-    type: 'T1',
-    status: 'released',
-    goodsDescription: '20 pallets consumer electronics',
-    departure: 'NL000011 Rotterdam',
-    destination: 'DE004301 Düsseldorf',
-    orderId: 'ORD-2024-1234',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    releasedAt: new Date(Date.now() - 1000 * 60 * 30),
-  },
-  {
-    id: '2',
-    lrn: 'NL240115001235',
-    mrn: '24NL0000001234568',
-    type: 'T2',
-    status: 'submitted',
-    goodsDescription: '15 pallets textiles',
-    departure: 'NL000011 Rotterdam',
-    destination: 'BE000001 Antwerpen',
-    orderId: 'ORD-2024-1235',
-    createdAt: new Date(Date.now() - 1000 * 60 * 45),
-  },
-  {
-    id: '3',
-    lrn: 'NL240115001236',
-    mrn: null,
-    type: 'export',
-    status: 'draft',
-    goodsDescription: '50 pallets machinery parts',
-    departure: 'NL000011 Rotterdam',
-    destination: 'CH002801 Basel',
-    orderId: 'ORD-2024-1236',
-    createdAt: new Date(Date.now() - 1000 * 60 * 20),
-  },
-  {
-    id: '4',
-    lrn: 'NL240115001237',
-    mrn: null,
-    type: 'T1',
-    status: 'rejected',
-    goodsDescription: '10 containers automotive parts',
-    departure: 'NL000011 Rotterdam',
-    destination: 'GB001001 Felixstowe',
-    orderId: 'ORD-2024-1237',
-    error: 'Invalid commodity code 8703.23.19',
-    createdAt: new Date(Date.now() - 1000 * 60 * 90),
-  },
-];
+const mockDeclarations: Array<{
+  id: string;
+  lrn: string;
+  mrn: string | null;
+  type: string;
+  status: string;
+  goodsDescription: string;
+  departure: string;
+  destination: string;
+  orderId: string;
+  createdAt: Date;
+  releasedAt?: Date;
+  error?: string;
+}> = [];
 
 const customsOffices = [
   { code: 'NL000011', name: 'Rotterdam' },

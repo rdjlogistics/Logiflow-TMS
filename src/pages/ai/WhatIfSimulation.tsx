@@ -48,42 +48,7 @@ interface Scenario {
   createdAt: Date;
 }
 
-const mockScenarios: Scenario[] = [
-  {
-    id: '1',
-    name: 'Vloot Uitbreiding Q2',
-    type: 'fleet',
-    status: 'completed',
-    results: {
-      capacityChange: '+15%',
-      costChange: '+€12,500/maand',
-      profitImpact: '+€8,200/maand',
-      utilizationChange: '-5%',
-    },
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-  },
-  {
-    id: '2',
-    name: 'Brandstofprijzen +20%',
-    type: 'cost',
-    status: 'completed',
-    results: {
-      marginImpact: '-3.2%',
-      costChange: '+€4,800/maand',
-      breakEvenChange: '+€0.12/km',
-      recommendedPriceAdjust: '+4.5%',
-    },
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48),
-  },
-  {
-    id: '3',
-    name: 'Piekseizoen December',
-    type: 'demand',
-    status: 'running',
-    progress: 65,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30),
-  },
-];
+const mockScenarios: Scenario[] = [];
 
 export default function WhatIfSimulation() {
   const [scenarios, setScenarios] = useState<Scenario[]>(mockScenarios);

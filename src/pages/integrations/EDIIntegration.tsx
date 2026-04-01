@@ -35,54 +35,16 @@ const messageTypes = [
   { code: 'ORDERS', name: 'Purchase Order', description: 'Inkooporder' },
 ];
 
-const mockMessages = [
-  {
-    id: '1',
-    messageType: 'IFTMIN',
-    direction: 'inbound',
-    partnerName: 'HEMA Logistics',
-    status: 'processed',
-    createdAt: new Date(Date.now() - 1000 * 60 * 30),
-    orderId: 'ORD-2024-1234',
-  },
-  {
-    id: '2',
-    messageType: 'IFTSTA',
-    direction: 'outbound',
-    partnerName: 'Albert Heijn',
-    status: 'sent',
-    createdAt: new Date(Date.now() - 1000 * 60 * 45),
-    orderId: 'ORD-2024-1233',
-  },
-  {
-    id: '3',
-    messageType: 'INVOIC',
-    direction: 'outbound',
-    partnerName: 'Jumbo Supermarkten',
-    status: 'pending',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60),
-    orderId: 'ORD-2024-1232',
-  },
-  {
-    id: '4',
-    messageType: 'IFTMIN',
-    direction: 'inbound',
-    partnerName: 'Bol.com',
-    status: 'failed',
-    createdAt: new Date(Date.now() - 1000 * 60 * 90),
-    orderId: null,
-    error: 'Parsing error: Invalid segment UNH'
-  },
-  {
-    id: '5',
-    messageType: 'DESADV',
-    direction: 'outbound',
-    partnerName: 'Action Nederland',
-    status: 'processed',
-    createdAt: new Date(Date.now() - 1000 * 60 * 120),
-    orderId: 'ORD-2024-1230',
-  },
-];
+const mockMessages: Array<{
+  id: string;
+  messageType: string;
+  direction: string;
+  partnerName: string;
+  status: string;
+  createdAt: Date;
+  orderId: string | null;
+  error?: string;
+}> = [];
 
 const sampleEdiMessage = `UNB+UNOC:3+SENDER:ZZ+RECEIVER:ZZ+240115:1430+123456789'
 UNH+1+IFTMIN:D:99B:UN'

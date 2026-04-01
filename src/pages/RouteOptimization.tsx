@@ -104,8 +104,8 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
 };
 
-// Demo stops data (fallback when no real data)
-const demoStops = [
+// Empty default (no demo data for new accounts)
+const demoStops: Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: "high" | "medium" | "low" }> = [
   { id: "1", address: "Hoofdkantoor Amsterdam", city: "Amsterdam", lat: 52.3676, lng: 4.9041, timeWindow: "08:00-10:00", priority: "high" as const },
   { id: "2", address: "Distributiecentrum Utrecht", city: "Utrecht", lat: 52.0907, lng: 5.1214, timeWindow: "10:00-12:00", priority: "medium" as const },
   { id: "3", address: "Warehouse Rotterdam", city: "Rotterdam", lat: 51.9244, lng: 4.4777, timeWindow: "12:00-14:00", priority: "medium" as const },
