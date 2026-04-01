@@ -34,6 +34,25 @@ Deno.serve(async (req) => {
 
     console.log(`[execute-workflow] trigger_type=${trigger_type} tenant=${tenant_id}`);
 
+    // === Customer Data Enrichment ===
+    // If trigger_data has customer_id but no customer object, fetch it
+    if (trigger_data.customer_id && !trigger_data.customer) {
+      const { data: customerData } = await supabase
+        .from("customers")
+        .select("company_name, contact_name, email, phone")
+        .eq("id", trigger_data.customer_id)
+        .single();
+
+      if (customerData) {
+        trigger_data.customer = {
+          name: customerData.company_name || "",
+          contact: customerData.contact_name || "",
+          email: customerData.email || "",
+          phone: customerData.phone || "",
+        };
+      }
+    }
+
     // Find matching active workflows
     const { data: workflows, error: wfError } = await supabase
       .from("workflow_automations")
@@ -75,14 +94,12 @@ Deno.serve(async (req) => {
       if (trigger_type === "invoice_overdue") {
         const configDays = config.days_overdue || 0;
         const actualDays = trigger_data.days_overdue as number;
-        // Match if days_overdue >= configured threshold
-        // But cap at next threshold to avoid duplicate reminders
         const thresholds = [7, 14, 30, 9999];
         const nextThreshold = thresholds.find((t) => t > configDays) || 9999;
         return actualDays >= configDays && actualDays < nextThreshold;
       }
 
-      return true; // order_created, driver_assigned, invoice_created match all
+      return true;
     });
 
     console.log(`[execute-workflow] ${matchingWorkflows.length} workflows matched`);
@@ -118,9 +135,9 @@ Deno.serve(async (req) => {
       let hasError = false;
 
       for (const action of actions || []) {
-        // Apply delay if configured
+        // Log delay but don't block — delays are not supported in edge functions
         if (action.delay_minutes > 0) {
-          await new Promise((r) => setTimeout(r, action.delay_minutes * 60 * 1000));
+          console.log(`[execute-workflow] Skipping delay of ${action.delay_minutes}min (not supported in edge functions)`);
         }
 
         try {
@@ -134,7 +151,7 @@ Deno.serve(async (req) => {
             error: err instanceof Error ? err.message : String(err),
           });
           console.error(`[execute-workflow] Action ${action.action_type} failed:`, err);
-          break; // Stop on first failure
+          break;
         }
       }
 
@@ -203,20 +220,47 @@ async function executeAction(
 
       if (!to) throw new Error("Email recipient is empty");
 
-      // Enqueue via pgmq
-      const { error } = await supabase.rpc("send_email_batch" as string, {
-        queue_name: "email_queue",
-        batch_size: 1,
-        vt: 0,
-      });
+      // Send email directly via Resend API
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@rdjlogistics.nl";
 
-      // Fallback: insert directly into email_send_log for tracking
+      if (resendApiKey) {
+        const emailResp = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: `RDJ Logistics <${fromEmail}>`,
+            to: [to],
+            subject,
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              ${body.replace(/\n/g, "<br>")}
+              <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">
+              <p style="color: #999; font-size: 12px;">Dit is een automatisch bericht van het workflow-systeem.</p>
+            </div>`,
+          }),
+        });
+
+        if (!emailResp.ok) {
+          const errText = await emailResp.text();
+          console.error(`[workflow] Resend error: ${errText}`);
+          throw new Error(`Email send failed: ${emailResp.status}`);
+        }
+
+        console.log(`[workflow] Email sent to ${to} via Resend`);
+      } else {
+        console.warn("[workflow] No RESEND_API_KEY configured, logging email only");
+      }
+
+      // Always log to email_send_log for audit trail
       await supabase.from("email_send_log").insert({
         company_id: tenantId,
         recipient_email: to,
         subject,
         template_name: "workflow_email",
-        status: "pending",
+        status: resendApiKey ? "sent" : "pending",
         metadata: { body, source: "workflow_automation" },
       });
 
@@ -275,6 +319,25 @@ async function executeAction(
       }
 
       return { message_sent: true };
+    }
+
+    case "log_event": {
+      const title = resolveTemplate(String(config.title || config.message || "Workflow event"), triggerData);
+      const details = resolveTemplate(String(config.details || ""), triggerData);
+      const severity = String(config.severity || "info");
+
+      // Log to email_send_log as audit trail (reuse existing table)
+      await supabase.from("email_send_log").insert({
+        company_id: tenantId,
+        recipient_email: "system@workflow",
+        subject: title,
+        template_name: "workflow_log_event",
+        status: "sent",
+        metadata: { details, severity, trigger_data: triggerData, source: "workflow_automation" },
+      });
+
+      console.log(`[workflow] Event logged: "${title}" severity=${severity}`);
+      return { title, severity, logged: true };
     }
 
     case "create_task": {

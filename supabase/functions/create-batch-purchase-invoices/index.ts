@@ -6,6 +6,51 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// BTW logic for purchase invoices
+const EU_LANDEN = [
+  'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR',
+  'DE','GR','HU','IE','IT','LV','LT','LU','MT','NL',
+  'PL','PT','RO','SK','SI','ES','SE',
+];
+
+const LAND_NAAM_NAAR_ISO: Record<string, string> = {
+  'nederland': 'NL', 'the netherlands': 'NL', 'netherlands': 'NL', 'holland': 'NL',
+  'belgie': 'BE', 'belgium': 'BE', 'duitsland': 'DE', 'germany': 'DE',
+  'frankrijk': 'FR', 'france': 'FR', 'spanje': 'ES', 'spain': 'ES',
+  'italië': 'IT', 'italie': 'IT', 'italy': 'IT',
+  'oostenrijk': 'AT', 'austria': 'AT', 'portugal': 'PT',
+  'polen': 'PL', 'poland': 'PL', 'tsjechië': 'CZ', 'tsjechie': 'CZ',
+  'hongarije': 'HU', 'hungary': 'HU', 'roemenië': 'RO', 'roemenie': 'RO', 'romania': 'RO',
+  'bulgarije': 'BG', 'bulgaria': 'BG', 'kroatië': 'HR', 'kroatie': 'HR', 'croatia': 'HR',
+  'griekenland': 'GR', 'greece': 'GR', 'ierland': 'IE', 'ireland': 'IE',
+  'denemarken': 'DK', 'denmark': 'DK', 'zweden': 'SE', 'sweden': 'SE',
+  'finland': 'FI', 'noorwegen': 'NO', 'norway': 'NO', 'zwitserland': 'CH', 'switzerland': 'CH',
+};
+
+function normaliseerLand(land: string | null | undefined): string {
+  if (!land || land.trim() === '') return 'NL';
+  const cleaned = land.trim();
+  if (cleaned.length === 2) return cleaned.toUpperCase();
+  const lower = cleaned.toLowerCase();
+  if (LAND_NAAM_NAAR_ISO[lower]) return LAND_NAAM_NAAR_ISO[lower];
+  return cleaned.toUpperCase().substring(0, 2);
+}
+
+function isGeldigBTWnummer(nr: string | null | undefined): boolean {
+  if (!nr) return false;
+  return /^[A-Z]{2}[A-Z0-9]{8,}$/i.test(nr.replace(/[\s.-]/g, ''));
+}
+
+function berekenBTW(ontvangerLand: string | null, ontvangerBTW: string | null): { tarief: 0 | 9 | 21; type: string; factuurVermelding: string } {
+  const ontvanger = normaliseerLand(ontvangerLand);
+  if (ontvanger === 'NL') return { tarief: 21, type: 'normaal', factuurVermelding: '' };
+  if (EU_LANDEN.includes(ontvanger) && isGeldigBTWnummer(ontvangerBTW)) {
+    return { tarief: 0, type: 'verlegd', factuurVermelding: 'BTW verlegd - Intracommunautaire dienst art. 44 BTW-richtlijn 2006/112/EG' };
+  }
+  if (EU_LANDEN.includes(ontvanger)) return { tarief: 21, type: 'normaal', factuurVermelding: '' };
+  return { tarief: 0, type: 'vrijgesteld', factuurVermelding: 'Vrijgesteld van BTW - dienst buiten de EU' };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -65,7 +110,7 @@ Deno.serve(async (req) => {
     // Find eligible trips
     const { data: trips, error: tripsError } = await supabase
       .from("trips")
-      .select("id, order_number, purchase_total, carrier_id, carriers!inner(company_name)")
+      .select("id, order_number, purchase_total, carrier_id, carriers!inner(company_name, country, vat_number)")
       .eq("company_id", companyId)
       .eq("carrier_id", carrier_id)
       .in("status", ["afgerond", "gecontroleerd"])
@@ -90,11 +135,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    const carrierName = (trips[0].carriers as any)?.company_name || "Onbekend";
+    const carrier = trips[0].carriers as any;
+    const carrierName = carrier?.company_name || "Onbekend";
+
+    // Smart VAT calculation based on carrier country
+    const carrierCountry = carrier?.country || "NL";
+    const carrierVat = carrier?.vat_number || null;
+    const btwResult = berekenBTW(carrierCountry, carrierVat);
+    const vatPercentage = btwResult.tarief;
 
     // Calculate totals
     const subtotal = trips.reduce((sum, t) => sum + Number(t.purchase_total || 0), 0);
-    const vatPercentage = 21;
     const vatAmount = Math.round(subtotal * (vatPercentage / 100) * 100) / 100;
     const totalAmount = Math.round((subtotal + vatAmount) * 100) / 100;
 
