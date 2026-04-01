@@ -76,13 +76,14 @@ export function usePredictiveAnalytics() {
       ] = await Promise.all([
         supabase
           .from('trips')
-          .select('*')
+          .select('id, trip_date, status, pickup_city, delivery_city, sales_total, purchase_total, actual_arrival, actual_departure, pickup_time_from, delivery_time_from, driver_id, customer_id, created_at')
           .gte('trip_date', thirtyDaysAgo)
           .lte('trip_date', today.toISOString())
-          .order('trip_date', { ascending: true }),
+          .order('trip_date', { ascending: true })
+          .limit(500),
         supabase
           .from('trips')
-          .select('*, customer:customers(company_name)')
+          .select('id, trip_date, status, pickup_city, delivery_city, sales_total, purchase_total, pickup_time_from, delivery_time_from, driver_id, customer_id, customer:customers(company_name)')
           .gte('trip_date', startOfDay(today).toISOString())
           .lte('trip_date', sevenDaysAhead)
           .in('status', ['draft', 'aanvraag', 'offerte', 'gepland', 'geladen', 'onderweg']),
@@ -91,7 +92,8 @@ export function usePredictiveAnalytics() {
           .select('user_id, full_name'),
         supabase
           .from('vehicles')
-          .select('*'),
+          .select('id, license_plate, brand, model, vehicle_type, status, next_maintenance_date, last_maintenance_date')
+          .limit(200),
       ]);
 
       const newPredictions: Prediction[] = [];

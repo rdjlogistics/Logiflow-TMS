@@ -157,7 +157,8 @@ export const useHolds = (status?: string) => {
         .from('holds')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       
       if (status) {
         query = query.eq('status', status);
@@ -183,7 +184,8 @@ export const useDuplicateCandidates = () => {
         .select('*')
         .eq('tenant_id', company.id)
         .eq('status', 'pending')
-        .order('confidence', { ascending: false });
+        .order('confidence', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as DuplicateCandidate[];
     },
@@ -202,7 +204,8 @@ export const useAuthorityRules = () => {
         .from('authority_rules')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('role');
+        .order('role')
+        .limit(100);
       if (error) throw error;
       return (data || []) as AuthorityRule[];
     },
@@ -273,7 +276,8 @@ export const useSafetyProfiles = () => {
         .from('safety_profiles')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('name');
+        .order('name')
+        .limit(50);
       if (error) throw error;
       return (data || []) as SafetyProfile[];
     },
@@ -292,7 +296,8 @@ export const useFeatureFlags = () => {
         .from('feature_flags')
         .select('*')
         .or(`tenant_id.eq.${company.id},tenant_id.is.null`)
-        .order('feature_key');
+        .order('feature_key')
+        .limit(100);
       if (error) throw error;
       return (data || []) as FeatureFlag[];
     },

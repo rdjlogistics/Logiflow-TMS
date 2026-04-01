@@ -25,9 +25,10 @@ export function usePortalData(customerId?: string | null) {
       // Fetch customer submissions filtered by customer_id
       const { data: submissions, error } = await supabase
         .from('customer_submissions')
-        .select('*')
+        .select('id, customer_id, reference_number, status, pickup_city, delivery_city, pickup_address, house_number_pickup, delivery_address, house_number_delivery, delivery_date, quantity, weight_kg, estimated_price, converted_trip_id, created_at')
         .eq('customer_id', customerId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       if (error) throw error;
 
@@ -40,7 +41,7 @@ export function usePortalData(customerId?: string | null) {
       if (tripIds.length > 0) {
         const { data: trips } = await supabase
           .from('trips')
-          .select('*')
+          .select('id, status, tracking_token')
           .in('id', tripIds);
         tripsData = trips || [];
       }
@@ -100,7 +101,7 @@ export function usePortalData(customerId?: string | null) {
       // Fetch invoices from database
       const { data: invoicesData } = await supabase
         .from('invoices')
-        .select('*')
+        .select('id, invoice_number, status, total_amount, amount_paid, due_date, paid_at, created_at')
         .eq('customer_id', customerId!)
         .order('created_at', { ascending: false })
         .limit(50);
@@ -143,7 +144,7 @@ export function usePortalData(customerId?: string | null) {
       if (tripIdsForClaims.length > 0) {
         const { data } = await supabase
           .from('claim_cases')
-          .select('*')
+          .select('id, order_id, claim_type, status, notes, created_at, updated_at')
           .in('order_id', tripIdsForClaims)
           .order('created_at', { ascending: false })
           .limit(50);

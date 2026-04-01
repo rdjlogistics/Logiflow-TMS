@@ -207,7 +207,8 @@ export const useAutomations = () => {
         .from('automation_definitions')
         .select('*')
         .eq('company_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as AutomationDefinition[];
     },
@@ -252,7 +253,8 @@ export const useReconciliationIssues = () => {
         .from('reconciliation_issues')
         .select('*')
         .eq('company_id', company.id)
-        .order('detected_at', { ascending: false });
+        .order('detected_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as ReconciliationIssue[];
     },
@@ -290,7 +292,8 @@ export const useAuthorityDelegations = () => {
         .from('authority_delegations')
         .select('*')
         .eq('company_id', company.id)
-        .order('role');
+        .order('role')
+        .limit(50);
       if (error) throw error;
       return (data || []) as AuthorityDelegation[];
     },
@@ -355,7 +358,8 @@ export const useLegalHolds = () => {
         .from('legal_holds')
         .select('*')
         .eq('company_id', company.id)
-        .order('applied_at', { ascending: false });
+        .order('applied_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as LegalHold[];
     },
@@ -374,7 +378,8 @@ export const useFinanceHolds = () => {
         .from('finance_holds')
         .select('*')
         .eq('company_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as FinanceHold[];
     },
@@ -394,7 +399,8 @@ export const useAIRecommendations = () => {
         .select('*')
         .eq('company_id', company.id)
         .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
       if (error) throw error;
       return (data || []) as AIRecommendation[];
     },

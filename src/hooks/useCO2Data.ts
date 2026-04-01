@@ -100,7 +100,7 @@ export function useCO2Data(year: string, period: string) {
         .lte('trip_date', toDate)
         .in('status', ['afgerond', 'gecontroleerd', 'gefactureerd', 'afgeleverd'])
         .not('distance_km', 'is', null)
-        .limit(2000);
+        .limit(500);
 
       if (error) throw error;
 
