@@ -46,7 +46,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { invoiceId, to, subject, body, cc, bcc, attachPdf } = await req.json();
+    const reqBody = await req.json();
+    const invoiceId = reqBody.invoiceId || reqBody.invoice_id;
+    const to = reqBody.to || reqBody.recipient_emails;
+    const subject = reqBody.subject || reqBody.email_subject;
+    const body = reqBody.body || reqBody.email_body;
+    const cc = reqBody.cc;
+    const bcc = reqBody.bcc;
+    const attachPdf = reqBody.attachPdf ?? reqBody.include_pdf;
     if (!invoiceId || !to || !subject) {
       return new Response(JSON.stringify({ error: "invoiceId, to en subject zijn verplicht" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
