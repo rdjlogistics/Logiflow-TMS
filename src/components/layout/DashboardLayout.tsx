@@ -12,6 +12,7 @@ import { useCopilotContext } from "@/components/copilot";
 import { SessionWarningDialog } from "@/components/security/SessionWarningDialog";
 import { SessionRefreshIndicator } from "@/components/driver/SessionRefreshIndicator";
 import { Loader2, Menu, Bot, Sparkles, Command, Bell, RefreshCw } from "lucide-react";
+import { GlobalSearch } from "@/components/common/GlobalSearch";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
