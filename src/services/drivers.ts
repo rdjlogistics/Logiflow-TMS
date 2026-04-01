@@ -45,6 +45,7 @@ export async function fetchDrivers(filters: DriverFilters = {}) {
   if (filters.isZzp !== undefined) query = query.eq('is_zzp', filters.isZzp);
   if (filters.vehicleId) query = query.eq('vehicle_id', filters.vehicleId);
   if (filters.limit) query = query.limit(filters.limit);
+  else query = query.limit(200);
 
   const { data, error } = await query;
   if (error) throw error;

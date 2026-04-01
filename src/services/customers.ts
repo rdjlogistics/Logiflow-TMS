@@ -11,14 +11,16 @@ export interface CustomerFilters {
 }
 
 const CUSTOMER_SELECT = `
-  *,
+  id, tenant_id, company_name, contact_name, email, phone, address, city, postal_code, country,
+  vat_number, kvk_number, is_active, credit_blocked, credit_limit, payment_terms_days,
+  iban, bic, notes, created_at, updated_at,
   invoices(id, status, total_amount, amount_paid)
 `;
 
 export async function fetchCustomers(filters: CustomerFilters = {}) {
   let query = supabase
     .from('customers')
-    .select('*')
+    .select('id, tenant_id, company_name, contact_name, email, phone, city, postal_code, country, vat_number, is_active, credit_blocked, credit_limit, payment_terms_days, created_at, updated_at')
     .is('deleted_at', null)
     .order('company_name');
 
@@ -27,24 +29,17 @@ export async function fetchCustomers(filters: CustomerFilters = {}) {
   if (filters.creditBlocked !== undefined) query = query.eq('credit_blocked', filters.creditBlocked);
   if (filters.limit) query = query.limit(filters.limit);
 
-  if (!filters.limit) query = query.limit(5000);
+  if (filters.search) {
+    const q = `%${filters.search}%`;
+    query = query.or(`company_name.ilike.${q},contact_name.ilike.${q},email.ilike.${q},vat_number.ilike.${q}`);
+  }
+
+  if (!filters.limit) query = query.limit(100);
 
   const { data, error } = await query;
   if (error) throw error;
 
-  let result = data ?? [];
-
-  if (filters.search) {
-    const q = filters.search.toLowerCase();
-    result = result.filter(c =>
-      c.company_name?.toLowerCase().includes(q) ||
-      c.contact_name?.toLowerCase().includes(q) ||
-      c.email?.toLowerCase().includes(q) ||
-      c.vat_number?.toLowerCase().includes(q)
-    );
-  }
-
-  return result;
+  return data ?? [];
 }
 
 export async function fetchCustomerById(id: string) {
