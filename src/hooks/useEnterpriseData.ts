@@ -207,7 +207,8 @@ export const useAutomations = () => {
         .from('automation_definitions')
         .select('*')
         .eq('company_id', company.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as AutomationDefinition[];
     },
