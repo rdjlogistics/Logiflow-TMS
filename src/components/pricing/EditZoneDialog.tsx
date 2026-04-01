@@ -101,8 +101,18 @@ export const EditZoneDialog: React.FC<EditZoneDialogProps> = ({
         return { cities };
       case "country":
         return { countries };
-      case "geo_polygon":
-        return { coordinates: [] };
+      case "geo_polygon": {
+        const coords = (window as any).__geoCoords;
+        if (Array.isArray(coords)) {
+          return { coordinates: coords };
+        }
+        try {
+          const parsed = JSON.parse(coords || "[]");
+          return { coordinates: Array.isArray(parsed) ? parsed : [] };
+        } catch {
+          return { coordinates: [] };
+        }
+      }
       default:
         return {};
     }
