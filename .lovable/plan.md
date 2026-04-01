@@ -1,68 +1,57 @@
 
 
-# Performance & Schaalbaarheid — Volgende Stap
+# Performance Hardening — Ronde 3
 
-## Wat al gedaan is (goed)
-- Dashboard queries: tenant-scoped met `company_id` filter ✅
+## Wat al gedaan is
+- Polling hooks: alle 8 hebben `refetchIntervalInBackground: false` ✅
 - Trips service: limit 100, server-side search, expliciete kolommen ✅
 - Realtime: 500ms debounce ✅
-- Dashboard: `refetchIntervalInBackground: false` ✅
-- Lazy loading: 100+ pagina's via `lazyWithRetry` ✅
-- Vite: `manualChunks` voor vendor splitting ✅
+- Dashboard: tenant-scoped, background polling gestopt ✅
+- Predictive dispatch: limit 500 → 50 ✅
+- SW cache: 30s StaleWhileRevalidate ✅
 - Database: 16 compound indexes ✅
-- Dashboard: geconsolideerde RPC `get_dashboard_counts` ✅
+- Global staleTime: 5 minuten ✅
 
-## Wat nog open staat
+## Wat nog overblijft
 
-### 1. HOOG: 6 andere polling hooks missen `refetchIntervalInBackground: false`
-Elke hook met `refetchInterval` die GEEN `refetchIntervalInBackground: false` heeft, veroorzaakt onnodige server-calls als de tab niet actief is. Bij 200 gebruikers met elk 3-4 tabbladen open is dit een serieuze load multiplier.
+### 1. HOOG: Customers service — limit 5000 + client-side search
+`src/services/customers.ts` regel 30: `query.limit(5000)` — identiek probleem als trips had. Zoekfilter draait client-side op alle data.
 
-**Bestanden:**
-- `src/hooks/useClientErrorLogs.ts` — 2x (30s interval)
-- `src/pages/EmailDashboard.tsx` — (10s interval!)
-- `src/pages/CustomerTrackTrace.tsx` — (30s interval)
-- `src/components/dispatch/DispatchDashboard.tsx` — (30s interval)
-- `src/components/dispatch/DispatchChannelStatus.tsx` — (60s interval)
-- `src/pages/enterprise/LiveBoard.tsx` — (30s interval)
-- `src/pages/integrations/TelematicsIntegration.tsx` — (30s interval)
+**Fix**: Verlaag naar 100, verplaats search naar server met `.ilike()`.
 
-**Fix**: Voeg `refetchIntervalInBackground: false` toe aan alle 8 useQuery calls.
+### 2. HOOG: 74 bestanden met `select('*')` — bulk-scan nog niet gedaan
+De vorige ronde fixte Carriers, Procurement en LearningSystem. Er zijn nog ~70 bestanden met `select('*')`. De meeste zijn klein (settings, 1 rij), maar er zijn nog high-traffic cases:
+- `usePortalShipments.ts` — trips + driver_locations
+- `usePODClaims.ts` — `limit(200)` met `select('*')`
+- `useClientErrorLogs.ts` — `limit(500)` met `select('*')`
 
-### 2. HOOG: 125 bestanden gebruiken `select('*')` — top-10 ergste cases
-De meeste `select('*')` calls zijn op kleine tabellen (settings, plans) en niet erg. Maar er zijn high-traffic tabellen die te veel data sturen:
+**Fix**: Vervang `select('*')` op deze 3 high-traffic hooks.
 
-**Kritieke cases om te fixen:**
-- `src/pages/Carriers.tsx` — 5x `select('*')` op carriers + carrier_contacts (kan 50+ kolommen zijn)
-- `src/pages/Procurement.tsx` — `select('*')` op rfq_requests + rfq_offertes
-- `src/hooks/useLearningSystemDB.ts` — `limit(200)` met `select('*')` op events
+### 3. MIDDEL: Customers service heeft `CUSTOMER_SELECT` gedefinieerd maar niet gebruikt
+Regel 13-16 definieert `CUSTOMER_SELECT` met `*` en join, maar `fetchCustomers` op regel 21 gebruikt gewoon `select('*')` zonder de join. Dit is een bug — de join kolommen worden nooit opgehaald.
 
-**Fix**: Vervang `select('*')` door expliciete kolommen op deze 3 high-traffic bestanden.
+**Fix**: Gebruik `CUSTOMER_SELECT` met expliciete kolommen.
 
-### 3. MIDDEL: Predictive dispatch laadt 500 historische trips
-`src/hooks/usePredictiveDispatch.ts` doet `.limit(500)` op past trips voor driver matching. Dit is veel data die bij elke dispatch-opening wordt geladen.
+### 4. MIDDEL: Drivers service mist default limit
+`src/services/drivers.ts` regel 47-49 heeft geen default limit als `filters.limit` niet gezet is — dit kan alle drivers ophalen.
 
-**Fix**: Verlaag naar `.limit(50)` — de meest recente 50 trips per driver is genoeg voor patroonherkenning.
+**Fix**: Voeg `if (!filters.limit) query = query.limit(200);` toe.
 
-### 4. MIDDEL: Cloud instance sizing bewustzijn
-Bij 50+ gelijktijdige gebruikers kan de database-instance de bottleneck worden, ongeacht code-optimalisaties. De huidige instance size moet geëvalueerd worden.
+### 5. LAAG: Instance sizing advies
+Bij groei naar 50+ gelijktijdige gebruikers kan de database-instance de bottleneck worden. Dit is niet op te lossen met code.
 
-**Actie**: Adviseer de gebruiker over instance upgrade via Backend > Advanced Settings als de load toeneemt.
-
-### 5. LAAG: Service Worker API cache te agressief
-`vite.config.ts` cached Supabase API responses voor 5 minuten (`maxAgeSeconds: 300`). Dit kan stale data tonen na schrijf-operaties.
-
-**Fix**: Verlaag `maxAgeSeconds` naar 30 en gebruik `StaleWhileRevalidate` i.p.v. `NetworkFirst` voor een betere balans.
+**Advies**: Ga naar Backend > Geavanceerde instellingen > Instance upgraden voor meer capaciteit.
 
 ---
 
 ## Concrete wijzigingen
 
-| # | Fix | Bestanden | Impact |
-|---|-----|-----------|--------|
-| 1 | `refetchIntervalInBackground: false` op 8 polling hooks | 7 bestanden | Hoog |
-| 2 | `select('*')` → expliciete kolommen op Carriers, Procurement, LearningSystem | 3 bestanden | Hoog |
-| 3 | Predictive dispatch limit 500 → 50 | `usePredictiveDispatch.ts` | Middel |
-| 4 | SW cache 300s → 30s + StaleWhileRevalidate | `vite.config.ts` | Laag |
+| # | Fix | Bestand | Impact |
+|---|-----|---------|--------|
+| 1 | Customers limit 5000→100 + server-side search | `src/services/customers.ts` | Hoog |
+| 2 | `select('*')` → kolommen op 3 high-traffic hooks | `usePortalShipments.ts`, `usePODClaims.ts`, `useClientErrorLogs.ts` | Hoog |
+| 3 | Gebruik CUSTOMER_SELECT met expliciete kolommen | `src/services/customers.ts` | Middel |
+| 4 | Drivers default limit toevoegen | `src/services/drivers.ts` | Middel |
 
-Totaal: ~11 bestanden, geen database migraties nodig, geen breaking changes.
+Totaal: 5 bestanden, geen database migraties, geen breaking changes.
 
