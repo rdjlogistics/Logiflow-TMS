@@ -62,7 +62,7 @@ export function useLegalConsent() {
   return { consent, showBanner, acceptConsent, revokeConsent };
 }
 
-export function LegalConsentBanner() {
+export const LegalConsentBanner = React.forwardRef<HTMLDivElement>(function LegalConsentBanner(_props, _ref) {
   const { showBanner, acceptConsent } = useLegalConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [acceptances, setAcceptances] = useState({
