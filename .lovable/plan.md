@@ -1,22 +1,76 @@
 
 
-# OnboardingChecklist naar boven verplaatsen
+# Hardcoded & Demo Data Verwijderen — Volledige Analyse
 
 ## Probleem
 
-De `<OnboardingChecklist />` component staat op regel 592 in `src/pages/Dashboard.tsx`, helemaal onderaan de pagina — ná de header, stats, OPS snapshot, widget grid én snelle acties. Voor nieuwe accounts is dit het belangrijkste element, maar het is onzichtbaar zonder te scrollen.
+Nieuwe accounts zien nep-data op diverse pagina's. Het vorige plan was goedgekeurd maar nooit uitgevoerd. Hieronder de volledige, bijgewerkte lijst.
 
-## Oplossing
+---
 
-Verplaats `<OnboardingChecklist />` van regel 592 (na "Snelle acties") naar direct ná de mobile quick stats grid en desktop OPS snapshot — dus vóór de "Jouw Dashboard" widget sectie. Dit zorgt ervoor dat nieuwe gebruikers het onboarding-blok meteen zien als eerste content na de header.
+## 12 bestanden met hardcoded data
 
-## Technisch
+| # | Bestand | Wat | Ernst |
+|---|---------|-----|-------|
+| 1 | `src/pages/enterprise/AIPlanView.tsx` | `demoPlanRevisions` — 3 fake plan-revisies (ORD-2024-008 etc.) | Hoog |
+| 2 | `src/pages/enterprise/DataQuality.tsx` | `demoDuplicates` — 3 fake duplicaten als fallback | Hoog |
+| 3 | `src/pages/enterprise/AIRecommendations.tsx` | `demoRecommendations` — 3 fake AI-aanbevelingen als fallback | Hoog |
+| 4 | `src/pages/integrations/EDIIntegration.tsx` | `mockMessages` — 5 fake EDI-berichten (HEMA, Bol.com etc.) | Hoog |
+| 5 | `src/pages/integrations/CustomsNCTS.tsx` | `mockDeclarations` — 4 fake douaneaangiftes | Hoog |
+| 6 | `src/components/portal/b2c/B2CPaymentSheet.tsx` | `demoPaymentMethods` — fake iDEAL + Visa | Middel |
+| 7 | `src/pages/RouteOptimization.tsx` | `demoStops` — 8 fake adressen als fallback | Hoog |
+| 8 | `src/components/wms/WMSWarehouseMap.tsx` | `generateDemoZones()` — 8 fake warehouse zones | Middel |
+| 9 | `src/components/wms/WMSActivityFeed.tsx` | `generateDemoActivities()` — 6 fake activiteiten | Middel |
+| 10 | `src/hooks/useFuelStations.ts` | `generateMockStations()` — random fake tankstations | Middel |
+| 11 | `src/pages/ai/WhatIfSimulation.tsx` | `mockScenarios` — 3 fake simulatie-scenario's | Middel |
+| 12 | `src/components/enterprise/LogDetailDialog.tsx` | `mockRequestDetails` — fake request/response body | Laag |
 
-| Actie | Bestand | Wat |
-|-------|---------|-----|
-| **Edit** | `src/pages/Dashboard.tsx` | Verwijder `<OnboardingChecklist />` van regel 592; voeg het toe rond regel 511 (na de mobiele OPS sectie, vóór de widget grid sectie) |
+---
+
+## Aanpak per bestand
+
+**Stap 1 — Enterprise pagina's** (3 bestanden):
+- `AIPlanView.tsx`: Verwijder `demoPlanRevisions`, start met `[]`. Toon lege-staat: "Nog geen planwijzigingen vandaag"
+- `DataQuality.tsx`: Verwijder `demoDuplicates` fallback. Toon lege-staat als er geen DB-duplicaten zijn
+- `AIRecommendations.tsx`: Verwijder `demoRecommendations` fallback. Toon lege-staat: "Nog geen aanbevelingen"
+
+**Stap 2 — Integratie pagina's** (2 bestanden):
+- `EDIIntegration.tsx`: Vervang `mockMessages` door `[]`. Toon "Nog geen EDI-berichten ontvangen"
+- `CustomsNCTS.tsx`: Vervang `mockDeclarations` door `[]`. Toon "Nog geen douaneaangiftes"
+
+**Stap 3 — Route & Portaal** (2 bestanden):
+- `RouteOptimization.tsx`: Vervang `demoStops` fallback door `[]`. Toon instructie "Voeg stops toe"
+- `B2CPaymentSheet.tsx`: Vervang `demoPaymentMethods` door `[]`. Toont al lege-staat
+
+**Stap 4 — WMS & Fuel** (3 bestanden):
+- `WMSWarehouseMap.tsx`: `generateDemoZones()` retourneert `[]`
+- `WMSActivityFeed.tsx`: `generateDemoActivities()` retourneert `[]`
+- `useFuelStations.ts`: Verwijder `generateMockStations()` en `generateLocalMockStations()`. Return lege array bij API-fout
+
+**Stap 5 — AI & Logs** (2 bestanden):
+- `WhatIfSimulation.tsx`: Vervang `mockScenarios` door `[]`. Toon "Maak je eerste simulatie"
+- `LogDetailDialog.tsx`: Vervang hardcoded request body door daadwerkelijke log data (of "Geen details beschikbaar")
+
+---
+
+## Bestanden
+
+| Actie | Bestand |
+|-------|---------|
+| **Edit** | `src/pages/enterprise/AIPlanView.tsx` |
+| **Edit** | `src/pages/enterprise/DataQuality.tsx` |
+| **Edit** | `src/pages/enterprise/AIRecommendations.tsx` |
+| **Edit** | `src/pages/integrations/EDIIntegration.tsx` |
+| **Edit** | `src/pages/integrations/CustomsNCTS.tsx` |
+| **Edit** | `src/components/portal/b2c/B2CPaymentSheet.tsx` |
+| **Edit** | `src/pages/RouteOptimization.tsx` |
+| **Edit** | `src/components/wms/WMSWarehouseMap.tsx` |
+| **Edit** | `src/components/wms/WMSActivityFeed.tsx` |
+| **Edit** | `src/hooks/useFuelStations.ts` |
+| **Edit** | `src/pages/ai/WhatIfSimulation.tsx` |
+| **Edit** | `src/components/enterprise/LogDetailDialog.tsx` |
 
 ## Resultaat
 
-Nieuwe accounts zien de onboarding checklist ("Welkom bij je Command Center") direct bovenaan het dashboard, zonder te hoeven scrollen.
+Elke nieuwe account start volledig schoon — geen nep-orders, nep-klanten, nep-berichten of nep-scenario's. Alle pagina's tonen een passende lege-staat met instructies.
 
