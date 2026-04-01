@@ -154,7 +154,7 @@ const RouteOptimization = () => {
   const { data: tenantSettings } = useTenantSettings();
   useGeocodeBackfill();
   
-  const [stops, setStops] = useState<Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: string; tripId?: string; orderNumber?: string; stopType?: string; houseNumber?: string; notes?: string; documentUrl?: string; documentName?: string; country?: string }>>(demoStops);
+  const [stops, setStops] = useState<Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: string; tripId?: string; orderNumber?: string; stopType?: string; houseNumber?: string; notes?: string; documentUrl?: string; documentName?: string; country?: string }>>([]);
   const [optimizationResult, setOptimizationResult] = useState<any>(null);
   const [respectTimeWindows, setRespectTimeWindows] = useState(true);
   const [avoidTolls, setAvoidTolls] = useState(false);
