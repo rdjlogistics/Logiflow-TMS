@@ -123,9 +123,9 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <TooltipTrigger asChild>
                 <Card 
                   className={cn(
-                    "relative overflow-hidden border-border/50 bg-card/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group h-full",
+                    "relative overflow-hidden border-white/[0.06] dark:border-white/[0.06] bg-white/[0.04] dark:bg-white/[0.04] backdrop-blur-xl shadow-none hover:bg-white/[0.07] dark:hover:bg-white/[0.07] transition-all duration-500 group h-full",
                     card.onClick && "cursor-pointer",
-                    card.pulse && "ring-2 ring-destructive/30 ring-offset-2 ring-offset-background"
+                    card.pulse && "ring-1 ring-destructive/20 ring-offset-1 ring-offset-background"
                   )}
                   onClick={card.onClick}
                 >
