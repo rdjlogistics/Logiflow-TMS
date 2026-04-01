@@ -55,7 +55,7 @@ const getErrorMessage = (error: { message: string }) => {
   return `Er is een fout opgetreden: ${error.message}`;
 };
 
-const Auth = () => {
+const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
   const { user, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
