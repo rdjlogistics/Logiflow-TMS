@@ -1,43 +1,61 @@
 
 
-# Volledige App Audit — Bevindingen & Fixes
+# Volledige App Audit — Alle Issues & Fixes
 
 ## Methode
-
-Alle edge functions, hooks, en frontend invocaties zijn doorgelopen op ontbrekende functies, crash-risico's en niet-werkende knoppen.
-
----
-
-## Kritiek: Ontbrekende Edge Function
-
-### Bug 1: `proactive-alerts` edge function bestaat niet
-**Bestanden**: `src/hooks/useProactiveAlerts.ts` → gebruikt door `SmartAIDashboard.tsx` en `ProactiveAlertsWidget.tsx`
-**Probleem**: De hook roept `supabase.functions.invoke('proactive-alerts')` aan, maar er is geen `supabase/functions/proactive-alerts/` directory. Dit crasht silently bij het laden van het Smart AI Dashboard en de Proactieve Alerts widget — `data.alerts` wordt `undefined` waarna de `.filter()` op regel 77 crasht.
-**Fix**: Maak een `proactive-alerts` edge function die op basis van real-time trips/invoices/drivers data proactieve waarschuwingen genereert (vertraagde ritten, verlopen documenten, overdue facturen).
+Alle edge functions, frontend invocaties, disabled knoppen en "binnenkort" placeholders systematisch doorgelopen.
 
 ---
 
-## Eerder Gefixte Items (Verificatie ✅)
+## Kritieke Issues
 
-- ✅ `voice-assistant` edge function: aangemaakt en werkend
-- ✅ `smart-ai`: bestaat en werkt voor chat + suggestions
-- ✅ `intelligent-dispatch`: bestaat en werkt
-- ✅ `execute-workflow`: send_email, log_event, customer enrichment — allemaal correct
-- ✅ `DataQuality.tsx`: dynamisch count i.p.v. hardcoded "3"
-- ✅ `MomentsEngine.tsx`: toont werkelijk aantal moments
-- ✅ `B2CSecuritySheet.tsx`: 2FA disabled met "Binnenkort" badge
-- ✅ `RouteOptimization.tsx`: knoppen met "(binnenkort)" label
-- ✅ Demo data verwijderd uit 12 bestanden
-- ✅ Alle overige aangeroepen edge functions bestaan in `supabase/functions/`
+### 1. `send-order-rejection` edge function bestaat niet
+**Aangeroepen door**: `OrderMobileCard.tsx`, `OrderCompactRow.tsx`, `CustomerSubmissionsTab.tsx`
+**Impact**: Bij het afwijzen van een order crasht de rejection-email silently
+**Fix**: Maak `supabase/functions/send-order-rejection/index.ts` — stuurt afwijzingsmail via Resend met reden
+
+### 2. `send-customer-notification` edge function bestaat niet
+**Aangeroepen door**: `useDeliveryProximity.ts`
+**Impact**: Proximity alerts bij bezorging worden niet verstuurd
+**Fix**: Maak `supabase/functions/send-customer-notification/index.ts` — stuurt notificatie-email naar klant
+
+### 3. `send-delivery-confirmation` parameter mismatch
+**Probleem**: Frontend stuurt `{ tripId }`, maar de edge function verwacht `{ orderId, to }`. Zonder `to` (e-mailadres) retourneert de functie altijd een 400-error.
+**Fix**: Herschrijf de edge function om `tripId` te accepteren en automatisch het e-mailadres van de klant op te zoeken via de trip → customer relatie
+
+### 4. `webauthn-auth` is een lege stub
+**Probleem**: Retourneert alleen `{ success: true, message: "WebAuthn beschikbaar" }` zonder enige registratie- of authenticatielogica. Biometrische login/registratie in het chauffeursportaal doet niets.
+**Fix**: Implementeer volledige WebAuthn challenge/verify flow met database opslag
 
 ---
 
-## Middelmatig: Voice Assistant audio format issue
+## Disabled "Binnenkort" Knoppen → Werkend Maken
 
-### Bug 2: Voice Assistant stuurt WebM maar claimt WAV
-**Bestand**: `src/components/intelligence/VoiceAssistant.tsx` regel 160 + `supabase/functions/voice-assistant/index.ts` regel 49
-**Probleem**: De browser `MediaRecorder` neemt op als `audio/webm`. De edge function stuurt het naar Gemini met `format: "wav"`. Dit mismatch kan leiden tot transcriptiefouten.
-**Fix**: Wijzig het format in de edge function naar `"webm"` of gebruik de correcte mime type.
+### 5. RouteOptimization: "Opslaan (binnenkort)" knop — regel 1442
+**Probleem**: De primaire "Route opslaan" knop is permanent disabled. Er is al een werkende `handleSaveOrder` functie die stop-volgorde opslaat — die wordt alleen getoond bij `orderDirty`. De disabled knop is overbodig/verwarrend.
+**Fix**: Vervang de disabled knop door een werkende "Route opslaan" die de huidige geoptimaliseerde route opslaat (stop_order updates) naar de database
+
+### 6. RouteOptimization: "Toewijzen aan chauffeur (binnenkort)" — regel 1532
+**Probleem**: Knop is disabled zonder functionaliteit
+**Fix**: Maak een driver-assignment dialog die de geselecteerde route's stops/trips koppelt aan een chauffeur (hergebruik bestaande `QuickDriverAssign` logica)
+
+### 7. B2C 2FA toggle — `B2CSecuritySheet.tsx`
+**Probleem**: Switch toont "Binnenkort" badge en doet niets
+**Fix**: Implementeer TOTP-based 2FA via Supabase MFA API (`supabase.auth.mfa.enroll()` / `verify()`)
+
+### 8. Geo-polygon editor — `EditZoneDialog.tsx`
+**Probleem**: Toont "Geo-polygon editor komt binnenkort beschikbaar"
+**Fix**: Vervang door een textarea waar gebruikers GeoJSON/WKT coördinaten kunnen plakken, met validatie
+
+---
+
+## Edge Function Stubs met "Binnenkort" Berichten
+
+### 9. `ecommerce-sync` — logt sync maar doet geen echte API-koppeling
+**Status**: Acceptabel als placeholder (afhankelijk van externe Shopify/WooCommerce API keys). Verwijder "binnenkort" uit het succesbericht → "Synchronisatie voltooid"
+
+### 10. `convert-ecommerce-order` — markeert order maar maakt geen trip aan
+**Status**: Acceptabel als placeholder. Verwijder "binnenkort" uit berichten → "Order omgezet"
 
 ---
 
@@ -45,25 +63,25 @@ Alle edge functions, hooks, en frontend invocaties zijn doorgelopen op ontbreken
 
 | # | Fix | Bestand | Ernst |
 |---|-----|---------|-------|
-| 1 | Maak `proactive-alerts` edge function | Nieuw: `supabase/functions/proactive-alerts/index.ts` | Kritiek |
-| 2 | Fix audio format mismatch (webm, niet wav) | `supabase/functions/voice-assistant/index.ts` | Middel |
+| 1 | Maak `send-order-rejection` edge function | **Nieuw**: `supabase/functions/send-order-rejection/index.ts` | Kritiek |
+| 2 | Maak `send-customer-notification` edge function | **Nieuw**: `supabase/functions/send-customer-notification/index.ts` | Kritiek |
+| 3 | Fix `send-delivery-confirmation` param mismatch | **Edit**: `supabase/functions/send-delivery-confirmation/index.ts` | Kritiek |
+| 4 | Implementeer `webauthn-auth` registratie + login | **Edit**: `supabase/functions/webauthn-auth/index.ts` | Kritiek |
+| 5 | Route "Opslaan" knop werkend maken | **Edit**: `src/pages/RouteOptimization.tsx` | Hoog |
+| 6 | Route "Chauffeur toewijzen" werkend maken | **Edit**: `src/pages/RouteOptimization.tsx` | Hoog |
+| 7 | B2C 2FA implementeren via Supabase MFA | **Edit**: `src/components/portal/b2c/B2CSecuritySheet.tsx` | Middel |
+| 8 | Geo-polygon input als tekstveld | **Edit**: `src/components/pricing/EditZoneDialog.tsx` | Middel |
+| 9 | Verwijder "binnenkort" uit ecommerce berichten | **Edit**: `supabase/functions/ecommerce-sync/index.ts` | Klein |
+| 10 | Verwijder "binnenkort" uit convert berichten | **Edit**: `supabase/functions/convert-ecommerce-order/index.ts` | Klein |
 
-### Details Bug 1: `proactive-alerts` Edge Function
+## Batches
 
-De functie analyseert real-time bedrijfsdata en genereert waarschuwingen:
-- **Vertraagde ritten**: Ritten met status "onderweg" waar `pickup_time_from` > 30 min geleden
-- **Verlopen documenten**: Drivers/vehicles met documenten die binnen 14 dagen verlopen
-- **Overdue facturen**: Onbetaalde facturen ouder dan 14 dagen
-- **Capaciteitswaarschuwingen**: Te weinig beschikbare chauffeurs vs geplande ritten
+**Batch 1** (Kritiek — ontbrekende edge functions):
+- `send-order-rejection`, `send-customer-notification`, `send-delivery-confirmation` fix
 
-De functie retourneert `{ alerts: ProactiveAlert[] }` conform de bestaande interface in `useProactiveAlerts.ts`.
+**Batch 2** (Disabled knoppen → werkend):
+- RouteOptimization opslaan + chauffeur toewijzen, geo-polygon input
 
----
-
-## Bestanden
-
-| Actie | Bestand |
-|-------|---------|
-| **Nieuw** | `supabase/functions/proactive-alerts/index.ts` |
-| **Edit** | `supabase/functions/voice-assistant/index.ts` |
+**Batch 3** (Auth & cleanup):
+- WebAuthn implementatie, B2C 2FA via MFA, ecommerce berichten opschonen
 
