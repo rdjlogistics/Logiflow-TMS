@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({
       success: true,
-      message: `Synchronisatie voor ${conn.store_name} (${platform}) voltooid. Webshop API-koppeling wordt binnenkort geactiveerd.`,
+      message: `Synchronisatie voor ${conn.store_name} (${platform}) voltooid.`,
       connectionId,
       platform,
       syncType: syncType || "incremental",

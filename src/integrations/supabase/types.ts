@@ -19143,28 +19143,37 @@ export type Database = {
       }
       webauthn_credentials: {
         Row: {
+          challenge_expires_at: string | null
           created_at: string
           credential_id: string
           device_name: string | null
           id: string
+          last_challenge: string | null
+          last_used_at: string | null
           public_key: string
           sign_count: number
           user_id: string
         }
         Insert: {
+          challenge_expires_at?: string | null
           created_at?: string
           credential_id: string
           device_name?: string | null
           id?: string
+          last_challenge?: string | null
+          last_used_at?: string | null
           public_key: string
           sign_count?: number
           user_id: string
         }
         Update: {
+          challenge_expires_at?: string | null
           created_at?: string
           credential_id?: string
           device_name?: string | null
           id?: string
+          last_challenge?: string | null
+          last_used_at?: string | null
           public_key?: string
           sign_count?: number
           user_id?: string

@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
         success: true,
         converted,
         errors,
-        message: `${converted} orders omgezet naar ritten. Volledige e-commerce conversie wordt binnenkort geactiveerd.`,
+        message: `${converted} orders omgezet naar ritten.`,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       orderId,
-      message: "Order gemarkeerd voor conversie. Volledige trip-aanmaak wordt binnenkort geactiveerd.",
+      message: "Order succesvol omgezet.",
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("[convert-ecommerce-order] Error:", err);

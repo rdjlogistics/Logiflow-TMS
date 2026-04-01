@@ -66,13 +66,62 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
     }
   };
 
+  const [enrolling2FA, setEnrolling2FA] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [verifyCode, setVerifyCode] = useState('');
+  const [factorId, setFactorId] = useState<string | null>(null);
+
   const handleToggle2FA = async (enabled: boolean) => {
-    // 2FA requires additional infrastructure (TOTP setup)
-    // For now, show informative message
     if (enabled) {
-      toast.info("Twee-factor authenticatie wordt binnenkort ondersteund. We werken aan deze functie.");
+      setEnrolling2FA(true);
+      try {
+        const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
+        if (error) throw error;
+        if (data) {
+          setFactorId(data.id);
+          setQrCode(data.totp.qr_code);
+        }
+      } catch (err: any) {
+        toast.error(`2FA activeren mislukt: ${err.message}`);
+        setEnrolling2FA(false);
+      }
+    } else {
+      // Unenroll
+      try {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factors?.totp?.[0];
+        if (totpFactor) {
+          await supabase.auth.mfa.unenroll({ factorId: totpFactor.id });
+          setTwoFAEnabled(false);
+          toast.success("2FA uitgeschakeld");
+        }
+      } catch (err: any) {
+        toast.error(`2FA uitschakelen mislukt: ${err.message}`);
+      }
     }
-    // Don't toggle the switch since it's not yet implemented
+  };
+
+  const handleVerify2FA = async () => {
+    if (!factorId || !verifyCode) return;
+    setSaving(true);
+    try {
+      const { data: challengeData, error: challengeErr } = await supabase.auth.mfa.challenge({ factorId });
+      if (challengeErr) throw challengeErr;
+      
+      const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId, challengeId: challengeData.id, code: verifyCode });
+      if (verifyErr) throw verifyErr;
+      
+      setTwoFAEnabled(true);
+      setEnrolling2FA(false);
+      setQrCode(null);
+      setVerifyCode('');
+      setFactorId(null);
+      toast.success("2FA succesvol geactiveerd!");
+    } catch (err: any) {
+      toast.error(`Verificatie mislukt: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSignOutAllSessions = async () => {
@@ -170,15 +219,41 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-sm">Twee-factor authenticatie</p>
-                    <p className="text-xs text-muted-foreground">Extra beveiliging bij inloggen</p>
-                    <Badge variant="outline" className="text-[10px] mt-0.5 text-muted-foreground">Binnenkort</Badge>
+                    <p className="text-xs text-muted-foreground">Extra beveiliging via authenticator app</p>
                   </div>
                   <Switch 
-                    checked={false}
-                    disabled
-                    className="opacity-50"
+                    checked={twoFAEnabled}
+                    onCheckedChange={handleToggle2FA}
+                    disabled={enrolling2FA}
                   />
                 </div>
+                {enrolling2FA && qrCode && (
+                  <div className="mt-4 pt-3 border-t border-border/50 space-y-3">
+                    <p className="text-xs text-muted-foreground">Scan de QR-code met je authenticator app (bijv. Google Authenticator):</p>
+                    <div className="flex justify-center">
+                      <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 rounded-lg" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="verifyCode">Verificatiecode</Label>
+                      <Input
+                        id="verifyCode"
+                        value={verifyCode}
+                        onChange={(e) => setVerifyCode(e.target.value)}
+                        placeholder="6-cijferige code"
+                        maxLength={6}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEnrolling2FA(false); setQrCode(null); setFactorId(null); }}>
+                        Annuleren
+                      </Button>
+                      <Button size="sm" className="flex-1" onClick={handleVerify2FA} disabled={saving || verifyCode.length < 6}>
+                        {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                        Activeren
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
             

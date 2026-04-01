@@ -101,8 +101,18 @@ export const EditZoneDialog: React.FC<EditZoneDialogProps> = ({
         return { cities };
       case "country":
         return { countries };
-      case "geo_polygon":
-        return { coordinates: [] };
+      case "geo_polygon": {
+        const coords = (window as any).__geoCoords;
+        if (Array.isArray(coords)) {
+          return { coordinates: coords };
+        }
+        try {
+          const parsed = JSON.parse(coords || "[]");
+          return { coordinates: Array.isArray(parsed) ? parsed : [] };
+        } catch {
+          return { coordinates: [] };
+        }
+      }
       default:
         return {};
     }
@@ -288,10 +298,34 @@ export const EditZoneDialog: React.FC<EditZoneDialogProps> = ({
             </div>
           )}
 
-          {/* Geo Polygon Placeholder */}
+          {/* Geo Polygon Editor */}
           {matchType === "geo_polygon" && (
-            <div className="p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
-              Geo-polygon editor komt binnenkort beschikbaar
+            <div className="space-y-3">
+              <Label>GeoJSON Coördinaten</Label>
+              <textarea
+                className="w-full h-32 p-3 text-xs font-mono border rounded-lg bg-background resize-y focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={'Plak GeoJSON coördinaten, bijv.:\n[[4.89, 52.37], [4.90, 52.38], [4.91, 52.37], [4.89, 52.37]]'}
+                value={(() => {
+                  const rules = zone?.match_rules_json as Record<string, unknown>;
+                  return rules?.coordinates ? JSON.stringify(rules.coordinates, null, 2) : '';
+                })()}
+                onChange={(e) => {
+                  // Store raw text; buildMatchRules will parse it
+                  try {
+                    const parsed = JSON.parse(e.target.value);
+                    if (Array.isArray(parsed)) {
+                      // Valid — will be picked up by buildMatchRules override
+                      (window as any).__geoCoords = parsed;
+                    }
+                  } catch {
+                    // Allow typing, validation on save
+                    (window as any).__geoCoords = e.target.value;
+                  }
+                }}
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Voer een array van [lng, lat] coördinaten in als GeoJSON polygon
+              </p>
             </div>
           )}
 
