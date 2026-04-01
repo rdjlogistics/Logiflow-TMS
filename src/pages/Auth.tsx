@@ -735,6 +735,6 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
       </div>
     </div>
   );
-};
+});
 
 export default Auth;

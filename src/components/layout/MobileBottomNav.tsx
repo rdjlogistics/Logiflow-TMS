@@ -22,14 +22,12 @@ const tabs: NavTab[] = [
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  if (pathname === "/admin/settings" && search.includes("tab=notificaties")) {
-    return "meldingen";
-  }
   if (pathname.startsWith("/admin/settings")) {
     return "instellingen";
   }
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
+  if (pathname.startsWith("/trips")) return "ritten";
   return "home";
 }
 

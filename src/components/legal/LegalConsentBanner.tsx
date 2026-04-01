@@ -239,7 +239,7 @@ export const LegalConsentBanner = React.forwardRef<HTMLDivElement>(function Lega
       </Dialog>
     </>
   );
-}
+});
 
 interface ConsentItemProps {
   icon: React.ElementType;
