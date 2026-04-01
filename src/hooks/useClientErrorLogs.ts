@@ -26,7 +26,7 @@ export function useClientErrorLogs(limit = 50) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('client_error_logs')
-        .select('*')
+        .select('id, error_message, error_stack, component_name, url, user_agent, created_at')
         .order('created_at', { ascending: false })
         .limit(limit);
 

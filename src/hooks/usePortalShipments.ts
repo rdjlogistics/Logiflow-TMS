@@ -204,7 +204,7 @@ export function useShipmentTracking(shipmentId: string) {
         // First try to find as customer submission
         const { data: submission, error: subError } = await supabase
           .from('customer_submissions')
-          .select('*')
+          .select('id, reference_number, status, pickup_city, delivery_city, pickup_address, delivery_address, house_number_pickup, house_number_delivery, pickup_postal_code, delivery_postal_code, created_at, delivery_date, quantity, weight_kg, estimated_price, product_description, converted_trip_id')
           .eq('id', shipmentId)
           .maybeSingle();
 

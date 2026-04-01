@@ -99,7 +99,7 @@ export const usePODClaims = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("chain_of_custody_events")
-        .select("*")
+        .select("id, tenant_id, order_id, event_type, recorded_at, actor_role, actor_id, details_json")
         .order("recorded_at", { ascending: false })
         .limit(200);
       if (error) throw error;
