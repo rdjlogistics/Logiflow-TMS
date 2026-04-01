@@ -278,7 +278,7 @@ export const useDashboardData = () => {
     hasEnoughData,
     loading: isLoading,
     error: error instanceof Error ? error : null,
-    lastRefresh: new Date(),
+    lastRefresh: dataUpdatedAt ? new Date(dataUpdatedAt) : new Date(),
     refetch: handleRefetch,
   };
 };

@@ -139,6 +139,8 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
             </div>
             
             <div className="flex items-center gap-1.5 flex-shrink-0">
+              {/* Global Search */}
+              <GlobalSearch />
               {/* Notification Center */}
               <NotificationBell />
 
