@@ -1529,11 +1529,9 @@ const RouteOptimization = () => {
                         </Button>
                       </div>
                     )}
-                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px]" disabled={true}
-                      title="Chauffeur toewijzen wordt binnenkort beschikbaar"
-                    >
+                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px] opacity-50" disabled={true}>
                       <Truck className="h-3 w-3 mr-1" />
-                      Toewijzen aan chauffeur
+                      Toewijzen aan chauffeur (binnenkort)
                     </Button>
                   </CardContent>
                 </Card>
