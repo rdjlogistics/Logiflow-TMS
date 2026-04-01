@@ -871,7 +871,7 @@ const Carriers = () => {
     setTrashLoading(true);
     const { data, error } = await supabase
       .from('carriers')
-      .select('*')
+      .select('id, company_name, contact_name, email, phone, city, country, is_active, rating, deleted_at')
       .eq('tenant_id', company.id)
       .not('deleted_at', 'is', null)
       .order('deleted_at', { ascending: false });
