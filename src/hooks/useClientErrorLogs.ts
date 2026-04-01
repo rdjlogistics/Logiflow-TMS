@@ -72,5 +72,6 @@ export function useClientErrorSummary() {
       return Array.from(grouped.values()).sort((a, b) => b.count - a.count);
     },
     refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
   });
 }

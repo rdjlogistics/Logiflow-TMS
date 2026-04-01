@@ -65,6 +65,7 @@ export default function TelematicsIntegration() {
       return data ?? [];
     },
     refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
   const handleAddConnection = () => {

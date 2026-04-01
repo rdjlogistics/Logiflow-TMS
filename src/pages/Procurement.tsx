@@ -129,7 +129,7 @@ const Procurement = () => {
       if (!selectedRFQ?.id) return [];
       const { data, error } = await supabase
         .from("rfq_offertes" as any)
-        .select("*")
+        .select("id, rfq_id, carrier_naam, carrier_email, prijs, doorlooptijd_uren, notities, status, created_at")
         .eq("rfq_id", selectedRFQ.id)
         .order("prijs", { ascending: true });
       if (error) throw error;

@@ -152,10 +152,10 @@ export const useLearningSystemDB = () => {
       // Get recent events for analysis
       const { data: events } = await supabase
         .from('learning_events')
-        .select('*')
+        .select('id, event_type, context, decision, outcome, created_at')
         .eq('tenant_id', currentCompany.id)
         .order('created_at', { ascending: false })
-        .limit(200);
+        .limit(100);
 
       if (!events || events.length < 3) {
         setIsLearning(false);

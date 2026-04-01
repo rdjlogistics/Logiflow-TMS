@@ -1021,7 +1021,7 @@ const Carriers = () => {
     const carrierIds = exportCarriers.map(c => c.id);
     const { data: contactsData } = await supabase
       .from('carrier_contacts')
-      .select('*')
+      .select('id, carrier_id, name, role, email, phone, is_primary')
       .in('carrier_id', carrierIds)
       .eq('tenant_id', company.id);
 
