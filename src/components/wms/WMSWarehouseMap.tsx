@@ -243,16 +243,7 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
   );
 }
 
-// Demo zones generator
+// Returns empty array — zones come from database
 export function generateDemoZones(): Zone[] {
-  return [
-    { id: "1", code: "A1", name: "Opslag Zone A", type: "storage", utilization: 82, items: 1250 },
-    { id: "2", code: "A2", name: "Opslag Zone B", type: "storage", utilization: 65, items: 890 },
-    { id: "3", code: "B1", name: "Picking Zone", type: "picking", utilization: 45, items: 320, alerts: 2 },
-    { id: "4", code: "C1", name: "Staging Area", type: "staging", utilization: 91, items: 45 },
-    { id: "5", code: "R1", name: "Receiving Dock", type: "receiving", utilization: 30, items: 12 },
-    { id: "6", code: "S1", name: "Shipping Dock", type: "shipping", utilization: 55, items: 28 },
-    { id: "7", code: "K1", name: "Koeling", type: "cold", utilization: 78, items: 156 },
-    { id: "8", code: "H1", name: "ADR Opslag", type: "hazmat", utilization: 25, items: 42, alerts: 1 },
-  ];
+  return [];
 }

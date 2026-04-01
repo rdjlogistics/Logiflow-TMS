@@ -12,14 +12,9 @@ interface B2CPaymentSheetProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Demo payment methods
-const demoPaymentMethods: PaymentMethod[] = [
-  { id: "1", type: "ideal", name: "iDEAL - ING", last4: "****", isDefault: true },
-  { id: "2", type: "card", name: "Visa", last4: "4242", isDefault: false },
-];
 
 export const B2CPaymentSheet = ({ open, onOpenChange }: B2CPaymentSheetProps) => {
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(demoPaymentMethods);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const handleSetDefault = (id: string) => {

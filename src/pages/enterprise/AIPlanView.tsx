@@ -34,11 +34,6 @@ import { nl } from 'date-fns/locale';
 import { useCopilotContext } from '@/components/copilot';
 import { useToast } from '@/hooks/use-toast';
 
-const demoPlanRevisions = [
-  { id: '1', time: '08:45', trigger: 'Nieuwe order', description: 'ORD-2024-008 toegevoegd, herplanning uitgevoerd', impact: '+12 km, -5 min wachttijd', status: 'applied' },
-  { id: '2', time: '09:30', trigger: 'Vertraging', description: 'ORD-2024-003 30 min vertraagd door file A2', impact: 'Volgorde aangepast', status: 'applied' },
-  { id: '3', time: '10:15', trigger: 'GPS Alert', description: 'Chauffeur Klaas geen GPS signaal 5 min', impact: 'Monitoring actief', status: 'proposed' },
-];
 
 const timeSlots = Array.from({ length: 12 }, (_, i) => i + 6); // 6:00 - 17:00
 
@@ -65,7 +60,7 @@ interface PlanAssignment {
 const AIPlanView: React.FC = () => {
   const [isAutoPlanning, setIsAutoPlanning] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [planRevisions, setPlanRevisions] = useState(demoPlanRevisions);
+  const [planRevisions, setPlanRevisions] = useState<Array<{ id: string; time: string; trigger: string; description: string; impact: string; status: string }>>([]);
   const { openPanel } = useCopilotContext();
   const { toast } = useToast();
 

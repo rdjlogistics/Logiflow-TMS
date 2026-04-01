@@ -104,17 +104,8 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
 };
 
-// Demo stops data (fallback when no real data)
-const demoStops = [
-  { id: "1", address: "Hoofdkantoor Amsterdam", city: "Amsterdam", lat: 52.3676, lng: 4.9041, timeWindow: "08:00-10:00", priority: "high" as const },
-  { id: "2", address: "Distributiecentrum Utrecht", city: "Utrecht", lat: 52.0907, lng: 5.1214, timeWindow: "10:00-12:00", priority: "medium" as const },
-  { id: "3", address: "Warehouse Rotterdam", city: "Rotterdam", lat: 51.9244, lng: 4.4777, timeWindow: "12:00-14:00", priority: "medium" as const },
-  { id: "4", address: "Klant Den Haag", city: "Den Haag", lat: 52.0705, lng: 4.3007, timeWindow: "14:00-16:00", priority: "low" as const },
-  { id: "5", address: "Depot Eindhoven", city: "Eindhoven", lat: 51.4416, lng: 5.4697, timeWindow: "16:00-18:00", priority: "high" as const },
-  { id: "6", address: "Hub Groningen", city: "Groningen", lat: 53.2194, lng: 6.5665, timeWindow: "09:00-11:00", priority: "medium" as const },
-  { id: "7", address: "Terminal Breda", city: "Breda", lat: 51.5719, lng: 4.7683, timeWindow: "11:00-13:00", priority: "low" as const },
-  { id: "8", address: "Overslagpunt Arnhem", city: "Arnhem", lat: 51.9851, lng: 5.8987, timeWindow: "13:00-15:00", priority: "high" as const },
-];
+// Empty default (no demo data for new accounts)
+const demoStops: Array<{ id: string; address: string; city: string; lat: number; lng: number; timeWindow: string; priority: "high" | "medium" | "low" }> = [];
 
 const providerLabels: Record<string, string> = {
   smartroute: "SmartRoute",

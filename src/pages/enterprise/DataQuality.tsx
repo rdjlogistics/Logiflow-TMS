@@ -43,42 +43,6 @@ const DataQuality = () => {
     }, 2000);
   };
 
-  // Demo data
-  const demoDuplicates = [
-    {
-      id: '1',
-      entity_type: 'customer',
-      entity_id_a: 'cust-001',
-      entity_id_b: 'cust-045',
-      confidence: 0.92,
-      match_reasons: { name_similarity: 0.95, address_match: true, phone_match: false },
-      status: 'pending',
-      entity_a_name: 'Van der Berg Transport B.V.',
-      entity_b_name: 'Van den Berg Transport BV'
-    },
-    {
-      id: '2',
-      entity_type: 'address',
-      entity_id_a: 'addr-012',
-      entity_id_b: 'addr-089',
-      confidence: 0.88,
-      match_reasons: { street_match: true, city_match: true, postal_code_similar: true },
-      status: 'pending',
-      entity_a_name: 'Hoofdstraat 123, Amsterdam',
-      entity_b_name: 'Hoofdstraat 123-A, Amsterdam'
-    },
-    {
-      id: '3',
-      entity_type: 'payee',
-      entity_id_a: 'pay-034',
-      entity_id_b: 'pay-078',
-      confidence: 0.85,
-      match_reasons: { name_similarity: 0.82, iban_match: true },
-      status: 'pending',
-      entity_a_name: 'Jansen Logistics',
-      entity_b_name: 'Jansen Logistics B.V.'
-    },
-  ];
 
   const getEntityIcon = (type: string) => {
     switch (type) {
@@ -126,7 +90,7 @@ const DataQuality = () => {
     }
   };
 
-  const displayDuplicates = duplicates?.length ? duplicates : demoDuplicates;
+  const displayDuplicates = duplicates || [];
 
   return (
     <DashboardLayout 
