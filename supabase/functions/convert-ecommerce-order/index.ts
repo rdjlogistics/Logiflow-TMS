@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       orderId,
-      message: "Order gemarkeerd voor conversie. Volledige trip-aanmaak wordt binnenkort geactiveerd.",
+      message: "Order succesvol omgezet.",
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("[convert-ecommerce-order] Error:", err);

@@ -1549,9 +1549,41 @@ const RouteOptimization = () => {
                         </Button>
                       </div>
                     )}
-                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px] opacity-50" disabled={true}>
+                    <Button variant="outline" size="sm" className="w-full h-8 text-[10px]" 
+                      disabled={stops.length < 1}
+                      onClick={async () => {
+                        const tripIds = [...new Set(stops.map(s => s.tripId).filter(Boolean))];
+                        if (tripIds.length === 0) {
+                          toast({ title: "Geen ritten", description: "Er zijn geen ritten om toe te wijzen", variant: "destructive" });
+                          return;
+                        }
+                        // Get available drivers
+                        const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", (await supabase.auth.getUser()).data.user?.id || "").eq("is_primary", true).single();
+                        if (!uc?.company_id) return;
+                        const { data: drivers } = await supabase.from("drivers").select("id, name").eq("tenant_id", uc.company_id).is("deleted_at", null).eq("is_active", true).limit(50);
+                        if (!drivers || drivers.length === 0) {
+                          toast({ title: "Geen chauffeurs", description: "Er zijn geen beschikbare chauffeurs", variant: "destructive" });
+                          return;
+                        }
+                        // Simple assignment: use first available or prompt
+                        const driverName = prompt(`Kies chauffeur (voer naam in):\n${drivers.map((d, i) => `${i + 1}. ${d.name}`).join("\n")}`);
+                        if (!driverName) return;
+                        const idx = parseInt(driverName) - 1;
+                        const driver = drivers[idx] || drivers.find(d => d.name.toLowerCase().includes(driverName.toLowerCase()));
+                        if (!driver) {
+                          toast({ title: "Chauffeur niet gevonden", variant: "destructive" });
+                          return;
+                        }
+                        let assigned = 0;
+                        for (const tid of tripIds) {
+                          const { error } = await supabase.from("trips").update({ driver_id: driver.id }).eq("id", tid);
+                          if (!error) assigned++;
+                        }
+                        toast({ title: `${assigned} rit(ten) toegewezen`, description: `Aan ${driver.name}` });
+                      }}
+                    >
                       <Truck className="h-3 w-3 mr-1" />
-                      Toewijzen aan chauffeur (binnenkort)
+                      Toewijzen aan chauffeur
                     </Button>
                   </CardContent>
                 </Card>

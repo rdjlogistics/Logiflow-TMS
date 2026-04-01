@@ -219,15 +219,41 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-sm">Twee-factor authenticatie</p>
-                    <p className="text-xs text-muted-foreground">Extra beveiliging bij inloggen</p>
-                    <Badge variant="outline" className="text-[10px] mt-0.5 text-muted-foreground">Binnenkort</Badge>
+                    <p className="text-xs text-muted-foreground">Extra beveiliging via authenticator app</p>
                   </div>
                   <Switch 
-                    checked={false}
-                    disabled
-                    className="opacity-50"
+                    checked={twoFAEnabled}
+                    onCheckedChange={handleToggle2FA}
+                    disabled={enrolling2FA}
                   />
                 </div>
+                {enrolling2FA && qrCode && (
+                  <div className="mt-4 pt-3 border-t border-border/50 space-y-3">
+                    <p className="text-xs text-muted-foreground">Scan de QR-code met je authenticator app (bijv. Google Authenticator):</p>
+                    <div className="flex justify-center">
+                      <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 rounded-lg" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="verifyCode">Verificatiecode</Label>
+                      <Input
+                        id="verifyCode"
+                        value={verifyCode}
+                        onChange={(e) => setVerifyCode(e.target.value)}
+                        placeholder="6-cijferige code"
+                        maxLength={6}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEnrolling2FA(false); setQrCode(null); setFactorId(null); }}>
+                        Annuleren
+                      </Button>
+                      <Button size="sm" className="flex-1" onClick={handleVerify2FA} disabled={saving || verifyCode.length < 6}>
+                        {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                        Activeren
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
             
