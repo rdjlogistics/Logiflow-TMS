@@ -1439,9 +1439,29 @@ const RouteOptimization = () => {
                             <RotateCcw className="h-3.5 w-3.5 mr-1" />
                             Reset
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs opacity-50" disabled={true}>
+                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" 
+                            disabled={!optimizationResult || isSavingOrder}
+                            onClick={async () => {
+                              if (!optimizationResult) return;
+                              try {
+                                setIsSavingOrder(true);
+                                const tripStops = stops.filter(s => !s.id.includes("-pickup") && !s.id.includes("-delivery"));
+                                for (let i = 0; i < tripStops.length; i++) {
+                                  const stop = tripStops[i];
+                                  if (stop.id) {
+                                    await supabase.from("route_stops").update({ stop_order: i + 1 }).eq("id", stop.id);
+                                  }
+                                }
+                                toast({ title: "Route opgeslagen ✅", description: "Stop-volgorde is bijgewerkt" });
+                              } catch (err) {
+                                toast({ title: "Fout", description: "Kon route niet opslaan", variant: "destructive" });
+                              } finally {
+                                setIsSavingOrder(false);
+                              }
+                            }}
+                          >
                             <Save className="h-3.5 w-3.5 mr-1" />
-                            Opslaan (binnenkort)
+                            {isSavingOrder ? "Opslaan..." : "Opslaan"}
                           </Button>
                         </div>
                       </div>
