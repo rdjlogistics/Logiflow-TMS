@@ -276,7 +276,8 @@ export const useSafetyProfiles = () => {
         .from('safety_profiles')
         .select('*')
         .eq('tenant_id', company.id)
-        .order('name');
+        .order('name')
+        .limit(50);
       if (error) throw error;
       return (data || []) as SafetyProfile[];
     },
