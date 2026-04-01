@@ -253,7 +253,8 @@ export const useReconciliationIssues = () => {
         .from('reconciliation_issues')
         .select('*')
         .eq('company_id', company.id)
-        .order('detected_at', { ascending: false });
+        .order('detected_at', { ascending: false })
+        .limit(100);
       if (error) throw error;
       return (data || []) as ReconciliationIssue[];
     },
