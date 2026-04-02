@@ -31,7 +31,9 @@ const B2CPortal = () => {
           <p className="text-sm text-muted-foreground">Volg je pakketten in realtime</p>
         </div>
         
-        <B2CShipmentsList shipments={shipments} loading={loading} />
+        <div ref={shipmentsRef}>
+          <B2CShipmentsList shipments={shipments} loading={loading} />
+        </div>
       </div>
     </B2CLayout>
   );
