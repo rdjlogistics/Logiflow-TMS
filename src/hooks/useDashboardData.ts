@@ -85,13 +85,11 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   }) || [];
   const podTrips = allTrips?.filter(t => ['afgerond', 'gecontroleerd'].includes(t.status) && t.pod_available === false) || [];
 
-  // Invoice calculations
-  const openInvoices = invoicesData?.filter(inv => inv.status === "verzonden" || inv.status === "vervallen").length || 0;
-  const totalRevenue = invoicesData?.reduce((sum, inv) => sum + (Number(inv.amount_paid) || 0), 0) || 0;
-  const pendingPayments = invoicesData?.reduce((sum, inv) => {
-    if (inv.status !== "betaald") return sum + (Number(inv.total_amount) - Number(inv.amount_paid || 0));
-    return sum;
-  }, 0) || 0;
+  // Invoice calculations — now from server-side RPC
+  const invStats = (invoiceStatsResult.data as any) || {};
+  const openInvoices = invStats.open_invoices || 0;
+  const totalRevenue = invStats.total_paid || 0;
+  const pendingPayments = invStats.pending_payments || 0;
 
   // Ops stats
   const terminalStatuses = ['geannuleerd', 'afgerond', 'afgeleverd', 'gecontroleerd', 'gefactureerd'];

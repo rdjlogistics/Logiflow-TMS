@@ -48,7 +48,8 @@ export function useInvoiceStats(companyId?: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchInvoiceStats()
+    if (!companyId) { setLoading(false); return; }
+    fetchInvoiceStats(companyId)
       .then(setStats)
       .catch(console.error)
       .finally(() => setLoading(false));
