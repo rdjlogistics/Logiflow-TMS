@@ -114,53 +114,23 @@ export async function fetchOverdueInvoices(companyId?: string) {
 }
 
 export async function fetchInvoiceStats(companyId?: string) {
-  let query = supabase
-    .from('invoices')
-    .select('status, total_amount, amount_paid, due_date');
-
-  if (companyId) query = query.eq('company_id', companyId);
-
-  const { data, error } = await query;
-
-  if (error) throw error;
-
-  const invoices = data ?? [];
-  const today = new Date().toISOString().split('T')[0];
-
-  let totalRevenue = 0;
-  let totalPaid = 0;
-  let totalOutstanding = 0;
-  let totalOverdue = 0;
-  let countOverdue = 0;
-
-  for (const inv of invoices) {
-    const total = inv.total_amount ?? 0;
-    const paid = inv.amount_paid ?? 0;
-    const open = Math.max(0, total - paid);
-
-    if (inv.status === 'betaald') {
-      totalPaid += total;
-    } else {
-      totalOutstanding += open;
-      if (inv.due_date && inv.due_date < today) {
-        totalOverdue += open;
-        countOverdue++;
-      }
-    }
-    totalRevenue += total;
+  if (!companyId) {
+    return { totalRevenue: 0, totalPaid: 0, totalOutstanding: 0, totalOverdue: 0, countOverdue: 0, total: 0, byStatus: {} };
   }
 
+  const { data, error } = await supabase.rpc('get_invoice_stats', { p_company_id: companyId });
+  if (error) throw error;
+
+  const stats = data as any ?? {};
   return {
-    totalRevenue,
-    totalPaid,
-    totalOutstanding,
-    totalOverdue,
-    countOverdue,
-    total: invoices.length,
-    byStatus: invoices.reduce<Record<string, number>>((acc, inv) => {
-      const s = inv.status ?? 'unknown';
-      acc[s] = (acc[s] ?? 0) + 1;
-      return acc;
-    }, {}),
+    totalRevenue: stats.total_revenue ?? 0,
+    totalPaid: stats.total_paid ?? 0,
+    totalOutstanding: stats.total_outstanding ?? 0,
+    totalOverdue: stats.total_overdue ?? 0,
+    countOverdue: stats.count_overdue ?? 0,
+    total: stats.total ?? 0,
+    openInvoices: stats.open_invoices ?? 0,
+    pendingPayments: stats.pending_payments ?? 0,
+    byStatus: {},
   };
 }
