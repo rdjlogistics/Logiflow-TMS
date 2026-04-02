@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useFuelCardConnections, useFuelCards, useCreateFuelCardConnection, type FuelCardProvider, type ImportMethod } from "@/hooks/useFinance";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Fuel,
   Plus,
