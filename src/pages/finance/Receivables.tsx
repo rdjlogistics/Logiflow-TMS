@@ -210,17 +210,17 @@ export default function Receivables() {
 
   return (
     <DashboardLayout title="Debiteuren & Incasso" description="Openstaande vorderingen, incasso en kredietbeheer">
-      <div className="space-y-6">
+      <div className="space-y-6 pb-24 md:pb-6">
         {/* Premium Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-card/60 backdrop-blur-xl border border-border/30 p-1 rounded-xl">
-            <TabsTrigger value="overzicht" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+          <TabsList className="bg-card/60 backdrop-blur-xl border border-border/30 p-1 rounded-xl w-full sm:w-auto">
+            <TabsTrigger value="overzicht" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Overzicht
             </TabsTrigger>
-            <TabsTrigger value="incasso" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+            <TabsTrigger value="incasso" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Incasso
             </TabsTrigger>
-            <TabsTrigger value="credit" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+            <TabsTrigger value="credit" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Credit Analytics
             </TabsTrigger>
           </TabsList>
