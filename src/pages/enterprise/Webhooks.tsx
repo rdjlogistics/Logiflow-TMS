@@ -34,7 +34,7 @@ const Webhooks = () => {
     setIsSaving(true);
     try {
       const { error } = await supabase.from("notification_channels").insert({
-        tenant_id: companyId,
+        tenant_id: company.id,
         channel_type: "webhook",
         name: `Webhook ${new Date().toLocaleDateString("nl-NL")}`,
         config_json: { url: webhookUrl, events: WEBHOOK_EVENTS.map(e => e.name) },
