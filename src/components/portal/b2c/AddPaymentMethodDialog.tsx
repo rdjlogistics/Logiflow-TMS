@@ -159,9 +159,6 @@ export const AddPaymentMethodDialog = ({
   const handleSubmit = async () => {
     setSaving(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
     let newMethod: PaymentMethod;
     
     switch (selectedType) {

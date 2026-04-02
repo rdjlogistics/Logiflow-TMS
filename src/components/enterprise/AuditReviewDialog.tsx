@@ -31,19 +31,18 @@ export function AuditReviewDialog({ open, onOpenChange, item, onResolve }: Audit
     if (!item || !resolution) return;
     
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    onResolve?.(item, resolution, notes);
-    toast({
-      title: "Audit item afgehandeld ✓",
-      description: `Order ${item.order} is gemarkeerd als "${resolution}".`
-    });
-    
-    setIsSubmitting(false);
-    setResolution("");
-    setNotes("");
-    onOpenChange(false);
+    try {
+      await onResolve?.(item, resolution, notes);
+      toast({
+        title: "Audit item afgehandeld ✓",
+        description: `Order ${item.order} is gemarkeerd als "${resolution}".`
+      });
+      setResolution("");
+      setNotes("");
+      onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!item) return null;

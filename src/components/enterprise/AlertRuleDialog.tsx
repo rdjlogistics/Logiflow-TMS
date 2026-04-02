@@ -39,9 +39,8 @@ export function AlertRuleDialog({ open, onOpenChange, rule, onSave }: AlertRuleD
     if (!name.trim() || !trigger.trim()) return;
     
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onSave?.({
+    try {
+    await onSave?.({
       id: rule?.id || `ALT-${Date.now()}`,
       name,
       trigger,
