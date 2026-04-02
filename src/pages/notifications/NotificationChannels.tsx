@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import {
@@ -73,8 +74,83 @@ const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 export default function NotificationChannels() {
   const { user } = useAuth();
   const [channels, setChannels] = useState<NotificationChannel[]>([]);
-  const [logs] = useState<NotificationLog[]>([]);
+  const [logs, setLogs] = useState<NotificationLog[]>([]);
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
+
+  // Load channels from database on mount
+  const { data: dbChannels } = useQuery({
+    queryKey: ['notification_channels', user?.id],
+    queryFn: async () => {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (!companyId) return [];
+      const { data, error } = await supabase
+        .from('notification_channels')
+        .select('*')
+        .eq('tenant_id', companyId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Load notification logs from database
+  const { data: dbLogs } = useQuery({
+    queryKey: ['notification_logs', user?.id],
+    queryFn: async () => {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (!companyId) return [];
+      const { data, error } = await supabase
+        .from('notification_logs')
+        .select('*')
+        .eq('tenant_id', companyId)
+        .order('sent_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Sync DB data into local state via useEffect
+  useEffect(() => {
+    if (dbChannels && dbChannels.length > 0) {
+      const mapped: NotificationChannel[] = dbChannels.map((ch: any) => ({
+        id: ch.id,
+        type: ch.channel_type as NotificationChannel['type'],
+        name: ch.channel_type === 'whatsapp' ? 'WhatsApp' : ch.channel_type === 'sms' ? 'SMS' : ch.channel_type === 'email' ? 'Email' : 'Push',
+        isActive: ch.is_active ?? false,
+        phoneNumber: ch.config_json?.phone_number,
+      }));
+      setChannels(mapped);
+
+      // Sync templates from channels that have template data
+      const templatesMapped: NotificationTemplate[] = dbChannels
+        .filter((ch: any) => ch.default_templates_json?.event)
+        .map((ch: any) => ({
+          id: ch.id,
+          event: ch.default_templates_json.event,
+          channels: ch.default_templates_json.channels || [ch.channel_type],
+          messageTemplate: ch.default_templates_json.messageTemplate || '',
+          isActive: ch.is_active ?? false,
+        }));
+      if (templatesMapped.length > 0) setTemplates(templatesMapped);
+    }
+  }, [dbChannels]);
+
+  useEffect(() => {
+    if (dbLogs && dbLogs.length > 0) {
+      const mapped: NotificationLog[] = dbLogs.map((l: any) => ({
+        id: l.id,
+        channel: l.channel_type || 'email',
+        recipient: l.recipient || '',
+        message: l.message_body || '',
+        status: l.delivery_status === 'delivered' ? 'delivered' : l.delivery_status === 'failed' ? 'failed' : 'sent',
+        sentAt: new Date(l.sent_at),
+        deliveredAt: l.delivered_at ? new Date(l.delivered_at) : undefined,
+      }));
+      setLogs(mapped);
+    }
+  }, [dbLogs]);
   
   // Template edit dialog state
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
@@ -116,11 +192,20 @@ export default function NotificationChannels() {
     }
   };
 
-  const toggleChannel = (id: string) => {
-    setChannels(channels.map(c => 
-      c.id === id ? { ...c, isActive: !c.isActive } : c
-    ));
-    toast.success('Kanaal status bijgewerkt');
+  const toggleChannel = async (id: string) => {
+    const channel = channels.find(c => c.id === id);
+    if (!channel) return;
+    const newActive = !channel.isActive;
+    setChannels(channels.map(c => c.id === id ? { ...c, isActive: newActive } : c));
+    
+    // Persist to DB
+    try {
+      await supabase.from('notification_channels').update({ is_active: newActive }).eq('id', id);
+      toast.success('Kanaal status bijgewerkt');
+    } catch {
+      setChannels(channels.map(c => c.id === id ? { ...c, isActive: !newActive } : c));
+      toast.error('Kon status niet bijwerken');
+    }
   };
 
   const toggleTemplate = (id: string) => {

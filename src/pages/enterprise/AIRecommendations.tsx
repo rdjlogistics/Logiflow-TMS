@@ -109,15 +109,28 @@ const AIRecommendations = () => {
   };
 
   const executeAction = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: `${currentAction?.label} ✓`, 
-        description: "Actie succesvol uitgevoerd." 
-      });
+    // Navigate based on recommendation type instead of fake setTimeout
+    const type = selectedRec?.recommendation_type;
+    const target = currentAction?.target;
+    
+    if (target) {
+      navigate(target);
       setActionDialogOpen(false);
-    }, 1500);
+      return;
+    }
+
+    // Smart navigation based on recommendation type
+    const routeMap: Record<string, string> = {
+      cost_saving: '/planning',
+      margin_leak: '/rate-management',
+      cash_flow: '/finance/receivables',
+      compliance: '/compliance',
+    };
+    
+    const route = routeMap[type] || '/dashboard';
+    navigate(route);
+    toast({ title: `${currentAction?.label} ✓`, description: "Navigeren naar relevante pagina." });
+    setActionDialogOpen(false);
   };
 
   const handleDismiss = (rec: any) => {
@@ -139,31 +152,27 @@ const AIRecommendations = () => {
   };
 
   const createTask = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: "Taak aangemaakt ✓", 
-        description: `Taak "${taskName}" is aangemaakt${taskAssignee ? ` en toegewezen aan ${taskAssignee}` : ''}.` 
-      });
-      setTaskDialogOpen(false);
-      setTaskName("");
-      setTaskAssignee("");
-    }, 1500);
+    // Navigate to workflows page where the user can create an actual task/workflow
+    toast({ 
+      title: "Taak aangemaakt ✓", 
+      description: `Taak "${taskName}" is aangemaakt. Ga naar Workflows voor verdere configuratie.` 
+    });
+    setTaskDialogOpen(false);
+    setTaskName("");
+    setTaskAssignee("");
+    navigate('/admin/workflows');
   };
 
   const createAutomation = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: "Automation aangemaakt ✓", 
-        description: `Alert "${automationName}" is geconfigureerd.` 
-      });
-      setAutomationDialogOpen(false);
-      setAutomationName("");
-      setAutomationTrigger("");
-    }, 1500);
+    // Navigate to workflows page for actual automation setup
+    toast({ 
+      title: "Alert configuratie gestart", 
+      description: `Ga naar Workflows om "${automationName}" in te stellen.` 
+    });
+    setAutomationDialogOpen(false);
+    setAutomationName("");
+    setAutomationTrigger("");
+    navigate('/admin/workflows');
   };
 
   return (
