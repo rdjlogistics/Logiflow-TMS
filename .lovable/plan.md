@@ -1,37 +1,54 @@
 
 
-# Non-Functional Buttons Audit — Ronde 4
+# Chauffeurs Portalen — Grondige Audit & Fix Plan
 
-## Eerder gefixt (Ronde 1, 2 & 3)
-18 knoppen zijn al functioneel gemaakt.
+## Gevonden problemen
 
-## Nieuwe bevindingen
+Na het doorlichten van alle chauffeurs- en carrier-portaal code en bijbehorende edge functions, zijn er **5 kritieke bugs** gevonden die edge function errors veroorzaken, plus **1 parameter-mismatch** die zorgt dat e-mails nooit aankomen.
 
-Na grondige scan op `// Simulate`, `await new Promise(setTimeout)`, toast-only handlers, en mock-data patronen zijn er **3 concrete gevallen** gevonden die nog nep-logica of ontbrekende DB-operaties hebben:
+### 1. `auto-send-vrachtbrief` — Parameter mismatch (KRITIEK)
+**Alle 7 callers** sturen `{ tripId }`, maar de edge function destructureert `{ orderId }`. Resultaat: `orderId` is altijd `undefined` → 400 error "orderId verplicht".
 
-### 1. Webhooks — `handleCreate` (toast-only, geen DB)
-**Bestand**: `src/pages/enterprise/Webhooks.tsx`
-De "Webhook toevoegen" knop toont alleen een toast maar slaat de webhook URL niet op. Bij page refresh is alles weg.
+- `StopCheckoutFlow.tsx` → `{ body: { tripId } }`
+- `useDriverTrips.ts` → `{ body: { tripId } }`
+- `useOfflineSync.ts` → `{ body: { tripId: checkout.tripId } }`
+- `QuickEditPopover.tsx` → `{ body: { tripId } }`
+- `useStopEvents.ts` → `{ body: { tripId } }`
+- `OrderCompleteDialog.tsx` → `{ body: { tripId: orderId } }`
+- `EnhancedBulkActionsBar.tsx` → `{ body: { tripId: id } }`
 
-**Fix**: De webhook URL en geselecteerde events opslaan in de `notification_channels` tabel (type = 'webhook') via een Supabase insert.
+**Fix**: Edge function aanpassen: `const orderId = body.tripId || body.orderId;` (backwards compatible)
 
-### 2. DisputeDetailDialog — Fake 1000ms delay
-**Bestand**: `src/components/enterprise/DisputeDetailDialog.tsx` regel 39
-`handleSendResponse` heeft nog `await new Promise(resolve => setTimeout(resolve, 1000))` als fake delay. De parent (`Disputes.tsx`) doet nu wél echte DB-operaties via `onRespond`, maar de dialog simuleert een wachttijd.
+### 2. `generate-document-pdf` — Parameter mismatch (KRITIEK)
+`DocumentsSheet.tsx` stuurt `{ orderId: tripId, documentType }`, maar de edge function verwacht `{ entityId, documentType }`. Resultaat: `entityId` is `undefined` → 400 error.
 
-**Fix**: Fake delay verwijderen, `try/finally` toevoegen rond de `onRespond` call.
+**Fix**: Edge function aanpassen: `const entityId = body.entityId || body.orderId;`
 
-### 3. SettlementApprovalDialog — Fake 500ms delay bij PDF download
-**Bestand**: `src/components/enterprise/SettlementApprovalDialog.tsx` regel 55
-`handleDownload` heeft `await new Promise(resolve => setTimeout(resolve, 500))` als fake delay. De PDF-generatie erna is wél echt (maakt een blob + download), maar de delay is onnodig.
+### 3. `send-customer-notification` — Parameter mismatch (EMAILS KOMEN NIET AAN)
+`customerNotifications.ts` stuurt:
+```
+{ customer_id, title, body, notification_type, data: { trip_id, status } }
+```
+Maar de edge function destructureert:
+```
+{ customer_id, trip_id, notification_type, message, subject }
+```
+Problemen:
+- `trip_id` zit genest in `data` maar wordt top-level verwacht
+- Het bericht wordt als `body` gestuurd maar de functie leest `message`
+- `title` wordt gestuurd maar de functie leest `subject`
 
-**Fix**: Fake delay verwijderen.
+**Fix**: Edge function aanpassen om alle varianten te accepteren
 
-### Uitgesloten (geen fix nodig)
-- **EDIIntegration / CustomsNCTS**: Mock data als demo-weergave — deze pagina's zijn read-only overzichten zonder DB-tabellen. Aparte feature om deze te koppelen.
-- **useFuelStations**: Simulated prijsupdates zijn een bewust demo-feature (met "Demo-weergave actief" badge).
-- **WhatIfSimulation**: Per definitie een client-side simulatietool.
-- **SalesPipeline `window.location.href`**: Navigeert naar `/customers` — is functioneel, geen toast-only.
+### 4. `send-push-notification-to-planners` — Doet geen echte push
+De functie logt alleen `console.log("Would send...")` maar stuurt geen echte push notificatie. Het maakt wél in-app notifications aan, dus die werken. De push zelf is een no-op.
+
+**Fix**: Dit is acceptabel als tussenoplossing — de in-app notificaties werken. De push-crypto vereist een web-push library. Markeren als known limitation, geen breaking fix nodig.
+
+### 5. `send-delivery-confirmation` — `getClaims` compatibiliteit
+Gebruikt `supabase.auth.getClaims()` wat alleen werkt met `@supabase/supabase-js` v2.69+. De import is `@supabase/supabase-js@2` (floating) wat zou moeten resolven naar een recente versie, maar dit is fragiel.
+
+**Fix**: Als dit al werkt hoeft het niet aangepast. Maar de functie moet ook `tripId` correct ontvangen — dit werkt al correct want de functie leest `body.tripId || body.orderId`.
 
 ---
 
@@ -39,9 +56,12 @@ De "Webhook toevoegen" knop toont alleen een toast maar slaat de webhook URL nie
 
 | # | Bestand | Probleem | Fix |
 |---|---------|----------|-----|
-| 1 | `src/pages/enterprise/Webhooks.tsx` | Toast-only, geen DB | Webhook opslaan in `notification_channels` |
-| 2 | `src/components/enterprise/DisputeDetailDialog.tsx` | Fake 1000ms delay | Delay verwijderen, try/finally |
-| 3 | `src/components/enterprise/SettlementApprovalDialog.tsx` | Fake 500ms delay | Delay verwijderen |
+| 1 | `supabase/functions/auto-send-vrachtbrief/index.ts` | Verwacht `orderId`, ontvangt `tripId` | Accepteer beide: `body.tripId \|\| body.orderId` |
+| 2 | `supabase/functions/generate-document-pdf/index.ts` | Verwacht `entityId`, ontvangt `orderId` | Accepteer beide: `body.entityId \|\| body.orderId` |
+| 3 | `supabase/functions/send-customer-notification/index.ts` | Verwacht `trip_id` en `message` top-level, ontvangt genest in `data` en als `body` | Beide varianten accepteren |
+| 4 | `src/lib/customerNotifications.ts` | Stuurt verkeerde property names | Parameters corrigeren naar wat de functie verwacht |
 
-Totaal: 3 bestanden, geen migraties nodig, geen breaking changes. Dit is waarschijnlijk de laatste ronde met meaningvolle vondsten.
+Totaal: 3 edge functions + 1 client file. Na wijzigingen moeten de 3 edge functions herdeployed worden.
+
+Geen database migraties nodig. Geen breaking changes — alle fixes zijn backwards compatible.
 
