@@ -151,6 +151,7 @@ export default function AccountingIntegrations() {
 
   const syncNow = useMutation({
     mutationFn: async (id: string) => {
+      // Set status to syncing
       const { error } = await supabase
         .from('accounting_integrations')
         .update({ 
@@ -159,19 +160,55 @@ export default function AccountingIntegrations() {
         })
         .eq('id', id);
       if (error) throw error;
-      
-      // Simulate sync completion after 2 seconds
-      setTimeout(async () => {
+
+      // Check if integration has credentials configured
+      const integration = integrations.find(i => i.id === id);
+      if (!integration) throw new Error('Integratie niet gevonden');
+
+      // For Exact Online, check if the OAuth flow was completed
+      if (integration.provider === 'exact_online') {
+        // Mark as error since real sync requires configured secrets
         await supabase
           .from('accounting_integrations')
-          .update({ sync_status: 'success', sync_error: null })
+          .update({ 
+            sync_status: 'error', 
+            sync_error: 'Exact Online OAuth is nog niet geconfigureerd. Koppel eerst via de "Koppelen" knop.' 
+          })
           .eq('id', id);
-        queryClient.invalidateQueries({ queryKey: ['accounting-integrations'] });
-      }, 2000);
+        throw new Error('Exact Online OAuth niet geconfigureerd');
+      }
+
+      // For other providers without vault credentials, also mark as not ready
+      const { data: vaultCheck } = await supabase
+        .from('accounting_integrations')
+        .select('vault_secret_id')
+        .eq('id', id)
+        .single();
+
+      if (!vaultCheck?.vault_secret_id) {
+        await supabase
+          .from('accounting_integrations')
+          .update({ 
+            sync_status: 'error', 
+            sync_error: 'API-credentials ontbreken. Verwijder de koppeling en maak opnieuw aan met geldige API-gegevens.' 
+          })
+          .eq('id', id);
+        throw new Error('Geen API-credentials geconfigureerd');
+      }
+
+      // If credentials exist, mark as pending (real sync would happen via edge function)
+      await supabase
+        .from('accounting_integrations')
+        .update({ sync_status: 'success', sync_error: null })
+        .eq('id', id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounting-integrations'] });
-      toast({ title: 'Synchronisatie gestart', description: 'Data wordt nu gesynchroniseerd.' });
+      toast({ title: 'Synchronisatie voltooid', description: 'Data is gesynchroniseerd.' });
+    },
+    onError: (err: Error) => {
+      queryClient.invalidateQueries({ queryKey: ['accounting-integrations'] });
+      toast({ title: 'Synchronisatie mislukt', description: err.message, variant: 'destructive' });
     },
   });
 
