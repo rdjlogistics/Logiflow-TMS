@@ -598,6 +598,10 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                     <Input id="capacity_kg" type="number" value={formData.capacity_kg || ''} onChange={(e) => setFormData({ ...formData, capacity_kg: e.target.value ? Number(e.target.value) : null })} />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="purchase_price">Aanschafprijs (€)</Label>
+                    <Input id="purchase_price" type="number" value={formData.purchase_price} onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })} placeholder="45000" />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="is_active">Status</Label>
                     <div className="flex items-center gap-3 h-10">
                       <Switch id="is_active" checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
