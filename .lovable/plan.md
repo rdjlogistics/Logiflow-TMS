@@ -1,57 +1,28 @@
 
+# Fix: Inkoopfactuur aanmaken faalt — `line_type` constraint violation
 
-# Non-Functional Buttons Audit — Ronde 7
+## Probleem
 
-## Resultaat
+De edge function `create-batch-purchase-invoices` zet `line_type: "transport"` bij het aanmaken van factuurregels, maar de database constraint op `purchase_invoice_lines` staat alleen deze waarden toe:
+- `trip`
+- `accessorial`
+- `fuel_surcharge`
+- `other`
 
-Na een grondige scan van alle edge function invocaties, parameter-patronen, fake delays, en toast-only handlers is er **1 kritiek probleem** gevonden:
+Dit veroorzaakt een database error: `new row for relation "purchase_invoice_lines" violates check constraint "purchase_invoice_lines_line_type_check"`.
 
-### `send-purchase-invoice-email` — Parameter mismatch (KRITIEK)
+De factuur-header wordt wel aangemaakt, maar de regels falen — waarna de edge function de factuur weer verwijdert (rollback) en een error teruggeeft.
 
-**Edge function** (`supabase/functions/send-purchase-invoice-email/index.ts` regel 16) destructureert:
-```
-{ invoiceId, to, subject, body }
-```
+## Fix
 
-**Callers** sturen compleet andere veldnamen:
+**1 bestand**: `supabase/functions/create-batch-purchase-invoices/index.ts`
 
-`PurchaseInvoiceEmailComposer.tsx`:
-```
-{ purchase_invoice_id, recipient_emails, email_subject, email_body, include_pdf, document_ids }
-```
+Wijzig regel waar `line_type: "transport"` staat naar `line_type: "trip"` (regel ~175).
 
-`PurchaseInvoiceBulkActions.tsx`:
-```
-{ purchase_invoice_id, recipient_emails, email_subject, email_body, include_pdf }
-```
+Na de fix wordt de edge function opnieuw gedeployed.
 
-**Resultaat**: `invoiceId` = `undefined` → 400 error "invoiceId en to verplicht". Geen enkele inkoopfactuur-email wordt ooit verstuurd.
-
-**Fix**: Edge function aanpassen om beide sets parameter-namen te accepteren (backwards compatible), inclusief het versturen naar meerdere ontvangers (`recipient_emails` is een array).
-
----
-
-## Overige bevindingen (geen fix nodig)
-
-Alle andere edge functions zijn in eerdere rondes al gefixt of waren correct:
-- `send-order-confirmation` — gefixt ronde 6
-- `send-document-email` — gefixt ronde 6
-- `send-push-notification` — gefixt ronde 6
-- `auto-send-vrachtbrief` — gefixt ronde 5
-- `generate-document-pdf` — gefixt ronde 6
-- `send-customer-notification` — gefixt ronde 5
-- `send-invoice-email` — accepteert al beide varianten
-- `send-invoice-reminder` — parameters matchen
-- `send-order-rejection` — parameters matchen
-- `send-delivery-confirmation` — parameters matchen
-- `generate-invoice-pdf` — parameters matchen
-- Alle `await new Promise(setTimeout)` zijn legitieme retries of progress bars
-
-## Wijzigingen
-
-| # | Bestand | Probleem | Fix |
-|---|---------|----------|-----|
-| 1 | `supabase/functions/send-purchase-invoice-email/index.ts` | Verwacht `invoiceId`+`to`, ontvangt `purchase_invoice_id`+`recipient_emails`+`email_subject`+`email_body` | Accepteer beide + loop over meerdere ontvangers |
-
-Totaal: 1 edge function. Geen frontend wijzigingen nodig. Na deployment werken inkoopfactuur-emails end-to-end.
-
+## Impact
+- Geen database migratie nodig
+- Geen frontend wijzigingen
+- Backwards compatible
+- Na deployment werkt het aanmaken van inkoopfacturen direct end-to-end
