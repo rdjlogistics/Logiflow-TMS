@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import FuelManagement from '@/components/fleet/FuelManagement';
 import MaintenanceManagement from '@/components/fleet/MaintenanceManagement';
 import VehicleOverview from '@/components/fleet/VehicleOverview';
+import VehicleValuation from '@/components/fleet/VehicleValuation';
 import { useFleetManagement } from '@/hooks/useFleetManagement';
 
 const FleetManagement = () => {
