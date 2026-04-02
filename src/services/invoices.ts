@@ -29,7 +29,7 @@ const INVOICE_DETAIL_SELECT = `
 export async function fetchInvoices(filters: InvoiceFilters = {}) {
   let query = supabase
     .from('invoices')
-    .select(INVOICE_SELECT)
+    .select(INVOICE_LIST_SELECT)
     .order('invoice_date', { ascending: false });
 
   if (filters.companyId) query = query.eq('company_id', filters.companyId);
