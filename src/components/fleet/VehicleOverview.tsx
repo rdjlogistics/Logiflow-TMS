@@ -177,6 +177,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
         year_of_manufacture: formData.year_of_manufacture ? parseInt(formData.year_of_manufacture) : null,
         insurance_expiry_date: formData.insurance_expiry_date || null,
         next_service_date: formData.next_service_date || null,
+        purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
         company_id: company?.id,
       };
       if (editingVehicle) {
