@@ -219,7 +219,7 @@ Deno.serve(async (req) => {
         total_price: unitPrice,
         vat_percentage: vatPercentage,
         vat_amount: lineVat,
-        line_type: "transport",
+        line_type: "trip",
       };
     });
 
