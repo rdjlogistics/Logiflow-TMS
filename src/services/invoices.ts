@@ -15,7 +15,7 @@ export interface InvoiceFilters {
 // Light select for list views — no nested invoice_lines
 const INVOICE_LIST_SELECT = `
   id, invoice_number, invoice_date, due_date, status, total_amount, amount_paid, paid_at,
-  company_id, customer_id, currency, notes, created_at, updated_at,
+  company_id, customer_id, notes, created_at, updated_at,
   customers(company_name, email, payment_terms_days)
 `;
 
