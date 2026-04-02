@@ -73,13 +73,13 @@ export default function WhatIfSimulation() {
       const [tripsRes, vehiclesRes] = await Promise.all([
         supabase
           .from('trips')
-          .select('id, revenue, cost_total, status')
+          .select('id, price, sales_total, purchase_total, status')
           .eq('company_id', company.id)
           .gte('trip_date', thirtyDaysAgo.toISOString().split('T')[0])
           .lte('trip_date', now.toISOString().split('T')[0]),
         supabase
           .from('vehicles')
-          .select('id, status')
+          .select('id, is_active')
           .eq('company_id', company.id),
       ]);
 
@@ -87,9 +87,9 @@ export default function WhatIfSimulation() {
       const vehicles = vehiclesRes.data || [];
 
       const totalTrips = trips.length;
-      const totalRevenue = trips.reduce((sum, t) => sum + (Number(t.revenue) || 0), 0);
-      const totalCost = trips.reduce((sum, t) => sum + (Number(t.cost_total) || 0), 0);
-      const activeVehicles = vehicles.filter(v => v.status === 'active' || v.status === 'actief').length;
+      const totalRevenue = trips.reduce((sum, t) => sum + (Number(t.sales_total ?? t.price) || 0), 0);
+      const totalCost = trips.reduce((sum, t) => sum + (Number(t.purchase_total) || 0), 0);
+      const activeVehicles = vehicles.filter(v => v.is_active === true).length;
       const totalVehicles = vehicles.length;
       const occupancy = totalVehicles > 0 ? Math.round((activeVehicles / totalVehicles) * 100) : 0;
 
