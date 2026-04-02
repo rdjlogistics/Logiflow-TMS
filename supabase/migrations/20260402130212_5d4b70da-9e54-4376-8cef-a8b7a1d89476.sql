@@ -1,0 +1,1 @@
+ALTER TABLE public.vehicles ADD COLUMN purchase_price numeric NULL;
