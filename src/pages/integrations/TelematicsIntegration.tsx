@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/hooks/useCompany";
 
 const providers = [
   { id: 'tomtom', name: 'TomTom Telematics', logo: '🗺️', description: 'Webfleet Solutions' },
@@ -27,14 +28,33 @@ const providers = [
 ];
 
 export default function TelematicsIntegration() {
-  const [connections, setConnections] = useState<Array<{
-    id: string; provider: string; name: string; isActive: boolean;
-    lastSync: string; vehiclesLinked: number; status: string;
-  }>>([]);
+  const { company } = useCompany();
+  const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [syncInterval, setSyncInterval] = useState('5');
+
+  // Fetch connections from database
+  const { data: connections = [] } = useQuery({
+    queryKey: ['telematics-connections'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('telematics_connections')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((c: any) => ({
+        id: c.id,
+        provider: c.provider,
+        name: c.name,
+        isActive: c.is_active,
+        lastSync: c.last_sync_at ? new Date(c.last_sync_at).toLocaleString('nl-NL') : 'Wacht op activatie',
+        vehiclesLinked: c.vehicles_linked ?? 0,
+        status: c.status,
+      }));
+    },
+  });
 
   // Fetch real vehicles from database
   const { data: vehicles = [], isLoading: vehiclesLoading } = useQuery({
@@ -68,22 +88,39 @@ export default function TelematicsIntegration() {
     refetchIntervalInBackground: false,
   });
 
-  const handleAddConnection = () => {
-    if (!selectedProvider || !apiKey) { toast.error("Vul alle velden in"); return; }
+  const handleAddConnection = async () => {
+    if (!selectedProvider || !apiKey || !company?.id) { toast.error("Vul alle velden in"); return; }
     const provider = providers.find(p => p.id === selectedProvider);
-    const newConn = {
-      id: Date.now().toString(), provider: selectedProvider, name: provider?.name || selectedProvider,
-      isActive: false, lastSync: 'Wacht op activatie', vehiclesLinked: 0, status: 'pending_activation'
-    };
-    setConnections(prev => [...prev, newConn]);
-    toast.info(`${provider?.name} configuratie opgeslagen — koppeling vereist activatie bij de provider`);
-    setIsAddDialogOpen(false);
-    setSelectedProvider('');
-    setApiKey('');
+    try {
+      const { error } = await supabase
+        .from('telematics_connections')
+        .insert({
+          tenant_id: company.id,
+          provider: selectedProvider,
+          name: provider?.name || selectedProvider,
+          sync_interval_minutes: parseInt(syncInterval) || 5,
+          status: 'pending_activation',
+          is_active: false,
+        });
+      if (error) throw error;
+      toast.info(`${provider?.name} configuratie opgeslagen — koppeling vereist activatie bij de provider`);
+      queryClient.invalidateQueries({ queryKey: ['telematics-connections'] });
+      setIsAddDialogOpen(false);
+      setSelectedProvider('');
+      setApiKey('');
+    } catch (err: any) {
+      toast.error("Opslaan mislukt", { description: err.message });
+    }
   };
 
-  const toggleConnection = (id: string) => {
-    setConnections(prev => prev.map(c => c.id === id ? { ...c, isActive: !c.isActive } : c));
+  const toggleConnection = async (id: string) => {
+    const conn = connections.find((c: any) => c.id === id);
+    if (!conn) return;
+    const { error } = await supabase
+      .from('telematics_connections')
+      .update({ is_active: !conn.isActive, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (!error) queryClient.invalidateQueries({ queryKey: ['telematics-connections'] });
   };
 
   // Build vehicle status from active trips

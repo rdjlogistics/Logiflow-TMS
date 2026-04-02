@@ -26,6 +26,7 @@ import {
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const messageTypes = [
   { code: 'IFTMIN', name: 'Transport Order', description: 'Transportopdracht van klant' },
@@ -84,14 +85,21 @@ export default function EDIIntegration() {
     }
   };
 
-  const handleRetry = (messageId: string) => {
+  const handleRetry = async (messageId: string) => {
     toast.info("Bericht opnieuw verwerken...");
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from('edi_messages')
+        .update({ status: 'pending', error_details: null, updated_at: new Date().toISOString() })
+        .eq('id', messageId);
+      if (error) throw error;
       setMessages((prev: any[]) => prev.map((m: any) =>
-        m.id === messageId ? { ...m, status: 'processed', error: undefined } : m
+        m.id === messageId ? { ...m, status: 'pending', error: undefined } : m
       ));
-      toast.success("Bericht succesvol verwerkt");
-    }, 1500);
+      toast.success("Bericht in wachtrij geplaatst voor herverwerking");
+    } catch (err: any) {
+      toast.error("Retry mislukt", { description: err.message });
+    }
   };
 
   const stats = {

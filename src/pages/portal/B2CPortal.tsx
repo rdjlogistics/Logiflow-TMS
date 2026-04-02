@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { toast } from "sonner";
 import B2CLayout from "@/components/portal/b2c/B2CLayout";
 import B2CShipmentsList from "@/components/portal/b2c/B2CShipmentsList";
@@ -8,13 +7,17 @@ import { usePortalAuth } from "@/hooks/usePortalAuth";
 const B2CPortal = () => {
   const { customer, customerId } = usePortalAuth();
   const { shipments, loading, refetch } = usePortalData(customerId);
-  const [unreadNotifications] = useState(2);
+
+  // Real notification count based on recent shipment activity (in transit or pending)
+  const unreadNotifications = shipments.filter(
+    (s: any) => s.status === 'onderweg' || s.status === 'geladen' || s.status === 'gepland'
+  ).length;
 
   const handleNotificationsClick = () => {
     toast.info("Notificaties", {
       description: unreadNotifications > 0 
-        ? `Je hebt ${unreadNotifications} nieuwe notificaties over je zendingen.`
-        : "Geen nieuwe notificaties."
+        ? `Je hebt ${unreadNotifications} actieve zendingen.`
+        : "Geen actieve zendingen."
     });
   };
 

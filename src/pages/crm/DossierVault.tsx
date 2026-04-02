@@ -133,7 +133,31 @@ const DossierVault = () => {
 
     setIsUploading(true);
     try {
-      // For demo purposes, just show success
+      // Upload file to Supabase Storage
+      const fileExt = uploadFile.name.split('.').pop();
+      const filePath = `${company.id}/${uploadData.accountId}/${Date.now()}_${uploadFile.name}`;
+
+      const { error: storageError } = await supabase.storage
+        .from('dossier-documents')
+        .upload(filePath, uploadFile);
+
+      if (storageError) throw storageError;
+
+      // Insert record in dossier_documents table
+      const { error: dbError } = await supabase
+        .from('dossier_documents')
+        .insert({
+          account_id: uploadData.accountId,
+          tenant_id: company.id,
+          doc_type: uploadData.docType,
+          file_name: uploadFile.name,
+          file_url: filePath,
+          version: 1,
+          locked_after_signature: false,
+        });
+
+      if (dbError) throw dbError;
+
       toast({
         title: 'Document geüpload ✓',
         description: `${uploadFile.name} is succesvol toegevoegd aan de vault.`,
@@ -316,10 +340,16 @@ const DossierVault = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(doc.file_url, '_blank')}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {
+                              const { data } = await supabase.storage.from('dossier-documents').createSignedUrl(doc.file_url, 3600);
+                              if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                            }}>
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { const a = document.createElement('a'); a.href = doc.file_url; a.download = doc.file_name; a.click(); }}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {
+                              const { data } = await supabase.storage.from('dossier-documents').download(doc.file_url);
+                              if (data) { const url = URL.createObjectURL(data); const a = document.createElement('a'); a.href = url; a.download = doc.file_name; a.click(); URL.revokeObjectURL(url); }
+                            }}>
                               <Download className="h-4 w-4" />
                             </Button>
                           </div>

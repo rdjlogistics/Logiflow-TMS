@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import B2BDashboard from "@/components/portal/b2b/B2BDashboard";
 import { BulkImportDialog } from "@/components/portal/b2b/BulkImportDialog";
@@ -17,9 +17,6 @@ const B2BPortal = () => {
   const unreadNotifications = cases.filter(c => c.status === 'open' || c.status === 'in_progress').length;
 
   const handleNotificationsClick = () => {
-    toast.info("Notificaties", {
-      description: `Je hebt ${unreadNotifications} nieuwe updates over je zendingen.`
-    });
     navigate("/portal/b2b/cases");
   };
 

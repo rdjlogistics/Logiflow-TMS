@@ -17474,6 +17474,59 @@ export type Database = {
         }
         Relationships: []
       }
+      telematics_connections: {
+        Row: {
+          api_key_encrypted: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          last_sync_at: string | null
+          name: string
+          provider: string
+          status: string
+          sync_interval_minutes: number | null
+          tenant_id: string
+          updated_at: string
+          vehicles_linked: number | null
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_at?: string | null
+          name: string
+          provider: string
+          status?: string
+          sync_interval_minutes?: number | null
+          tenant_id: string
+          updated_at?: string
+          vehicles_linked?: number | null
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_at?: string | null
+          name?: string
+          provider?: string
+          status?: string
+          sync_interval_minutes?: number | null
+          tenant_id?: string
+          updated_at?: string
+          vehicles_linked?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telematics_connections_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       telematics_integrations: {
         Row: {
           api_endpoint: string | null
