@@ -28,7 +28,12 @@ Deno.serve(async (req) => {
 
     // Get user's company
     const { data: profile } = await supabaseAdmin.from("profiles").select("company_id").eq("id", user.id).single();
-    const tenantId = profile?.company_id;
+    let tenantId = profile?.company_id;
+    if (!tenantId) {
+      // Fallback: check user_companies table
+      const { data: uc } = await supabaseAdmin.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();
+      tenantId = uc?.company_id;
+    }
     if (!tenantId) {
       return new Response(JSON.stringify({ error: "Geen bedrijf gekoppeld" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -147,7 +152,6 @@ Deno.serve(async (req) => {
         origin_city,
         destination_city,
         distance_km: dist,
-        vehicle_type: vehicle_type || null,
         base_price: baseCharge,
         lane_adjustment: 0,
         surge_adjustment: surgeCharge,
@@ -155,16 +159,19 @@ Deno.serve(async (req) => {
         calculated_price: finalPrice,
         rules_applied_json: adjustments,
         surge_factors_json: factors.map((f: any) => ({ name: f.name, multiplier: f.multiplier })),
-        surge_multiplier: surgeMultiplier,
       });
     } catch (e) {
       console.warn("[calculate-price] Could not save calculation:", e);
     }
 
+    const validUntil = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+
     return new Response(JSON.stringify({
       base_price: baseCharge,
       final_price: finalPrice,
       surge_multiplier: surgeMultiplier,
+      currency: "EUR",
+      valid_until: validUntil,
       adjustments,
       breakdown: {
         distance_charge: distanceCharge,
