@@ -145,6 +145,10 @@ Deno.serve(async (req) => {
       ? `<div style="margin-top:16px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:11px;color:#6b7280;">${escapeHtml(invoice.footnote)}</div>`
       : "";
 
+    const vatNoteHtml = invoice.vat_note
+      ? `<div style="margin-top:12px;padding:10px;background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;font-size:11px;color:#1e40af;">${escapeHtml(invoice.vat_note)}</div>`
+      : "";
+
     const periodStr = invoice.period_from && invoice.period_to
       ? `${formatDate(invoice.period_from)} t/m ${formatDate(invoice.period_to)}`
       : "";
@@ -219,12 +223,13 @@ Deno.serve(async (req) => {
 
   <div class="totals">
     <div class="total-row"><span>Subtotaal</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.subtotal || 0)}</span></div>
-    <div class="total-row"><span>BTW ${invoice.vat_percentage || 21}%</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.vat_amount || 0)}</span></div>
+    <div class="total-row"><span>BTW ${invoice.vat_percentage ?? 21}%${invoice.vat_type === 'verlegd' ? ' (verlegd)' : ''}</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.vat_amount || 0)}</span></div>
     <div class="total-row grand"><span>Totaal</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.total_amount || 0)}</span></div>
   </div>
 
-  ${selfBillingNote}
-  ${footnoteHtml}
+   ${selfBillingNote}
+   ${vatNoteHtml}
+   ${footnoteHtml}
 
   ${carrier?.iban ? `<div style="margin-top:24px;padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:11px;">
     <strong>Betaling naar:</strong> ${escapeHtml(carrier.company_name)} - IBAN: ${escapeHtml(carrier.iban)}${carrier.bic ? ` / BIC: ${escapeHtml(carrier.bic)}` : ""}

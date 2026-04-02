@@ -142,7 +142,10 @@ Deno.serve(async (req) => {
     const carrierCountry = carrier?.country || "NL";
     const carrierVat = carrier?.vat_number || null;
     const btwResult = berekenBTW(carrierCountry, carrierVat);
-    const vatPercentage = btwResult.tarief;
+    // For purchase invoices: "verlegd" means the NL buyer must self-assess 21% VAT
+    const vatPercentage = btwResult.type === 'verlegd' ? 21 : btwResult.tarief;
+    const vatType = btwResult.type;
+    const vatNote = btwResult.factuurVermelding || null;
 
     // Calculate totals
     const subtotal = trips.reduce((sum, t) => sum + Number(t.purchase_total || 0), 0);
@@ -192,6 +195,8 @@ Deno.serve(async (req) => {
         total_amount: totalAmount,
         is_self_billing: is_self_billing || false,
         footnote: footnote || null,
+        vat_type: vatType,
+        vat_note: vatNote,
         status: "concept",
         created_by: user.id,
       })
