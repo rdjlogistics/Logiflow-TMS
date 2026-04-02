@@ -176,7 +176,7 @@ export function DriverProfielTab({ onLogout }: DriverProfielTabProps) {
             .select('id, order_number, status, trip_date, pickup_address, pickup_city, delivery_address, delivery_city, route_stops(id, address, city, status, actual_arrival)')
             .eq('driver_id', driver.id)
             .order('trip_date', { ascending: false })
-            .limit(500);
+            .limit(50);
           data.trips = trips;
         }
       });
