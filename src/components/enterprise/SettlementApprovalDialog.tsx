@@ -52,7 +52,6 @@ export function SettlementApprovalDialog({ open, onOpenChange, settlement, onApp
     if (!settlement) return;
     
     setIsDownloading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
     
     // Generate and download PDF
     const pdfContent = `Settlement Statement ${settlement.id}\n\nCarrier: ${settlement.carrier}\nPeriod: ${settlement.period}\nOrders: ${settlement.orders}\nGross: €${settlement.grossAmount.toFixed(2)}\nDeductions: -€${settlement.deductions.toFixed(2)}\nNet: €${settlement.netAmount.toFixed(2)}`;

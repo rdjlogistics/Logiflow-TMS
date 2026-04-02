@@ -36,17 +36,17 @@ export function DisputeDetailDialog({ open, onOpenChange, dispute, onRespond, on
     if (!dispute || !responseMessage.trim()) return;
     
     setIsSending(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    onRespond?.(dispute, responseMessage);
-    toast({
-      title: "Reactie verzonden ✓",
-      description: `Carrier ${dispute.carrier} ontvangt een notificatie.`
-    });
-    
-    setIsSending(false);
-    setResponseMessage("");
-    onOpenChange(false);
+    try {
+      onRespond?.(dispute, responseMessage);
+      toast({
+        title: "Reactie verzonden ✓",
+        description: `Carrier ${dispute.carrier} ontvangt een notificatie.`
+      });
+      setResponseMessage("");
+      onOpenChange(false);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (!dispute) return null;
