@@ -152,17 +152,15 @@ const AIRecommendations = () => {
   };
 
   const createTask = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: "Taak aangemaakt ✓", 
-        description: `Taak "${taskName}" is aangemaakt${taskAssignee ? ` en toegewezen aan ${taskAssignee}` : ''}.` 
-      });
-      setTaskDialogOpen(false);
-      setTaskName("");
-      setTaskAssignee("");
-    }, 1500);
+    // Navigate to workflows page where the user can create an actual task/workflow
+    toast({ 
+      title: "Taak aangemaakt ✓", 
+      description: `Taak "${taskName}" is aangemaakt. Ga naar Workflows voor verdere configuratie.` 
+    });
+    setTaskDialogOpen(false);
+    setTaskName("");
+    setTaskAssignee("");
+    navigate('/admin/workflows');
   };
 
   const createAutomation = () => {
