@@ -1,77 +1,65 @@
 
 
-# Audit & Fix: Non-functionele knoppen in de app
+# Kritische Audit: Non-functionele modules waterdicht maken
 
 ## Gevonden problemen
 
-Na een grondige audit van alle pagina's zijn deze knoppen/features gevonden die **niet echt werken** — ze tonen alleen een toast of gebruiken mock data:
+Na een grondige audit van alle pagina's zijn er **5 modules** gevonden die database-tabellen hebben maar puur op lokale state draaien — data gaat verloren bij pagina-refresh:
 
-| # | Pagina | Probleem | Ernst |
-|---|--------|----------|-------|
-| 1 | **DossierVault** (CRM) | Upload knop toont alleen toast "geüpload ✓" maar slaat bestand NIET op in storage/database | Hoog |
-| 2 | **B2C Portal** | Notificatie-teller hardcoded op `2`, klik toont alleen toast | Midden |
-| 3 | **B2B Portal** | Notificatie-klik toont onnodige toast vóór navigatie naar cases | Laag |
-| 4 | **FuelIndexUpdateDialog** (Tariefbeheer) | `onUpdate` callback wordt niet meegegeven — brandstofindex wordt nooit opgeslagen | Hoog |
-| 5 | **EDI Integratie** | Retry knop is nep — `setTimeout` simuleert succes | Midden |
-| 6 | **Telematics Integratie** | Connecties worden alleen in lokale state opgeslagen, niet in database | Midden |
-| 7 | **SystemHealth** | Webhook "Retry Now" knop toont alleen toast | Laag |
+| # | Pagina | Probleem | DB tabel beschikbaar | Ernst |
+|---|--------|----------|---------------------|-------|
+| 1 | **Tender Templates** | CRUD alleen in `useState` met hardcoded data | `tender_templates` ✅ | Hoog |
+| 2 | **Customs/NCTS** | Aangiftes alleen in lokale state, submit is nep `setTimeout` | `customs_declarations` ✅ | Hoog |
+| 3 | **Notification Channels** | Kanalen en templates starten leeg (`useState([])`), worden niet geladen uit DB | `notification_channels` + `notification_logs` ✅ | Hoog |
+| 4 | **AI Recommendations** | "Actie uitvoeren", "Taak aanmaken", "Automation maken" — alles `setTimeout` + toast | Geen echte actie | Midden |
+| 5 | **What-If Simulation** | Simulatie is puur cosmetisch — lokale state met fake progress | Geen DB tabel | Laag |
 
-## Fixes
+## Fixes (3 kritische, 2 verbeteringen)
 
-### 1. DossierVault — Echte upload naar Storage
-**Bestand: `src/pages/crm/DossierVault.tsx`**
-- Upload bestand naar Supabase Storage bucket `dossier-documents`
-- Insert record in `dossier_documents` tabel met `file_url`, `account_id`, `doc_type`, `tenant_id`
-- Verwijder `// For demo purposes` comment
+### 1. Tender Templates — Volledig naar database
+**Bestand: `src/pages/tendering/TenderTemplates.tsx`**
+- Vervang `useState(initialTemplates)` door `useQuery` die `tender_templates` ophaalt
+- CRUD operaties via `supabase.from('tender_templates').insert/update/delete`
+- Voeg `company_id` toe bij insert (via `useCompany`)
+- Verwijder hardcoded `initialTemplates` array
 
-**Database: Storage bucket aanmaken**
-- Maak `dossier-documents` storage bucket aan (private)
-- RLS policy: alleen eigen tenant kan lezen/schrijven
+### 2. Customs/NCTS — Aangiftes opslaan in database
+**Bestand: `src/pages/integrations/CustomsNCTS.tsx`**
+- Vervang `useState(mockDeclarations)` door `useQuery` op `customs_declarations`
+- `handleCreateDeclaration`: insert naar DB met `tenant_id`, `declaration_type`, `goods_description`, etc.
+- `handleSubmitDeclaration`: update status in DB naar `submitted` + genereer MRN
+- Laad bestaande aangiftes bij pagina-load
 
-### 2. B2C Portal — Echte notificatie-telling
-**Bestand: `src/pages/portal/B2CPortal.tsx`**
-- Vervang `useState(2)` door echte telling op basis van recente shipment status updates
-- Notificatie-klik navigeert naar zendingenoverzicht i.p.v. toast
+### 3. Notification Channels — Laden uit database
+**Bestand: `src/pages/notifications/NotificationChannels.tsx`**
+- Voeg `useQuery` toe die `notification_channels` + `notification_logs` ophaalt bij mount
+- Map DB rows naar de bestaande `NotificationChannel[]` en `NotificationLog[]` interfaces
+- `toggleChannel`: update `is_active` in DB (i.p.v. alleen lokale state)
+- Bestaande `handleSaveTemplate` en `handleSaveChannel` upserts zijn al correct — alleen het laden ontbreekt
 
-### 3. B2B Portal — Verwijder onnodige toast
-**Bestand: `src/pages/portal/B2BPortal.tsx`**
-- Verwijder `toast.info()` call, behoud alleen `navigate("/portal/b2b/cases")`
+### 4. AI Recommendations — Acties koppelen aan workflows
+**Bestand: `src/pages/enterprise/AIRecommendations.tsx`**
+- `executeAction`: navigeer naar relevante pagina op basis van actie-type (bijv. route-planning, tariefbeheer)
+- `createTask`: insert in een bestaande tabel of navigeer naar workflow-pagina
+- `createAutomation`: navigeer naar `/admin/workflows` met pre-filled data
+- Verwijder alle nep `setTimeout` patronen
 
-### 4. FuelIndexUpdateDialog — Brandstofindex opslaan
-**Bestand: `src/pages/RateManagement.tsx`**
-- Voeg `onUpdate` callback toe die de nieuwe index opslaat in `surcharge_rules` of `tenant_settings`
-- De dialog component zelf is al correct gebouwd, alleen de aanroep mist de callback
-
-### 5. EDI Integratie — Echte retry via database
-**Bestand: `src/pages/integrations/EDIIntegration.tsx`**
-- De EDI pagina werkt al met een `edi_messages` tabel
-- Retry: update message status in database naar `pending`, dan herverwerk
-- Vervang `setTimeout` mock door echte database update
-
-### 6. Telematics — Connecties opslaan in database
-**Bestand: `src/pages/integrations/TelematicsIntegration.tsx`**
-- Sla provider-connecties op in een `telematics_connections` tabel (of hergebruik bestaande integratie-tabel)
-- Laad connecties bij pagina-load
-
-**Database migratie**: `telematics_connections` tabel aanmaken
-
-### 7. SystemHealth — Webhook retry verbeteren
-**Bestand: `src/pages/enterprise/SystemHealth.tsx`**
-- Dit is een monitoring pagina met hardcoded demo data — geen echte webhook tabel
-- Fix: verander toast naar een duidelijke melding dat de functie vereist dat de integratie eerst actief geconfigureerd is, of verberg de retry knop als er geen echte webhook data is
+### 5. DataQuality scan — Verwijder setTimeout
+**Bestand: `src/pages/enterprise/DataQuality.tsx`**
+- De `handleScan` functie wropt `refetch()` in een `setTimeout` — verwijder de timeout en await `refetch()` direct
 
 ## Niet geraakt
-- Alle export/download/print functies — deze werken al correct
-- Alle clipboard copy functies — werken al
-- Alle edge function aanroepen — werken al
-- Desktop layouts — geen wijzigingen
+- FuelIndexUpdateDialog — al gefixt in vorige ronde ✅
+- DossierVault upload — al gefixt ✅
+- B2C/B2B Portal notificaties — al gefixt ✅
+- EDI retry — al gefixt ✅
+- Telematics persistentie — al gefixt ✅
+- What-If Simulation — blijft client-side (is een planning tool, geen operationeel systeem)
 
 ## Volgorde
-1. Database migratie (storage bucket + telematics tabel)
-2. DossierVault echte upload (hoogste prioriteit)
-3. FuelIndexUpdateDialog callback
-4. B2C/B2B Portal notificaties
-5. EDI retry
-6. Telematics persistentie
-7. SystemHealth toast verbetering
+1. Tender Templates → DB (hoogste impact, tabel bestaat al)
+2. Customs/NCTS → DB (tabel bestaat al)
+3. Notification Channels → laden uit DB
+4. AI Recommendations → echte navigatie-acties
+5. DataQuality → verwijder setTimeout
 
