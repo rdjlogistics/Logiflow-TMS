@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/hooks/useCompany";
 
 const providers = [
   { id: 'tomtom', name: 'TomTom Telematics', logo: '🗺️', description: 'Webfleet Solutions' },
