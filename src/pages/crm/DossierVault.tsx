@@ -133,7 +133,31 @@ const DossierVault = () => {
 
     setIsUploading(true);
     try {
-      // For demo purposes, just show success
+      // Upload file to Supabase Storage
+      const fileExt = uploadFile.name.split('.').pop();
+      const filePath = `${company.id}/${uploadData.accountId}/${Date.now()}_${uploadFile.name}`;
+
+      const { error: storageError } = await supabase.storage
+        .from('dossier-documents')
+        .upload(filePath, uploadFile);
+
+      if (storageError) throw storageError;
+
+      // Insert record in dossier_documents table
+      const { error: dbError } = await supabase
+        .from('dossier_documents')
+        .insert({
+          account_id: uploadData.accountId,
+          tenant_id: company.id,
+          doc_type: uploadData.docType,
+          file_name: uploadFile.name,
+          file_url: filePath,
+          version: 1,
+          locked_after_signature: false,
+        });
+
+      if (dbError) throw dbError;
+
       toast({
         title: 'Document geüpload ✓',
         description: `${uploadFile.name} is succesvol toegevoegd aan de vault.`,
