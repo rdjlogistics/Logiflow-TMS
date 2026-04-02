@@ -87,7 +87,7 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
           background: `radial-gradient(circle at 100% 0%, ${color}, transparent 70%)`,
         }} />
         <ShimmerOverlay />
-        <CardContent className="pt-6 pb-5">
+        <CardContent className="pt-4 pb-3 md:pt-6 md:pb-5">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
@@ -210,17 +210,17 @@ export default function Receivables() {
 
   return (
     <DashboardLayout title="Debiteuren & Incasso" description="Openstaande vorderingen, incasso en kredietbeheer">
-      <div className="space-y-6">
+      <div className="space-y-6 pb-24 md:pb-6">
         {/* Premium Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-card/60 backdrop-blur-xl border border-border/30 p-1 rounded-xl">
-            <TabsTrigger value="overzicht" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+          <TabsList className="bg-card/60 backdrop-blur-xl border border-border/30 p-1 rounded-xl w-full sm:w-auto">
+            <TabsTrigger value="overzicht" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Overzicht
             </TabsTrigger>
-            <TabsTrigger value="incasso" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+            <TabsTrigger value="incasso" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Incasso
             </TabsTrigger>
-            <TabsTrigger value="credit" className="rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+            <TabsTrigger value="credit" className="rounded-lg px-4 py-2.5 text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
               Credit Analytics
             </TabsTrigger>
           </TabsList>
@@ -229,8 +229,8 @@ export default function Receivables() {
           <TabsContent value="overzicht" className="mt-6 space-y-6">
             {isLoading ? (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                  {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 md:h-28 rounded-2xl" />)}
                 </div>
                 <div className="space-y-3">
                   {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
@@ -239,7 +239,7 @@ export default function Receivables() {
             ) : (
               <>
                 {/* KPI Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                   <KPICard
                     icon={Euro}
                     label="Totaal Openstaand"
@@ -275,12 +275,12 @@ export default function Receivables() {
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Zoek klant..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 bg-card/50 border-border/30 backdrop-blur-sm"
+                      className="pl-10 h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg"
                     />
                   </div>
                   <Button variant="outline" size="sm" onClick={cycleSortBy} className="gap-2">
@@ -357,7 +357,7 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.04 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: index * 0.05 }}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn(
@@ -365,18 +365,21 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
           group.totalOverdue > 0 ? "border-destructive/20" : "border-border/25",
           isOpen && "shadow-lg"
         )}>
+          {/* Top highlight */}
+          <div className="h-px bg-gradient-to-r from-transparent via-foreground/[0.06] to-transparent" />
           {/* Mesh gradient accent */}
           {group.totalOverdue > 0 && (
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive/60 via-destructive/30 to-transparent" />
           )}
 
           <CollapsibleTrigger asChild>
-            <button className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors rounded-2xl">
-              <div className="flex items-center gap-4 min-w-0">
+            <button className="w-full px-4 md:px-5 py-4 min-h-[56px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 hover:bg-muted/30 transition-colors rounded-2xl touch-manipulation">
+              {/* Top row: chevron + name + invoice count */}
+              <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
                 {isOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
-                <div className="text-left min-w-0">
-                  <p className="font-semibold text-sm truncate">{group.companyName}</p>
-                  <p className="text-xs text-muted-foreground">
+                <div className="text-left min-w-0 flex-1">
+                  <p className="font-semibold text-base sm:text-sm tracking-tight truncate">{group.companyName}</p>
+                  <p className="text-xs text-muted-foreground/80">
                     {group.invoices.length} facturen
                     {overdueInvoices.length > 0 && (
                       <span className="text-destructive ml-2">• {overdueInvoices.length} verlopen</span>
@@ -384,13 +387,14 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 flex-shrink-0">
+              {/* Bottom row on mobile: badges + amount */}
+              <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 pl-7 sm:pl-0">
                 {group.totalOverdue > 0 && (
-                  <Badge variant="destructive" className="tabular-nums text-xs">
+                  <Badge variant="destructive" className="tabular-nums text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">
                     €{group.totalOverdue.toLocaleString("nl-NL", { maximumFractionDigits: 0 })} verlopen
                   </Badge>
                 )}
-                <span className="font-bold tabular-nums text-sm">
+                <span className="font-bold tabular-nums text-sm ml-auto">
                   €{group.totalOpen.toLocaleString("nl-NL", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -407,10 +411,11 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                   return (
                     <div
                       key={inv.id}
-                      className="flex items-center justify-between py-3 gap-4 hover:bg-muted/20 -mx-2 px-2 rounded-lg cursor-pointer transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-2 sm:gap-4 hover:bg-muted/20 -mx-2 px-2 rounded-lg cursor-pointer transition-colors min-h-[48px] touch-manipulation"
                       onClick={() => onNavigate(inv.id)}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      {/* Row 1: invoice number + status badges */}
+                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
                         <span className="font-mono text-xs text-muted-foreground">{inv.invoice_number}</span>
                         <InvoiceStatusBadge
                           status={inv.status}
@@ -420,18 +425,19 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                         />
                         <InvoiceAgingBadge dueDate={inv.due_date} status={inv.status} />
                       </div>
+                      {/* Row 2: date + amount + action */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(inv.due_date), "d MMM yyyy", { locale: nl })}
                         </span>
-                        <span className={cn("font-semibold tabular-nums text-sm", isOverdue && "text-destructive")}>
+                        <span className={cn("font-semibold tabular-nums text-sm ml-auto sm:ml-0", isOverdue && "text-destructive")}>
                           €{inv.total_amount.toLocaleString("nl-NL", { minimumFractionDigits: 2 })}
                         </span>
                         {isOverdue && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-primary/10"
+                            className="h-10 w-10 sm:h-8 sm:w-8 p-0 hover:bg-primary/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               onReminder({
