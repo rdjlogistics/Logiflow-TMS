@@ -254,7 +254,7 @@ export function InvoiceBulkActionsBar({
               ) : (
                 <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />
               )}
-              Betaald
+              <span className="hidden sm:inline">Betaald</span>
             </Button>
 
             {/* Export */}
