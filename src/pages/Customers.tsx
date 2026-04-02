@@ -534,12 +534,12 @@ const Customers = () => {
       <div className="space-y-4 md:space-y-6 pb-24 md:pb-6 animate-fade-in">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div className="relative flex-1 max-w-full sm:max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
             <Input
               placeholder="Zoek klanten..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg focus-visible:border-primary/40"
             />
           </div>
           <div className="flex items-center gap-3">
