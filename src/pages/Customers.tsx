@@ -542,14 +542,15 @@ const Customers = () => {
               className="pl-10 h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg focus-visible:border-primary/40"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer whitespace-nowrap backdrop-blur-sm bg-card/30 border border-border/20 rounded-xl px-3 py-2">
               <Checkbox checked={hideTestData} onCheckedChange={(v) => setHideTestData(!!v)} />
-              Verberg test-data
+              <span className="hidden sm:inline">Verberg test-data</span>
+              <span className="sm:hidden">Test</span>
             </label>
-            <Button variant="outline" onClick={handleExportCSV} className="gap-2">
+            <Button variant="outline" onClick={handleExportCSV} className="gap-2 shrink-0">
               <Download className="h-4 w-4" />
-              CSV
+              <span className="hidden sm:inline">CSV</span>
             </Button>
             <Button variant="outline" onClick={openTrash} className="gap-2 relative">
               <Trash2 className="h-4 w-4" />
