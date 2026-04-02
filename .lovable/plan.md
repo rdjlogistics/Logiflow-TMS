@@ -1,52 +1,76 @@
 
 
-# Debiteuren & Incasso — iOS 27 "Elite Class" mobiele optimalisatie
+# Waarde & Afschrijving tab toevoegen aan Vlootbeheer
 
-## Probleem
-De pagina toont op mobiel overlappende elementen: badges, bedragen en datums staan op één regel gepropt waardoor tekst afkapt. De accordion-trigger heeft te kleine touch targets en de layout is niet geoptimaliseerd voor smalle schermen.
+## Overzicht
 
-## Wijzigingen
+Een nieuwe "Waarde & Afschrijving" tab in Vlootbeheer die per voertuig de actuele inruilwaarde berekent met een afschrijvingsalgoritme, plus de Total Cost of Ownership (TCO) toont op basis van echte data uit de database.
 
-### Bestand: `src/pages/finance/Receivables.tsx`
+## Database migratie
 
-**1. Bottom spacing**
-- `pb-24 md:pb-6` op de main container zodat content boven de bottom nav blijft
+**Kolom toevoegen aan `vehicles` tabel:**
+- `purchase_price` (numeric, nullable) — aanschafwaarde van het voertuig
 
-**2. KPI Cards grid**
-- `grid-cols-2` op mobiel (i.p.v. `grid-cols-1`) zodat 4 kaarten in 2x2 passen
-- Kleinere padding in KPICard op mobiel: `pt-4 pb-3 md:pt-6 md:pb-5`
+Dit is de enige ontbrekende kolom. Alle andere data (bouwjaar, km-stand, lease, verzekering, brandstofverbruik, onderhoudskosten) bestaat al.
 
-**3. Zoekbalk — Glassmorphism**
-- `h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg`
+## Afschrijvingsalgoritme
 
-**4. Customer Accordion — Mobiel-first layout**
-- Trigger: Stack verticaal op mobiel — bedrijfsnaam bovenaan, badges + bedrag op een aparte regel eronder
-- Touch target: `min-h-[56px] py-4` 
-- Bedrijfsnaam: `text-base font-semibold tracking-tight` op mobiel
-- Badge "verlopen": kleiner formaat, `text-[10px]` op mobiel
+Client-side berekening per voertuig:
 
-**5. Invoice rijen in accordion — Mobiel stack**
-- Op mobiel: verticale stack i.p.v. horizontale flex
-- Factuurnummer + status badges op regel 1
-- Datum + bedrag + mail-knop op regel 2
-- Touch targets: `min-h-[48px]`
+```text
+Lineaire afschrijving over 8 jaar (standaard voor bedrijfsvoertuigen NL):
+  leeftijd = huidig_jaar - bouwjaar
+  restwaarde_pct = max(10%, 100% - (leeftijd / 8) * 90%)
+  
+Kilometerscorrectie:
+  verwacht_km = leeftijd * 30.000 (gemiddeld NL bedrijfsvoertuig)
+  km_ratio = werkelijke_km / verwacht_km
+  correctie = 1 - (km_ratio - 1) * 0.15  (max ±15% impact)
+  
+Inruilwaarde = aanschafprijs * restwaarde_pct * km_correctie
 
-**6. Staggered animaties**
-- Spring physics op accordion cards: `type: 'spring', stiffness: 260, damping: 24`
-- Delay per card: `i * 0.05`
+TCO per maand:
+  afschrijving/maand + lease + verzekering + gemiddeld_onderhoud + brandstof_schatting
+```
 
-**7. Tabs — Grotere touch targets op mobiel**
-- TabsTrigger: `px-4 py-2.5 text-sm` op mobiel
+## Nieuwe bestanden
 
-### Niet geraakt
-- Desktop layout blijft ongewijzigd (alle wijzigingen via responsive breakpoints)
-- Incasso en Credit Analytics tabs — geen wijzigingen
-- Alle functionaliteit (navigatie, herinneringen, sorting) blijft 100% intact
+### 1. `src/components/fleet/VehicleValuation.tsx`
+Nieuwe tab-component met:
+- **Vloot-samenvatting**: Totale vlootwaarde, gemiddelde TCO/maand, gemiddelde leeftijd
+- **Per-voertuig kaarten** (glassmorphism, iOS 27 style):
+  - Voertuig info (kenteken, merk/model, bouwjaar, km-stand)
+  - Aanschafprijs invulveld (inline editable als nog niet gezet)
+  - Visuele afschrijvingsbalk (gradient van groen → rood)
+  - Huidige geschatte inruilwaarde
+  - TCO breakdown: afschrijving, lease, verzekering, onderhoud, brandstof
+  - TCO per km berekening
+- **Sorteer/filter**: Op waarde, leeftijd, TCO
+
+### 2. `src/lib/vehicleValuation.ts`
+Pure functies voor het afschrijvingsalgoritme:
+- `calculateDepreciation(purchasePrice, yearOfManufacture, mileageKm)` → inruilwaarde + restwaarde%
+- `calculateTCO(vehicle, maintenanceCosts)` → maandelijkse TCO breakdown
+- Exporteerbare constanten (afschrijvingsduur, km/jaar benchmark)
+
+## Bestaande bestanden aanpassen
+
+### 3. `src/pages/FleetManagement.tsx`
+- Importeer `VehicleValuation` component
+- Voeg 4e tab toe: "Waarde" met `TrendingDown` icoon
+- TabsContent met `forceMount` patroon (consistent met bestaande tabs)
+
+### 4. `src/hooks/useFleetManagement.ts`
+- `Vehicle` interface uitbreiden met `purchase_price: number | null`
+- Maintenance costs query toevoegen (som van kosten per voertuig uit `vehicle_maintenance`)
+
+### 5. `src/components/fleet/VehicleOverview.tsx`
+- `VehicleFormData` uitbreiden met `purchase_price` veld
+- Invoerveld toevoegen in het voertuig-bewerkingsdialoog (Financieel tab)
 
 ## Resultaat
-- 2x2 KPI grid op mobiel met compacte glassmorphism kaarten
-- Gestapelde accordion layout die niet meer overlapt
-- 48-56px touch targets overal
-- Premium glassmorphism zoekbalk
-- Proper safe-area spacing boven bottom nav
+- Echte berekeningen op basis van database-data (bouwjaar, km, onderhoud, lease, verzekering)
+- Aanschafprijs is het enige nieuwe invoerveld
+- TCO combineert alle bestaande kosten in één overzicht
+- Glassmorphism UI consistent met rest van de app
 
