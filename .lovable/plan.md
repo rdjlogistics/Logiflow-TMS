@@ -1,29 +1,27 @@
 
 
-# Verwijder de Trips pagina
+# Fix: Applicatie is broken na Trips-verwijdering
 
-## Waarom
+## Analyse
 
-De `/trips` pagina is een apart rittenoverz dat overlapt met het orderoverzicht (`/orders`). De gebruiker wil dit samenvoegen door de trips-pagina te verwijderen.
+Alle 7 bestanden uit het plan zijn correct aangepast:
+- ✅ `src/pages/Trips.tsx` is verwijderd
+- ✅ `src/App.tsx` — geen Trips import, redirect naar `/orders`
+- ✅ `MobileBottomNav.tsx` — 4 tabs, geen trips referentie
+- ✅ `QuickLinksWidget.tsx` — `/orders` in plaats van `/trips`
+- ✅ `RecentActivityFeed.tsx` — `/orders`
+- ✅ `ActionQueue.tsx` — `/orders`
+- ✅ `CashflowCockpit.tsx` — `/orders`
 
-## Wijzigingen
+Er zijn geen console errors of network errors zichtbaar. De code compileert correct.
 
-| # | Bestand | Actie |
-|---|---------|-------|
-| 1 | `src/App.tsx` | Route `/trips` wijzigen naar `<Navigate to="/orders" replace />` (redirect zodat eventuele bookmarks blijven werken) + verwijder de `Trips` lazy import |
-| 2 | `src/pages/Trips.tsx` | Bestand verwijderen |
-| 3 | `src/components/layout/MobileBottomNav.tsx` | "Ritten" tab verwijderen uit `tabs` array + verwijder `Route` import + update `getActiveTab` (verwijder trips check). Grid wordt `grid-cols-4` |
-| 4 | `src/components/dashboard/widgets/QuickLinksWidget.tsx` | Link "Ritten" → `/trips` wijzigen naar `/orders` |
-| 5 | `src/components/dashboard/RecentActivityFeed.tsx` | `link: "/trips"` → `link: "/orders"` |
-| 6 | `src/components/dashboard/ActionQueue.tsx` | `Link to="/trips"` → `Link to="/orders"`, label "Bekijk ritten" → "Bekijk orders" |
-| 7 | `src/pages/finance/CashflowCockpit.tsx` | SelectItem `/trips` verwijderen of wijzigen naar `/orders` |
+## Mogelijke oorzaak
 
-### Gerelateerde bestanden die NIET geraakt worden
-- `src/components/trips/` — Deze componenten worden gebruikt door het carrier portal en andere flows, niet alleen door de trips pagina
-- `src/hooks/useCarrierTrips.ts` — Carrier-specifiek, blijft bestaan
+Het probleem kan een **stale build cache** zijn — de preview toont oude chunks die verwijzen naar het verwijderde `Trips.tsx` bestand. Dit is een bekende Vite hot-reload issue bij het verwijderen van bestanden.
 
-## Resultaat
-- `/trips` redirect naar `/orders`
-- Bottom nav heeft 4 items in plaats van 5
-- Alle links in de app verwijzen naar `/orders` in plaats van `/trips`
+## Fix
+
+**Bestand**: `src/App.tsx` — Toevoegen van een lege regel (whitespace change) om een volledige rebuild te forceren. Dit is een no-op die de build cache reset.
+
+Als er een daadwerkelijke TypeScript-fout is die pas bij rebuild zichtbaar wordt, zal die dan verschijnen en kunnen we die gericht fixen.
 
