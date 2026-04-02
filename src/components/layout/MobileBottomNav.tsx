@@ -49,7 +49,7 @@ export function MobileBottomNav() {
           WebkitBackdropFilter: "blur(48px) saturate(200%)",
         }}
       >
-        <div className="grid grid-cols-5 px-2 py-1.5">
+        <div className="grid grid-cols-4 px-2 py-1.5">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
 

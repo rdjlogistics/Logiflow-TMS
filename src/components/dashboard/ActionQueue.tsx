@@ -212,8 +212,8 @@ const ActionQueue = ({ actions, loading }: ActionQueueProps) => {
               </motion.div>
               <motion.div whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                 <Button variant="outline" size="default" asChild className="w-full sm:w-auto h-11 sm:h-10">
-                  <Link to="/trips">
-                    Bekijk ritten
+                  <Link to="/orders">
+                    Bekijk orders
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>

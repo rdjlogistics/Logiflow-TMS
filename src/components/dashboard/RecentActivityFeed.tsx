@@ -125,7 +125,7 @@ const RecentActivityFeed = ({ loading: externalLoading }: RecentActivityFeedProp
             description: `${trip.pickup_address?.split(",")[0] || "Ophaal"} → ${trip.delivery_address?.split(",")[0] || "Aflever"}`,
             status: trip.status,
             timestamp: trip.created_at,
-            link: "/trips",
+            link: "/orders",
           });
         });
 
