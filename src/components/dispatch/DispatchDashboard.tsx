@@ -72,7 +72,7 @@ export function DispatchDashboard() {
         autoAssignThreshold: config?.min_confidence_auto_assign || 90,
       };
     },
-    refetchInterval: 30000,
+    refetchInterval: 120000,
     refetchIntervalInBackground: false,
   });
 

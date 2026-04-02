@@ -84,7 +84,7 @@ export default function TelematicsIntegration() {
       if (error) throw error;
       return data ?? [];
     },
-    refetchInterval: 30000,
+    refetchInterval: 120000,
     refetchIntervalInBackground: false,
   });
 
