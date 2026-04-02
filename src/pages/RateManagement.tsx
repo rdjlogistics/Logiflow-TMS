@@ -21,6 +21,7 @@ import {
   Download, Search, Filter, MoreHorizontal, Edit, Copy, Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { FuelIndexUpdateDialog } from "@/components/rates/FuelIndexUpdateDialog";
 import { useRateContractEngine, type RateContract } from "@/hooks/useRateContractEngine";
 import { FeatureGate } from "@/components/subscription/FeatureGate";
