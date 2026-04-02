@@ -508,7 +508,31 @@ const RateManagement = () => {
           </DialogContent>
         </Dialog>
 
-        <FuelIndexUpdateDialog open={fuelIndexDialogOpen} onOpenChange={setFuelIndexDialogOpen} />
+        <FuelIndexUpdateDialog 
+          open={fuelIndexDialogOpen} 
+          onOpenChange={setFuelIndexDialogOpen}
+          onUpdate={async (newIndex, newPrice) => {
+            // Find or create fuel surcharge rule and update payload_json
+            const fuelRule = surchargeRules.find((r: any) => r.surcharge_type === 'fuel');
+            if (fuelRule) {
+              const { error } = await supabase
+                .from('surcharge_rules')
+                .update({
+                  payload_json: {
+                    ...(fuelRule.payload_json as any || {}),
+                    fuel_index: newIndex,
+                    reference_price: newPrice,
+                    updated_at: new Date().toISOString(),
+                  },
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', fuelRule.id);
+              if (error) throw error;
+            } else {
+              toast({ title: 'Geen brandstoftoeslag regel gevonden', description: 'Maak eerst een brandstoftoeslag regel aan in Toeslagen Configuratie.', variant: 'destructive' });
+            }
+          }}
+        />
       </div>
       </FeatureGate>
     </DashboardLayout>

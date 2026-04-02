@@ -17,9 +17,6 @@ const B2BPortal = () => {
   const unreadNotifications = cases.filter(c => c.status === 'open' || c.status === 'in_progress').length;
 
   const handleNotificationsClick = () => {
-    toast.info("Notificaties", {
-      description: `Je hebt ${unreadNotifications} nieuwe updates over je zendingen.`
-    });
     navigate("/portal/b2b/cases");
   };
 

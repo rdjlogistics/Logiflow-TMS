@@ -376,9 +376,9 @@ const SystemHealth = () => {
                       <TableCell className="text-muted-foreground">10 min geleden</TableCell>
                       <TableCell className="text-red-600 text-sm">Connection timeout</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm" onClick={() => {
-                          toast.info('Retry in wachtrij', { description: 'Webhook retry vereist een actieve externe integratie. Configureer de webhook endpoint in uw integratie-instellingen.' });
-                        }}>Retry Now</Button>
+                        <Button variant="outline" size="sm" disabled>
+                          Retry (niet beschikbaar)
+                        </Button>
                       </TableCell>
                     </TableRow>
                   </TableBody>
