@@ -20168,6 +20168,7 @@ export type Database = {
         Args: { p_card_id: string }
         Returns: string
       }
+      get_invoice_stats: { Args: { p_company_id: string }; Returns: Json }
       get_latest_driver_location: {
         Args: { p_trip_id: string }
         Returns: {

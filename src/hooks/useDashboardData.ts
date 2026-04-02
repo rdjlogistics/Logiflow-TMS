@@ -52,15 +52,15 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
 
   const [
     countsResult,
-    { data: invoicesData },
+    invoiceStatsResult,
     { data: tripsData },
     { data: allTrips },
     { data: submissions },
     unreadEmailResult,
   ] = await Promise.all([
     supabase.rpc('get_dashboard_counts', { p_month_start: monthStart.toISOString() }),
-    // Invoices — tenant-scoped
-    supabase.from("invoices").select("status, total_amount, amount_paid, created_at").eq("company_id", companyId).limit(200),
+    // Invoice stats via server-side RPC — replaces client-side aggregation
+    supabase.rpc('get_invoice_stats', { p_company_id: companyId }),
     // Trips for revenue chart (6 months) — tenant-scoped
     supabase.from("trips").select("trip_date, sales_total, purchase_total, created_at, status, driver_id, vehicle_id, pickup_city, delivery_city, pod_available, id, order_number").is("deleted_at", null).eq("company_id", companyId).gte("created_at", sixMonthsAgo.toISOString()),
     // Recent trips for status/weekly/ops (6 weeks) — tenant-scoped
@@ -85,13 +85,11 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   }) || [];
   const podTrips = allTrips?.filter(t => ['afgerond', 'gecontroleerd'].includes(t.status) && t.pod_available === false) || [];
 
-  // Invoice calculations
-  const openInvoices = invoicesData?.filter(inv => inv.status === "verzonden" || inv.status === "vervallen").length || 0;
-  const totalRevenue = invoicesData?.reduce((sum, inv) => sum + (Number(inv.amount_paid) || 0), 0) || 0;
-  const pendingPayments = invoicesData?.reduce((sum, inv) => {
-    if (inv.status !== "betaald") return sum + (Number(inv.total_amount) - Number(inv.amount_paid || 0));
-    return sum;
-  }, 0) || 0;
+  // Invoice calculations — now from server-side RPC
+  const invStats = (invoiceStatsResult.data as any) || {};
+  const openInvoices = invStats.open_invoices || 0;
+  const totalRevenue = invStats.total_paid || 0;
+  const pendingPayments = invStats.pending_payments || 0;
 
   // Ops stats
   const terminalStatuses = ['geannuleerd', 'afgerond', 'afgeleverd', 'gecontroleerd', 'gefactureerd'];
