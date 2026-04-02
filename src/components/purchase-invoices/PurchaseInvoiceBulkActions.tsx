@@ -275,13 +275,12 @@ export const PurchaseInvoiceBulkActions = ({
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
         >
           <div
             className={cn(
-              "flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl",
+              "flex flex-wrap items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-2xl shadow-2xl",
               "bg-background/95 backdrop-blur-xl border border-border/50",
-              "min-w-[600px]"
             )}
           >
             {/* Selection info */}
