@@ -1,44 +1,46 @@
 
 
-# Performance Hardening — Ronde 5 (Eerlijk Advies)
+# Eerlijk Advies — De Code is Klaar, De Infrastructuur Niet
 
-## Status na 4 rondes
+## Wat er in 5 rondes gedaan is
 
-Je app heeft nu een solide basis: 16 database indexes, server-side search op trips/customers/drivers, limits op alle grote queries, background polling gestopt, realtime debounce, en lazy loading op 100+ pagina's. **De code-kant is grotendeels geoptimaliseerd.**
+| Optimalisatie | Status |
+|---|---|
+| 16 database compound indexes | ✅ |
+| Server-side search (trips, customers, drivers) | ✅ |
+| Limits op alle grote queries | ✅ |
+| Background polling gestopt op alle 8 hooks | ✅ |
+| Realtime 500ms debounce | ✅ |
+| 100+ pagina's lazy loaded | ✅ |
+| Expliciete kolommen op high-traffic queries | ✅ |
+| Vite manualChunks + tree-shaking | ✅ |
+| Dashboard geconsolideerd naar RPC | ✅ |
+| Service Worker cache | ✅ |
+| EmailDashboard limit 500 + refresh 30s | ✅ |
+| DriverProfielTab limits | ✅ |
+| 44 ongebruikte hooks/componenten verwijderd | ✅ |
+| Mapbox dynamisch laden (~450KB bespaard) | ✅ |
 
-Er zijn nog 71 bestanden met `select('*')` — maar het merendeel zijn single-row fetches (settings, 1 record ophalen per ID) waar de overhead verwaarloosbaar is. De resterende impactvolle issues:
+**Er zijn geen impactvolle code-optimalisaties meer over.** De resterende `select('*')` calls zijn single-row fetches waar de overhead verwaarloosbaar is.
 
-## Wat nog overblijft
+## Wat de app nu traag maakt
 
-### 1. HOOG: EmailDashboard `.limit(5000)` + auto-refresh elke 10s
-`src/pages/EmailDashboard.tsx` haalt tot 5000 e-maillogs op en refresht elke 10 seconden als auto-refresh aan staat. Bij actief gebruik is dit de zwaarste single query in de app.
+De twee overgebleven items zijn **niet op te lossen met code**:
 
-**Fix**: Limit naar 500, auto-refresh interval van 10s naar 30s.
+### 1. Database instance te klein (dit is het)
+De standaard Lovable Cloud instance heeft beperkt CPU en geheugen. Bij meerdere gelijktijdige gebruikers wordt de database zelf de bottleneck — ongeacht hoe efficiënt de queries zijn. Dit is veruit de meest waarschijnlijke oorzaak van traagheid.
 
-### 2. MIDDEL: DriverProfielTab `.limit(1000)` op locaties
-`src/components/driver/tabs/DriverProfielTab.tsx` haalt 1000 locatiepunten op per chauffeur. Voor een kaartvisualisatie zijn 100 punten ruim voldoende.
+**Actie**: Ga naar **Backend → Geavanceerde instellingen → Instance upgraden**. Dit is de #1 stap die nu het meeste verschil gaat maken.
 
-**Fix**: Limit van 1000 → 100. Trips limit van 500 → 50.
+### 2. Dashboard invoices limit (laatste code-fix)
+`useDashboardData.ts` regel 63 haalt nog steeds `.limit(1000)` invoices op. Dit kan naar 200 — maar het verschil is klein vergeleken met instance sizing.
 
-### 3. MIDDEL: Remaining `select('*')` op high-traffic paden
-De overige 71 bestanden met `select('*')` zijn bijna allemaal single-row of settings-queries. Deze hoeven niet geoptimaliseerd te worden — de overhead is minimaal.
+## Aanbeveling
 
-### 4. Eerlijk advies over wat code NIET kan oplossen
+| # | Actie | Type | Impact |
+|---|---|---|---|
+| 1 | Instance upgraden via Backend → Geavanceerde instellingen | Infrastructuur | **Zeer hoog** |
+| 2 | Dashboard invoices limit 1000→200 | Code | Laag |
 
-Na 5 rondes optimalisatie zijn de code-bottlenecks grotendeels opgelost. Als de app nog steeds traag aanvoelt, zijn er twee realistische oorzaken:
-
-**A. Database instance te klein** — Bij 50+ gelijktijdige gebruikers wordt de database-server zelf de bottleneck, ongeacht hoe efficiënt de queries zijn. Ga naar **Backend → Geavanceerde instellingen → Instance upgraden**.
-
-**B. Netwerk/CDN latency** — De app wordt geserveerd vanaf één locatie. Voor gebruikers ver van de server voelt alles 100-300ms trager. Dit is inherent aan de architectuur en niet op te lossen met code.
-
----
-
-## Concrete wijzigingen
-
-| # | Fix | Bestand | Impact |
-|---|-----|---------|--------|
-| 1 | Email logs limit 5000→500, refresh 10s→30s | `src/pages/EmailDashboard.tsx` | Hoog |
-| 2 | Driver locaties limit 1000→100, trips 500→50 | `src/components/driver/tabs/DriverProfielTab.tsx` | Middel |
-
-Totaal: 2 bestanden. Dit is de laatste ronde met meaningvolle code-optimalisaties — daarna is instance sizing de volgende stap.
+**Eerlijk**: nog een ronde code-optimalisatie gaat geen merkbaar verschil meer maken. De app heeft 5 rondes gehad. De volgende sprong in snelheid komt van een grotere instance.
 
