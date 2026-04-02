@@ -151,11 +151,23 @@ export default function NotificationChannels() {
     if (!editingTemplate) return;
     
     setSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (companyId) {
+        await supabase.from('notification_channels').upsert({
+          id: editingTemplate.id.length === 36 ? editingTemplate.id : undefined,
+          tenant_id: companyId,
+          channel_type: editingTemplate.channels[0] || 'email',
+          is_active: editingTemplate.isActive,
+          default_templates_json: { event: editingTemplate.event, messageTemplate: editingTemplate.messageTemplate, channels: editingTemplate.channels },
+        });
+      }
+    } catch {}
     
-    setTemplates(prev => prev.map(t => 
-      t.id === editingTemplate.id ? editingTemplate : t
-    ));
+    setTemplates(prev => {
+      const exists = prev.find(t => t.id === editingTemplate.id);
+      return exists ? prev.map(t => t.id === editingTemplate.id ? editingTemplate : t) : [...prev, editingTemplate];
+    });
     
     setSaving(false);
     setShowTemplateDialog(false);
