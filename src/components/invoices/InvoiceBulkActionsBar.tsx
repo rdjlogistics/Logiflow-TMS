@@ -203,9 +203,9 @@ export function InvoiceBulkActionsBar({
                   {processingAction?.startsWith("reminder") ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
-                    <Bell className="h-4 w-4 mr-2" />
+                   <Bell className="h-4 w-4 mr-2" />
                   )}
-                  Herinnering
+                  <span className="hidden sm:inline">Herinnering</span>
                   <ChevronDown className="h-3 w-3 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
