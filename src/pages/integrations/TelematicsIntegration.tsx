@@ -28,6 +28,7 @@ const providers = [
 ];
 
 export default function TelematicsIntegration() {
+  const { company } = useCompany();
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState('');
