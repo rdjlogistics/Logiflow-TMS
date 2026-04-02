@@ -411,10 +411,11 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                   return (
                     <div
                       key={inv.id}
-                      className="flex items-center justify-between py-3 gap-4 hover:bg-muted/20 -mx-2 px-2 rounded-lg cursor-pointer transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-2 sm:gap-4 hover:bg-muted/20 -mx-2 px-2 rounded-lg cursor-pointer transition-colors min-h-[48px] touch-manipulation"
                       onClick={() => onNavigate(inv.id)}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      {/* Row 1: invoice number + status badges */}
+                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
                         <span className="font-mono text-xs text-muted-foreground">{inv.invoice_number}</span>
                         <InvoiceStatusBadge
                           status={inv.status}
@@ -424,18 +425,19 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                         />
                         <InvoiceAgingBadge dueDate={inv.due_date} status={inv.status} />
                       </div>
+                      {/* Row 2: date + amount + action */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(inv.due_date), "d MMM yyyy", { locale: nl })}
                         </span>
-                        <span className={cn("font-semibold tabular-nums text-sm", isOverdue && "text-destructive")}>
+                        <span className={cn("font-semibold tabular-nums text-sm ml-auto sm:ml-0", isOverdue && "text-destructive")}>
                           €{inv.total_amount.toLocaleString("nl-NL", { minimumFractionDigits: 2 })}
                         </span>
                         {isOverdue && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-primary/10"
+                            className="h-10 w-10 sm:h-8 sm:w-8 p-0 hover:bg-primary/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               onReminder({
