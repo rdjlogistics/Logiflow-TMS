@@ -275,12 +275,12 @@ export default function Receivables() {
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Zoek klant..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 bg-card/50 border-border/30 backdrop-blur-sm"
+                      className="pl-10 h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg"
                     />
                   </div>
                   <Button variant="outline" size="sm" onClick={cycleSortBy} className="gap-2">
