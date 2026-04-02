@@ -89,12 +89,13 @@ export default function TelematicsIntegration() {
   });
 
   const handleAddConnection = async () => {
-    if (!selectedProvider || !apiKey) { toast.error("Vul alle velden in"); return; }
+    if (!selectedProvider || !apiKey || !company?.id) { toast.error("Vul alle velden in"); return; }
     const provider = providers.find(p => p.id === selectedProvider);
     try {
       const { error } = await supabase
         .from('telematics_connections')
         .insert({
+          tenant_id: company.id,
           provider: selectedProvider,
           name: provider?.name || selectedProvider,
           sync_interval_minutes: parseInt(syncInterval) || 5,
