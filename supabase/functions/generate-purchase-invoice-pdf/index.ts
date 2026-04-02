@@ -145,6 +145,10 @@ Deno.serve(async (req) => {
       ? `<div style="margin-top:16px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:11px;color:#6b7280;">${escapeHtml(invoice.footnote)}</div>`
       : "";
 
+    const vatNoteHtml = invoice.vat_note
+      ? `<div style="margin-top:12px;padding:10px;background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;font-size:11px;color:#1e40af;">${escapeHtml(invoice.vat_note)}</div>`
+      : "";
+
     const periodStr = invoice.period_from && invoice.period_to
       ? `${formatDate(invoice.period_from)} t/m ${formatDate(invoice.period_to)}`
       : "";
