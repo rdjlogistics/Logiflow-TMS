@@ -87,7 +87,7 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
           background: `radial-gradient(circle at 100% 0%, ${color}, transparent 70%)`,
         }} />
         <ShimmerOverlay />
-        <CardContent className="pt-6 pb-5">
+        <CardContent className="pt-4 pb-3 md:pt-6 md:pb-5">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
