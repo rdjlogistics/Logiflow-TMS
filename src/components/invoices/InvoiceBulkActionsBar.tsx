@@ -174,9 +174,9 @@ export function InvoiceBulkActionsBar({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+        className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
       >
-        <div className="flex items-center gap-3 px-4 py-3 bg-card border border-border shadow-xl rounded-xl backdrop-blur-lg">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-3 bg-card border border-border shadow-xl rounded-xl backdrop-blur-lg">
           {/* Selection Info */}
           <div className="flex items-center gap-2 pr-3 border-r border-border">
             <Badge variant="secondary" className="font-mono">
@@ -203,9 +203,9 @@ export function InvoiceBulkActionsBar({
                   {processingAction?.startsWith("reminder") ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
-                    <Bell className="h-4 w-4 mr-2" />
+                   <Bell className="h-4 w-4 mr-2" />
                   )}
-                  Herinnering
+                  <span className="hidden sm:inline">Herinnering</span>
                   <ChevronDown className="h-3 w-3 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
@@ -254,7 +254,7 @@ export function InvoiceBulkActionsBar({
               ) : (
                 <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />
               )}
-              Betaald
+              <span className="hidden sm:inline">Betaald</span>
             </Button>
 
             {/* Export */}
@@ -269,7 +269,7 @@ export function InvoiceBulkActionsBar({
               ) : (
                 <FileDown className="h-4 w-4 mr-2" />
               )}
-              Export
+              <span className="hidden sm:inline">Export</span>
             </Button>
           </div>
 

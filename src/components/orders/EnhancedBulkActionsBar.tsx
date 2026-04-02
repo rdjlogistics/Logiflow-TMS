@@ -823,7 +823,7 @@ export const EnhancedBulkActionsBar: React.FC<EnhancedBulkActionsBarProps> = ({
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+            className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit"
           >
             <div className={cn(
               'flex items-center gap-1.5 pl-4 pr-2 py-2 rounded-2xl',

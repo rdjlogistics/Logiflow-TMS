@@ -275,13 +275,12 @@ export const PurchaseInvoiceBulkActions = ({
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
         >
           <div
             className={cn(
-              "flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl",
+              "flex flex-wrap items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-2xl shadow-2xl",
               "bg-background/95 backdrop-blur-xl border border-border/50",
-              "min-w-[600px]"
             )}
           >
             {/* Selection info */}
@@ -348,14 +347,14 @@ export const PurchaseInvoiceBulkActions = ({
                 size="sm"
                 onClick={() => setShowPaymentModal(true)}
                 disabled={bulkPaymentMutation.isPending}
-                className="gap-2"
+                className="gap-1.5"
               >
                 {bulkPaymentMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <CreditCard className="h-4 w-4" />
                 )}
-                Betaling
+                <span className="hidden sm:inline">Betaling</span>
               </Button>
 
               {/* Bulk email */}
@@ -364,14 +363,14 @@ export const PurchaseInvoiceBulkActions = ({
                 size="sm"
                 onClick={() => setShowBulkEmailModal(true)}
                 disabled={isSendingBulkEmail}
-                className="gap-2"
+                className="gap-1.5"
               >
                 {isSendingBulkEmail ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Mail className="h-4 w-4" />
                 )}
-              E-mail versturen
+                <span className="hidden sm:inline">E-mail</span>
               </Button>
 
               {/* SEPA Export */}
@@ -379,10 +378,10 @@ export const PurchaseInvoiceBulkActions = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowSepaModal(true)}
-                className="gap-2"
+                className="gap-1.5"
               >
                 <Landmark className="h-4 w-4" />
-                SEPA Export
+                <span className="hidden sm:inline">SEPA</span>
               </Button>
 
               {/* Export */}
@@ -390,10 +389,10 @@ export const PurchaseInvoiceBulkActions = ({
                 variant="outline"
                 size="sm"
                 onClick={handleExportExcel}
-                className="gap-2"
+                className="gap-1.5"
               >
                 <FileDown className="h-4 w-4" />
-                Export
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </div>
 

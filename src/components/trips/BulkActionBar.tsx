@@ -95,7 +95,7 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95vw] max-w-2xl"
+          className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
         >
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-2xl px-5 py-3.5">
             {loading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
