@@ -59,6 +59,7 @@ interface VehicleFormData {
   year_of_manufacture: string;
   insurance_expiry_date: string;
   next_service_date: string;
+  purchase_price: string;
 }
 
 const emptyFormData: VehicleFormData = {
