@@ -843,7 +843,27 @@ const RoutePlanning = () => {
         </AnimatePresence>
       </div>
 
-      <AddStopDialog open={showAddStopDialog} onOpenChange={setShowAddStopDialog} onAddStop={(stop) => toast({ title: "Stop toegevoegd", description: `${stop.companyName || stop.address} is klaar voor route optimalisatie` })} />
+      <AddStopDialog open={showAddStopDialog} onOpenChange={setShowAddStopDialog} onAddStop={async (stop) => {
+        try {
+          const { data: companyId } = await supabase.rpc("get_user_company_cached", { p_user_id: (await supabase.auth.getUser()).data.user?.id });
+          const { error } = await supabase.from("trips").insert({
+            tenant_id: companyId,
+            pickup_address: stop.address || "Depot",
+            pickup_city: stop.city || null,
+            delivery_address: stop.address,
+            delivery_city: stop.city || null,
+            delivery_latitude: stop.latitude || null,
+            delivery_longitude: stop.longitude || null,
+            trip_date: selectedDate === "all" ? format(new Date(), "yyyy-MM-dd") : selectedDate,
+            status: "gepland",
+            notes: stop.companyName ? `Stop: ${stop.companyName}` : undefined,
+          });
+          if (error) throw error;
+          toast({ title: "Stop toegevoegd ✓", description: `${stop.companyName || stop.address} is aangemaakt als rit` });
+        } catch (err: any) {
+          toast({ title: "Fout bij toevoegen", description: err.message, variant: "destructive" });
+        }
+      }} />
       <OrderImportDialog open={showImportDialog} onOpenChange={setShowImportDialog} />
     </DashboardLayout>
   );

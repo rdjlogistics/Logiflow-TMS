@@ -143,7 +143,34 @@ const AlertsEscalations = () => {
         open={ruleDialogOpen}
         onOpenChange={setRuleDialogOpen}
         rule={selectedRule}
-        onSave={() => toast({ title: "Regel opgeslagen ✓" })}
+        onSave={async (ruleData) => {
+          try {
+            const { data: companyId } = await supabase.rpc("get_user_company_cached", { p_user_id: user!.id });
+            if (!companyId) return;
+            const escalationMinutes = ruleData.autoEscalate ? parseInt(ruleData.autoEscalate.replace(/[^0-9]/g, '')) || 15 : 15;
+            if (selectedRule?.id && !selectedRule.id.startsWith("ALT-")) {
+              await supabase.from("alert_rules").update({
+                name: ruleData.name || "",
+                description: ruleData.trigger || "",
+                notification_channels: ruleData.channels || [],
+                escalation_after_minutes: escalationMinutes,
+                is_active: true,
+              }).eq("id", selectedRule.id);
+            } else {
+              await supabase.from("alert_rules").insert({
+                company_id: companyId,
+                name: ruleData.name || "",
+                description: ruleData.trigger || "",
+                notification_channels: ruleData.channels || [],
+                escalation_after_minutes: escalationMinutes,
+                is_active: true,
+              });
+            }
+            toast({ title: "Regel opgeslagen ✓" });
+          } catch (err: any) {
+            toast({ title: "Fout bij opslaan", description: err.message, variant: "destructive" });
+          }
+        }}
       />
     </DashboardLayout>
   );

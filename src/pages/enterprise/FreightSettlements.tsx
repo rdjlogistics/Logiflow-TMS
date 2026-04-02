@@ -177,7 +177,19 @@ const FreightSettlements = () => {
         open={approvalOpen}
         onOpenChange={setApprovalOpen}
         settlement={approvalSettlement}
-        onApprove={() => toast({ title: "Settlement goedgekeurd ✓" })}
+        onApprove={async (settlement) => {
+          const { data: companyId } = await supabase.rpc("get_user_company_cached", { p_user_id: user!.id });
+          if (!companyId || !settlement) return;
+          const carrierId = settlements.find(s => s.carrierName === settlement.carrier)?.carrierId;
+          if (carrierId) {
+            await supabase
+              .from("purchase_invoices")
+              .update({ status: "approved" })
+              .eq("company_id", companyId)
+              .eq("carrier_id", carrierId);
+          }
+          toast({ title: "Settlement goedgekeurd ✓", description: `${settlement.carrier} is goedgekeurd voor betaling.` });
+        }}
       />
     </DashboardLayout>
   );
