@@ -227,8 +227,9 @@ Deno.serve(async (req) => {
     <div class="total-row grand"><span>Totaal</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.total_amount || 0)}</span></div>
   </div>
 
-  ${selfBillingNote}
-  ${footnoteHtml}
+   ${selfBillingNote}
+   ${vatNoteHtml}
+   ${footnoteHtml}
 
   ${carrier?.iban ? `<div style="margin-top:24px;padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:11px;">
     <strong>Betaling naar:</strong> ${escapeHtml(carrier.company_name)} - IBAN: ${escapeHtml(carrier.iban)}${carrier.bic ? ` / BIC: ${escapeHtml(carrier.bic)}` : ""}
