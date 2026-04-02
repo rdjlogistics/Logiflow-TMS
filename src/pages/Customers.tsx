@@ -798,17 +798,21 @@ const Customers = () => {
 
         {/* Bulk Actions Toolbar */}
         {someSelected && (
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 backdrop-blur-xl bg-card/60 rounded-2xl border border-border/20 shadow-xl"
+          >
             <CheckSquare className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">{selectedIds.size} geselecteerd</span>
             <div className="flex gap-2 ml-auto">
               {isAdmin && (
                 <Button size="sm" variant="destructive" onClick={() => setBulkDeleteDialogOpen(true)} className="gap-1.5">
-                  <Trash2 className="h-3.5 w-3.5" /> Naar prullenbak
+                  <Trash2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Naar prullenbak</span>
                 </Button>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         <Card>
