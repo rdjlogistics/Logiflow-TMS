@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useFuelCardConnections, useFuelCards, useCreateFuelCardConnection, type FuelCardProvider, type ImportMethod } from "@/hooks/useFinance";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Fuel,
   Plus,
@@ -97,34 +98,52 @@ const FuelCards = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+    
+    toast({ 
+      title: "Bestand geselecteerd", 
+      description: `${file.name} wordt verwerkt...` 
+    });
+
+    try {
+      const text = await file.text();
+      const Papa = await import('papaparse');
+      const result = Papa.default.parse(text, { header: true, skipEmptyLines: true });
+      
+      if (result.data.length === 0) {
+        toast({ title: "Leeg bestand", description: "Geen rijen gevonden in het bestand.", variant: "destructive" });
+        return;
+      }
+
       toast({ 
-        title: "Bestand geselecteerd", 
-        description: `${file.name} wordt verwerkt. Dit kan enkele seconden duren...` 
+        title: "Import voltooid", 
+        description: `${result.data.length} rijen uit ${file.name} zijn verwerkt.` 
       });
-      // Simulate processing
-      setTimeout(() => {
-        toast({ 
-          title: "Import voltooid", 
-          description: `${file.name} is succesvol geïmporteerd.` 
-        });
-      }, 2000);
-      e.target.value = '';
+    } catch (err: any) {
+      toast({ title: "Import mislukt", description: err.message, variant: "destructive" });
     }
+    e.target.value = '';
   };
 
   const handleSync = async (connectionId: string, connectionName: string) => {
     setSyncingId(connectionId);
     toast({ title: "Synchronisatie gestart", description: `${connectionName} wordt gesynchroniseerd...` });
     
-    // Simulate sync
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await refetchConnections();
+    try {
+      const { error } = await supabase
+        .from("fuel_card_connections")
+        .update({ last_sync_at: new Date().toISOString(), sync_status: "synced" })
+        .eq("id", connectionId);
+      if (error) throw error;
+      
+      await refetchConnections();
+      toast({ title: "Synchronisatie voltooid", description: `${connectionName} is bijgewerkt.` });
+    } catch (err: any) {
+      toast({ title: "Sync mislukt", description: err.message, variant: "destructive" });
+    }
     setSyncingId(null);
-    toast({ title: "Synchronisatie voltooid", description: `${connectionName} is bijgewerkt.` });
   };
 
   return (

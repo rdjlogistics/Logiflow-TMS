@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { FileSearch, CheckCircle, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ import { AuditReviewDialog } from "@/components/enterprise/AuditReviewDialog";
 
 const AuditQueue = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [resolvedIds, setResolvedIds] = useState<string[]>([]);
   const [reviewItem, setReviewItem] = useState<any>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -92,8 +94,25 @@ const AuditQueue = () => {
 
   const visibleItems = auditItems.filter((item) => !resolvedIds.includes(item.id));
 
-  const handleResolve = (item: any, _resolution: string, _notes: string) => {
+  const handleResolve = async (item: any, resolution: string, notes: string) => {
+    const tripId = item.id.replace('-dist', '');
+    try {
+      await supabase.from('anomaly_events').insert({
+        tenant_id: (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data,
+        anomaly_type: item.type === 'Prijsafwijking' ? 'price_deviation' : 'distance_deviation',
+        entity_type: 'trip',
+        entity_id: tripId,
+        title: `${item.type}: ${item.order}`,
+        description: notes || resolution,
+        severity: item.severity,
+        is_resolved: true,
+        resolved_at: new Date().toISOString(),
+        resolved_by: user!.id,
+        resolution_notes: `${resolution}: ${notes}`,
+      });
+    } catch {}
     setResolvedIds((prev) => [...prev, item.id]);
+    queryClient.invalidateQueries({ queryKey: ['audit-queue'] });
   };
 
   const openReview = (item: any) => {

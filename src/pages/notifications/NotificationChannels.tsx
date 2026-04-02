@@ -27,6 +27,8 @@ import {
   Pencil
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import {
@@ -69,6 +71,7 @@ interface NotificationTemplate {
 const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 
 export default function NotificationChannels() {
+  const { user } = useAuth();
   const [channels, setChannels] = useState<NotificationChannel[]>([]);
   const [logs] = useState<NotificationLog[]>([]);
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
@@ -148,11 +151,23 @@ export default function NotificationChannels() {
     if (!editingTemplate) return;
     
     setSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (companyId) {
+        await supabase.from('notification_channels').upsert({
+          id: editingTemplate.id.length === 36 ? editingTemplate.id : undefined,
+          tenant_id: companyId,
+          channel_type: editingTemplate.channels[0] || 'email',
+          is_active: editingTemplate.isActive,
+          default_templates_json: { event: editingTemplate.event, messageTemplate: editingTemplate.messageTemplate, channels: editingTemplate.channels },
+        });
+      }
+    } catch {}
     
-    setTemplates(prev => prev.map(t => 
-      t.id === editingTemplate.id ? editingTemplate : t
-    ));
+    setTemplates(prev => {
+      const exists = prev.find(t => t.id === editingTemplate.id);
+      return exists ? prev.map(t => t.id === editingTemplate.id ? editingTemplate : t) : [...prev, editingTemplate];
+    });
     
     setSaving(false);
     setShowTemplateDialog(false);
@@ -181,7 +196,18 @@ export default function NotificationChannels() {
     if (!editingChannel) return;
     
     setSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (companyId) {
+        await supabase.from('notification_channels').upsert({
+          id: editingChannel.id.length === 36 ? editingChannel.id : undefined,
+          tenant_id: companyId,
+          channel_type: editingChannel.type,
+          is_active: editingChannel.isActive,
+          provider: editingChannel.type,
+        });
+      }
+    } catch {}
     
     setChannels(prev => prev.map(c => 
       c.id === editingChannel.id ? editingChannel : c

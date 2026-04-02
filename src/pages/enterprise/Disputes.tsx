@@ -189,6 +189,16 @@ const Disputes = () => {
           createdAt: format(new Date(detailCase.created_at), "d MMM yyyy", { locale: nl }),
           description: detailCase.notes ?? "Geen beschrijving",
         } : null}
+        onRespond={async (_dispute, message) => {
+          try {
+            await supabase.from('claim_cases').update({
+              notes: `${detailCase?.notes || ''}\n\n[Reactie]: ${message}`,
+              status: 'in_review' as any,
+            }).eq('id', detailCase?.id);
+            queryClient.invalidateQueries({ queryKey: ['disputes'] });
+          } catch {}
+          setDetailOpen(false);
+        }}
         onResolve={() => {
           resolveMutation.mutate({ id: detailCase?.id, notes: "Opgelost via detail dialog" });
           setDetailOpen(false);

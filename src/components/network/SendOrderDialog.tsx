@@ -73,17 +73,32 @@ export const SendOrderDialog = ({ open, onOpenChange, targetCompany }: SendOrder
     }
 
     setSending(true);
-    // Simulate sending
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const { error } = await supabase.from("notifications").insert({
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        title: `Opdracht verzonden: ${selectedOrder?.order_number}`,
+        message: message || `Order ${selectedOrder?.order_number} (${selectedOrder?.pickup_city} → ${selectedOrder?.delivery_city}) is naar ${targetCompany.name} gestuurd.`,
+        type: "order_sent",
+        channel: "push",
+        metadata: {
+          order_id: selectedOrderId,
+          target_company_id: targetCompany.id,
+          target_company_name: targetCompany.name,
+          order_number: selectedOrder?.order_number,
+        },
+      });
+      if (error) throw error;
+      
+      toast.success("Opdracht verzonden", {
+        description: `Order is verstuurd naar ${targetCompany.name}. Ze ontvangen een notificatie.`
+      });
+      onOpenChange(false);
+      setSelectedOrderId("");
+      setMessage("");
+    } catch (err: any) {
+      toast.error("Fout bij verzenden", { description: err.message });
+    }
     setSending(false);
-    
-    toast.success("Opdracht verzonden", {
-      description: `Order is verstuurd naar ${targetCompany.name}. Ze ontvangen een notificatie.`
-    });
-    
-    onOpenChange(false);
-    setSelectedOrderId("");
-    setMessage("");
   };
 
   const selectedOrder = orders.find(o => o.id === selectedOrderId);

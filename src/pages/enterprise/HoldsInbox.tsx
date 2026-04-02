@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useHolds, useResolveHold } from '@/hooks/useWorldClassData';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Shield, 
   AlertTriangle, 
@@ -452,13 +453,27 @@ const HoldsInbox = () => {
               }}>Annuleren</Button>
               <Button 
                 onClick={async () => {
+                  if (!escalateHold) return;
                   setIsEscalating(true);
-                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  try {
+                    const { error } = await (supabase as any)
+                      .from('holds')
+                      .update({
+                        severity: escalatePriority,
+                        escalated_at: new Date().toISOString(),
+                        escalation_level: (escalateHold.escalation_level || 0) + 1,
+                        resolution_note: `Geëscaleerd: ${escalateReason}`,
+                      })
+                      .eq('id', escalateHold.id);
+                    if (error) throw error;
+                    toast({
+                      title: "Hold geëscaleerd ✓",
+                      description: `${escalateHold?.entity_id} is geëscaleerd met prioriteit ${escalatePriority}.`,
+                    });
+                  } catch (err: any) {
+                    toast({ title: "Fout bij escaleren", description: err.message, variant: "destructive" });
+                  }
                   setIsEscalating(false);
-                  toast({
-                    title: "Hold geëscaleerd ✓",
-                    description: `${escalateHold?.entity_id} is geëscaleerd met prioriteit ${escalatePriority}.`,
-                  });
                   setShowEscalateDialog(false);
                   setEscalateReason('');
                   setEscalateHold(null);
