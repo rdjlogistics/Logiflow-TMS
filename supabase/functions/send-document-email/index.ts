@@ -13,17 +13,47 @@ Deno.serve(async (req) => {
     const { data: uc } = await supabaseAdmin.from("user_companies").select("company_id").eq("user_id", cd.claims.sub).eq("is_primary", true).single();
     if (!uc?.company_id) return new Response(JSON.stringify({ error: "Geen bedrijf" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { to, subject, body, documentType, entityId } = await req.json();
-    if (!to || !subject) return new Response(JSON.stringify({ error: "to en subject verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const reqBody = await req.json();
+    const to = reqBody.to;
+    const documentType = reqBody.documentType || "document";
+    const orderNumber = reqBody.orderNumber || "";
+    const documentUrl = reqBody.documentUrl || "";
+    const message = reqBody.message || reqBody.body || "";
 
-    console.log(`[send-document-email] Sending ${documentType || "document"} to ${to}`);
+    // Auto-generate subject if not provided
+    const docTypeLabels: Record<string, string> = {
+      pod: "Proof of Delivery",
+      vrachtbrief: "Vrachtbrief",
+      cmr: "CMR",
+      invoice: "Factuur",
+      transport_order: "Transportopdracht",
+    };
+    const label = docTypeLabels[documentType] || documentType;
+    const subject = reqBody.subject || (orderNumber ? `${label} - ${orderNumber}` : label);
+
+    if (!to) return new Response(JSON.stringify({ error: "to is verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    console.log(`[send-document-email] Sending ${documentType} to ${to}`);
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) return new Response(JSON.stringify({ error: "E-mail niet geconfigureerd" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+    // Build HTML body with document link if available
+    let htmlBody = message || `<p>Bijgaand het gevraagde document.</p>`;
+    if (documentUrl && !htmlBody.includes(documentUrl)) {
+      htmlBody += `<p style="margin-top:16px;"><a href="${documentUrl}" style="background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Document bekijken</a></p>`;
+    }
+
+    const emailHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+        <h2 style="color:#2563eb;">${label}${orderNumber ? ` - ${orderNumber}` : ""}</h2>
+        ${htmlBody}
+        <p style="margin-top:24px;color:#6b7280;font-size:12px;">Dit is een automatisch gegenereerd bericht.</p>
+      </div>`;
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST", headers: { "Authorization": `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: (Deno.env.get("RESEND_FROM_EMAIL") || "noreply@resend.dev").replace(/[<>"']/g, ""), to: [to], subject, html: body || `<p>Bijgaand het gevraagde document.</p>` }),
+      body: JSON.stringify({ from: (Deno.env.get("RESEND_FROM_EMAIL") || "noreply@resend.dev").replace(/[<>"']/g, ""), to: [to], subject, html: emailHtml }),
     });
     const resData = await res.json();
     if (!res.ok) return new Response(JSON.stringify({ error: resData.message || "Verzenden mislukt" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });

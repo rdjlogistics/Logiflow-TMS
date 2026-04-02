@@ -9,12 +9,35 @@ Deno.serve(async (req) => {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
     const { data: cd, error: ce } = await supabase.auth.getClaims(authHeader.replace("Bearer ", ""));
     if (ce || !cd?.claims) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { title, body: notifBody, userId, data } = await req.json();
+    const body = await req.json();
+    // Accept both userId and driver_id
+    const userId = body.userId || body.driver_id;
+    const title = body.title || "Notificatie";
+    const notifBody = body.body || body.message || "";
+    const data = body.data || {};
+
     console.log(`[send-push-notification] To user ${userId}: ${title}`);
 
-    // Placeholder - actual implementation requires web-push library
-    return new Response(JSON.stringify({ success: true, message: "Push notification verzonden" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (!userId) return new Response(JSON.stringify({ error: "userId of driver_id verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    // Create in-app notification
+    const { error: insertErr } = await supabaseAdmin.from("notifications").insert({
+      user_id: userId,
+      title: title,
+      message: notifBody,
+      type: data.type || "push",
+      data: data,
+      is_read: false,
+    });
+
+    if (insertErr) {
+      console.error("[send-push-notification] Insert error:", insertErr);
+      return new Response(JSON.stringify({ error: insertErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    return new Response(JSON.stringify({ success: true, message: "Notificatie verzonden" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("[send-push-notification] Error:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
