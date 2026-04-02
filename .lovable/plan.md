@@ -1,54 +1,50 @@
 
 
-# Chauffeurs Portalen — Grondige Audit & Fix Plan
+# Non-Functional Buttons & Edge Function Mismatches — Ronde 6
 
 ## Gevonden problemen
 
-Na het doorlichten van alle chauffeurs- en carrier-portaal code en bijbehorende edge functions, zijn er **5 kritieke bugs** gevonden die edge function errors veroorzaken, plus **1 parameter-mismatch** die zorgt dat e-mails nooit aankomen.
+Na een grondige scan van alle edge function invocaties en hun corresponderende server-side code, zijn er **4 kritieke parameter-mismatches** gevonden die direct resulteren in errors of mislukte acties:
 
-### 1. `auto-send-vrachtbrief` — Parameter mismatch (KRITIEK)
-**Alle 7 callers** sturen `{ tripId }`, maar de edge function destructureert `{ orderId }`. Resultaat: `orderId` is altijd `undefined` → 400 error "orderId verplicht".
-
-- `StopCheckoutFlow.tsx` → `{ body: { tripId } }`
-- `useDriverTrips.ts` → `{ body: { tripId } }`
-- `useOfflineSync.ts` → `{ body: { tripId: checkout.tripId } }`
-- `QuickEditPopover.tsx` → `{ body: { tripId } }`
-- `useStopEvents.ts` → `{ body: { tripId } }`
-- `OrderCompleteDialog.tsx` → `{ body: { tripId: orderId } }`
-- `EnhancedBulkActionsBar.tsx` → `{ body: { tripId: id } }`
-
-**Fix**: Edge function aanpassen: `const orderId = body.tripId || body.orderId;` (backwards compatible)
-
-### 2. `generate-document-pdf` — Parameter mismatch (KRITIEK)
-`DocumentsSheet.tsx` stuurt `{ orderId: tripId, documentType }`, maar de edge function verwacht `{ entityId, documentType }`. Resultaat: `entityId` is `undefined` → 400 error.
-
-**Fix**: Edge function aanpassen: `const entityId = body.entityId || body.orderId;`
-
-### 3. `send-customer-notification` — Parameter mismatch (EMAILS KOMEN NIET AAN)
-`customerNotifications.ts` stuurt:
+### 1. `send-order-confirmation` — Parameter mismatch (KRITIEK)
+**Edge function** (`supabase/functions/send-order-confirmation/index.ts` regel 16) verwacht:
 ```
-{ customer_id, title, body, notification_type, data: { trip_id, status } }
+{ orderId, to, subject, body }
 ```
-Maar de edge function destructureert:
+**Alle 4 callers** sturen:
 ```
-{ customer_id, trip_id, notification_type, message, subject }
+{ tripId, customerEmail, customerName, orderNumber, pickupAddress, ... }
 ```
-Problemen:
-- `trip_id` zit genest in `data` maar wordt top-level verwacht
-- Het bericht wordt als `body` gestuurd maar de functie leest `message`
-- `title` wordt gestuurd maar de functie leest `subject`
+Resultaat: `orderId` = `undefined` → 400 error "orderId en to verplicht". Geen enkele orderbevestiging wordt ooit verstuurd.
 
-**Fix**: Edge function aanpassen om alle varianten te accepteren
+Callers: `OrderCompactRow.tsx`, `OrderMobileCard.tsx`, `EnhancedBulkActionsBar.tsx`, `OrderForm.tsx`
 
-### 4. `send-push-notification-to-planners` — Doet geen echte push
-De functie logt alleen `console.log("Would send...")` maar stuurt geen echte push notificatie. Het maakt wél in-app notifications aan, dus die werken. De push zelf is een no-op.
+**Fix**: Edge function aanpassen om `tripId` en `customerEmail` te accepteren + een volledige HTML e-mail te genereren met de meegegeven adresgegevens.
 
-**Fix**: Dit is acceptabel als tussenoplossing — de in-app notificaties werken. De push-crypto vereist een web-push library. Markeren als known limitation, geen breaking fix nodig.
+### 2. `send-push-notification` — Parameter mismatch
+**Edge function** (regel 13) leest `{ title, body: notifBody, userId, data }`.
+**Alle 5 callers** sturen `driver_id` in plaats van `userId`.
+Resultaat: `userId` = `undefined` → notificatie gelogd naar "user undefined", geen echte actie.
 
-### 5. `send-delivery-confirmation` — `getClaims` compatibiliteit
-Gebruikt `supabase.auth.getClaims()` wat alleen werkt met `@supabase/supabase-js` v2.69+. De import is `@supabase/supabase-js@2` (floating) wat zou moeten resolven naar een recente versie, maar dit is fragiel.
+Callers: `QuickDriverAssign.tsx`, `DriverAssignment.tsx`, `OrderForm.tsx`, `DriverDocumentVerificationCard.tsx`, `DocumentVerification.tsx`
 
-**Fix**: Als dit al werkt hoeft het niet aangepast. Maar de functie moet ook `tripId` correct ontvangen — dit werkt al correct want de functie leest `body.tripId || body.orderId`.
+**Fix**: Edge function aanpassen: `const userId = body.userId || body.driver_id;` + in-app notification inserten.
+
+### 3. `send-document-email` — Ontbrekende `subject` parameter
+**Edge function** (regel 16) vereist `{ to, subject }` en geeft 400 als `subject` ontbreekt.
+**Alle 3 callers** sturen `{ to, documentUrl, documentType, orderNumber }` maar **geen `subject`**.
+Resultaat: 400 error "to en subject verplicht". Geen enkel document-email wordt verstuurd.
+
+Callers: `SendPodEmailDialog.tsx`, `SendTransportOrderDialog.tsx`, `EnhancedBulkActionsBar.tsx`
+
+**Fix**: Edge function aanpassen om `subject` te genereren uit `documentType` + `orderNumber` als die niet is meegegeven. Ook `documentUrl`, `attachmentUrls` en `message` verwerken in de e-mail body.
+
+### 4. `generate-pod-pdf` — Response mismatch
+**Edge function** retourneert `{ html, fileName, success }`.
+**Frontend** (`DigitalPOD.tsx` regel 80) verwacht `data.pdf` (base64).
+Resultaat: "Geen PDF data ontvangen" error bij POD download.
+
+**Fix**: Frontend aanpassen om ook `data.html` te accepteren als fallback (consistent met `handleDownloadVrachtbrief` patroon dat al op regel 139 staat).
 
 ---
 
@@ -56,12 +52,10 @@ Gebruikt `supabase.auth.getClaims()` wat alleen werkt met `@supabase/supabase-js
 
 | # | Bestand | Probleem | Fix |
 |---|---------|----------|-----|
-| 1 | `supabase/functions/auto-send-vrachtbrief/index.ts` | Verwacht `orderId`, ontvangt `tripId` | Accepteer beide: `body.tripId \|\| body.orderId` |
-| 2 | `supabase/functions/generate-document-pdf/index.ts` | Verwacht `entityId`, ontvangt `orderId` | Accepteer beide: `body.entityId \|\| body.orderId` |
-| 3 | `supabase/functions/send-customer-notification/index.ts` | Verwacht `trip_id` en `message` top-level, ontvangt genest in `data` en als `body` | Beide varianten accepteren |
-| 4 | `src/lib/customerNotifications.ts` | Stuurt verkeerde property names | Parameters corrigeren naar wat de functie verwacht |
+| 1 | `supabase/functions/send-order-confirmation/index.ts` | Verwacht `orderId`+`to`, ontvangt `tripId`+`customerEmail` + extra velden | Accepteer beide + genereer HTML e-mail |
+| 2 | `supabase/functions/send-push-notification/index.ts` | Verwacht `userId`, ontvangt `driver_id` | Accepteer beide + in-app notification insert |
+| 3 | `supabase/functions/send-document-email/index.ts` | Vereist `subject`, callers sturen het niet | Auto-genereer subject uit `documentType`+`orderNumber`, verwerk `documentUrl`/`attachmentUrls` |
+| 4 | `src/pages/operations/DigitalPOD.tsx` | Verwacht `data.pdf`, functie retourneert `data.html` | HTML fallback toevoegen (zelfde patroon als `handleDownloadVrachtbrief`) |
 
-Totaal: 3 edge functions + 1 client file. Na wijzigingen moeten de 3 edge functions herdeployed worden.
-
-Geen database migraties nodig. Geen breaking changes — alle fixes zijn backwards compatible.
+Totaal: 3 edge functions + 1 frontend file. Alle fixes zijn backwards compatible. Na deployment werken orderbevestigingen, document-emails, push notificaties en POD downloads end-to-end.
 
