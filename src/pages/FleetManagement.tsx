@@ -9,10 +9,10 @@ import {
   Fuel,
   Wrench,
   Truck,
-  
   AlertTriangle,
   Calendar,
   TrendingUp,
+  TrendingDown,
   Gauge,
   Loader2,
 } from 'lucide-react';
@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import FuelManagement from '@/components/fleet/FuelManagement';
 import MaintenanceManagement from '@/components/fleet/MaintenanceManagement';
 import VehicleOverview from '@/components/fleet/VehicleOverview';
+import VehicleValuation from '@/components/fleet/VehicleValuation';
 import { useFleetManagement } from '@/hooks/useFleetManagement';
 
 const FleetManagement = () => {
@@ -112,6 +113,10 @@ const FleetManagement = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="valuation" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
+              <TrendingDown className="h-4 w-4" />
+              Waarde
+            </TabsTrigger>
           </TabsList>
 
           <AnimatePresence mode="wait">
@@ -130,6 +135,9 @@ const FleetManagement = () => {
               </TabsContent>
               <TabsContent value="maintenance" className="mt-0" forceMount={activeTab === 'maintenance' ? true : undefined}>
                 {activeTab === 'maintenance' && <MaintenanceManagement />}
+              </TabsContent>
+              <TabsContent value="valuation" className="mt-0" forceMount={activeTab === 'valuation' ? true : undefined}>
+                {activeTab === 'valuation' && <VehicleValuation />}
               </TabsContent>
             </motion.div>
           </AnimatePresence>

@@ -59,6 +59,7 @@ interface VehicleFormData {
   year_of_manufacture: string;
   insurance_expiry_date: string;
   next_service_date: string;
+  purchase_price: string;
 }
 
 const emptyFormData: VehicleFormData = {
@@ -74,6 +75,7 @@ const emptyFormData: VehicleFormData = {
   year_of_manufacture: '',
   insurance_expiry_date: '',
   next_service_date: '',
+  purchase_price: '',
 };
 
 interface VehicleOverviewProps {
@@ -140,6 +142,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
       year_of_manufacture: vehicle.year_of_manufacture?.toString() || '',
       insurance_expiry_date: vehicle.insurance_expiry_date || '',
       next_service_date: vehicle.next_service_date || '',
+      purchase_price: vehicle.purchase_price?.toString() || '',
     });
     setDialogOpen(true);
   };
@@ -174,6 +177,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
         year_of_manufacture: formData.year_of_manufacture ? parseInt(formData.year_of_manufacture) : null,
         insurance_expiry_date: formData.insurance_expiry_date || null,
         next_service_date: formData.next_service_date || null,
+        purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
         company_id: company?.id,
       };
       if (editingVehicle) {
@@ -592,6 +596,10 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                   <div className="space-y-2">
                     <Label htmlFor="capacity_kg">Laadvermogen (kg)</Label>
                     <Input id="capacity_kg" type="number" value={formData.capacity_kg || ''} onChange={(e) => setFormData({ ...formData, capacity_kg: e.target.value ? Number(e.target.value) : null })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="purchase_price">Aanschafprijs (€)</Label>
+                    <Input id="purchase_price" type="number" value={formData.purchase_price} onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })} placeholder="45000" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="is_active">Status</Label>

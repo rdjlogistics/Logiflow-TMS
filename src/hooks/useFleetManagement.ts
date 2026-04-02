@@ -21,6 +21,7 @@ export interface Vehicle {
   next_service_km: number | null;
   insurance_expiry_date: string | null;
   year_of_manufacture: number | null;
+  purchase_price: number | null;
   created_at: string;
   updated_at: string;
 }

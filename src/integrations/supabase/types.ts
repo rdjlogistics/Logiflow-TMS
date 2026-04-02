@@ -18831,6 +18831,7 @@ export type Database = {
           next_service_date: string | null
           next_service_km: number | null
           notes: string | null
+          purchase_price: number | null
           tank_capacity_liters: number | null
           updated_at: string
           vehicle_type: string | null
@@ -18857,6 +18858,7 @@ export type Database = {
           next_service_date?: string | null
           next_service_km?: number | null
           notes?: string | null
+          purchase_price?: number | null
           tank_capacity_liters?: number | null
           updated_at?: string
           vehicle_type?: string | null
@@ -18883,6 +18885,7 @@ export type Database = {
           next_service_date?: string | null
           next_service_km?: number | null
           notes?: string | null
+          purchase_price?: number | null
           tank_capacity_liters?: number | null
           updated_at?: string
           vehicle_type?: string | null
