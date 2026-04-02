@@ -196,7 +196,18 @@ export default function NotificationChannels() {
     if (!editingChannel) return;
     
     setSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const companyId = (await supabase.rpc('get_user_company_cached', { p_user_id: user!.id })).data;
+      if (companyId) {
+        await supabase.from('notification_channels').upsert({
+          id: editingChannel.id.length === 36 ? editingChannel.id : undefined,
+          tenant_id: companyId,
+          channel_type: editingChannel.type,
+          is_active: editingChannel.isActive,
+          provider: editingChannel.type,
+        });
+      }
+    } catch {}
     
     setChannels(prev => prev.map(c => 
       c.id === editingChannel.id ? editingChannel : c
