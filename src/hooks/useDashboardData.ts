@@ -60,7 +60,7 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   ] = await Promise.all([
     supabase.rpc('get_dashboard_counts', { p_month_start: monthStart.toISOString() }),
     // Invoices — tenant-scoped
-    supabase.from("invoices").select("status, total_amount, amount_paid, created_at").eq("company_id", companyId).limit(1000),
+    supabase.from("invoices").select("status, total_amount, amount_paid, created_at").eq("company_id", companyId).limit(200),
     // Trips for revenue chart (6 months) — tenant-scoped
     supabase.from("trips").select("trip_date, sales_total, purchase_total, created_at, status, driver_id, vehicle_id, pickup_city, delivery_city, pod_available, id, order_number").is("deleted_at", null).eq("company_id", companyId).gte("created_at", sixMonthsAgo.toISOString()),
     // Recent trips for status/weekly/ops (6 weeks) — tenant-scoped
