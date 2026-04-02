@@ -116,13 +116,13 @@ const ExceptionsInbox = () => {
             const { data: companyId } = await supabase.rpc("get_user_company_cached", { p_user_id: user!.id });
             if (!companyId) return;
             const entityId = (exc as any)._id ?? exc.order;
-            const anomaly = exceptions.find((e: any) => e.id === entityId || e.entity_id === exc.order);
             await supabase.from("notifications").insert({
               tenant_id: companyId,
               user_id: user!.id,
               title: `Ping: ${exc.type}`,
               message: message || `Status update gevraagd voor order ${exc.order}`,
               type: "ping",
+              channel: "push",
               entity_type: "anomaly_event",
               entity_id: entityId,
             });
