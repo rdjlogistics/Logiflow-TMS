@@ -129,7 +129,7 @@ export default function EmailDashboard() {
       if (error) throw error;
       return (data ?? []) as EmailLogRow[];
     },
-    refetchInterval: autoRefresh ? 10000 : false,
+    refetchInterval: autoRefresh ? 30000 : false,
     refetchIntervalInBackground: false,
   });
 

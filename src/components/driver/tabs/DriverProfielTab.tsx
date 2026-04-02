@@ -196,7 +196,7 @@ export function DriverProfielTab({ onLogout }: DriverProfielTabProps) {
         // driver_locations.driver_id stores auth.uid() (not drivers.id)
         const { data: locs } = await supabase.from('driver_locations')
           .select('latitude, longitude, speed, heading, recorded_at')
-          .eq('driver_id', user!.id).order('recorded_at', { ascending: false }).limit(1000);
+          .eq('driver_id', user!.id).order('recorded_at', { ascending: false }).limit(100);
         data.locationHistory = locs;
       });
     }
