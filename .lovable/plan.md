@@ -1,65 +1,63 @@
 
 
-# Kritische Audit: Non-functionele modules waterdicht maken
+# Kritische Audit: Resterende waterdichte fixes
 
-## Gevonden problemen
+## Analyse
 
-Na een grondige audit van alle pagina's zijn er **5 modules** gevonden die database-tabellen hebben maar puur op lokale state draaien — data gaat verloren bij pagina-refresh:
+Na grondige audit van alle pagina's in `src/pages/` zijn de volgende resterende problemen gevonden:
 
-| # | Pagina | Probleem | DB tabel beschikbaar | Ernst |
-|---|--------|----------|---------------------|-------|
-| 1 | **Tender Templates** | CRUD alleen in `useState` met hardcoded data | `tender_templates` ✅ | Hoog |
-| 2 | **Customs/NCTS** | Aangiftes alleen in lokale state, submit is nep `setTimeout` | `customs_declarations` ✅ | Hoog |
-| 3 | **Notification Channels** | Kanalen en templates starten leeg (`useState([])`), worden niet geladen uit DB | `notification_channels` + `notification_logs` ✅ | Hoog |
-| 4 | **AI Recommendations** | "Actie uitvoeren", "Taak aanmaken", "Automation maken" — alles `setTimeout` + toast | Geen echte actie | Midden |
-| 5 | **What-If Simulation** | Simulatie is puur cosmetisch — lokale state met fake progress | Geen DB tabel | Laag |
+| # | Module | Probleem | Ernst |
+|---|--------|----------|-------|
+| 1 | **What-If Simulation** | 100% nep — `setTimeout` loop simuleert progressie, resultaten zijn hardcoded formules op slider-waarden, geen echte data | Midden |
+| 2 | **AccountingIntegrations** | `syncNow` gebruikt `setTimeout(2000)` om sync_status naar 'success' te zetten — geen echte sync | Midden |
+| 3 | **Messenger** | Heeft een 5-seconden fallback `setTimeout` die `loading` op false zet zelfs als fetch nog loopt — race condition | Laag |
+| 4 | **B2C Portal** | `handleNotificationsClick` toont nog steeds `toast.info` in plaats van navigatie | Laag |
 
-## Fixes (3 kritische, 2 verbeteringen)
+## Wat al waterdicht IS (geen actie nodig)
+- Tender Templates → DB ✅
+- Customs/NCTS → DB ✅  
+- Notification Channels → DB laden ✅
+- AI Recommendations → echte navigatie ✅
+- DataQuality → setTimeout verwijderd ✅
+- DossierVault → echte upload ✅
+- EDI → echte retry ✅
+- Telematics → DB persistentie ✅
+- FuelIndex → echte update ✅
+- Alle edge function aanroepen → werken correct ✅
+- Alle CRUD operaties → DB-backed ✅
 
-### 1. Tender Templates — Volledig naar database
-**Bestand: `src/pages/tendering/TenderTemplates.tsx`**
-- Vervang `useState(initialTemplates)` door `useQuery` die `tender_templates` ophaalt
-- CRUD operaties via `supabase.from('tender_templates').insert/update/delete`
-- Voeg `company_id` toe bij insert (via `useCompany`)
-- Verwijder hardcoded `initialTemplates` array
+## Fixes
 
-### 2. Customs/NCTS — Aangiftes opslaan in database
-**Bestand: `src/pages/integrations/CustomsNCTS.tsx`**
-- Vervang `useState(mockDeclarations)` door `useQuery` op `customs_declarations`
-- `handleCreateDeclaration`: insert naar DB met `tenant_id`, `declaration_type`, `goods_description`, etc.
-- `handleSubmitDeclaration`: update status in DB naar `submitted` + genereer MRN
-- Laad bestaande aangiftes bij pagina-load
+### 1. What-If Simulation — Echte data-driven berekeningen
+**Bestand: `src/pages/ai/WhatIfSimulation.tsx`**
+- Vervang `setTimeout` progressie-loop door directe berekening
+- Haal echte data op: aantal ritten, gemiddelde omzet, vlootgrootte, bezettingsgraad uit `trips` en `vehicles` tabellen
+- Bereken impact op basis van echte getallen × slider-percentages
+- Resultaat: "Als je vloot +20% groeit → je kunt X extra ritten/maand aan, verwachte omzetimpact: €Y"
 
-### 3. Notification Channels — Laden uit database
-**Bestand: `src/pages/notifications/NotificationChannels.tsx`**
-- Voeg `useQuery` toe die `notification_channels` + `notification_logs` ophaalt bij mount
-- Map DB rows naar de bestaande `NotificationChannel[]` en `NotificationLog[]` interfaces
-- `toggleChannel`: update `is_active` in DB (i.p.v. alleen lokale state)
-- Bestaande `handleSaveTemplate` en `handleSaveChannel` upserts zijn al correct — alleen het laden ontbreekt
+### 2. AccountingIntegrations — Sync feedback verbeteren  
+**Bestand: `src/pages/admin/AccountingIntegrations.tsx`**
+- Vervang `setTimeout(2000)` door een polling-mechanisme dat de echte `sync_status` checkt na de update
+- Of: verwijder de fake success en laat de gebruiker refreshen (eerlijker)
+- De sync zelf kan pas echt werken als Exact Online secrets geconfigureerd zijn — toon dit duidelijk
 
-### 4. AI Recommendations — Acties koppelen aan workflows
-**Bestand: `src/pages/enterprise/AIRecommendations.tsx`**
-- `executeAction`: navigeer naar relevante pagina op basis van actie-type (bijv. route-planning, tariefbeheer)
-- `createTask`: insert in een bestaande tabel of navigeer naar workflow-pagina
-- `createAutomation`: navigeer naar `/admin/workflows` met pre-filled data
-- Verwijder alle nep `setTimeout` patronen
+### 3. Messenger — Race condition fixen
+**Bestand: `src/pages/Messenger.tsx`**  
+- Verwijder de 5-seconden `setTimeout` fallback — de `fetchTrips` functie zet loading al correct op false
+- Het timeout is overbodig en kan loading-state problemen veroorzaken
 
-### 5. DataQuality scan — Verwijder setTimeout
-**Bestand: `src/pages/enterprise/DataQuality.tsx`**
-- De `handleScan` functie wropt `refetch()` in een `setTimeout` — verwijder de timeout en await `refetch()` direct
+### 4. B2C Portal — Notificaties navigatie
+**Bestand: `src/pages/portal/B2CPortal.tsx`**
+- Vervang `toast.info("Notificaties")` door navigatie naar zendingenoverzicht
 
 ## Niet geraakt
-- FuelIndexUpdateDialog — al gefixt in vorige ronde ✅
-- DossierVault upload — al gefixt ✅
-- B2C/B2B Portal notificaties — al gefixt ✅
-- EDI retry — al gefixt ✅
-- Telematics persistentie — al gefixt ✅
-- What-If Simulation — blijft client-side (is een planning tool, geen operationeel systeem)
+- What-If Simulation is een planning/analyse tool — lokale berekeningen zijn acceptabel, maar moeten op echte data gebaseerd zijn
+- Messenger `setTimeout` is een minor issue maar kan bugs veroorzaken
+- Desktop layouts — geen wijzigingen
 
 ## Volgorde
-1. Tender Templates → DB (hoogste impact, tabel bestaat al)
-2. Customs/NCTS → DB (tabel bestaat al)
-3. Notification Channels → laden uit DB
-4. AI Recommendations → echte navigatie-acties
-5. DataQuality → verwijder setTimeout
+1. What-If Simulation → echte data + directe berekening
+2. AccountingIntegrations → verwijder fake sync success
+3. Messenger → verwijder race condition
+4. B2C Portal → notificatie navigatie
 
