@@ -35,7 +35,8 @@ export const useAllDriverLocations = (options: UseAllDriverLocationsOptions = {}
 
       if (queryError) throw queryError;
 
-      const parsed: DriverLocation[] = (data || []).map((loc: any) => ({
+      const rawData = Array.isArray(data) ? data : (typeof data === 'string' ? JSON.parse(data) : []);
+      const parsed: DriverLocation[] = rawData.map((loc: any) => ({
         driver_id: loc.driver_id,
         driver_name: loc.driver_name || `Chauffeur ${loc.driver_id?.slice(0, 6)}`,
         phone: loc.phone ?? null,
