@@ -142,6 +142,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
       year_of_manufacture: vehicle.year_of_manufacture?.toString() || '',
       insurance_expiry_date: vehicle.insurance_expiry_date || '',
       next_service_date: vehicle.next_service_date || '',
+      purchase_price: vehicle.purchase_price?.toString() || '',
     });
     setDialogOpen(true);
   };
