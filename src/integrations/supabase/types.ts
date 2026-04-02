@@ -20206,6 +20206,14 @@ export type Database = {
         }[]
       }
       get_dashboard_counts: { Args: { p_month_start: string }; Returns: Json }
+      get_dashboard_ops: {
+        Args: {
+          p_company_id: string
+          p_month_start: string
+          p_six_months_ago: string
+        }
+        Returns: Json
+      }
       get_driver_location_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -20215,6 +20223,10 @@ export type Database = {
           recorded_at: string
           speed: number
         }[]
+      }
+      get_driver_locations_with_names: {
+        Args: { p_max_age_minutes?: number }
+        Returns: Json
       }
       get_fuel_card_credentials: {
         Args: { p_connection_id: string }

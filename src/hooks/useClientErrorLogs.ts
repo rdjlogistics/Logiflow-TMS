@@ -33,7 +33,7 @@ export function useClientErrorLogs(limit = 50) {
       if (error) throw error;
       return (data ?? []) as ClientErrorLog[];
     },
-    refetchInterval: 30_000,
+    refetchInterval: 300_000,
     refetchIntervalInBackground: false,
   });
 }
@@ -71,7 +71,7 @@ export function useClientErrorSummary() {
 
       return Array.from(grouped.values()).sort((a, b) => b.count - a.count);
     },
-    refetchInterval: 30_000,
+    refetchInterval: 300_000,
     refetchIntervalInBackground: false,
   });
 }

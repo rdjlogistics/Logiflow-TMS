@@ -98,12 +98,13 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
-            handler: "StaleWhileRevalidate",
+            handler: "NetworkFirst",
             options: {
               cacheName: "supabase-api-cache",
+              networkTimeoutSeconds: 3,
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 30,
+                maxEntries: 50,
+                maxAgeSeconds: 5,
               },
             },
           },

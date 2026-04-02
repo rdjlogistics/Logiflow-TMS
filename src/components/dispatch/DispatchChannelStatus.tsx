@@ -100,7 +100,7 @@ export function DispatchChannelStatus() {
         channelStats,
       };
     },
-    refetchInterval: 60000,
+    refetchInterval: 120000,
     refetchIntervalInBackground: false,
   });
 
