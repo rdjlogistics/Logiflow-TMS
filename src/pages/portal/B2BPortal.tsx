@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import B2BDashboard from "@/components/portal/b2b/B2BDashboard";
 import { BulkImportDialog } from "@/components/portal/b2b/BulkImportDialog";
