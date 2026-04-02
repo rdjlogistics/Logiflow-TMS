@@ -57,7 +57,7 @@ export async function fetchInvoices(filters: InvoiceFilters = {}) {
 export async function fetchInvoiceById(id: string) {
   const { data, error } = await supabase
     .from('invoices')
-    .select(INVOICE_SELECT)
+    .select(INVOICE_DETAIL_SELECT)
     .eq('id', id)
     .maybeSingle();
 
