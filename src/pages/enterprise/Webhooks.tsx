@@ -26,7 +26,7 @@ const Webhooks = () => {
       toast({ title: "URL vereist", description: "Voer een geldige webhook URL in.", variant: "destructive" });
       return;
     }
-    if (!companyId) {
+    if (!company?.id) {
       toast({ title: "Fout", description: "Geen bedrijf gevonden.", variant: "destructive" });
       return;
     }
