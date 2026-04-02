@@ -70,8 +70,6 @@ const MomentsEngine = () => {
     await updateMomentStatus.mutateAsync({ id: momentId, status: newStatus });
   };
 
-  const queryClient = useQueryClient();
-  
   const handleScanEvents = async () => {
     setScanning(true);
     toast({ title: "Events scannen", description: "Klantactiviteit wordt gescand voor nieuwe momenten..." });
