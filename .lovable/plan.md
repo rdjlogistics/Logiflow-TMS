@@ -1,63 +1,58 @@
 
 
-# Kritische Audit: Resterende waterdichte fixes
+# Kritische Audit: TenderDashboard waterdicht maken
 
-## Analyse
+## Gevonden probleem
 
-Na grondige audit van alle pagina's in `src/pages/` zijn de volgende resterende problemen gevonden:
+Na grondige audit van alle pagina's is er **1 kritieke module** die nog volledig op lokale state draait terwijl de database-tabellen al bestaan:
 
-| # | Module | Probleem | Ernst |
-|---|--------|----------|-------|
-| 1 | **What-If Simulation** | 100% nep — `setTimeout` loop simuleert progressie, resultaten zijn hardcoded formules op slider-waarden, geen echte data | Midden |
-| 2 | **AccountingIntegrations** | `syncNow` gebruikt `setTimeout(2000)` om sync_status naar 'success' te zetten — geen echte sync | Midden |
-| 3 | **Messenger** | Heeft een 5-seconden fallback `setTimeout` die `loading` op false zet zelfs als fetch nog loopt — race condition | Laag |
-| 4 | **B2C Portal** | `handleNotificationsClick` toont nog steeds `toast.info` in plaats van navigatie | Laag |
+| Module | Probleem | DB tabellen beschikbaar | Ernst |
+|--------|----------|------------------------|-------|
+| **TenderDashboard** | CRUD volledig in `useState([])` — data verdwijnt bij pagina-refresh, `avgSavings` hardcoded op "12%" | `tenders` + `tender_invites` ✅ | **Hoog** |
 
-## Wat al waterdicht IS (geen actie nodig)
+### Wat al waterdicht IS (geen actie nodig)
 - Tender Templates → DB ✅
-- Customs/NCTS → DB ✅  
-- Notification Channels → DB laden ✅
+- Customs/NCTS → DB ✅
+- Notification Channels → DB ✅
 - AI Recommendations → echte navigatie ✅
 - DataQuality → setTimeout verwijderd ✅
 - DossierVault → echte upload ✅
 - EDI → echte retry ✅
 - Telematics → DB persistentie ✅
 - FuelIndex → echte update ✅
-- Alle edge function aanroepen → werken correct ✅
-- Alle CRUD operaties → DB-backed ✅
+- What-If Simulation → echte data ✅
+- AccountingIntegrations → credential check ✅
+- Messenger → race condition gefixt ✅
+- B2C Portal → navigatie i.p.v. toast ✅
+- CarrierScorecards → `useCarrierScorecards` hook (DB-backed) ✅
+- TenderHistory → al met `tender_invites` query ✅
 
-## Fixes
+## Fix
 
-### 1. What-If Simulation — Echte data-driven berekeningen
-**Bestand: `src/pages/ai/WhatIfSimulation.tsx`**
-- Vervang `setTimeout` progressie-loop door directe berekening
-- Haal echte data op: aantal ritten, gemiddelde omzet, vlootgrootte, bezettingsgraad uit `trips` en `vehicles` tabellen
-- Bereken impact op basis van echte getallen × slider-percentages
-- Resultaat: "Als je vloot +20% groeit → je kunt X extra ritten/maand aan, verwachte omzetimpact: €Y"
+### Bestand: `src/pages/tendering/TenderDashboard.tsx`
 
-### 2. AccountingIntegrations — Sync feedback verbeteren  
-**Bestand: `src/pages/admin/AccountingIntegrations.tsx`**
-- Vervang `setTimeout(2000)` door een polling-mechanisme dat de echte `sync_status` checkt na de update
-- Of: verwijder de fake success en laat de gebruiker refreshen (eerlijker)
-- De sync zelf kan pas echt werken als Exact Online secrets geconfigureerd zijn — toon dit duidelijk
+**Vervang volledige lokale state door database-operaties:**
 
-### 3. Messenger — Race condition fixen
-**Bestand: `src/pages/Messenger.tsx`**  
-- Verwijder de 5-seconden `setTimeout` fallback — de `fetchTrips` functie zet loading al correct op false
-- Het timeout is overbodig en kan loading-state problemen veroorzaken
+1. **Laden**: `useQuery` op `tenders` tabel met `company_id` filter + count van `tender_invites` per tender
+2. **Aanmaken** (`handleCreateTender`): `supabase.from('tenders').insert()` met `company_id`, `title`, `deadline`, `expected_price_min/max`, `status: 'open'`
+3. **Accepteren** (`handleAcceptBid`): `supabase.from('tenders').update({ status: 'accepted' })` 
+4. **Annuleren** (`handleCancelTender`): `supabase.from('tenders').update({ status: 'cancelled' })`
+5. **Stats berekening**: `avgSavings` berekend uit echte data (verschil `expected_price_max` vs laagste `offered_price` uit `tender_invites`)
+6. **`bestOffer`**: Join met `tender_invites` om werkelijke laagste bod op te halen
 
-### 4. B2C Portal — Notificaties navigatie
-**Bestand: `src/pages/portal/B2CPortal.tsx`**
-- Vervang `toast.info("Notificaties")` door navigatie naar zendingenoverzicht
+### Imports toe te voegen
+- `useQuery`, `useMutation`, `useQueryClient` van `@tanstack/react-query`
+- `supabase` van `@/integrations/supabase/client`
+- `useCompany` van `@/hooks/useCompany`
 
-## Niet geraakt
-- What-If Simulation is een planning/analyse tool — lokale berekeningen zijn acceptabel, maar moeten op echte data gebaseerd zijn
-- Messenger `setTimeout` is een minor issue maar kan bugs veroorzaken
-- Desktop layouts — geen wijzigingen
+### Niet geraakt
+- Dialog UI, filters, Sheet detail-view — blijven identiek
+- `TenderHistory`, `TenderTemplates`, `CarrierScorecards` — al DB-backed
+- Desktop layout — geen wijzigingen
 
-## Volgorde
-1. What-If Simulation → echte data + directe berekening
-2. AccountingIntegrations → verwijder fake sync success
-3. Messenger → verwijder race condition
-4. B2C Portal → notificatie navigatie
+## Resultaat
+- Charter aanvragen persistent in database
+- Echte statistieken op basis van DB data
+- `bestOffer` komt uit werkelijke biedingen van carriers
+- Data overleeft pagina-refresh
 
