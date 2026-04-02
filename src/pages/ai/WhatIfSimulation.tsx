@@ -5,36 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/hooks/useCompany";
 import { 
   FlaskConical, 
-  Plus,
   Play,
   TrendingUp,
-  TrendingDown,
   Truck,
-  Users,
   Euro,
-  Calendar,
   BarChart3,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 
 interface ScenarioResult {
   [key: string]: string | undefined;
-  capacityChange?: string;
-  costChange?: string;
-  profitImpact?: string;
-  utilizationChange?: string;
-  marginImpact?: string;
-  breakEvenChange?: string;
-  recommendedPriceAdjust?: string;
-  demandImpact?: string;
+  huidigAantalRitten?: string;
+  huidigeOmzet?: string;
+  verwachteRittenNaSimulatie?: string;
+  verwachteOmzetNaSimulatie?: string;
+  vlootCapaciteit?: string;
+  bezettingsgraad?: string;
+  kostenImpact?: string;
   recommendation?: string;
 }
 
@@ -44,14 +40,12 @@ interface Scenario {
   type: string;
   status: string;
   results?: ScenarioResult;
-  progress?: number;
   createdAt: Date;
 }
 
-const mockScenarios: Scenario[] = [];
-
 export default function WhatIfSimulation() {
-  const [scenarios, setScenarios] = useState<Scenario[]>(mockScenarios);
+  const { company } = useCompany();
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [newScenario, setNewScenario] = useState({
     name: '',
@@ -63,55 +57,102 @@ export default function WhatIfSimulation() {
   });
 
   const runScenario = async () => {
-    setIsCreating(true);
-    toast.info("Simulatie wordt uitgevoerd...");
-    
-    const scenario = {
-      id: Date.now().toString(),
-      name: newScenario.name || 'Nieuwe Simulatie',
-      type: newScenario.type,
-      status: 'running',
-      progress: 0,
-      createdAt: new Date(),
-    };
-    
-    setScenarios([scenario, ...scenarios]);
-    
-    // Simulate progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(r => setTimeout(r, 200));
-      setScenarios(prev => prev.map(s => 
-        s.id === scenario.id ? { ...s, progress: i } : s
-      ));
+    if (!company?.id) {
+      toast.error("Geen bedrijf gevonden.");
+      return;
     }
-    
-    // Complete with results
-    setScenarios(prev => prev.map(s => 
-      s.id === scenario.id ? { 
-        ...s, 
+
+    setIsCreating(true);
+    toast.info("Echte data wordt opgehaald voor simulatie...");
+
+    try {
+      // Fetch real data from DB
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      const [tripsRes, vehiclesRes] = await Promise.all([
+        supabase
+          .from('trips')
+          .select('id, revenue, cost_total, status')
+          .eq('company_id', company.id)
+          .gte('trip_date', thirtyDaysAgo.toISOString().split('T')[0])
+          .lte('trip_date', now.toISOString().split('T')[0]),
+        supabase
+          .from('vehicles')
+          .select('id, status')
+          .eq('company_id', company.id),
+      ]);
+
+      const trips = tripsRes.data || [];
+      const vehicles = vehiclesRes.data || [];
+
+      const totalTrips = trips.length;
+      const totalRevenue = trips.reduce((sum, t) => sum + (Number(t.revenue) || 0), 0);
+      const totalCost = trips.reduce((sum, t) => sum + (Number(t.cost_total) || 0), 0);
+      const activeVehicles = vehicles.filter(v => v.status === 'active' || v.status === 'actief').length;
+      const totalVehicles = vehicles.length;
+      const occupancy = totalVehicles > 0 ? Math.round((activeVehicles / totalVehicles) * 100) : 0;
+
+      // Calculate simulation impact
+      const demandFactor = 1 + (newScenario.demandChange[0] / 100);
+      const fleetFactor = 1 + (newScenario.fleetChange[0] / 100);
+      const costFactor = 1 + (newScenario.costChange[0] / 100);
+      const priceFactor = 1 + (newScenario.priceChange[0] / 100);
+
+      const projectedTrips = Math.round(totalTrips * demandFactor);
+      const projectedRevenue = Math.round(totalRevenue * demandFactor * priceFactor);
+      const projectedCost = Math.round(totalCost * costFactor * fleetFactor);
+      const projectedFleet = Math.round(totalVehicles * fleetFactor);
+      const newOccupancy = projectedFleet > 0 
+        ? Math.min(100, Math.round((projectedTrips / (projectedFleet * 1.5)) * 100))
+        : 0;
+
+      // Generate recommendation
+      let recommendation = '';
+      if (demandFactor > fleetFactor && occupancy > 80) {
+        recommendation = `Vraag stijgt sneller dan vlootcapaciteit. Overweeg ${Math.ceil(totalVehicles * (demandFactor - fleetFactor))} extra voertuigen.`;
+      } else if (projectedRevenue - projectedCost < totalRevenue - totalCost) {
+        recommendation = `Let op: nettomarge daalt van €${(totalRevenue - totalCost).toLocaleString('nl-NL')} naar €${(projectedRevenue - projectedCost).toLocaleString('nl-NL')} per maand.`;
+      } else if (newOccupancy < 50) {
+        recommendation = `Bezettingsgraad is laag (${newOccupancy}%). Overweeg vloot te verkleinen of meer acquisitie.`;
+      } else {
+        recommendation = `Scenario ziet er positief uit. Verwachte marge: €${(projectedRevenue - projectedCost).toLocaleString('nl-NL')}/maand.`;
+      }
+
+      const scenario: Scenario = {
+        id: Date.now().toString(),
+        name: newScenario.name || 'Nieuwe Simulatie',
+        type: newScenario.type,
         status: 'completed',
-        progress: undefined,
+        createdAt: new Date(),
         results: {
-          capacityChange: `${newScenario.fleetChange[0] > 0 ? '+' : ''}${newScenario.fleetChange[0]}%`,
-          demandImpact: `${newScenario.demandChange[0] > 0 ? '+' : ''}${newScenario.demandChange[0]}%`,
-          profitImpact: `${Math.round((newScenario.demandChange[0] - newScenario.costChange[0]) * 150)}€/maand`,
-          recommendation: newScenario.demandChange[0] > newScenario.fleetChange[0] 
-            ? 'Overweeg capaciteitsuitbreiding'
-            : 'Huidige capaciteit is voldoende',
-        }
-      } : s
-    ));
-    
-    setIsCreating(false);
-    toast.success("Simulatie voltooid!");
-    setNewScenario({
-      name: '',
-      type: 'capacity',
-      demandChange: [0],
-      fleetChange: [0],
-      costChange: [0],
-      priceChange: [0],
-    });
+          huidigAantalRitten: `${totalTrips} ritten/maand`,
+          huidigeOmzet: `€${totalRevenue.toLocaleString('nl-NL')}`,
+          verwachteRittenNaSimulatie: `${projectedTrips} ritten/maand`,
+          verwachteOmzetNaSimulatie: `€${projectedRevenue.toLocaleString('nl-NL')}`,
+          vlootCapaciteit: `${totalVehicles} → ${projectedFleet} voertuigen`,
+          bezettingsgraad: `${occupancy}% → ${newOccupancy}%`,
+          kostenImpact: `€${totalCost.toLocaleString('nl-NL')} → €${projectedCost.toLocaleString('nl-NL')}`,
+          recommendation,
+        },
+      };
+
+      setScenarios(prev => [scenario, ...prev]);
+      toast.success("Simulatie voltooid op basis van echte data!");
+      setNewScenario({
+        name: '',
+        type: 'capacity',
+        demandChange: [0],
+        fleetChange: [0],
+        costChange: [0],
+        priceChange: [0],
+      });
+    } catch (err) {
+      console.error('Simulation error:', err);
+      toast.error("Fout bij ophalen van data voor simulatie.");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const getTypeBadge = (type: string) => {
@@ -130,7 +171,7 @@ export default function WhatIfSimulation() {
   };
 
   return (
-    <DashboardLayout title="What-If Simulatie" description="Scenario planning en capaciteitsvoorspelling">
+    <DashboardLayout title="What-If Simulatie" description="Scenario planning op basis van echte bedrijfsdata">
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Create Scenario */}
         <Card className="lg:col-span-1">
@@ -139,7 +180,7 @@ export default function WhatIfSimulation() {
               <FlaskConical className="h-5 w-5" />
               Nieuwe Simulatie
             </CardTitle>
-            <CardDescription>Creëer een what-if scenario</CardDescription>
+            <CardDescription>Bereken impact op basis van echte data</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -234,8 +275,8 @@ export default function WhatIfSimulation() {
             >
               {isCreating ? (
                 <>
-                  <FlaskConical className="h-4 w-4 mr-2 animate-pulse" />
-                  Simuleren...
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Data ophalen...
                 </>
               ) : (
                 <>
@@ -251,6 +292,15 @@ export default function WhatIfSimulation() {
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-lg font-semibold">Simulatie Resultaten</h2>
           
+          {scenarios.length === 0 && (
+            <Card>
+              <CardContent className="pt-6 text-center text-muted-foreground">
+                <FlaskConical className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>Nog geen simulaties uitgevoerd. Stel de parameters in en klik op "Simulatie Starten".</p>
+              </CardContent>
+            </Card>
+          )}
+
           {scenarios.map(scenario => (
             <Card key={scenario.id}>
               <CardContent className="pt-6">
@@ -259,17 +309,10 @@ export default function WhatIfSimulation() {
                     <h3 className="font-medium">{scenario.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       {getTypeBadge(scenario.type)}
-                      {scenario.status === 'running' ? (
-                        <Badge variant="outline" className="border-blue-500">
-                          <FlaskConical className="h-3 w-3 mr-1 animate-pulse" />
-                          Running
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-green-500 text-white">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Voltooid
-                        </Badge>
-                      )}
+                      <Badge className="bg-green-500 text-white">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Voltooid
+                      </Badge>
                     </div>
                   </div>
                   <span className="text-sm text-muted-foreground">
@@ -277,31 +320,25 @@ export default function WhatIfSimulation() {
                   </span>
                 </div>
 
-                {scenario.status === 'running' && scenario.progress !== undefined ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>Simulatie voortgang</span>
-                      <span>{scenario.progress}%</span>
-                    </div>
-                    <Progress value={scenario.progress} />
-                  </div>
-                ) : scenario.results ? (
+                {scenario.results && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {Object.entries(scenario.results).map(([key, value]) => (
-                      <div key={key} className="p-3 bg-muted/50 rounded-lg">
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </p>
-                        <p className={`text-lg font-bold ${
-                          String(value).includes('+') ? 'text-green-600' : 
-                          String(value).includes('-') ? 'text-red-600' : ''
-                        }`}>
-                          {value}
-                        </p>
-                      </div>
+                    {Object.entries(scenario.results)
+                      .filter(([key]) => key !== 'recommendation')
+                      .map(([key, value]) => (
+                        <div key={key} className="p-3 bg-muted/50 rounded-lg">
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </p>
+                          <p className={`text-sm font-bold ${
+                            String(value).includes('+') ? 'text-green-600' : 
+                            String(value).includes('-') ? 'text-red-600' : ''
+                          }`}>
+                            {value}
+                          </p>
+                        </div>
                     ))}
                   </div>
-                ) : null}
+                )}
 
                 {scenario.results?.recommendation && (
                   <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-start gap-2">
