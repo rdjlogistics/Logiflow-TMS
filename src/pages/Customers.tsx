@@ -531,29 +531,30 @@ const Customers = () => {
 
   return (
     <DashboardLayout title="Klanten">
-      <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="space-y-4 md:space-y-6 pb-24 md:pb-6 animate-fade-in">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div className="relative flex-1 max-w-full sm:max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
             <Input
               placeholder="Zoek klanten..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-12 rounded-2xl backdrop-blur-xl bg-card/40 border-border/20 shadow-lg focus-visible:border-primary/40"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer whitespace-nowrap backdrop-blur-sm bg-card/30 border border-border/20 rounded-xl px-3 py-2">
               <Checkbox checked={hideTestData} onCheckedChange={(v) => setHideTestData(!!v)} />
-              Verberg test-data
+              <span className="hidden sm:inline">Verberg test-data</span>
+              <span className="sm:hidden">Test</span>
             </label>
-            <Button variant="outline" onClick={handleExportCSV} className="gap-2">
+            <Button variant="outline" onClick={handleExportCSV} className="gap-2 shrink-0">
               <Download className="h-4 w-4" />
-              CSV
+              <span className="hidden sm:inline">CSV</span>
             </Button>
-            <Button variant="outline" onClick={openTrash} className="gap-2 relative">
+            <Button variant="outline" onClick={openTrash} className="gap-2 relative shrink-0">
               <Trash2 className="h-4 w-4" />
-              Prullenbak
+              <span className="hidden sm:inline">Prullenbak</span>
               {trashCount > 0 && (
                 <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
                   {trashCount}
@@ -797,24 +798,28 @@ const Customers = () => {
 
         {/* Bulk Actions Toolbar */}
         {someSelected && (
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 backdrop-blur-xl bg-card/60 rounded-2xl border border-border/20 shadow-xl"
+          >
             <CheckSquare className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">{selectedIds.size} geselecteerd</span>
             <div className="flex gap-2 ml-auto">
               {isAdmin && (
                 <Button size="sm" variant="destructive" onClick={() => setBulkDeleteDialogOpen(true)} className="gap-1.5">
-                  <Trash2 className="h-3.5 w-3.5" /> Naar prullenbak
+                  <Trash2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Naar prullenbak</span>
                 </Button>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        <Card>
-          <CardHeader className="pb-2 md:pb-4">
-            <CardTitle className="text-lg md:text-xl">Klanten ({filteredCustomers.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 md:p-6">
+        <div className="rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 overflow-hidden shadow-lg">
+          <div className="px-5 py-4 border-b border-border/20">
+            <h2 className="text-xl font-bold tracking-tight">Klanten ({filteredCustomers.length})</h2>
+          </div>
+          <div className="md:p-6">
             {loading ? (
               <LoadingState message="Klanten laden..." />
             ) : filteredCustomers.length === 0 ? (
@@ -839,12 +844,15 @@ const Customers = () => {
                           <motion.div
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.04 }}
+                            transition={{ delay: i * 0.05, type: 'spring', stiffness: 260, damping: 24 }}
                           >
-                          <Card className="border-border/40 bg-gradient-to-br from-card to-muted/20 shadow-sm">
-                            <CardContent className="p-4 space-y-3">
+                          <div className="relative rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 shadow-lg overflow-hidden">
+                            {/* Premium top highlight */}
+                            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/[0.08] to-transparent" />
+                            
+                            <div className="p-4 space-y-3">
                               <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                                   <Checkbox
                                     checked={selectedIds.has(customer.id)}
                                     onCheckedChange={() => toggleSelect(customer.id)}
@@ -852,39 +860,39 @@ const Customers = () => {
                                   />
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      <p className="font-semibold truncate">{customer.company_name}</p>
+                                      <p className="text-base font-semibold tracking-tight truncate">{customer.company_name}</p>
                                       {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
                                       {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
                                     </div>
                                     {customer.contact_name && (
-                                      <p className="text-sm text-muted-foreground truncate">{customer.contact_name}</p>
+                                      <p className="text-sm text-muted-foreground/80 truncate">{customer.contact_name}</p>
                                     )}
                                   </div>
                                 </div>
                                 {customer.user_id ? (
-                                  <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30 flex-shrink-0">
+                                  <Badge variant="outline" className="text-xs backdrop-blur-sm bg-emerald-500/15 text-emerald-500 border-emerald-500/30 rounded-full px-3 py-1 flex-shrink-0">
                                     Portal ✓
                                   </Badge>
                                 ) : null}
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                  <span className="text-muted-foreground text-xs">Email</span>
+                                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Email</span>
                                   <p className="font-medium truncate">{customer.email || "—"}</p>
                                 </div>
                                 <div>
-                                  <span className="text-muted-foreground text-xs">Stad</span>
+                                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Stad</span>
                                   <p className="font-medium">{customer.city || "—"}</p>
                                 </div>
                               </div>
 
-                              <div className="flex gap-2 pt-1 border-t border-border/30">
+                              <div className="flex gap-1.5 pt-2 border-t border-border/10">
                                 {!customer.user_id && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="min-h-[44px] gap-1.5 text-xs"
+                                    className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                     onClick={() => setPortalCustomer(customer)}
                                   >
                                     <UserPlus className="h-3.5 w-3.5 text-primary" />
@@ -894,7 +902,7 @@ const Customers = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="min-h-[44px] gap-1.5 text-xs"
+                                  className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                   onClick={() => setAuditCustomerId(customer.id)}
                                 >
                                   <History className="h-3.5 w-3.5" />
@@ -903,7 +911,7 @@ const Customers = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="min-h-[44px] gap-1.5 text-xs"
+                                  className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                   onClick={() => handleEdit(customer)}
                                 >
                                   <Pencil className="h-3.5 w-3.5" />
@@ -913,15 +921,15 @@ const Customers = () => {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="min-h-[44px] min-w-[44px] ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    className="min-h-[48px] min-w-[48px] ml-auto rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
                                     onClick={() => handleDeleteRequest(customer)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 )}
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                           </motion.div>
                         </SwipeableCard>
                       ))}
@@ -1000,8 +1008,8 @@ const Customers = () => {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Single delete confirm */}
         <DeleteConfirmDialog
