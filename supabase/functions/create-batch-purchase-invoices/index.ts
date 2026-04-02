@@ -195,6 +195,8 @@ Deno.serve(async (req) => {
         total_amount: totalAmount,
         is_self_billing: is_self_billing || false,
         footnote: footnote || null,
+        vat_type: vatType,
+        vat_note: vatNote,
         status: "concept",
         created_by: user.id,
       })

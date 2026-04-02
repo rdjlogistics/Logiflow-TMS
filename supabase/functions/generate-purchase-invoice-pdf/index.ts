@@ -219,7 +219,7 @@ Deno.serve(async (req) => {
 
   <div class="totals">
     <div class="total-row"><span>Subtotaal</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.subtotal || 0)}</span></div>
-    <div class="total-row"><span>BTW ${invoice.vat_percentage || 21}%</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.vat_amount || 0)}</span></div>
+    <div class="total-row"><span>BTW ${invoice.vat_percentage ?? 21}%${invoice.vat_type === 'verlegd' ? ' (verlegd)' : ''}</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.vat_amount || 0)}</span></div>
     <div class="total-row grand"><span>Totaal</span><span style="font-variant-numeric:tabular-nums;">${formatCurrency(invoice.total_amount || 0)}</span></div>
   </div>
 
