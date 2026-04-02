@@ -71,6 +71,7 @@ interface NotificationTemplate {
 const availableChannels = ['whatsapp', 'sms', 'email', 'push'];
 
 export default function NotificationChannels() {
+  const { user } = useAuth();
   const [channels, setChannels] = useState<NotificationChannel[]>([]);
   const [logs] = useState<NotificationLog[]>([]);
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
