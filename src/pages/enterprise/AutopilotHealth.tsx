@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { useHolds, useJobRuns, useIntegrationFailures } from '@/hooks/useWorldClassData';
+import { useHolds, useJobRuns, useIntegrationFailures, useResolveIntegrationFailure } from '@/hooks/useWorldClassData';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Zap,
@@ -24,12 +24,14 @@ import {
 import { format, formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const AutopilotHealth = () => {
   const { toast } = useToast();
   const { data: activeHolds } = useHolds('active');
   const { data: jobRuns, isLoading: loadingJobs } = useJobRuns(undefined, 20);
-  const { data: failures } = useIntegrationFailures('pending');
+  const { data: failures, refetch: refetchFailures } = useIntegrationFailures('pending');
+  const resolveFailure = useResolveIntegrationFailure();
   const [retryingAll, setRetryingAll] = useState(false);
   const [retryingItem, setRetryingItem] = useState<string | null>(null);
   const [resolvedItems, setResolvedItems] = useState<string[]>([]);
@@ -43,21 +45,41 @@ const AutopilotHealth = () => {
 
   const handleRetryAll = async () => {
     setRetryingAll(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const pendingIds = failures?.map((f: any) => f.id) || [];
+      for (const id of pendingIds) {
+        await (supabase as any).from('integration_failures').update({
+          status: 'retrying',
+          last_attempt_at: new Date().toISOString(),
+          attempts: (supabase as any).rpc ? undefined : 1,
+        }).eq('id', id);
+      }
+      await refetchFailures();
+      toast({ title: "Retry voltooid", description: "Alle gefaalde integraties zijn opnieuw geprobeerd." });
+    } catch (err: any) {
+      toast({ title: "Fout", description: err.message, variant: "destructive" });
+    }
     setRetryingAll(false);
-    toast({ title: "Retry voltooid", description: "Alle gefaalde integraties zijn opnieuw geprobeerd." });
   };
 
   const handleRetryItem = async (id: string, source: string) => {
     setRetryingItem(id);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      await (supabase as any).from('integration_failures').update({
+        status: 'retrying',
+        last_attempt_at: new Date().toISOString(),
+      }).eq('id', id);
+      await refetchFailures();
+      toast({ title: "Retry voltooid", description: `${source} is succesvol opnieuw uitgevoerd.` });
+    } catch (err: any) {
+      toast({ title: "Fout", description: err.message, variant: "destructive" });
+    }
     setRetryingItem(null);
-    toast({ title: "Retry voltooid", description: `${source} is succesvol opnieuw uitgevoerd.` });
   };
 
   const handleResolveItem = (id: string, source: string) => {
+    resolveFailure.mutate({ id, resolution_note: `Handmatig opgelost: ${source}` });
     setResolvedItems(prev => [...prev, id]);
-    toast({ title: "Afgehandeld", description: `${source} fout is als opgelost gemarkeerd.` });
   };
 
   const getStatusBadge = (status: string) => {
