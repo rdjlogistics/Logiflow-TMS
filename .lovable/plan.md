@@ -1,36 +1,26 @@
 
 
-# Fix: Inkoopfactuur BTW wordt niet berekend
+# Fix: Dynamic Pricing werkt niet
 
 ## Probleem
 
-Er zijn **2 bugs** die samen het probleem veroorzaken:
+Na het bekijken van de edge function `calculate-price` en de database-schema is er **1 probleem** gevonden:
 
-### 1. PDF toont "BTW 21%" maar bedrag is €0,00
-In `generate-purchase-invoice-pdf/index.ts` regel 222:
-```javascript
-BTW ${invoice.vat_percentage || 21}%
-```
-Omdat `vat_percentage` de waarde `0` heeft (falsy in JavaScript), valt `0 || 21` terug naar `21`. Dus het label zegt "BTW 21%" terwijl het bedrag €0,00 is — verwarrend en incorrect.
+De edge function probeert bij het opslaan van de berekening kolommen in te voegen die **niet bestaan** in de `price_calculations` tabel:
+- `vehicle_type` — bestaat niet
+- `surge_multiplier` — bestaat niet
 
-### 2. BTW-berekening markeert EU-carriers met BTW-nummer als "verlegd" (0%)
-In `create-batch-purchase-invoices/index.ts` regel 44-52, de `berekenBTW()` functie:
-- Carrier "Euro Transport GmbH" is uit Duitsland (EU) met geldig BTW-nummer → tarief wordt 0% (verlegd)
-- Dit is fiscaal correct voor **verkoopfacturen** (je levert diensten aan een EU-bedrijf)
-- Maar voor **inkoopfacturen** (je ontvangt diensten) moet de BTW wél op de factuur staan — de ontvanger (NL bedrijf) moet 21% BTW afdragen via verlegde BTW
+Dit zit weliswaar in een try-catch, maar de hoofdflow kan ook falen als de gebruiker geen `company_id` heeft in het `profiles` tabel (de functie retourneert dan een 400 error: "Geen bedrijf gekoppeld").
 
-**De huidige logica is verkeerd voor inkoopfacturen**: bij verlegde BTW moet het bedrag wél berekend en getoond worden op de factuur, zodat de boekhouding klopt.
+Daarnaast ontbreekt `valid_until` en `currency` in de response van de edge function, terwijl de `useSmartPricing` hook die verwacht (maar `useDynamicPricing` niet — dat is de hook die de Dynamic Pricing pagina gebruikt, dus die klopt).
 
 ## Fix
 
-### Bestand 1: `supabase/functions/create-batch-purchase-invoices/index.ts`
-- Bij `berekenBTW` resultaat `type === 'verlegd'`: BTW tarief op 21% houden (niet 0%), maar de `factuurVermelding` over verlegde BTW behouden
-- De factuur toont dan correct: Subtotaal + BTW 21% = Totaal
-- Voeg `vat_type` en `vat_note` velden toe aan de invoice record
+### Bestand 1: `supabase/functions/calculate-price/index.ts`
 
-### Bestand 2: `supabase/functions/generate-purchase-invoice-pdf/index.ts`
-- Fix `|| 21` → `?? 21` zodat 0% correct wordt getoond als dat de intentie is
-- Toon de BTW-vermelding (verlegd/vrijgesteld) wanneer aanwezig in `invoice.vat_note` of `invoice.footnote`
+1. **Fix insert columns** — Verwijder `vehicle_type` en `surge_multiplier` uit de insert naar `price_calculations` (deze kolommen bestaan niet in de tabel)
+2. **Fallback voor company_id** — Check ook `user_companies` tabel als `profiles.company_id` null is (consistent met hoe `useDynamicPricing` hooks werken)
+3. **Voeg `currency` en `valid_until` toe aan response** — Zodat de `useSmartPricing` hook ook correct werkt
 
-Totaal: 2 edge functions. Geen database migratie nodig (vat_type en vat_note kolommen bestaan al op purchase_invoices).
+Totaal: 1 edge function. Geen frontend wijzigingen. Na deployment werkt Dynamic Pricing end-to-end.
 
