@@ -844,12 +844,15 @@ const Customers = () => {
                           <motion.div
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.04 }}
+                            transition={{ delay: i * 0.05, type: 'spring', stiffness: 260, damping: 24 }}
                           >
-                          <Card className="border-border/40 bg-gradient-to-br from-card to-muted/20 shadow-sm">
-                            <CardContent className="p-4 space-y-3">
+                          <div className="relative rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 shadow-lg overflow-hidden">
+                            {/* Premium top highlight */}
+                            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/[0.08] to-transparent" />
+                            
+                            <div className="p-4 space-y-3">
                               <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                                   <Checkbox
                                     checked={selectedIds.has(customer.id)}
                                     onCheckedChange={() => toggleSelect(customer.id)}
@@ -857,39 +860,39 @@ const Customers = () => {
                                   />
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      <p className="font-semibold truncate">{customer.company_name}</p>
+                                      <p className="text-base font-semibold tracking-tight truncate">{customer.company_name}</p>
                                       {isTestCustomer(customer) && <Badge variant="destructive" size="sm">Test</Badge>}
                                       {isIncomplete(customer) && <Badge variant="warning" size="sm">Incompleet</Badge>}
                                     </div>
                                     {customer.contact_name && (
-                                      <p className="text-sm text-muted-foreground truncate">{customer.contact_name}</p>
+                                      <p className="text-sm text-muted-foreground/80 truncate">{customer.contact_name}</p>
                                     )}
                                   </div>
                                 </div>
                                 {customer.user_id ? (
-                                  <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30 flex-shrink-0">
+                                  <Badge variant="outline" className="text-xs backdrop-blur-sm bg-emerald-500/15 text-emerald-500 border-emerald-500/30 rounded-full px-3 py-1 flex-shrink-0">
                                     Portal ✓
                                   </Badge>
                                 ) : null}
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                  <span className="text-muted-foreground text-xs">Email</span>
+                                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Email</span>
                                   <p className="font-medium truncate">{customer.email || "—"}</p>
                                 </div>
                                 <div>
-                                  <span className="text-muted-foreground text-xs">Stad</span>
+                                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Stad</span>
                                   <p className="font-medium">{customer.city || "—"}</p>
                                 </div>
                               </div>
 
-                              <div className="flex gap-2 pt-1 border-t border-border/30">
+                              <div className="flex gap-1.5 pt-2 border-t border-border/10">
                                 {!customer.user_id && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="min-h-[44px] gap-1.5 text-xs"
+                                    className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                     onClick={() => setPortalCustomer(customer)}
                                   >
                                     <UserPlus className="h-3.5 w-3.5 text-primary" />
@@ -899,7 +902,7 @@ const Customers = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="min-h-[44px] gap-1.5 text-xs"
+                                  className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                   onClick={() => setAuditCustomerId(customer.id)}
                                 >
                                   <History className="h-3.5 w-3.5" />
@@ -908,7 +911,7 @@ const Customers = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="min-h-[44px] gap-1.5 text-xs"
+                                  className="min-h-[48px] gap-1.5 text-xs rounded-xl"
                                   onClick={() => handleEdit(customer)}
                                 >
                                   <Pencil className="h-3.5 w-3.5" />
@@ -918,15 +921,15 @@ const Customers = () => {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="min-h-[44px] min-w-[44px] ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    className="min-h-[48px] min-w-[48px] ml-auto rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
                                     onClick={() => handleDeleteRequest(customer)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 )}
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                           </motion.div>
                         </SwipeableCard>
                       ))}
