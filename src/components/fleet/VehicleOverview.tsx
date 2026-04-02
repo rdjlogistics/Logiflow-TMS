@@ -75,6 +75,7 @@ const emptyFormData: VehicleFormData = {
   year_of_manufacture: '',
   insurance_expiry_date: '',
   next_service_date: '',
+  purchase_price: '',
 };
 
 interface VehicleOverviewProps {

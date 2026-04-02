@@ -136,6 +136,9 @@ const FleetManagement = () => {
               <TabsContent value="maintenance" className="mt-0" forceMount={activeTab === 'maintenance' ? true : undefined}>
                 {activeTab === 'maintenance' && <MaintenanceManagement />}
               </TabsContent>
+              <TabsContent value="valuation" className="mt-0" forceMount={activeTab === 'valuation' ? true : undefined}>
+                {activeTab === 'valuation' && <VehicleValuation />}
+              </TabsContent>
             </motion.div>
           </AnimatePresence>
         </Tabs>
