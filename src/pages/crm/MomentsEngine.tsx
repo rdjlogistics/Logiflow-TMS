@@ -39,6 +39,7 @@ const MomentsEngine = () => {
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
   const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   
   const { 
     moments, 
