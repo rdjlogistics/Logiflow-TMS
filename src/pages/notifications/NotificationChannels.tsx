@@ -111,9 +111,9 @@ export default function NotificationChannels() {
     enabled: !!user,
   });
 
-  // Sync DB data into local state
-  useState(() => {
-    if (dbChannels && dbChannels.length > 0 && channels.length === 0) {
+  // Sync DB data into local state via useEffect
+  useEffect(() => {
+    if (dbChannels && dbChannels.length > 0) {
       const mapped: NotificationChannel[] = dbChannels.map((ch: any) => ({
         id: ch.id,
         type: ch.channel_type as NotificationChannel['type'],
@@ -122,48 +122,35 @@ export default function NotificationChannels() {
         phoneNumber: ch.config_json?.phone_number,
       }));
       setChannels(mapped);
+
+      // Sync templates from channels that have template data
+      const templatesMapped: NotificationTemplate[] = dbChannels
+        .filter((ch: any) => ch.default_templates_json?.event)
+        .map((ch: any) => ({
+          id: ch.id,
+          event: ch.default_templates_json.event,
+          channels: ch.default_templates_json.channels || [ch.channel_type],
+          messageTemplate: ch.default_templates_json.messageTemplate || '',
+          isActive: ch.is_active ?? false,
+        }));
+      if (templatesMapped.length > 0) setTemplates(templatesMapped);
     }
-  });
+  }, [dbChannels]);
 
-  // Effect to sync channels when dbChannels changes
-  if (dbChannels && dbChannels.length > 0 && channels.length === 0) {
-    const mapped: NotificationChannel[] = dbChannels.map((ch: any) => ({
-      id: ch.id,
-      type: ch.channel_type as NotificationChannel['type'],
-      name: ch.channel_type === 'whatsapp' ? 'WhatsApp' : ch.channel_type === 'sms' ? 'SMS' : ch.channel_type === 'email' ? 'Email' : 'Push',
-      isActive: ch.is_active ?? false,
-      phoneNumber: ch.config_json?.phone_number,
-    }));
-    setChannels(mapped);
-  }
-
-  // Sync logs
-  if (dbLogs && dbLogs.length > 0 && logs.length === 0) {
-    const mapped: NotificationLog[] = dbLogs.map((l: any) => ({
-      id: l.id,
-      channel: l.channel_type || 'email',
-      recipient: l.recipient || '',
-      message: l.message_body || '',
-      status: l.delivery_status === 'delivered' ? 'delivered' : l.delivery_status === 'failed' ? 'failed' : 'sent',
-      sentAt: new Date(l.sent_at),
-      deliveredAt: l.delivered_at ? new Date(l.delivered_at) : undefined,
-    }));
-    setLogs(mapped);
-  }
-
-  // Sync templates from channels that have template data
-  if (dbChannels && dbChannels.length > 0 && templates.length === 0) {
-    const mapped: NotificationTemplate[] = dbChannels
-      .filter((ch: any) => ch.default_templates_json?.event)
-      .map((ch: any) => ({
-        id: ch.id,
-        event: ch.default_templates_json.event,
-        channels: ch.default_templates_json.channels || [ch.channel_type],
-        messageTemplate: ch.default_templates_json.messageTemplate || '',
-        isActive: ch.is_active ?? false,
+  useEffect(() => {
+    if (dbLogs && dbLogs.length > 0) {
+      const mapped: NotificationLog[] = dbLogs.map((l: any) => ({
+        id: l.id,
+        channel: l.channel_type || 'email',
+        recipient: l.recipient || '',
+        message: l.message_body || '',
+        status: l.delivery_status === 'delivered' ? 'delivered' : l.delivery_status === 'failed' ? 'failed' : 'sent',
+        sentAt: new Date(l.sent_at),
+        deliveredAt: l.delivered_at ? new Date(l.delivered_at) : undefined,
       }));
-    if (mapped.length > 0) setTemplates(mapped);
-  }
+      setLogs(mapped);
+    }
+  }, [dbLogs]);
   
   // Template edit dialog state
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
