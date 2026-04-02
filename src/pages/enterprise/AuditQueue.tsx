@@ -15,6 +15,7 @@ import { AuditReviewDialog } from "@/components/enterprise/AuditReviewDialog";
 
 const AuditQueue = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [resolvedIds, setResolvedIds] = useState<string[]>([]);
   const [reviewItem, setReviewItem] = useState<any>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
