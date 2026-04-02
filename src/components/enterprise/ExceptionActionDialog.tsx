@@ -60,15 +60,16 @@ export function ExceptionActionDialog({
     setIsSubmitting(true);
     try {
       await onResolve?.(exception, resolution, notes);
-    toast({
-      title: "Exception opgelost ✓",
-      description: `${exception.type} voor order ${exception.order} is afgehandeld.`
-    });
-    
-    setIsSubmitting(false);
-    setResolution("");
-    setNotes("");
-    onOpenChange(false);
+      toast({
+        title: "Exception opgelost ✓",
+        description: `${exception.type} voor order ${exception.order} is afgehandeld.`
+      });
+      setResolution("");
+      setNotes("");
+      onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!exception) return null;
