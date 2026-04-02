@@ -77,23 +77,38 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
       const payload = { stop_proof_id: pod.id };
       const { data, error } = await supabase.functions.invoke('generate-pod-pdf', { body: payload });
       if (error) throw error;
-      if (!data?.pdf) throw new Error('Geen PDF data ontvangen');
+      const fileName = data?.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}`;
 
-      // Decode base64 PDF (consistent with invoice/purchase-invoice pattern)
-      const binaryString = atob(data.pdf);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
+      if (data?.pdf) {
+        // Decode base64 PDF
+        const binaryString = atob(data.pdf);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else if (data?.html) {
+        // Fallback: download as HTML (consistent with vrachtbrief pattern)
+        const blob = new Blob([data.html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName.endsWith('.html') ? fileName : `${fileName}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        throw new Error('Geen PDF of HTML data ontvangen');
       }
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = data.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       toast.success('PDF gedownload');
     } catch (err: any) {
       console.error('PDF download error:', err);
