@@ -164,10 +164,14 @@ Deno.serve(async (req) => {
       console.warn("[calculate-price] Could not save calculation:", e);
     }
 
+    const validUntil = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+
     return new Response(JSON.stringify({
       base_price: baseCharge,
       final_price: finalPrice,
       surge_multiplier: surgeMultiplier,
+      currency: "EUR",
+      valid_until: validUntil,
       adjustments,
       breakdown: {
         distance_charge: distanceCharge,
