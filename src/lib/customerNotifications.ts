@@ -52,10 +52,10 @@ export function notifyCustomerStatusChange(
     .invoke('send-customer-notification', {
       body: {
         customer_id: customerId,
-        title: mapping.title,
-        body: mapping.body(nr),
+        trip_id: tripId,
+        subject: mapping.title,
+        message: mapping.body(nr),
         notification_type: 'status_change',
-        data: { trip_id: tripId, status: newStatus },
       },
     })
     .catch((err) => console.error('[CustomerNotification] Failed:', err));

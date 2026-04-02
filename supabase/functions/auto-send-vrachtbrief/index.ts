@@ -13,7 +13,9 @@ Deno.serve(async (req) => {
     const { data: uc } = await supabaseAdmin.from("user_companies").select("company_id").eq("user_id", cd.claims.sub).eq("is_primary", true).single();
     if (!uc?.company_id) return new Response(JSON.stringify({ error: "Geen bedrijf" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { orderId, to } = await req.json();
+    const body = await req.json();
+    const orderId = body.tripId || body.orderId;
+    const to = body.to;
     if (!orderId) return new Response(JSON.stringify({ error: "orderId verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
     console.log(`[auto-send-vrachtbrief] Order ${orderId}`);
