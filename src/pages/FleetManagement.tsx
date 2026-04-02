@@ -9,10 +9,10 @@ import {
   Fuel,
   Wrench,
   Truck,
-  
   AlertTriangle,
   Calendar,
   TrendingUp,
+  TrendingDown,
   Gauge,
   Loader2,
 } from 'lucide-react';
