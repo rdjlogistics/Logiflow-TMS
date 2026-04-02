@@ -19,7 +19,7 @@ const WEBHOOK_EVENTS = [
 const Webhooks = () => {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { companyId } = useCompany();
+  const { company } = useCompany();
 
   const handleCreate = async () => {
     if (!webhookUrl.trim()) {
