@@ -531,7 +531,7 @@ const Customers = () => {
 
   return (
     <DashboardLayout title="Klanten">
-      <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="space-y-4 md:space-y-6 pb-24 md:pb-6 animate-fade-in">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div className="relative flex-1 max-w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
