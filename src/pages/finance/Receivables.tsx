@@ -357,7 +357,7 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.04 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: index * 0.05 }}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn(
@@ -365,18 +365,21 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
           group.totalOverdue > 0 ? "border-destructive/20" : "border-border/25",
           isOpen && "shadow-lg"
         )}>
+          {/* Top highlight */}
+          <div className="h-px bg-gradient-to-r from-transparent via-foreground/[0.06] to-transparent" />
           {/* Mesh gradient accent */}
           {group.totalOverdue > 0 && (
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive/60 via-destructive/30 to-transparent" />
           )}
 
           <CollapsibleTrigger asChild>
-            <button className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors rounded-2xl">
-              <div className="flex items-center gap-4 min-w-0">
+            <button className="w-full px-4 md:px-5 py-4 min-h-[56px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 hover:bg-muted/30 transition-colors rounded-2xl touch-manipulation">
+              {/* Top row: chevron + name + invoice count */}
+              <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
                 {isOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
-                <div className="text-left min-w-0">
-                  <p className="font-semibold text-sm truncate">{group.companyName}</p>
-                  <p className="text-xs text-muted-foreground">
+                <div className="text-left min-w-0 flex-1">
+                  <p className="font-semibold text-base sm:text-sm tracking-tight truncate">{group.companyName}</p>
+                  <p className="text-xs text-muted-foreground/80">
                     {group.invoices.length} facturen
                     {overdueInvoices.length > 0 && (
                       <span className="text-destructive ml-2">• {overdueInvoices.length} verlopen</span>
@@ -384,13 +387,14 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 flex-shrink-0">
+              {/* Bottom row on mobile: badges + amount */}
+              <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 pl-7 sm:pl-0">
                 {group.totalOverdue > 0 && (
-                  <Badge variant="destructive" className="tabular-nums text-xs">
+                  <Badge variant="destructive" className="tabular-nums text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">
                     €{group.totalOverdue.toLocaleString("nl-NL", { maximumFractionDigits: 0 })} verlopen
                   </Badge>
                 )}
-                <span className="font-bold tabular-nums text-sm">
+                <span className="font-bold tabular-nums text-sm ml-auto">
                   €{group.totalOpen.toLocaleString("nl-NL", { minimumFractionDigits: 2 })}
                 </span>
               </div>
