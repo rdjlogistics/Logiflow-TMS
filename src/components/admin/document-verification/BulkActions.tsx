@@ -25,7 +25,7 @@ export function BulkActions({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 safe-area-bottom"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit safe-area-bottom"
         >
           <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/40 bg-card/95 backdrop-blur-xl shadow-[var(--shadow-elevation)]">
             <Badge variant="secondary" className="tabular-nums">

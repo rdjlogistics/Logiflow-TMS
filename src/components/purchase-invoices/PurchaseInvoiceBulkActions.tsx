@@ -347,14 +347,14 @@ export const PurchaseInvoiceBulkActions = ({
                 size="sm"
                 onClick={() => setShowPaymentModal(true)}
                 disabled={bulkPaymentMutation.isPending}
-                className="gap-2"
+                className="gap-1.5"
               >
                 {bulkPaymentMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <CreditCard className="h-4 w-4" />
                 )}
-                Betaling
+                <span className="hidden sm:inline">Betaling</span>
               </Button>
 
               {/* Bulk email */}
@@ -363,14 +363,14 @@ export const PurchaseInvoiceBulkActions = ({
                 size="sm"
                 onClick={() => setShowBulkEmailModal(true)}
                 disabled={isSendingBulkEmail}
-                className="gap-2"
+                className="gap-1.5"
               >
                 {isSendingBulkEmail ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Mail className="h-4 w-4" />
                 )}
-              E-mail versturen
+                <span className="hidden sm:inline">E-mail</span>
               </Button>
 
               {/* SEPA Export */}
@@ -378,10 +378,10 @@ export const PurchaseInvoiceBulkActions = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowSepaModal(true)}
-                className="gap-2"
+                className="gap-1.5"
               >
                 <Landmark className="h-4 w-4" />
-                SEPA Export
+                <span className="hidden sm:inline">SEPA</span>
               </Button>
 
               {/* Export */}
@@ -389,10 +389,10 @@ export const PurchaseInvoiceBulkActions = ({
                 variant="outline"
                 size="sm"
                 onClick={handleExportExcel}
-                className="gap-2"
+                className="gap-1.5"
               >
                 <FileDown className="h-4 w-4" />
-                Export
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </div>
 

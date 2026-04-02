@@ -269,7 +269,7 @@ export function InvoiceBulkActionsBar({
               ) : (
                 <FileDown className="h-4 w-4 mr-2" />
               )}
-              Export
+              <span className="hidden sm:inline">Export</span>
             </Button>
           </div>
 
