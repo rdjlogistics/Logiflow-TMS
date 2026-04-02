@@ -41,35 +41,35 @@ export function ExceptionActionDialog({
     if (!exception) return;
     
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onPing?.(exception, message);
-    toast({
-      title: "Push notificatie verzonden ✓",
-      description: `Chauffeur voor order ${exception.order} ontvangt nu een ping.`
-    });
-    
-    setIsSubmitting(false);
-    setMessage("");
-    onOpenChange(false);
+    try {
+      await onPing?.(exception, message);
+      toast({
+        title: "Push notificatie verzonden ✓",
+        description: `Chauffeur voor order ${exception.order} ontvangt nu een ping.`
+      });
+      setMessage("");
+      onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResolve = async () => {
     if (!exception || !resolution) return;
     
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onResolve?.(exception, resolution, notes);
-    toast({
-      title: "Exception opgelost ✓",
-      description: `${exception.type} voor order ${exception.order} is afgehandeld.`
-    });
-    
-    setIsSubmitting(false);
-    setResolution("");
-    setNotes("");
-    onOpenChange(false);
+    try {
+      await onResolve?.(exception, resolution, notes);
+      toast({
+        title: "Exception opgelost ✓",
+        description: `${exception.type} voor order ${exception.order} is afgehandeld.`
+      });
+      setResolution("");
+      setNotes("");
+      onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!exception) return null;

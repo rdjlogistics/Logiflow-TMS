@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useRelationshipVault, MomentType, MomentStatus } from "@/hooks/useRelationshipVault";
 import { SendGiftDialog } from "@/components/crm/SendGiftDialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -39,6 +39,7 @@ const MomentsEngine = () => {
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
   const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   
   const { 
     moments, 
@@ -73,11 +74,12 @@ const MomentsEngine = () => {
     setScanning(true);
     toast({ title: "Events scannen", description: "Klantactiviteit wordt gescand voor nieuwe momenten..." });
     
-    // Refetch moments from database
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setScanning(false);
-    toast({ title: "Scan voltooid", description: `${moments?.length || 0} momenten gevonden in het systeem.` });
+    try {
+      await queryClient.invalidateQueries({ queryKey: ['relationship-moments'] });
+      toast({ title: "Scan voltooid", description: `${moments?.length || 0} momenten gevonden in het systeem.` });
+    } finally {
+      setScanning(false);
+    }
   };
 
   const handleOpenGiftDialog = (momentId: string, accountId: string) => {

@@ -39,26 +39,25 @@ export function AlertRuleDialog({ open, onOpenChange, rule, onSave }: AlertRuleD
     if (!name.trim() || !trigger.trim()) return;
     
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onSave?.({
-      id: rule?.id || `ALT-${Date.now()}`,
-      name,
-      trigger,
-      level,
-      autoEscalate,
-      recipients,
-      channels,
-      status: "active"
-    });
-    
-    toast({
-      title: rule ? "Regel bijgewerkt ✓" : "Regel aangemaakt ✓",
-      description: `Alert regel "${name}" is opgeslagen.`
-    });
-    
-    setIsSaving(false);
-    onOpenChange(false);
+    try {
+      await onSave?.({
+        id: rule?.id || `ALT-${Date.now()}`,
+        name,
+        trigger,
+        level,
+        autoEscalate,
+        recipients,
+        channels,
+        status: "active"
+      });
+      toast({
+        title: rule ? "Regel bijgewerkt ✓" : "Regel aangemaakt ✓",
+        description: `Alert regel "${name}" is opgeslagen.`
+      });
+      onOpenChange(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleChannel = (channel: string) => {
