@@ -111,7 +111,26 @@ const ExceptionsInbox = () => {
         exception={actionException}
         mode={actionMode}
         onResolve={(exc) => handleResolve((exc as any)._id ?? exc.order)}
-        onPing={() => toast({ title: "Ping verzonden ✓" })}
+        onPing={async (exc, message) => {
+          try {
+            const { data: companyId } = await supabase.rpc("get_user_company_cached", { p_user_id: user!.id });
+            if (!companyId) return;
+            const entityId = (exc as any)._id ?? exc.order;
+            const anomaly = exceptions.find((e: any) => e.id === entityId || e.entity_id === exc.order);
+            await supabase.from("notifications").insert({
+              tenant_id: companyId,
+              user_id: user!.id,
+              title: `Ping: ${exc.type}`,
+              message: message || `Status update gevraagd voor order ${exc.order}`,
+              type: "ping",
+              entity_type: "anomaly_event",
+              entity_id: entityId,
+            });
+            toast({ title: "Ping verzonden ✓", description: `Notificatie aangemaakt voor order ${exc.order}` });
+          } catch (err: any) {
+            toast({ title: "Ping mislukt", description: err.message, variant: "destructive" });
+          }
+        }}
       />
     </DashboardLayout>
   );

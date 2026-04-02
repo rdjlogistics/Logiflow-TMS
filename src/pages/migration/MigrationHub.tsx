@@ -538,9 +538,9 @@ export default function MigrationHub() {
                         <ProjectOptionsMenu
                           projectId={project.id}
                           projectName={project.name}
-                          onEdit={() => toast({ title: "Project bewerken", description: `Editor voor ${project.name} wordt geopend.` })}
+                          onEdit={() => { setSelectedProject(project.id); setActiveTab("overview"); }}
                           onArchive={() => updateProject.mutate({ id: project.id, status: 'ROLLED_BACK' } as any)}
-                          onDelete={() => toast({ title: "Project archiveren", description: `${project.name} is gearchiveerd.` })}
+                          onDelete={() => { if (confirm(`Weet je zeker dat je "${project.name}" wilt archiveren?`)) { updateProject.mutate({ id: project.id, status: 'ROLLED_BACK' } as any); } }}
                         />
                       </TableCell>
                     </TableRow>
