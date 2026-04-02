@@ -1,55 +1,51 @@
 
 
-# Non-Functional Buttons Audit — Ronde 2
+# Non-Functional Buttons Audit — Ronde 3
 
-## Eerder al gefixt (Ronde 1)
-De vorige ronde zijn deze 6 al opgelost: RoutePlanning AddStop, MigrationHub Edit/Delete, FreightSettlements Approve, ExceptionsInbox Ping, AlertsEscalations Save.
+## Eerder gefixt (Ronde 1 & 2)
+13 knoppen zijn al functioneel gemaakt in de vorige rondes.
 
 ## Nieuwe bevindingen
 
-Na een grondige scan op `// Simulate`, `await new Promise(resolve => setTimeout(...))` en toast-only handlers zijn er **7 nieuwe gevallen** gevonden:
+Na een grondige scan op `// Simulate`, `await new Promise(setTimeout)`, en toast-only handlers zijn er **5 nieuwe gevallen** gevonden die nog nep-logica bevatten:
 
-### 1. HoldsInbox — Escalatie-knop (fake simulate)
-**Bestand**: `src/pages/enterprise/HoldsInbox.tsx` regel 454
-De "Escaleren" knop simuleert een delay en toont een toast, maar doet niets in de database. De hold wordt niet ge-update met een hogere prioriteit of escalatiestatus.
+### 1. ExceptionActionDialog — Fake delay voor `onPing` en `onResolve`
+**Bestand**: `src/components/enterprise/ExceptionActionDialog.tsx` regels 44 en 61
+Beide handlers gebruiken `await new Promise(resolve => setTimeout(resolve, 800))` als fake delay voordat ze de callback aanroepen. De parent (`ExceptionsInbox`) doet nu wél echte DB-operaties, maar de dialog zelf simuleert nog een wachttijd.
 
-**Fix**: `useResolveHold` is al beschikbaar. De hold updaten met `severity` = escalatePriority en een `resolution_note` met de escalatiereden, of een apart `escalate` veld toevoegen.
+**Fix**: De fake delays verwijderen. De `setIsSubmitting` koppelen aan de daadwerkelijke callback-uitvoering.
 
-### 2. AutopilotHealth — Retry knoppen (fake simulate)
-**Bestand**: `src/pages/enterprise/AutopilotHealth.tsx` regels 44-56
-Beide retry-handlers (`handleRetryAll` en `handleRetryItem`) simuleren een delay en tonen een toast. `handleResolveItem` voegt alleen toe aan lokale state maar persisteert niets.
+### 2. AlertRuleDialog — Fake delay voor `onSave`
+**Bestand**: `src/components/enterprise/AlertRuleDialog.tsx` regel 42
+Dezelfde situatie: `await new Promise(resolve => setTimeout(resolve, 800))` als fake delay. De parent doet nu echte DB-operaties, maar de dialog simuleert.
 
-**Fix**: De `integration_failures` tabel bijwerken: status naar "retried" of "resolved". Na de update de query invalideren.
+**Fix**: Fake delay verwijderen.
 
-### 3. AuditQueue — Resolve handler (lokale state only)
-**Bestand**: `src/pages/enterprise/AuditQueue.tsx` regel 95
-`handleResolve` voegt het ID alleen toe aan lokale `resolvedIds` maar persisteert de resolutie niet. Bij een page refresh zijn alle "opgeloste" items terug.
+### 3. AuditReviewDialog — Fake delay voor `onResolve`
+**Bestand**: `src/components/enterprise/AuditReviewDialog.tsx` regel 35
+`await new Promise(resolve => setTimeout(resolve, 1000))` als fake delay. De parent (`AuditQueue`) persisteert nu naar de DB, maar de dialog simuleert nog.
 
-**Fix**: De onderliggende trip of anomaly bijwerken in de database (bijv. een `audit_resolved` veld of een aparte `audit_resolutions` insert).
+**Fix**: Fake delay verwijderen.
 
-### 4. Disputes — `onRespond` ontbreekt
-**Bestand**: `src/pages/enterprise/Disputes.tsx` regel 179
-De `DisputeDetailDialog` ontvangt geen `onRespond` callback. De "Reactie verzenden" knop in de dialog voert de fake delay uit en roept `onRespond?.()` aan — maar die is undefined.
+### 4. MomentsEngine — `handleScanEvents` fake delay
+**Bestand**: `src/pages/crm/MomentsEngine.tsx` regel 77
+De "Events scannen" knop toont een toast, wacht 1 seconde (fake), en toont dan een tweede toast. Er wordt geen echte data-operatie uitgevoerd — niet eens een `refetch()`.
 
-**Fix**: Een `onRespond` callback toevoegen die een notificatie-record aanmaakt of de dispute notes bijwerkt.
+**Fix**: De fake delay vervangen door een echte `refetch()` aanroep om momenten opnieuw uit de database op te halen.
 
-### 5. SendOrderDialog — Fake simulate
-**Bestand**: `src/components/network/SendOrderDialog.tsx` regel 75
-"Opdracht versturen" simuleert een delay en toont een toast, maar stuurt de order niet daadwerkelijk door.
+### 5. AddPaymentMethodDialog — Fake simulate
+**Bestand**: `src/components/portal/b2c/AddPaymentMethodDialog.tsx` regel 163
+De `handleSubmit` simuleert een API call met `await new Promise(resolve => setTimeout(resolve, 1500))`. De betaalmethode wordt alleen lokaal aangemaakt met `crypto.randomUUID()` en nooit naar de database gestuurd.
 
-**Fix**: Een `network_orders` of `notifications` record aanmaken in de database met de ordergegevens en het doelbedrijf.
+**Fix**: Dit is een B2C portal feature. Aangezien er geen `payment_methods` tabel bestaat, is de beste fix om de fake delay te verwijderen en het lokale-state patroon te behouden (de parent `onAdd` callback regelt de opslag). De delay van 1500ms is onnodig.
 
-### 6. FuelCards — Import en Sync (fake simulate)
-**Bestand**: `src/pages/finance/FuelCards.tsx` regels 100-128
-Zowel `handleFileImport` als `handleSync` simuleren verwerking met delays en tonen toasts, maar doen niets met de data.
-
-**Fix**: `handleFileImport` — het bestand parsen en brandstoftransacties inserten. `handleSync` — de `fuel_card_connections` tabel updaten met `last_sync`.
-
-### 7. NotificationChannels — Template/Channel opslaan (lokale state only)
-**Bestand**: `src/pages/notifications/NotificationChannels.tsx` regels 147-194
-`handleSaveTemplate` en `handleSaveChannel` updaten alleen lokale React state met een fake delay. Bij page refresh zijn alle wijzigingen weg.
-
-**Fix**: De `notification_templates` en `notification_channels` tabellen updaten/inserten via Supabase.
+### Uitgesloten (geen fix nodig)
+- **DownloadDataDialog**: Progress is cosmetisch maar de `onDownload` callback doet écht werk (genereert blob + download)
+- **BulkBookingImport**: Progress is cosmetisch maar `onImport` doet écht werk
+- **AccountingIntegrations**: Gebruikt een fake 2s delay maar doet daarna wél een echte DB update — acceptabel patroon
+- **WhatIfSimulation**: Is per definitie een simulatie-tool — het berekent scenario's client-side, dat is de bedoeling
+- **DataQuality**: De `setTimeout` wraps een echte `refetch()` — alleen de delay is onnodig maar de operatie is echt
+- **useAuth/useCompany/errorRecovery**: Retry delays zijn legitieme backoff-patronen
 
 ---
 
@@ -57,13 +53,11 @@ Zowel `handleFileImport` als `handleSync` simuleren verwerking met delays en ton
 
 | # | Bestand | Probleem | Fix |
 |---|---------|----------|-----|
-| 1 | `src/pages/enterprise/HoldsInbox.tsx` | Escalatie: fake simulate | Hold updaten met hogere severity via DB |
-| 2 | `src/pages/enterprise/AutopilotHealth.tsx` | Retry/Resolve: fake simulate | `integration_failures` status updaten |
-| 3 | `src/pages/enterprise/AuditQueue.tsx` | Resolve: lokale state only | Resolutie persisteren in DB |
-| 4 | `src/pages/enterprise/Disputes.tsx` | onRespond ontbreekt | Callback toevoegen met notificatie insert |
-| 5 | `src/components/network/SendOrderDialog.tsx` | Verzenden: fake simulate | Notificatie/order record aanmaken |
-| 6 | `src/pages/finance/FuelCards.tsx` | Import/Sync: fake simulate | Transacties inserten, connection updaten |
-| 7 | `src/pages/notifications/NotificationChannels.tsx` | Save: lokale state only | Templates/channels naar DB schrijven |
+| 1 | `src/components/enterprise/ExceptionActionDialog.tsx` | 2× fake delay 800ms | Delays verwijderen |
+| 2 | `src/components/enterprise/AlertRuleDialog.tsx` | Fake delay 800ms | Delay verwijderen |
+| 3 | `src/components/enterprise/AuditReviewDialog.tsx` | Fake delay 1000ms | Delay verwijderen |
+| 4 | `src/pages/crm/MomentsEngine.tsx` | Fake scan, geen refetch | Fake delay → echte `refetch()` |
+| 5 | `src/components/portal/b2c/AddPaymentMethodDialog.tsx` | Fake 1500ms delay | Delay verwijderen |
 
-Totaal: 7 bestanden. Mogelijk 1 migratie nodig als `notification_templates`/`notification_channels` tabellen nog niet bestaan.
+Totaal: 5 bestanden, geen database migraties, geen breaking changes. Kleine maar belangrijke cleanup.
 
