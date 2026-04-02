@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Webhook, Plus } from "lucide-react";
+import { Webhook, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/hooks/useCompany";
 
 const WEBHOOK_EVENTS = [
   { name: "Order Status Updates", description: "POST bij status wijzigingen" },
@@ -16,14 +18,38 @@ const WEBHOOK_EVENTS = [
 
 const Webhooks = () => {
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const { companyId } = useCompany();
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!webhookUrl.trim()) {
       toast({ title: "URL vereist", description: "Voer een geldige webhook URL in.", variant: "destructive" });
       return;
     }
-    toast({ title: "Webhook geconfigureerd ✓", description: `Events worden gestuurd naar ${webhookUrl}` });
-    setWebhookUrl("");
+    if (!companyId) {
+      toast({ title: "Fout", description: "Geen bedrijf gevonden.", variant: "destructive" });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.from("notification_channels").insert({
+        tenant_id: companyId,
+        channel_type: "webhook",
+        name: `Webhook ${new Date().toLocaleDateString("nl-NL")}`,
+        config_json: { url: webhookUrl, events: WEBHOOK_EVENTS.map(e => e.name) },
+        is_active: true,
+      });
+
+      if (error) throw error;
+
+      toast({ title: "Webhook opgeslagen ✓", description: `Events worden gestuurd naar ${webhookUrl}` });
+      setWebhookUrl("");
+    } catch (err: any) {
+      toast({ title: "Fout bij opslaan", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -49,8 +75,8 @@ const Webhooks = () => {
             ))}
             <div className="flex gap-2">
               <Input placeholder="https://jouw-domein.nl/webhook" value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} className="flex-1" />
-              <Button onClick={handleCreate}>
-                <Plus className="h-4 w-4 mr-2" /> Toevoegen
+              <Button onClick={handleCreate} disabled={isSaving}>
+                {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />} Toevoegen
               </Button>
             </div>
           </div>
