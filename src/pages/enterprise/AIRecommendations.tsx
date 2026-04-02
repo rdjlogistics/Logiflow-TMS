@@ -109,15 +109,28 @@ const AIRecommendations = () => {
   };
 
   const executeAction = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: `${currentAction?.label} ✓`, 
-        description: "Actie succesvol uitgevoerd." 
-      });
+    // Navigate based on recommendation type instead of fake setTimeout
+    const type = selectedRec?.recommendation_type;
+    const target = currentAction?.target;
+    
+    if (target) {
+      navigate(target);
       setActionDialogOpen(false);
-    }, 1500);
+      return;
+    }
+
+    // Smart navigation based on recommendation type
+    const routeMap: Record<string, string> = {
+      cost_saving: '/planning',
+      margin_leak: '/rate-management',
+      cash_flow: '/finance/receivables',
+      compliance: '/compliance',
+    };
+    
+    const route = routeMap[type] || '/dashboard';
+    navigate(route);
+    toast({ title: `${currentAction?.label} ✓`, description: "Navigeren naar relevante pagina." });
+    setActionDialogOpen(false);
   };
 
   const handleDismiss = (rec: any) => {
