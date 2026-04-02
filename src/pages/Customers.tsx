@@ -1005,8 +1005,8 @@ const Customers = () => {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Single delete confirm */}
         <DeleteConfirmDialog
