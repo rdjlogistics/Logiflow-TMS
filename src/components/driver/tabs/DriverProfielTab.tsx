@@ -176,7 +176,7 @@ export function DriverProfielTab({ onLogout }: DriverProfielTabProps) {
             .select('id, order_number, status, trip_date, pickup_address, pickup_city, delivery_address, delivery_city, route_stops(id, address, city, status, actual_arrival)')
             .eq('driver_id', driver.id)
             .order('trip_date', { ascending: false })
-            .limit(500);
+            .limit(50);
           data.trips = trips;
         }
       });
@@ -196,7 +196,7 @@ export function DriverProfielTab({ onLogout }: DriverProfielTabProps) {
         // driver_locations.driver_id stores auth.uid() (not drivers.id)
         const { data: locs } = await supabase.from('driver_locations')
           .select('latitude, longitude, speed, heading, recorded_at')
-          .eq('driver_id', user!.id).order('recorded_at', { ascending: false }).limit(1000);
+          .eq('driver_id', user!.id).order('recorded_at', { ascending: false }).limit(100);
         data.locationHistory = locs;
       });
     }

@@ -123,13 +123,13 @@ export default function EmailDashboard() {
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString())
         .order("created_at", { ascending: false })
-        .limit(5000);
+        .limit(500);
 
       const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as EmailLogRow[];
     },
-    refetchInterval: autoRefresh ? 10000 : false,
+    refetchInterval: autoRefresh ? 30000 : false,
     refetchIntervalInBackground: false,
   });
 
