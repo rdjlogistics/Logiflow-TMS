@@ -1122,7 +1122,7 @@ Overig,${summary.costs.other}
                             <SelectItem value="/finance/fuel-cards">Brandstof</SelectItem>
                             <SelectItem value="/finance/cashflow">Cashflow</SelectItem>
                             <SelectItem value="/fleet">Vlootbeheer</SelectItem>
-                            <SelectItem value="/trips">Ritten</SelectItem>
+                            <SelectItem value="/orders">Orders</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

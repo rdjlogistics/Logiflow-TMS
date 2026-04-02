@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const quickLinks = [
   { label: "Nieuwe order", href: "/orders/edit", icon: Plus, color: "text-primary" },
   { label: "Facturen", href: "/invoices", icon: FileText, color: "text-success" },
-  { label: "Ritten", href: "/trips", icon: Truck, color: "text-warning" },
+  { label: "Ritten", href: "/orders", icon: Truck, color: "text-warning" },
   { label: "Klanten", href: "/customers", icon: Users, color: "text-info" },
   { label: "Planning", href: "/planning/program", icon: Route, color: "text-gold" },
   { label: "Monitoring", href: "/kpi", icon: Settings, color: "text-destructive" },

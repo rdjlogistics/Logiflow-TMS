@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, FileText, Plus, Route, Settings, LucideIcon } from "lucide-react";
+import { Home, FileText, Plus, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
@@ -17,7 +17,6 @@ const tabs: NavTab[] = [
   { id: "home", icon: Home, label: "Home", path: "/" },
   { id: "orders", icon: FileText, label: "Orders", path: "/orders" },
   { id: "new", icon: Plus, label: "Nieuw", path: "/orders/edit", isCta: true },
-  { id: "ritten", icon: Route, label: "Ritten", path: "/trips" },
   { id: "instellingen", icon: Settings, label: "Instellingen", path: "/admin/settings" },
 ];
 
@@ -27,7 +26,6 @@ function getActiveTab(pathname: string, search: string): string {
   }
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
-  if (pathname.startsWith("/trips")) return "ritten";
   return "home";
 }
 
@@ -51,7 +49,7 @@ export function MobileBottomNav() {
           WebkitBackdropFilter: "blur(48px) saturate(200%)",
         }}
       >
-        <div className="grid grid-cols-5 px-2 py-1.5">
+        <div className="grid grid-cols-4 px-2 py-1.5">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
 
