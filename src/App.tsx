@@ -34,7 +34,7 @@ const Procurement = lazyWithRetry(() => import("./pages/Procurement"));
 const Customers = lazyWithRetry(() => import("./pages/Customers"));
 
 
-const Trips = lazyWithRetry(() => import("./pages/Trips"));
+
 const OrderForm = lazyWithRetry(() => import("./pages/OrderForm"));
 const OrderOverview = lazyWithRetry(() => import("./pages/OrderOverview"));
 const RecurringOrders = lazyWithRetry(() => import("./pages/RecurringOrders"));
