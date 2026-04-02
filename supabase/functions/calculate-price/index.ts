@@ -152,7 +152,6 @@ Deno.serve(async (req) => {
         origin_city,
         destination_city,
         distance_km: dist,
-        vehicle_type: vehicle_type || null,
         base_price: baseCharge,
         lane_adjustment: 0,
         surge_adjustment: surgeCharge,
@@ -160,7 +159,6 @@ Deno.serve(async (req) => {
         calculated_price: finalPrice,
         rules_applied_json: adjustments,
         surge_factors_json: factors.map((f: any) => ({ name: f.name, multiplier: f.multiplier })),
-        surge_multiplier: surgeMultiplier,
       });
     } catch (e) {
       console.warn("[calculate-price] Could not save calculation:", e);
