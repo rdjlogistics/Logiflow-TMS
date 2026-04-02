@@ -1,5 +1,4 @@
 import { toast } from "sonner";
-import { toast } from "sonner";
 import B2CLayout from "@/components/portal/b2c/B2CLayout";
 import B2CShipmentsList from "@/components/portal/b2c/B2CShipmentsList";
 import { usePortalData } from "@/components/portal/shared/usePortalData";
