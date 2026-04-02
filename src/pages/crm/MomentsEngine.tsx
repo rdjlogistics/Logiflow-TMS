@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useRelationshipVault, MomentType, MomentStatus } from "@/hooks/useRelationshipVault";
 import { SendGiftDialog } from "@/components/crm/SendGiftDialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
