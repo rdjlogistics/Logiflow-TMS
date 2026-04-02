@@ -28,7 +28,12 @@ Deno.serve(async (req) => {
 
     // Get user's company
     const { data: profile } = await supabaseAdmin.from("profiles").select("company_id").eq("id", user.id).single();
-    const tenantId = profile?.company_id;
+    let tenantId = profile?.company_id;
+    if (!tenantId) {
+      // Fallback: check user_companies table
+      const { data: uc } = await supabaseAdmin.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();
+      tenantId = uc?.company_id;
+    }
     if (!tenantId) {
       return new Response(JSON.stringify({ error: "Geen bedrijf gekoppeld" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
