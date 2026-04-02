@@ -113,6 +113,10 @@ const FleetManagement = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="valuation" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
+              <TrendingDown className="h-4 w-4" />
+              Waarde
+            </TabsTrigger>
           </TabsList>
 
           <AnimatePresence mode="wait">
