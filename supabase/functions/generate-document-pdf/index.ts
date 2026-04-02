@@ -46,7 +46,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { documentType, entityId, templateId } = await req.json();
+    const reqBody = await req.json();
+    const documentType = reqBody.documentType;
+    const entityId = reqBody.entityId || reqBody.orderId;
+    const templateId = reqBody.templateId;
     if (!documentType || !entityId) {
       return new Response(JSON.stringify({ error: "documentType en entityId zijn verplicht" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },

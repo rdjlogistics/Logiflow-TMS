@@ -20,7 +20,12 @@ Deno.serve(async (req) => {
 
     const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { customer_id, trip_id, notification_type, message, subject: customSubject } = await req.json();
+    const reqBody = await req.json();
+    const customer_id = reqBody.customer_id;
+    const trip_id = reqBody.trip_id || reqBody.data?.trip_id;
+    const notification_type = reqBody.notification_type;
+    const message = reqBody.message || reqBody.body;
+    const customSubject = reqBody.subject || reqBody.title;
     if (!customer_id && !trip_id) {
       return new Response(JSON.stringify({ error: "customer_id of trip_id is verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
