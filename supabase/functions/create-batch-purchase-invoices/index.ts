@@ -142,7 +142,10 @@ Deno.serve(async (req) => {
     const carrierCountry = carrier?.country || "NL";
     const carrierVat = carrier?.vat_number || null;
     const btwResult = berekenBTW(carrierCountry, carrierVat);
-    const vatPercentage = btwResult.tarief;
+    // For purchase invoices: "verlegd" means the NL buyer must self-assess 21% VAT
+    const vatPercentage = btwResult.type === 'verlegd' ? 21 : btwResult.tarief;
+    const vatType = btwResult.type;
+    const vatNote = btwResult.factuurVermelding || null;
 
     // Calculate totals
     const subtotal = trips.reduce((sum, t) => sum + Number(t.purchase_total || 0), 0);
