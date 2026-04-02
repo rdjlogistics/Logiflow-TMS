@@ -1,25 +1,36 @@
 
 
-# Audit Resultaat — Ronde 8: Geen kritieke problemen gevonden
+# Fix: Inkoopfactuur BTW wordt niet berekend
 
-## Wat is gecontroleerd
+## Probleem
 
-1. **Edge Functions auth** — Alle 67 edge functions gescand op `getClaims`: **0 gevonden**. De fix uit ronde 7 (44 functies) is volledig doorgevoerd.
-2. **Parameter mismatches** — Alle `functions.invoke()` calls in 52 frontend bestanden vergeleken met de edge function signatures: **geen mismatches**.
-3. **Fake delays / simulate patronen** — 4 bestanden bevatten `// Simulate` comments, maar zijn allemaal **functioneel**:
-   - `WhatIfSimulation.tsx` — Lokale wiskundige berekening met progress animatie (geen edge function nodig)
-   - `DataQuality.tsx` — 2s delay maar doet echte `refetch()` van duplicaat data
-   - `AccountingIntegrations.tsx` — Update echte DB-records, simuleert sync-completion
-   - `SalesPipeline.tsx` — Redirect naar /customers pagina (werkt)
-4. **Lege onClick handlers** — Geen `() => {}` handlers gevonden
-5. **Toast-only handlers** — Alle toasts zijn gekoppeld aan echte acties (DB mutations, navigatie, of file downloads)
-6. **Ontbrekende edge functions** — Alle aangeroepen functies bestaan in `supabase/functions/`
+Er zijn **2 bugs** die samen het probleem veroorzaken:
 
-## Conclusie
+### 1. PDF toont "BTW 21%" maar bedrag is €0,00
+In `generate-purchase-invoice-pdf/index.ts` regel 222:
+```javascript
+BTW ${invoice.vat_percentage || 21}%
+```
+Omdat `vat_percentage` de waarde `0` heeft (falsy in JavaScript), valt `0 || 21` terug naar `21`. Dus het label zegt "BTW 21%" terwijl het bedrag €0,00 is — verwarrend en incorrect.
 
-Na 8 rondes auditing en het fixen van 44+ edge functions, parameter mismatches, fake delays, en toast-only handlers is de applicatie **volledig functioneel**. Er zijn geen niet-werkende knoppen meer gevonden.
+### 2. BTW-berekening markeert EU-carriers met BTW-nummer als "verlegd" (0%)
+In `create-batch-purchase-invoices/index.ts` regel 44-52, de `berekenBTW()` functie:
+- Carrier "Euro Transport GmbH" is uit Duitsland (EU) met geldig BTW-nummer → tarief wordt 0% (verlegd)
+- Dit is fiscaal correct voor **verkoopfacturen** (je levert diensten aan een EU-bedrijf)
+- Maar voor **inkoopfacturen** (je ontvangt diensten) moet de BTW wél op de factuur staan — de ontvanger (NL bedrijf) moet 21% BTW afdragen via verlegde BTW
 
-De enige overgebleven "simulate" patronen zijn bewuste UX-keuzes (progress bars, lokale berekeningen) die geen edge function calls nodig hebben.
+**De huidige logica is verkeerd voor inkoopfacturen**: bij verlegde BTW moet het bedrag wél berekend en getoond worden op de factuur, zodat de boekhouding klopt.
 
-**Geen wijzigingen nodig.**
+## Fix
+
+### Bestand 1: `supabase/functions/create-batch-purchase-invoices/index.ts`
+- Bij `berekenBTW` resultaat `type === 'verlegd'`: BTW tarief op 21% houden (niet 0%), maar de `factuurVermelding` over verlegde BTW behouden
+- De factuur toont dan correct: Subtotaal + BTW 21% = Totaal
+- Voeg `vat_type` en `vat_note` velden toe aan de invoice record
+
+### Bestand 2: `supabase/functions/generate-purchase-invoice-pdf/index.ts`
+- Fix `|| 21` → `?? 21` zodat 0% correct wordt getoond als dat de intentie is
+- Toon de BTW-vermelding (verlegd/vrijgesteld) wanneer aanwezig in `invoice.vat_note` of `invoice.footnote`
+
+Totaal: 2 edge functions. Geen database migratie nodig (vat_type en vat_note kolommen bestaan al op purchase_invoices).
 
