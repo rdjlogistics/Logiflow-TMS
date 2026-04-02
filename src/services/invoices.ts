@@ -12,7 +12,15 @@ export interface InvoiceFilters {
   limit?: number;
 }
 
-const INVOICE_SELECT = `
+// Light select for list views — no nested invoice_lines
+const INVOICE_LIST_SELECT = `
+  id, invoice_number, invoice_date, due_date, status, total_amount, amount_paid, paid_at,
+  company_id, customer_id, currency, notes, created_at, updated_at,
+  customers(company_name, email, payment_terms_days)
+`;
+
+// Full select for detail views — includes lines and trip refs
+const INVOICE_DETAIL_SELECT = `
   *,
   customers(company_name, email, payment_terms_days),
   invoice_lines(*, trips(order_number))
