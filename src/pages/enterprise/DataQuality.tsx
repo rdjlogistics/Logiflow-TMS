@@ -34,13 +34,15 @@ const DataQuality = () => {
     setIsScanning(true);
     toast({ title: "Duplicaat scan gestart", description: "Het systeem scant alle entiteiten..." });
     
-    // Simulate scanning with delay, then refetch
-    setTimeout(async () => {
+    try {
       await refetch();
       await queryClient.invalidateQueries({ queryKey: ['duplicateCandidates'] });
-      setIsScanning(false);
       toast({ title: "Scan voltooid ✓", description: `${duplicates?.length || 0} potentiële duplicaten gevonden.` });
-    }, 2000);
+    } catch {
+      toast({ title: "Scan mislukt", description: "Kon duplicaten niet ophalen.", variant: "destructive" });
+    } finally {
+      setIsScanning(false);
+    }
   };
 
 

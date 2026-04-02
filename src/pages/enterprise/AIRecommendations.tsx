@@ -164,17 +164,15 @@ const AIRecommendations = () => {
   };
 
   const createAutomation = () => {
-    setIsExecuting(true);
-    setTimeout(() => {
-      setIsExecuting(false);
-      toast({ 
-        title: "Automation aangemaakt ✓", 
-        description: `Alert "${automationName}" is geconfigureerd.` 
-      });
-      setAutomationDialogOpen(false);
-      setAutomationName("");
-      setAutomationTrigger("");
-    }, 1500);
+    // Navigate to workflows page for actual automation setup
+    toast({ 
+      title: "Alert configuratie gestart", 
+      description: `Ga naar Workflows om "${automationName}" in te stellen.` 
+    });
+    setAutomationDialogOpen(false);
+    setAutomationName("");
+    setAutomationTrigger("");
+    navigate('/admin/workflows');
   };
 
   return (

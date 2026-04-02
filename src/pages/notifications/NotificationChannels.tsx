@@ -204,11 +204,20 @@ export default function NotificationChannels() {
     }
   };
 
-  const toggleChannel = (id: string) => {
-    setChannels(channels.map(c => 
-      c.id === id ? { ...c, isActive: !c.isActive } : c
-    ));
-    toast.success('Kanaal status bijgewerkt');
+  const toggleChannel = async (id: string) => {
+    const channel = channels.find(c => c.id === id);
+    if (!channel) return;
+    const newActive = !channel.isActive;
+    setChannels(channels.map(c => c.id === id ? { ...c, isActive: newActive } : c));
+    
+    // Persist to DB
+    try {
+      await supabase.from('notification_channels').update({ is_active: newActive }).eq('id', id);
+      toast.success('Kanaal status bijgewerkt');
+    } catch {
+      setChannels(channels.map(c => c.id === id ? { ...c, isActive: !newActive } : c));
+      toast.error('Kon status niet bijwerken');
+    }
   };
 
   const toggleTemplate = (id: string) => {
