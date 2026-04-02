@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfMonth, subMonths, format, startOfWeek, endOfWeek, eachWeekOfInterval, subWeeks, startOfDay, endOfDay } from "date-fns";
+import { startOfMonth, subMonths, format, eachWeekOfInterval, subWeeks, endOfWeek } from "date-fns";
 import { getNlLocale } from "@/lib/locale";
 import { useCompany } from "@/hooks/useCompany";
 
@@ -39,35 +39,32 @@ const EMPTY_DATA: DashboardData = {
   unreadEmailCount: 0,
 };
 
-// --- Data fetcher (tenant-scoped) ---
+// --- Data fetcher (tenant-scoped, uses server-side RPCs) ---
 
 async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   const now = new Date();
   const sixMonthsAgo = subMonths(startOfMonth(now), 5);
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
   const monthStart = startOfMonth(now);
 
   const nlLocalePromise = getNlLocale();
 
+  // 3 RPCs + 2 light queries instead of 6 heavy queries
   const [
     countsResult,
     invoiceStatsResult,
-    { data: tripsData },
-    { data: allTrips },
+    opsResult,
     { data: submissions },
     unreadEmailResult,
   ] = await Promise.all([
     supabase.rpc('get_dashboard_counts', { p_month_start: monthStart.toISOString() }),
-    // Invoice stats via server-side RPC — replaces client-side aggregation
     supabase.rpc('get_invoice_stats', { p_company_id: companyId }),
-    // Trips for revenue chart (6 months) — tenant-scoped
-    supabase.from("trips").select("trip_date, sales_total, purchase_total, created_at, status, driver_id, vehicle_id, pickup_city, delivery_city, pod_available, id, order_number").is("deleted_at", null).eq("company_id", companyId).gte("created_at", sixMonthsAgo.toISOString()),
-    // Recent trips for status/weekly/ops (6 weeks) — tenant-scoped
-    supabase.from("trips").select("id, order_number, status, trip_date, driver_id, vehicle_id, pickup_city, delivery_city, pod_available").is("deleted_at", null).eq("company_id", companyId).gte("trip_date", subWeeks(now, 6).toISOString()),
-    // Pending submissions
+    // New consolidated RPC — replaces 2 unbounded trips queries + client-side aggregation
+    supabase.rpc('get_dashboard_ops', {
+      p_company_id: companyId,
+      p_month_start: monthStart.toISOString(),
+      p_six_months_ago: sixMonthsAgo.toISOString(),
+    }),
     supabase.from("customer_submissions").select("id, pickup_company, delivery_company, status, created_at").eq("status", "pending").order("created_at", { ascending: false }).limit(10),
-    // Unread emails
     (supabase as any).from("inbound_emails").select("id", { count: "exact", head: true }).eq("read", false).then((r: any) => r).catch(() => ({ count: 0 })),
   ]);
 
@@ -78,45 +75,43 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   const pendingSubmissionsCount = counts.pending_submissions || 0;
   const purchaseInvoiceCount = counts.purchase_invoices || 0;
 
-  // Client-side: filter today's trips and POD-missing from allTrips
-  const todayTrips = allTrips?.filter(t => {
-    const d = new Date(t.trip_date);
-    return d >= todayStart && d <= todayEnd;
-  }) || [];
-  const podTrips = allTrips?.filter(t => ['afgerond', 'gecontroleerd'].includes(t.status) && t.pod_available === false) || [];
-
-  // Invoice calculations — now from server-side RPC
+  // Invoice stats from RPC
   const invStats = (invoiceStatsResult.data as any) || {};
   const openInvoices = invStats.open_invoices || 0;
   const totalRevenue = invStats.total_paid || 0;
   const pendingPayments = invStats.pending_payments || 0;
 
-  // Ops stats
-  const terminalStatuses = ['geannuleerd', 'afgerond', 'afgeleverd', 'gecontroleerd', 'gefactureerd'];
-  const chauffeurNodig = todayTrips.filter(t => !t.driver_id && !terminalStatuses.includes(t.status)).length;
-  const onderweg = todayTrips.filter(t => t.status === 'onderweg').length;
-  const afgeleverd = todayTrips.filter(t => ['afgeleverd', 'afgerond', 'gecontroleerd', 'gefactureerd'].includes(t.status)).length;
-  const podMissing = podTrips.length;
-  const atRisk = todayTrips.filter(t => !t.driver_id && !t.vehicle_id && !terminalStatuses.includes(t.status)).length;
+  // Ops data from consolidated RPC
+  const ops = (opsResult.data as any) || {};
+  const opsData = ops.ops || {};
+  const chauffeurNodig = opsData.chauffeur_nodig || 0;
+  const onderweg = opsData.onderweg || 0;
+  const afgeleverd = opsData.afgeleverd || 0;
+  const atRisk = opsData.at_risk || 0;
+  const podMissing = ops.pod_missing_count || 0;
+  const readyToInvoice = ops.ready_to_invoice || 0;
+  const completedCount = ops.completed_count || 0;
 
-  // Action queue
+  // Action queue from RPC data
   const actions: ActionItem[] = [];
-  todayTrips.filter(t => !t.driver_id && !terminalStatuses.includes(t.status)).forEach(trip => {
+  const unassigned = ops.unassigned_today || [];
+  for (const trip of unassigned) {
     actions.push({
       id: trip.id, orderId: trip.id,
       orderRef: trip.order_number ? `#${trip.order_number}` : `Rit ${trip.id.slice(0, 6)}`,
       issueLabel: "Chauffeur koppelen", issueType: "driver", severity: "critical",
       href: `/driver/assign`, pickupCity: trip.pickup_city || undefined, deliveryCity: trip.delivery_city || undefined,
     });
-  });
-  podTrips.slice(0, 5).forEach(trip => {
+  }
+  const podItems = ops.pod_missing_items || [];
+  for (const trip of podItems.slice(0, 5)) {
     actions.push({
       id: trip.id, orderId: trip.id,
       orderRef: trip.order_number ? `#${trip.order_number}` : `Rit ${trip.id.slice(0, 6)}`,
       issueLabel: "POD ontbreekt", issueType: "pod", severity: "warning",
       href: `/operations/pod`,
     });
-  });
+  }
   submissions?.forEach(sub => {
     actions.push({
       id: sub.id, orderRef: `Aanvraag ${sub.pickup_company || 'Onbekend'}`,
@@ -128,40 +123,45 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
 
   const nl = await nlLocalePromise;
 
-  // Revenue by month
+  // Revenue by month — map RPC month_key (YYYY-MM) to display format
   const monthlyRevenue: Record<string, { revenue: number; costs: number }> = {};
   for (let i = 5; i >= 0; i--) {
     monthlyRevenue[format(subMonths(now, i), "MMM", { locale: nl })] = { revenue: 0, costs: 0 };
   }
-  tripsData?.forEach(trip => {
-    const monthKey = format(new Date(trip.created_at), "MMM", { locale: nl });
+  const revenueRows = ops.revenue || [];
+  for (const row of revenueRows) {
+    const d = new Date(row.month_key + '-01');
+    const monthKey = format(d, "MMM", { locale: nl });
     if (monthlyRevenue[monthKey]) {
-      monthlyRevenue[monthKey].revenue += Number(trip.sales_total) || 0;
-      monthlyRevenue[monthKey].costs += Number(trip.purchase_total) || 0;
+      monthlyRevenue[monthKey].revenue += Number(row.revenue) || 0;
+      monthlyRevenue[monthKey].costs += Number(row.costs) || 0;
     }
-  });
+  }
   const revenueData = Object.entries(monthlyRevenue).map(([month, data]) => ({ month, revenue: data.revenue, costs: data.costs }));
 
-  // Trip status distribution
-  const statusCounts: Record<string, number> = { gepland: 0, onderweg: 0, afgerond: 0, geannuleerd: 0 };
+  // Trip status distribution from RPC
   const statusLabels: Record<string, string> = { gepland: "Gepland", onderweg: "Onderweg", afgerond: "Afgerond", geannuleerd: "Geannuleerd" };
-  allTrips?.forEach(trip => { if (statusCounts[trip.status] !== undefined) statusCounts[trip.status]++; });
-  const tripStatusData = Object.entries(statusCounts).map(([status, count]) => ({ status, count, label: statusLabels[status] || status }));
+  const rpcStatusCounts = ops.status_counts || {};
+  const tripStatusData = ['gepland', 'onderweg', 'afgerond', 'geannuleerd'].map(status => ({
+    status,
+    count: rpcStatusCounts[status] || 0,
+    label: statusLabels[status] || status,
+  }));
 
-  // Weekly trips
+  // Weekly trips from RPC
+  const rpcWeekly = ops.weekly || [];
   const weeks = eachWeekOfInterval({ start: subWeeks(now, 5), end: now });
   const weeklyTripsData = weeks.map(weekStart => {
     const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-    const weekTrips = allTrips?.filter(trip => { const d = new Date(trip.trip_date); return d >= weekStart && d <= weekEnd; }).length || 0;
+    const weekTrips = rpcWeekly.filter((w: any) => {
+      const d = new Date(w.week_start);
+      return d >= weekStart && d <= weekEnd;
+    }).reduce((sum: number, w: any) => sum + (w.trips || 0), 0);
     return { week: format(weekStart, "d/M"), trips: weekTrips };
   });
 
   // OTIF
-  const completedTrips = allTrips?.filter(t => ['afgerond', 'afgeleverd', 'gecontroleerd', 'gefactureerd'].includes(t.status)) || [];
-  const otifPercentage = completedTrips.length > 0 ? 100 : 0;
-
-  // Finance stats
-  const readyToInvoice = allTrips?.filter(t => ['afgerond', 'gecontroleerd'].includes(t.status)).length || 0;
+  const otifPercentage = completedCount > 0 ? 100 : 0;
 
   return {
     stats: {
@@ -201,8 +201,8 @@ export const useDashboardData = () => {
     staleTime: 30 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
-    refetchInterval: 60 * 1000,
-    refetchIntervalInBackground: false,   // Fix 5: stop polling in background tabs
+    refetchInterval: 2 * 60 * 1000, // 120s instead of 60s — reduces DB pressure by 50%
+    refetchIntervalInBackground: false,
     retry: 2,
     placeholderData: EMPTY_DATA,
   });
