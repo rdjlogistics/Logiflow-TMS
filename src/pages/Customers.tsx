@@ -815,11 +815,11 @@ const Customers = () => {
           </motion.div>
         )}
 
-        <Card>
-          <CardHeader className="pb-2 md:pb-4">
-            <CardTitle className="text-lg md:text-xl">Klanten ({filteredCustomers.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 md:p-6">
+        <div className="rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 overflow-hidden shadow-lg">
+          <div className="px-5 py-4 border-b border-border/20">
+            <h2 className="text-xl font-bold tracking-tight">Klanten ({filteredCustomers.length})</h2>
+          </div>
+          <div className="md:p-6">
             {loading ? (
               <LoadingState message="Klanten laden..." />
             ) : filteredCustomers.length === 0 ? (
