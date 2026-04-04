@@ -337,20 +337,18 @@ function MetricCard({ title, value, icon: Icon, trend, description }: MetricCard
   };
 
   return (
-    <motion.div whileHover={{ scale: 1.02 }}>
-      <Card className="bg-card/50 backdrop-blur border-border/50 hover:border-primary/30 transition-all">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">{title}</span>
-            <div className={cn("p-2 rounded-lg", trendColors[trend])}>
-              <Icon className="h-4 w-4" />
-            </div>
+    <Card className="bg-card/50 backdrop-blur border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-muted-foreground">{title}</span>
+          <div className={cn("p-2 rounded-lg", trendColors[trend])}>
+            <Icon className="h-4 w-4" />
           </div>
-          <span className="text-2xl font-bold">{value}</span>
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+        <span className="text-2xl font-bold">{value}</span>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+      </CardContent>
+    </Card>
   );
 }
 

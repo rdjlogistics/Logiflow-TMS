@@ -92,6 +92,6 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
           {format(new Date(message.createdAt), 'HH:mm', { locale: nl })}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 };

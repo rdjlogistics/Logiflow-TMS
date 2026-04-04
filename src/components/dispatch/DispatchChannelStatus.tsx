@@ -208,7 +208,7 @@ export function DispatchChannelStatus() {
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
