@@ -130,6 +130,5 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
             </Button>
           </div>
         </div>
-        </div>
   );
 }

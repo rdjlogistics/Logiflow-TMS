@@ -140,6 +140,5 @@ export function DriverBulkActions({
             </Tooltip>
           </div>
         </div>
-        </div>
   );
 }

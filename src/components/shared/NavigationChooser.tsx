@@ -108,6 +108,5 @@ export function NavigationChooser({ isOpen, onClose, destination, label, lat, ln
             </div>
           </div>
         </>
-        </>
   );
 }

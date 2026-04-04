@@ -150,6 +150,5 @@ export function FleetBulkActions({
             </Tooltip>
           </div>
         </div>
-        </div>
   );
 }
