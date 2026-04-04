@@ -125,7 +125,7 @@ export function useWeatherData(location: string = 'Nederland') {
           condition,
           icon,
           humidity: Math.round(current.relative_humidity_2m),
-          windSpeed: Math.round(current.wind_speed_10),
+          windSpeed: Math.round(current.wind_speed_10m),
           trafficExpected: traffic.level,
           trafficDescription: traffic.description,
           location: locationName,
