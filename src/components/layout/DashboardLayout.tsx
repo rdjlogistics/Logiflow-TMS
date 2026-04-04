@@ -37,7 +37,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
   const { canAccessChatGPT, loading: roleLoading } = useUserRole();
   const { openCommandBar } = useCopilotContext();
   const navigate = useNavigate();
-  const { needsOnboarding, loading: onboardingLoading } = useOnboardingRequired();
+  const { needsOnboarding, loading: onboardingLoading, error: onboardingError } = useOnboardingRequired();
   
   // Enable realtime notifications for new customer submissions
   useSubmissionNotifications();
@@ -86,7 +86,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
   }
 
   // Redirect to onboarding if not completed
-  if (!onboardingLoading && needsOnboarding) {
+  if (!onboardingLoading && !onboardingError && needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
   }
 
