@@ -1,131 +1,69 @@
 
 
-# Performance & Schaalbaarheidsplan — Productie-klaar voor 1000+ gebruikers
+# Uitvoeringsplan — 3 Batches, Stap voor Stap
 
-## Diagnose
+## Batch 1: useUserRole → React Query (auth crash fix)
 
-Na grondige audit van de codebase zijn er **7 kritieke performance bottlenecks** die de app langzaam maken onder belasting:
+**1 bestand, 16 importeurs, zero breaking changes**
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│  CLIENT (browser)                                       │
-│  ├─ Dashboard: 6 parallelle DB queries per pageload     │
-│  ├─ 2 trips-queries ZONDER LIMIT → onbegrensd rows     │
-│  ├─ useAllDriverLocations: polling + realtime + N+1     │
-│  └─ 8+ componenten met eigen pollingInterval (15-60s)   │
-│                                                         │
-│  DATABASE (Supabase)                                    │
-│  ├─ GEEN compound indexes op trips, invoices, etc.      │
-│  ├─ RLS subqueries op elke rij (get_user_company)       │
-│  └─ Unbounded selects zonder paginering                 │
-└─────────────────────────────────────────────────────────┘
-```
+**`src/hooks/useUserRole.ts`** — volledige herschrijving:
+- Vervang alle `useState`/`useEffect`/`useRef`/`roleCache` logica door `useQuery` met `queryKey: ['user-role', userId]`
+- React Query dedupliceert automatisch: 16 componenten = 1 DB query i.p.v. 16
+- Config: `staleTime: 5min`, `gcTime: 10min`, `retry: 3`, `retryDelay: 1500ms`
+- `clearAllRoleCache()` → roept `queryClient.removeQueries({ queryKey: ['user-role'] })` aan
+- `refetch` → `queryClient.invalidateQueries({ queryKey: ['user-role', userId] })`
+- Alle exports blijven 100% identiek: `role`, `loading`, `error`, `isAdmin`, `isMedewerker`, `isChauffeur`, `isKlant`, `canAccessChatGPT`, `canAccessPlanning`, `canAccessFinance`, `refetch`, `clearCache`
 
-## Fixes (7 stappen, in volgorde van impact)
+**Test**: Login → dashboard laadt → geen "Lock was released" console errors → role-based menu items tonen correct
 
-### 1. Database Indexes — Grootste impact, nul frontend-wijzigingen
+---
 
-**Migratie**: Compound indexes op de 5 zwaarst bevraagde tabellen.
+## Batch 2: Mapbox token + loader resilient maken
 
-```sql
--- trips: dashboard, orders, planning queries
-CREATE INDEX IF NOT EXISTS idx_trips_company_status ON trips(company_id, status) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_trips_company_date ON trips(company_id, trip_date DESC) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_trips_company_created ON trips(company_id, created_at DESC) WHERE deleted_at IS NULL;
+**2 bestanden**
 
--- invoices: finance, receivables, dashboard
-CREATE INDEX IF NOT EXISTS idx_invoices_company_status ON invoices(company_id, status);
-CREATE INDEX IF NOT EXISTS idx_invoices_company_due ON invoices(company_id, due_date) WHERE status != 'betaald';
+**`src/hooks/useMapboxToken.ts`**:
+- Bij succesvolle fetch: `localStorage.setItem('mapbox_token_cache', token)`
+- Bij fout na alle retries: probeer `localStorage.getItem('mapbox_token_cache')` als fallback
+- Als fallback bestaat: gebruik dat token, toon geen error → kaarten werken altijd
 
--- route_stops: planning, delivery tracking
-CREATE INDEX IF NOT EXISTS idx_route_stops_trip ON route_stops(trip_id, stop_order);
+**`src/utils/mapbox-loader.ts`**:
+- Bij fout in `import('mapbox-gl')`: reset `_loading = null` zodat volgende aanroep opnieuw kan proberen
+- Voeg `catch` toe aan de promise chain die `_loading` reset
 
--- driver_locations: GPS tracking, fleet map
-CREATE INDEX IF NOT EXISTS idx_driver_locations_recent ON driver_locations(driver_id, recorded_at DESC);
+**Test**: Kaarten laden op dashboard (FleetMapWidget) en op GPS Tracking pagina
 
--- customers: klantenpagina
-CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id);
+---
 
--- orders/submissions
-CREATE INDEX IF NOT EXISTS idx_submissions_status ON customer_submissions(status, created_at DESC);
-```
+## Batch 3: 6 componenten consolideren naar `loadMapboxGL()`
 
-### 2. Dashboard Server-Side RPC — Elimineer 2 onbegrensde queries
+**6 bestanden** — per bestand alleen de import-regel wijzigen:
 
-**Nieuwe RPC functie**: `get_dashboard_ops` die alle trips-aggregatie server-side doet.
+| Component | Aantal `import("mapbox-gl")` calls | Actie |
+|-----------|-------------------------------------|-------|
+| `FleetMapWidget.tsx` | 2 | → `loadMapboxGL()` |
+| `TrackingMap.tsx` | 5 | → `loadMapboxGL()` |
+| `DriverTrackDialog.tsx` | 3 | → `loadMapboxGL()` |
+| `OrderRoutePreview.tsx` | 1 | → `loadMapboxGL()` |
+| `OrderRouteDialog.tsx` | 2 | → `loadMapboxGL()` |
+| `BaseMap.tsx` | 1 | → `loadMapboxGL()` |
 
-Momenteel haalt de dashboard **alle trips van 6 maanden** + **alle trips van 6 weken** op zonder limit. Bij 500 ritten/maand = 3000+ rijen per pageload.
+Per component:
+- Voeg `import { loadMapboxGL } from '@/utils/mapbox-loader'` toe
+- Vervang elke `(await import("mapbox-gl")).default` door `await loadMapboxGL()`
+- Verwijder de losse CSS imports (`import("mapbox-gl/dist/mapbox-gl.css")`, `import("@/styles/map-styles.css")`) — zitten al in `loadMapboxGL()`
 
-**Bestand**: Nieuwe migratie
-- Maak `get_dashboard_ops(p_company_id, p_month_start, p_six_months_ago)` RPC
-- Retourneert: revenue per maand, trip status counts, weekly trips, ops stats — alles in 1 query
-- Dashboard hook roept 3 RPCs aan i.p.v. 6 losse queries
+**Test**: Navigeer naar elke pagina met een kaart (Dashboard, GPS Tracking, Order detail, Driver tracking) — kaarten laden correct
 
-**Bestand**: `src/hooks/useDashboardData.ts`
-- Vervang de 2 unbounded `trips` selects door de nieuwe RPC
-- Verwijder client-side aggregatie (maandelijkse revenue, status counts, weekly trips)
+---
 
-### 3. Trips Queries Limiteren — Alle pagina's
+## Samenvatting
 
-**Bestand**: `src/hooks/useDashboardData.ts`
-- Voeg `.limit(500)` toe aan beide trips queries als tussenoplossing (vóór RPC migratie)
-- `tripsData` (revenue chart): `.limit(500)` 
-- `allTrips` (ops/status): `.limit(300)`
+| Batch | Bestanden | Risico | Impact |
+|-------|-----------|--------|--------|
+| 1 | 1 | Laag (API identiek) | Auth crashes opgelost |
+| 2 | 2 | Laag (fallback toevoegen) | Kaarten werken altijd |
+| 3 | 6 | Laag (alleen import-regels) | Consistente error recovery |
 
-### 4. Driver Locations N+1 Fix
-
-**Bestand**: `src/hooks/useAllDriverLocations.ts`
-- Probleem: fetcht locaties → dan apart `profiles` → dan apart `drivers` = 3 queries
-- Fix: Maak 1 RPC `get_driver_locations_with_names(p_max_age_minutes)` die een JOIN doet
-- Verwijder de apart profiles/drivers lookups
-- Verwijder dubbele polling (nu polling + realtime tegelijk — kies 1)
-
-### 5. Polling Consolidatie — Verminder DB druk
-
-Momenteel draaien er **8+ onafhankelijke polling-intervals** die elk elke 15-60 seconden de DB raken. Bij 100 gebruikers = 800+ queries/minuut alleen van polling.
-
-**Wijzigingen**:
-- `useDashboardData`: verhoog `refetchInterval` van 60s → 120s
-- `useAllDriverLocations`: verwijder polling, gebruik alleen realtime channel
-- `DispatchDashboard`, `DispatchChannelStatus`: verhoog van 30s/60s → 120s
-- `useClientErrorLogs`: verhoog van 30s → 300s (admin-only, niet kritiek)
-- `TelematicsIntegration`: verhoog van 30s → 120s
-
-### 6. RLS Performance — Cached company lookup
-
-**Migratie**: Verifieer/optimaliseer `get_user_company_cached` functie.
-- Zorg dat deze `STABLE` + `SECURITY DEFINER` is met `SET search_path`
-- Voeg `RETURNS uuid` type hint toe voor planner-optimalisatie
-- Overweeg een `pg_stat_statements` check bij grotere datasets
-
-### 7. Bundle & Runtime Optimalisatie
-
-**Bestand**: `src/App.tsx`
-- Service worker cacht Supabase API responses 30 seconden → verhoog naar 10s of verwijder (stale data risico)
-
-**Bestand**: `vite.config.ts`
-- Supabase API `runtimeCaching` regel: verlaag `maxAgeSeconds` van 30 → 5 (of verwijder)
-- Dit voorkomt dat gebruikers stale data zien na mutations
-
-## Niet geraakt
-- Lazy loading structuur — al goed opgezet met `lazyWithRetry`
-- QueryClient config — `staleTime: 5min`, `gcTime: 10min` zijn goed voor high-traffic
-- `refetchOnWindowFocus: false` — correct voor multi-user scenario
-- ManualChunks — al geoptimaliseerd
-- ErrorBoundary, OfflineBanner — geen performance impact
-
-## Verwacht Resultaat
-- Dashboard laadtijd: **3-6s → <1s** (3 RPCs i.p.v. 6 unbounded queries)
-- DB load: **-60%** door indexes + polling consolidatie
-- GPS Tracking: **-66%** queries door realtime-only
-- Schaalbaar tot **1000+ concurrent users** zonder instance upgrade
-
-## Volgorde
-1. Database indexes (migratie) — instant impact, nul risico
-2. Dashboard trips `.limit()` — quick fix
-3. Dashboard RPC consolidatie — grootste impact
-4. Driver locations RPC + polling fix
-5. Polling intervals verhogen
-6. RLS check
-7. Service worker cache tuning
+**Totaal: 9 bestanden, 0 nieuwe dependencies, 0 database wijzigingen**
 
