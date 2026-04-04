@@ -289,7 +289,7 @@ export const CapacityIndicator = ({
 }: CapacityIndicatorProps) => {
   const activeVehicle = selectedVehicle || recommendedVehicle;
   const [tailLiftOnly, setTailLiftOnly] = useState(false);
-  const [showVisualizationModal, setShowVisualizationModal] = useState(false);
+  
 
   const filteredByCategory = useMemo(() => {
     return VEHICLE_CATEGORIES.map(cat => ({
