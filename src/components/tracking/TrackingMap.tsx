@@ -169,7 +169,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !pickupLocation) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const el = document.createElement("div");
       el.className = "pickup-marker";
