@@ -70,10 +70,29 @@ export default defineConfig(({ mode }) => ({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // Only precache the shell: index.html, main CSS, core vendor chunks
+        globPatterns: [
+          "index.html",
+          "assets/index-*.css",
+          "assets/vendor-react-*.js",
+          "assets/vendor-query-*.js",
+          "assets/vendor-ui-*.js",
+        ],
         navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
+          // Lazy-loaded JS chunks — cache on first use
+          {
+            urlPattern: /\/assets\/.*\.js$/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "lazy-chunks",
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/api\.mapbox\.com\/.*/i,
             handler: "CacheFirst",
