@@ -208,9 +208,9 @@ const B2BDeliveries = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <motion.div className="space-y-6", show: { opacity: 1, transition: { staggerChildren: 0.08 } } }}>
+      <motion.div className="space-y-6" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="show">
         {/* Header */}
-        <motion.div, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25 } } }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25 } } }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold flex items-center gap-2">
               <ClipboardCheck className="h-6 w-6 text-primary" />
@@ -223,7 +223,7 @@ const B2BDeliveries = () => {
         </motion.div>
 
         {/* Filters */}
-        <motion.div, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25, delay: 0.04 } } }} className="flex flex-wrap gap-3">
+        <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25, delay: 0.04 } } }} className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
