@@ -275,7 +275,7 @@ const DriverPortal = () => {
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center mb-0.5",
                   activeTab === item.id && "bg-white/10"
-                )}}
+                )}
               >
                 <item.icon className="h-5 w-5" />
                 {item.badge > 0 && (
