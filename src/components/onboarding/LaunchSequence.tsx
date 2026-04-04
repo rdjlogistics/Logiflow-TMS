@@ -76,7 +76,7 @@ export const LaunchSequence = ({ companyName, tmsPlan, aiPlan, dashboardPreset, 
         className="inline-flex items-center justify-center w-18 h-18 rounded-[22px] bg-gradient-to-br from-emerald-500 to-green-400 shadow-2xl shadow-emerald-500/25"
         style={{ width: 72, height: 72 }}
       >
-        <div}
+        <div
         >
           <Sparkles className="h-9 w-9 text-white" />
         </div>
@@ -104,7 +104,7 @@ export const LaunchSequence = ({ companyName, tmsPlan, aiPlan, dashboardPreset, 
 
           return (
             <div
-              key={item.key}}
+              key={item.key}
               className="flex items-center justify-between p-4 rounded-2xl backdrop-blur-xl bg-white/[0.04] border border-white/[0.08]"
             >
               <div className="flex items-center gap-3">
@@ -134,7 +134,7 @@ export const LaunchSequence = ({ companyName, tmsPlan, aiPlan, dashboardPreset, 
       </div>
 
       {/* Trial badge */}
-      <div}
+      <div
         className="p-4 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/10 backdrop-blur-xl max-w-sm mx-auto"
       >
         <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
@@ -146,7 +146,7 @@ export const LaunchSequence = ({ companyName, tmsPlan, aiPlan, dashboardPreset, 
       </div>
 
       {/* Launch button */}
-      <button}
+      <button
         onClick={onLaunch}
         disabled={saving}
         className={cn(

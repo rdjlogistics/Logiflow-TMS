@@ -188,9 +188,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
 
           return (
             <div
-              key={key},
-                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
-              }}
+              key={key}
               className={cn(span === 2 && 'sm:col-span-2')}
             >
               <div className="flex items-center justify-between mb-1.5">

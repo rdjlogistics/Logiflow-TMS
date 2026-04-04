@@ -92,7 +92,7 @@ const PricingPanel = ({
   onCalculateRoute, 
   isCalculating = false,
   tollResult,
-  isDetectingTolls = false, = 'sidebar',
+  isDetectingTolls = false,
   autoPriceResult,
   isAutoPricing = false,
   onApplyAutoPrice,
