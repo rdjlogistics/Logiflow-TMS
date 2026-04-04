@@ -3,8 +3,6 @@ project_id = "spycblsfcktsnepsdssv"
 [functions.chatgpt]
 verify_jwt = false
 
-[functions.copilot]
-verify_jwt = false
 
 [functions.create-batch-invoices]
 verify_jwt = false

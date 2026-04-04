@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
   const currentIndex = statusOrder.indexOf(currentStatus);
 
   return (
-    <div variants={itemVariants} className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+    <motion.div variants={itemVariants} className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
       {STATUS_STEPS.map((step, index) => {
         const isActive = index <= currentIndex;
         const isCurrent = step.key === currentStatus;
@@ -71,17 +72,19 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
 
         return (
           <div key={step.key} className="flex items-center gap-1 sm:gap-2">
-            <div
+            <motion.div
               className={cn(
                 "flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl border text-xs sm:text-sm font-medium transition-all duration-500",
                 isActive
                   ? "bg-primary/10 border-primary/30 text-primary shadow-lg shadow-primary/10"
                   : "bg-muted/30 border-border/30 text-muted-foreground"
               )}
+              animate={isCurrent ? { scale: [1, 1.03, 1] } : {}}
+              transition={{ duration: 2, repeat: Infinity }}
             >
               <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">{step.label}</span>
-            </div>
+            </motion.div>
             {index < STATUS_STEPS.length - 1 && (
               <div className={cn(
                 "w-6 sm:w-10 h-0.5 rounded-full transition-colors duration-500",
@@ -91,7 +94,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
           </div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
 
@@ -134,17 +137,22 @@ const LoadingSkeleton = () => (
 
 // Not Found State
 const NotFoundState = () => (
-  <div 
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
     className="flex flex-col items-center justify-center py-32"
   >
-    <div 
+    <motion.div 
       className="relative mb-8"
+      initial={{ scale: 0.8 }}
+      animate={{ scale: 1 }}
+      transition={{ type: "spring", stiffness: 300 }}
     >
       <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-xl">
         <FileText className="h-12 w-12 text-muted-foreground" />
       </div>
       <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-2xl" />
-    </div>
+    </motion.div>
     <p className="text-2xl font-bold text-foreground mb-2">Factuur niet gevonden</p>
     <p className="text-muted-foreground mb-8">Deze factuur bestaat niet of is verwijderd.</p>
     <Button asChild className="gap-2 h-11 px-6">
@@ -153,7 +161,7 @@ const NotFoundState = () => (
         Terug naar overzicht
       </Link>
     </Button>
-  </div>
+  </motion.div>
 );
 
 const InvoiceDetail = () => {
@@ -263,32 +271,43 @@ const InvoiceDetail = () => {
     <DashboardLayout title="Factuur">
       {/* Premium animated background mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 print:hidden">
-        <div
+        <motion.div
           className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4], x: [0, 20, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div
+        <motion.div
           className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"
+          animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
-      <div
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
         className="space-y-6 print:block print:shadow-none"
       >
         {/* Premium Header */}
-        <div 
+        <motion.div 
+          variants={itemVariants}
           className="relative rounded-2xl bg-gradient-to-br from-card/90 via-card/80 to-primary/5 backdrop-blur-2xl border border-border/40 shadow-2xl"
         >
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_50%_-30%,hsl(var(--primary)/0.12),transparent)] pointer-events-none" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/30 via-transparent to-transparent" />
-          <div
+          <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
+            initial={{ x: '-100%' }}
+            animate={{ x: '100%' }}
+            transition={{ repeat: Infinity, duration: 4, ease: 'linear', repeatDelay: 2 }}
           />
 
           <div className="relative p-6 lg:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-start gap-5">
-                <div>
+                <motion.div whileHover={{ scale: 1.05, x: -2 }} whileTap={{ scale: 0.95 }}>
                   <Button 
                     variant="ghost" size="icon" 
                     onClick={() => navigate("/invoices")}
@@ -296,14 +315,17 @@ const InvoiceDetail = () => {
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
-                </div>
+                </motion.div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h1 
+                    <motion.h1 
                       className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
                     >
                       {invoice.invoice_number}
-                    </h1>
+                    </motion.h1>
                     <InvoiceStatusBadge
                       status={invoice.status}
                       sentAt={invoice.sent_at}
@@ -312,17 +334,23 @@ const InvoiceDetail = () => {
                     />
                     <InvoiceAgingBadge dueDate={invoice.due_date} status={invoice.status} />
                   </div>
-                  <p 
+                  <motion.p 
                     className="text-muted-foreground text-base sm:text-lg"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
                   >
                     Factuur voor <span className="font-semibold text-foreground">{customer?.company_name || "–"}</span>
-                  </p>
+                  </motion.p>
                 </div>
               </div>
 
               {/* Actions */}
-              <div 
+              <motion.div 
                 className="flex flex-col sm:flex-row sm:flex-wrap gap-3 w-full lg:w-auto"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
               >
                 {/* Primary actions group */}
                 <div className="flex flex-wrap gap-2">
@@ -398,17 +426,18 @@ const InvoiceDetail = () => {
                     />
                   </div>
                 )}
-              </div>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Status Timeline */}
         <StatusTimeline currentStatus={invoice.status} />
 
         {/* Overdue Banner */}
         {isOverdue && (
-          <div
+          <motion.div
+            variants={itemVariants}
             className="relative overflow-hidden rounded-2xl border border-destructive/30 bg-destructive/5 backdrop-blur-xl p-4"
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--destructive)/0.1),transparent)] pointer-events-none" />
@@ -433,7 +462,7 @@ const InvoiceDetail = () => {
                 Betaling registreren
               </Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Main Content Grid */}
@@ -575,7 +604,7 @@ const InvoiceDetail = () => {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Payment Modal */}
       {invoice.status !== "betaald" && (
