@@ -3,8 +3,6 @@ import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion'
 import { Truck, Package, Weight, AlertTriangle, CheckCircle2, Info, ChevronDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VehicleCapacity, VehicleCategory, VEHICLE_CAPACITIES, VEHICLE_CATEGORIES, CargoItem } from './types';
-import { CargoFitVisualization } from './CargoFitVisualization';
-import { CargoFitVisualizationModal } from './CargoFitVisualizationModal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
 import { VehicleImage } from './VehicleImage';
@@ -291,7 +289,7 @@ export const CapacityIndicator = ({
 }: CapacityIndicatorProps) => {
   const activeVehicle = selectedVehicle || recommendedVehicle;
   const [tailLiftOnly, setTailLiftOnly] = useState(false);
-  const [showVisualizationModal, setShowVisualizationModal] = useState(false);
+  
 
   const filteredByCategory = useMemo(() => {
     return VEHICLE_CATEGORIES.map(cat => ({
@@ -474,18 +472,6 @@ export const CapacityIndicator = ({
           />
         </div>
 
-        {/* Cargo Fit Visualization */}
-        {cargoItems && cargoItems.some(i => i.length > 0 && i.width > 0) && (
-          <>
-            <CargoFitVisualization vehicle={activeVehicle} cargoItems={cargoItems} onExpand={() => setShowVisualizationModal(true)} />
-            <CargoFitVisualizationModal
-              open={showVisualizationModal}
-              onOpenChange={setShowVisualizationModal}
-              vehicle={activeVehicle}
-              cargoItems={cargoItems}
-            />
-          </>
-        )}
 
         {/* Tail-lift filter — Glassmorphism pill */}
         <div className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-card/30 backdrop-blur-sm border border-border/15 relative overflow-hidden">
