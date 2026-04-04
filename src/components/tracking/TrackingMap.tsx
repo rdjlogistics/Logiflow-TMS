@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
 import { Loader2, MapPin } from "lucide-react";
 
@@ -44,8 +45,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
 
     let cancelled = false;
     const init = async () => {
-      const mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      const mb = await loadMapboxGL();
       if (cancelled || !mapContainer.current || map.current) return;
 
       mb.accessToken = token;
@@ -87,7 +87,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       if (driverLocation && showDriverMarker) {
         const el = document.createElement("div");
@@ -135,7 +135,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !deliveryLocation) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const el = document.createElement("div");
       el.className = "delivery-marker";
@@ -169,7 +169,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !pickupLocation) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const el = document.createElement("div");
       el.className = "pickup-marker";
@@ -203,7 +203,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !showRoute) return;
 
     const drawRoute = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const points: [number, number][] = [];
       if (pickupLocation) points.push([pickupLocation.longitude, pickupLocation.latitude]);

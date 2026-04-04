@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import {
   Dialog,
   DialogContent,
@@ -60,8 +61,7 @@ const DriverTrackDialog: React.FC<DriverTrackDialogProps> = ({
 
     let cancelled = false;
     const init = async () => {
-      const mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      const mb = await loadMapboxGL();
       if (cancelled || !mapContainer.current || map.current) return;
 
       mb.accessToken = token;
@@ -110,7 +110,7 @@ const DriverTrackDialog: React.FC<DriverTrackDialogProps> = ({
     if (!map.current || !mapLoaded || !location) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
       const { latitude, longitude, heading } = location;
 
       if (!driverMarker.current) {
@@ -147,7 +147,7 @@ const DriverTrackDialog: React.FC<DriverTrackDialogProps> = ({
     if (!map.current || !mapLoaded || !destination || destMarker.current) return;
 
     const addDest = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
     const el = document.createElement("div");
     el.innerHTML = `

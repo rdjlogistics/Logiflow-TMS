@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X, Maximize2, Loader2 } from "lucide-react";
@@ -39,8 +40,7 @@ const OrderRoutePreview = ({
 
     let cancelled = false;
     const init = async () => {
-      const mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      const mb = await loadMapboxGL();
       if (cancelled || !mapContainer.current) return;
 
       try {

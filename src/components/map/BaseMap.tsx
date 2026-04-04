@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 
 type MapboxGL = typeof mapboxgl;
 import { useMapboxToken } from "@/hooks/useMapboxToken";
@@ -102,15 +103,9 @@ export const BaseMap = forwardRef<BaseMapRef, BaseMapProps>(({
 
     (async () => {
       try {
-        const [mapboxModule] = await Promise.all([
-          import("mapbox-gl"),
-          import("mapbox-gl/dist/mapbox-gl.css"),
-          import("@/styles/map-styles.css"),
-        ]);
+        const mapboxgl = await loadMapboxGL();
         
         if (cancelled || !mapContainer.current) return;
-
-        const mapboxgl = mapboxModule.default;
         mapboxglRef.current = mapboxgl;
         mapboxgl.accessToken = token;
         // lib loaded

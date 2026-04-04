@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
 import { useAllDriverLocations } from "@/hooks/useAllDriverLocations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,8 +46,7 @@ const FleetMapWidget = () => {
 
     let cancelled = false;
     const init = async () => {
-      const mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      const mb = await loadMapboxGL();
       if (cancelled || !mapContainerRef.current || mapRef.current) return;
 
       mb.accessToken = token;
@@ -93,7 +93,7 @@ const FleetMapWidget = () => {
     if (!mapRef.current || !mapLoaded) return;
 
     const updateMarkers = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       // Clear existing markers
       markersRef.current.forEach(m => m.remove());

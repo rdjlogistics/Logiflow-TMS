@@ -8,6 +8,7 @@ import {
 import { DestinationData } from "./DestinationCard";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { MapPin, Navigation, Clock, Route, AlertCircle, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,8 +124,7 @@ const OrderRouteDialog = ({
 
     // Defer map creation — Radix Dialog portal hasn't mounted yet when open flips
     const setup = async () => {
-      mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      mb = await loadMapboxGL();
       if (cancelled) return;
       mb.accessToken = token;
 
