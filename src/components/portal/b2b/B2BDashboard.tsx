@@ -155,7 +155,7 @@ export const B2BDashboard = ({
   };
 
   return (
-    <motion.div className="space-y-6" initial="hidden" animate="visible">
+    <motion.div className="space-y-6">
       {/* Welcome Greeting */}
       <motion.div
         className="relative rounded-2xl border border-border/20 bg-gradient-to-r from-primary/5 to-gold/5 backdrop-blur-sm p-5 overflow-hidden"
@@ -229,11 +229,11 @@ export const B2BDashboard = ({
         ) : (
           kpis.map((kpi, index) => (
             <motion.div key={kpi.label}>
-              <motion.div whileHover={{ scale: 1.03, y: -4 }}>
+              <motion.div>
                 <Card className={`relative overflow-hidden cursor-pointer border-border/30 bg-card/60 backdrop-blur-sm ${kpi.urgent ? 'border-red-500/50' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
-                      <motion.div className={`p-2 rounded-lg ${kpi.bgColor}`} whileHover={{ rotate: 10, scale: 1.1 }}>
+                      <motion.div className={`p-2 rounded-lg ${kpi.bgColor}`}>
                         <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
                       </motion.div>
                       {kpi.trend && (
@@ -304,9 +304,9 @@ export const B2BDashboard = ({
                       <motion.div
                         key={shipment.id}
                         custom={index}
-                        initial="hidden"
-                        animate="visible"
-                        whileHover={{ backgroundColor: "hsl(var(--muted) / 0.2)", x: 4 }}
+                       
+                       
+
                       >
                         <Link to={`/portal/b2b/shipments/${shipment.id}`} className="flex items-center gap-4 p-4 md:py-3 py-4 transition-colors touch-manipulation">
                           <div className="flex-1 min-w-0">
@@ -334,12 +334,12 @@ export const B2BDashboard = ({
         {/* Sidebar Widgets */}
         <motion.div className="space-y-4">
           {/* Widget 1: Openstaande Facturen */}
-          <motion.div whileHover={{ y: -2 }}>
+          <motion.div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <motion.div whileHover={{ rotate: 20 }}><Euro className="h-4 w-4 text-gold" /></motion.div>
+                    <motion.div><Euro className="h-4 w-4 text-gold" /></motion.div>
                     Openstaande Facturen
                   </span>
                   {overdueInvoices.length > 0 && (
@@ -398,8 +398,8 @@ export const B2BDashboard = ({
                           <motion.div
                             key={inv.id}
                             custom={i}
-                            initial="hidden"
-                            animate="visible"
+                           
+                           
                           >
                             <Link to="/portal/b2b/invoices" className="flex items-center justify-between py-2 text-sm group touch-manipulation">
                               <div className="min-w-0">
@@ -429,7 +429,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <motion.div whileHover={{ scale: 1.02 }} className="pt-1">
+                <motion.div className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/invoices" className="gap-1">
                       Bekijk alle facturen <ArrowUpRight className="h-3 w-3" />
@@ -441,12 +441,12 @@ export const B2BDashboard = ({
           </motion.div>
 
           {/* Widget 2: Aankomende Leveringen */}
-          <motion.div whileHover={{ y: -2 }}>
+          <motion.div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <motion.div whileHover={{ rotate: 20 }}><CalendarClock className="h-4 w-4 text-primary" /></motion.div>
+                    <motion.div><CalendarClock className="h-4 w-4 text-primary" /></motion.div>
                     Aankomende Leveringen
                   </span>
                   {openCasesCount > 0 && (
@@ -479,8 +479,8 @@ export const B2BDashboard = ({
                           <motion.div
                             key={s.id}
                             custom={i}
-                            initial="hidden"
-                            animate="visible"
+                           
+                           
                           >
                             <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 group touch-manipulation">
                               <div className="flex items-center justify-between">
@@ -517,7 +517,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <motion.div whileHover={{ scale: 1.02 }} className="pt-1">
+                <motion.div className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/shipments" className="gap-1">
                       Bekijk alle zendingen <ArrowUpRight className="h-3 w-3" />
@@ -529,11 +529,11 @@ export const B2BDashboard = ({
           </motion.div>
 
           {/* Widget 3: Recente Statusupdates */}
-          <motion.div whileHover={{ y: -2 }}>
+          <motion.div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <motion.div whileHover={{ rotate: 20 }}><Activity className="h-4 w-4 text-emerald-400" /></motion.div>
+                  <motion.div><Activity className="h-4 w-4 text-emerald-400" /></motion.div>
                   Recente Statusupdates
                 </CardTitle>
               </CardHeader>
@@ -558,9 +558,9 @@ export const B2BDashboard = ({
                         <motion.div
                           key={s.id}
                           custom={i}
-                          initial="hidden"
-                          animate="visible"
-                          whileHover={{ backgroundColor: "hsl(var(--muted) / 0.15)" }}
+                         
+                         
+
                           className="rounded-md transition-colors"
                         >
                           <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 px-1 touch-manipulation">

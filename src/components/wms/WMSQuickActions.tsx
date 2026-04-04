@@ -100,7 +100,7 @@ export function WMSQuickActions({
         <motion.button
           key={action.id}
           initial={{ opacity: 0, y: 10 }}
-          whileHover={{ y: -2 }}
+
           onClick={() => handleAction(action)}
           className={cn(
             "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl border",

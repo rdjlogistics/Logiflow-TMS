@@ -44,7 +44,7 @@ export const OverdueBanner = ({ isOverdue, dueDate, onPaymentClick }: OverdueBan
                 </p>
               </div>
               <motion.div
-                whileHover={{ scale: 1.03 }}
+
               >
                 <Button 
                   className="h-11 px-5 gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg shadow-red-500/25"

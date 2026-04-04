@@ -94,8 +94,8 @@ const OrderStepper = ({
                     {isCompleted ? (
                       <motion.span
                         key="check"
-                        initial="initial"
-                        animate="animate"
+                       
+                       
                         exit="exit"
                         className="flex items-center justify-center"
                       >
@@ -182,8 +182,8 @@ const OrderStepper = ({
                     {isCompleted ? (
                       <motion.span
                         key="check"
-                        initial="initial"
-                        animate="animate"
+                       
+                       
                         exit="exit"
                         className="flex items-center justify-center"
                       >

@@ -287,9 +287,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             </p>
           </div>
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+           
+           
             className={cn("flex flex-col pt-2", mobile ? "gap-3" : "gap-2")}
           >
             {[
@@ -299,7 +298,6 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             ].map((item, i) => (
               <motion.div
                 key={i}
-                variants={staggerItem}
                 className={cn(
                   "flex items-center gap-3 rounded-xl bg-muted/20 border border-border/20",
                   mobile ? "px-5 py-3.5" : "px-4 py-2.5"
@@ -324,9 +322,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             <p className={cn("text-muted-foreground mt-1", mobile ? "text-sm" : "text-xs sm:text-sm")}>Welke weergave past bij jouw rol?</p>
           </div>
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+           
+           
             className={cn(mobile ? "flex flex-col gap-3" : "grid grid-cols-3 gap-3")}
           >
             {selectablePresets.map((preset) => {
@@ -339,9 +336,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 return (
                   <motion.button
                     key={preset.id}
-                    variants={staggerItem}
                     onClick={() => { setSelectedPreset(preset); hapticSelection(); }}
-                    whileTap={{ scale: 0.97 }}
+
                     className={cn(
                       'relative flex items-center gap-4 p-4 rounded-2xl border-2 transition-all touch-manipulation text-left',
                       isSelected
@@ -386,10 +382,9 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
               return (
                 <motion.button
                   key={preset.id}
-                  variants={staggerItem}
                   onClick={() => { setSelectedPreset(preset); hapticSelection(); }}
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
+
+
                   className={cn(
                     'relative flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all',
                     isSelected
@@ -443,13 +438,12 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             <p className={cn("text-muted-foreground mt-1", mobile ? "text-sm" : "text-xs sm:text-sm")}>Fine-tune je ervaring</p>
           </div>
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+           
+           
             className={cn(mobile ? "space-y-4" : "space-y-3")}
           >
             {/* Theme */}
-            <motion.div variants={staggerItem} className={cn("rounded-2xl bg-muted/15 border border-border/20 space-y-3", mobile ? "p-5" : "p-4")}>
+            <motion.div className={cn("rounded-2xl bg-muted/15 border border-border/20 space-y-3", mobile ? "p-5" : "p-4")}>
               <p className="text-sm font-semibold flex items-center gap-2">
                 <Monitor className="h-4 w-4 text-muted-foreground" />
                 Thema
@@ -463,7 +457,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 ]).map(t => (
                   <motion.button
                     key={t.value}
-                    whileTap={{ scale: 0.93 }}
+
                     onClick={() => handleThemeChange(t.value)}
                     className={cn(
                       'flex flex-col items-center gap-1 rounded-xl border transition-all touch-manipulation',
@@ -481,7 +475,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             </motion.div>
 
             {/* Language */}
-            <motion.div variants={staggerItem} className={cn("rounded-2xl bg-muted/15 border border-border/20 space-y-3", mobile ? "p-5" : "p-4")}>
+            <motion.div className={cn("rounded-2xl bg-muted/15 border border-border/20 space-y-3", mobile ? "p-5" : "p-4")}>
               <p className="text-sm font-semibold flex items-center gap-2">
                 <Globe className="h-4 w-4 text-muted-foreground" />
                 Taal
@@ -496,7 +490,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                   ]).map(l => (
                     <motion.button
                       key={l.value}
-                      whileTap={{ scale: 0.95 }}
+
                       onClick={() => { setLanguage(l.value); hapticSelection(); }}
                       className={cn(
                         'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all touch-manipulation',
@@ -518,7 +512,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                   ]).map(l => (
                     <motion.button
                       key={l.value}
-                      whileTap={{ scale: 0.93 }}
+
                       onClick={() => { setLanguage(l.value); hapticSelection(); }}
                       className={cn(
                         'flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all min-h-[48px] touch-manipulation',
@@ -536,9 +530,9 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             </motion.div>
 
             {/* Compact Mode */}
-            <motion.div variants={staggerItem}>
+            <motion.div>
               <motion.button
-                whileTap={{ scale: 0.97 }}
+
                 onClick={() => { setCompactMode(!compactMode); hapticSelection(); }}
                 className={cn(
                   'w-full flex items-center justify-between rounded-2xl border transition-all touch-manipulation',
@@ -571,9 +565,9 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             </motion.div>
 
             {/* Sound */}
-            <motion.div variants={staggerItem}>
+            <motion.div>
               <motion.button
-                whileTap={{ scale: 0.97 }}
+
                 onClick={handleSoundToggle}
                 className={cn(
                   'w-full flex items-center justify-between rounded-2xl border transition-all touch-manipulation',
@@ -696,15 +690,13 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             </p>
           </div>
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+           
+           
             className="flex flex-wrap justify-center gap-2 pt-2"
           >
             {(selectedPreset?.widgets || DASHBOARD_PRESETS[0].widgets).slice(0, 5).map((w, i) => (
               <motion.div
                 key={w.id}
-                variants={staggerItem}
                 className={cn(
                   "px-3 py-1.5 rounded-full border text-xs font-medium",
                   mobile
@@ -717,7 +709,6 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             ))}
             {(selectedPreset?.widgets || DASHBOARD_PRESETS[0].widgets).length > 5 && (
               <motion.div
-                variants={staggerItem}
                 className="px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs text-primary font-medium"
               >
                 +{(selectedPreset?.widgets || DASHBOARD_PRESETS[0].widgets).length - 5} meer
@@ -754,7 +745,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
           <div className="w-12">
             {step > 0 && step < 3 ? (
               <motion.button
-                whileTap={{ scale: 0.9 }}
+
                 onClick={handleBack}
                 className="p-2 -ml-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
               >
@@ -762,7 +753,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
               </motion.button>
             ) : step === 0 ? (
               <motion.button
-                whileTap={{ scale: 0.9 }}
+
                 onClick={onSkip}
                 className="text-xs text-muted-foreground py-2 px-1 min-h-[48px] flex items-center"
               >
@@ -795,7 +786,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
 
           <div className="w-12 flex justify-end">
             <motion.button
-              whileTap={{ scale: 0.9 }}
+
               onClick={onSkip}
               className="p-2 -mr-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
             >
@@ -811,9 +802,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
               <motion.div
                 key={step}
                 custom={direction}
-                variants={mobileStepVariants}
-                initial="enter"
-                animate="center"
+               
+               
                 exit="exit"
               >
                 {renderStepContent(true)}
@@ -832,7 +822,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             className="bg-background px-5 pb-2 pointer-events-auto"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
           >
-            <motion.div whileTap={{ scale: 0.97 }}>
+            <motion.div>
               <Button
                 onClick={handleNext}
                 className={cn(
@@ -887,9 +877,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
       <DialogContent variant="default" size="full" hideCloseButton className="p-0 max-w-[95vw] max-h-[90vh] overflow-hidden rounded-2xl">
     <AnimatePresence>
       <motion.div
-        variants={overlayVariants}
-        initial="hidden"
-        animate="visible"
+       
+       
         exit="exit"
         className="flex w-full h-[85vh]"
         style={{
@@ -1177,8 +1166,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
           {/* Skip button */}
           <motion.button
             onClick={onSkip}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+
+
             className="absolute top-6 right-6 z-10 p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
             aria-label="Overslaan (ESC)"
           >
@@ -1265,7 +1254,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/10">
                   <div>
                     {step > 0 && step < 3 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <motion.div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1278,7 +1267,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                       </motion.div>
                     )}
                     {step === 0 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <motion.div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1291,7 +1280,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                     )}
                   </div>
 
-                  <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div>
                     <Button
                       size="lg"
                       onClick={handleNext}

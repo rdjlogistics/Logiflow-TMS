@@ -126,8 +126,8 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
       {/* Zone Grid with Smooth Animations */}
       <TooltipProvider delayDuration={200}>
         <motion.div
-          initial="hidden"
-          animate="show"
+         
+         
           className="grid grid-cols-3 gap-3"
         >
           <AnimatePresence mode="popLayout">

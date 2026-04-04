@@ -401,7 +401,7 @@ const OrderDocumentDialog = ({
                   <motion.label
                     key={type.value}
                     initial={false}
-                    whileHover={{ scale: 1.005 }}
+
                     className={cn(
                       "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
                       isSelected && "ring-1 ring-primary"
@@ -463,7 +463,7 @@ const OrderDocumentDialog = ({
                     return (
                       <motion.label
                         key={copy.value}
-                        whileHover={{ scale: 1.005 }}
+
                         className={cn(
                           "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
                           isChecked ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
