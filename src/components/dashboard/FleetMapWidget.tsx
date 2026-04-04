@@ -46,8 +46,7 @@ const FleetMapWidget = () => {
 
     let cancelled = false;
     const init = async () => {
-      const mb = (await import("mapbox-gl")).default;
-      await Promise.all([import("mapbox-gl/dist/mapbox-gl.css"), import("@/styles/map-styles.css")]);
+      const mb = await loadMapboxGL();
       if (cancelled || !mapContainerRef.current || mapRef.current) return;
 
       mb.accessToken = token;
