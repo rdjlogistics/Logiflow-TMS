@@ -283,7 +283,7 @@ Overig,${summary.costs.other}
         className="space-y-6"
       >
         {/* Header actions */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {/* Period selector */}
             <div className="flex rounded-lg border border-border/50 p-1 bg-muted/30">
@@ -340,7 +340,7 @@ Overig,${summary.costs.other}
         </div>
 
         {/* KPI Cards Row */}
-        <div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Revenue */}
           <Card variant="glass" className="relative overflow-hidden group cursor-pointer hover:border-emerald-500/30 transition-colors">
             <Link to="/invoices">
@@ -439,7 +439,7 @@ Overig,${summary.costs.other}
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cost Breakdown */}
-          <div variants={itemVariants} className="lg:col-span-2">
+          <div className="lg:col-span-2">
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -495,7 +495,7 @@ Overig,${summary.costs.other}
           </div>
 
           {/* Goals & Alerts */}
-          <div variants={itemVariants} className="space-y-6">
+          <div className="space-y-6">
             {/* Goals */}
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -542,7 +542,7 @@ Overig,${summary.costs.other}
                               : isWarning 
                               ? "bg-amber-500/5 border-amber-500/20 hover:bg-amber-500/10"
                               : "bg-muted/20 border-border/50 hover:bg-muted/40"
-                          )}
+                          )}}
                           onClick={() => {
                             // Navigate to action on mobile tap
                             if (window.innerWidth < 640) {
@@ -606,7 +606,7 @@ Overig,${summary.costs.other}
                               <div className={cn(
                                 "absolute -top-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full",
                                 isAchieved ? "bg-emerald-500 text-white" : isWarning ? "bg-amber-500 text-white" : "bg-primary text-primary-foreground"
-                              )} style={{ left: `${Math.min(Math.max(progress - 5, 0), 85)}%` }}>
+                              )} style={{ left: `${Math.min(Math.max(progress - 5, 0), 85)}%` >
                                 {Math.min(progress, 100).toFixed(0)}%
                               </div>
                             </div>
@@ -745,7 +745,7 @@ Overig,${summary.costs.other}
         </div>
 
         {/* Cashflow Forecast */}
-        <div variants={itemVariants}>
+        <div>
           <Card variant="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -822,7 +822,7 @@ Overig,${summary.costs.other}
 
         {/* Recent Transactions */}
         {recentTransactions && recentTransactions.length > 0 && (
-          <div variants={itemVariants}>
+          <div>
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">

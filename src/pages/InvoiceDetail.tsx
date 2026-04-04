@@ -63,7 +63,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
   const currentIndex = statusOrder.indexOf(currentStatus);
 
   return (
-    <div variants={itemVariants} className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
       {STATUS_STEPS.map((step, index) => {
         const isActive = index <= currentIndex;
         const isCurrent = step.key === currentStatus;
@@ -77,7 +77,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
                 isActive
                   ? "bg-primary/10 border-primary/30 text-primary shadow-lg shadow-primary/10"
                   : "bg-muted/30 border-border/30 text-muted-foreground"
-              )}
+              )} : {}
             >
               <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">{step.label}</span>
@@ -134,7 +134,7 @@ const LoadingSkeleton = () => (
 
 // Not Found State
 const NotFoundState = () => (
-  <div 
+  <div
     className="flex flex-col items-center justify-center py-32"
   >
     <div 
@@ -275,7 +275,7 @@ const InvoiceDetail = () => {
         className="space-y-6 print:block print:shadow-none"
       >
         {/* Premium Header */}
-        <div 
+        <div
           className="relative rounded-2xl bg-gradient-to-br from-card/90 via-card/80 to-primary/5 backdrop-blur-2xl border border-border/40 shadow-2xl"
         >
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_50%_-30%,hsl(var(--primary)/0.12),transparent)] pointer-events-none" />

@@ -154,7 +154,7 @@ export const B2BDashboard = ({
   };
 
   return (
-    <div className="space-y-6" initial="hidden" animate="visible">
+    <div className="space-y-6">
       {/* Welcome Greeting */}
       <div
         className="relative rounded-2xl border border-border/20 bg-gradient-to-r from-primary/5 to-gold/5 backdrop-blur-sm p-5 overflow-hidden"
@@ -171,13 +171,13 @@ export const B2BDashboard = ({
             {/* Greeting + Company */}
             <div className="flex items-baseline gap-2 flex-wrap">
               <h1
-                className="text-2xl font-display font-bold"
+                className="text-2xl font-display font-bold"}
               >
                 {getGreeting()}
               </h1>
               {companyName && (
                 <span
-                  className="text-2xl font-display font-bold text-primary"
+                  className="text-2xl font-display font-bold text-primary"}
                 >
                   , {companyName}
                 </span>
@@ -186,7 +186,7 @@ export const B2BDashboard = ({
 
             {/* Date */}
             <p
-              className="text-sm text-muted-foreground mt-0.5"
+              className="text-sm text-muted-foreground mt-0.5"}
             >
               {format(new Date(), "EEEE d MMMM yyyy", { locale: nl })}
             </p>
@@ -228,12 +228,12 @@ export const B2BDashboard = ({
                 <Card className={`relative overflow-hidden cursor-pointer border-border/30 bg-card/60 backdrop-blur-sm ${kpi.urgent ? 'border-red-500/50' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
-                      <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
+                      <div className={`p-2 rounded-lg ${kpi.bgColor}`}}>
                         <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
                       </div>
                       {kpi.trend && (
                         <div
-                          className="flex items-center gap-0.5 text-xs text-emerald-400"
+                          className="flex items-center gap-0.5 text-xs text-emerald-400"}
                         >
                           <TrendingUp className="h-3 w-3" /> {kpi.trend}
                         </div>
@@ -241,7 +241,7 @@ export const B2BDashboard = ({
                     </div>
                     <div className="mt-3">
                       <p
-                        className="text-2xl font-display font-bold"
+                        className="text-2xl font-display font-bold"}
                       >
                         {kpi.value}
                       </p>
@@ -346,7 +346,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : openInvoices.length === 0 ? (
-                  <div className="text-center py-4">
+                  <div className="text-center py-4"}>
                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Alles betaald</p>
                   </div>
@@ -354,7 +354,7 @@ export const B2BDashboard = ({
                   <>
                     <div className="text-center py-2">
                       <p
-                        className="text-2xl font-display font-bold tabular-nums"
+                        className="text-2xl font-display font-bold tabular-nums"}
                       >
                         {formatEuro(openInvoicesTotal)}
                       </p>
@@ -369,7 +369,7 @@ export const B2BDashboard = ({
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-emerald-500"
+                            className="h-full rounded-full bg-emerald-500"}
                           />
                         </div>
                       </div>
@@ -446,7 +446,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : activeShipments.length === 0 ? (
-                  <div className="text-center py-4">
+                  <div className="text-center py-4"}>
                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Geen actieve leveringen</p>
                   </div>
@@ -524,7 +524,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : recentUpdates.length === 0 ? (
-                  <div className="text-center py-4">
+                  <div className="text-center py-4"}>
                     <Inbox className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Geen recente updates</p>
                   </div>

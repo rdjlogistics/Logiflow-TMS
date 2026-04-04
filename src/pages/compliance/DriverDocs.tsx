@@ -37,7 +37,6 @@ import { useCompany } from "@/hooks/useCompany";
 import { format, differenceInDays } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
 const docTypes = [
   { value: 'drivers_license', label: 'Rijbewijs C/CE', icon: '🚛', color: 'from-blue-500/20 to-blue-600/10' },
   { value: 'adr_certificate', label: 'ADR Certificaat', icon: '⚠️', color: 'from-amber-500/20 to-amber-600/10' },
@@ -214,7 +213,7 @@ const DriverDocs = () => {
         className="space-y-6"
       >
         {/* Premium Header */}
-        <div variants={itemVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500/10 via-background to-emerald-500/5 border border-teal-500/20 p-6 sm:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500/10 via-background to-emerald-500/5 border border-teal-500/20 p-6 sm:p-8">
           <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
           
@@ -286,8 +285,7 @@ const DriverDocs = () => {
                       <Label className="text-xs uppercase text-muted-foreground tracking-wider">Document type *</Label>
                       <Select value={form.doc_type} onValueChange={(val) => {
                         const docType = docTypes.find(d => d.value === val);
-                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name }));
-                      }}>
+                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name })); }}>
                         <SelectTrigger className="h-11 bg-muted/30 border-border/50">
                           <SelectValue placeholder="Selecteer type..." />
                         </SelectTrigger>
@@ -368,7 +366,7 @@ const DriverDocs = () => {
         </div>
 
         {/* Stats Grid */}
-        <div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: 'Totaal', value: stats.total, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
             { label: 'Geldig', value: stats.valid, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -392,7 +390,7 @@ const DriverDocs = () => {
         </div>
 
         {/* Search & Filter */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -427,7 +425,7 @@ const DriverDocs = () => {
             </CardContent>
           </Card>
         ) : filteredDocs.length === 0 ? (
-          <div variants={itemVariants}>
+          <div>
             <Card variant="glass" className="border-dashed">
               <CardContent className="py-16 text-center">
                 <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-teal-500/10 to-emerald-500/10 flex items-center justify-center mx-auto mb-4">
@@ -447,7 +445,7 @@ const DriverDocs = () => {
             </Card>
           </div>
         ) : (
-          <div variants={itemVariants} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDocs.map((doc) => {
               const { status, daysLeft } = getExpiryStatus(doc.expiry_date);
               const config = statusConfig[status];
@@ -462,7 +460,7 @@ const DriverDocs = () => {
                     "active:scale-[0.99] touch-manipulation",
                     docType?.color || 'from-slate-500/10 to-slate-600/5',
                     "border-border/50 hover:border-primary/30"
-                  )}
+                  )}}}
                 >
                   {/* Status indicator */}
                   <div className={cn(
