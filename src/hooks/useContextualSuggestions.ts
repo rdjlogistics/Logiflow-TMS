@@ -133,7 +133,7 @@ Genereer suggesties voor:
 ${JSON.stringify(context, null, 2)}`;
       }
 
-      const { data, error } = await supabase.functions.invoke('smart-ai', {
+      const { data, error } = await supabase.functions.invoke('chatgpt', {
         body: {
           action: 'get-suggestions',
           mode: 'contextual',
