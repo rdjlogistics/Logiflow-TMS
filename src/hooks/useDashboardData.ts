@@ -231,7 +231,7 @@ export const useDashboardData = () => {
     otifPercentage: result.otifPercentage,
     unreadEmailCount: result.unreadEmailCount,
     hasEnoughData,
-    loading: isLoading,
+    loading: isFirstLoad,
     error: error instanceof Error ? error : null,
     lastRefresh: dataUpdatedAt ? new Date(dataUpdatedAt) : new Date(),
     refetch: handleRefetch,
