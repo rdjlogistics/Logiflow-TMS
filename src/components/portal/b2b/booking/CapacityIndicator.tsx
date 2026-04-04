@@ -472,18 +472,6 @@ export const CapacityIndicator = ({
           />
         </div>
 
-        {/* Cargo Fit Visualization */}
-        {cargoItems && cargoItems.some(i => i.length > 0 && i.width > 0) && (
-          <>
-            <CargoFitVisualization vehicle={activeVehicle} cargoItems={cargoItems} onExpand={() => setShowVisualizationModal(true)} />
-            <CargoFitVisualizationModal
-              open={showVisualizationModal}
-              onOpenChange={setShowVisualizationModal}
-              vehicle={activeVehicle}
-              cargoItems={cargoItems}
-            />
-          </>
-        )}
 
         {/* Tail-lift filter — Glassmorphism pill */}
         <div className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-card/30 backdrop-blur-sm border border-border/15 relative overflow-hidden">
