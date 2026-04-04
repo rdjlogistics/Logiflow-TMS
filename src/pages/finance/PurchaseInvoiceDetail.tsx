@@ -13,7 +13,7 @@ import { ExternalInvoiceMatchModal } from "@/components/purchase-invoices/Extern
 import { PaymentRegistrationModal } from "@/components/purchase-invoices/PaymentRegistrationModal";
 
 // Refactored components
-import { containerVariants, itemVariants } from "@/components/purchase-invoices/detail/PremiumGlassCard";
+import {  } from "@/components/purchase-invoices/detail/PremiumGlassCard";
 import { InvoiceHeader } from "@/components/purchase-invoices/detail/InvoiceHeader";
 import { StatusTimeline } from "@/components/purchase-invoices/detail/StatusTimeline";
 import { OverdueBanner, DifferenceBanner } from "@/components/purchase-invoices/detail/AlertBanners";

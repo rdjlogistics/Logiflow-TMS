@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { PurchaseInvoiceStatusBadge } from "@/components/purchase-invoices/PurchaseInvoiceStatusBadge";
-import { itemVariants } from "./PremiumGlassCard";
+import {  } from "./PremiumGlassCard";
 
 type PurchaseInvoiceStatus = "concept" | "definitief" | "verzonden" | "ontvangen" | "goedgekeurd" | "betaald" | "betwist";
 

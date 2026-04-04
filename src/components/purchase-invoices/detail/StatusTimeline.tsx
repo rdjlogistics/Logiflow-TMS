@@ -1,6 +1,6 @@
 import { CheckCircle2, Sparkles, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { itemVariants } from "./PremiumGlassCard";
+import {  } from "./PremiumGlassCard";
 
 interface StatusTimelineProps {
   currentStatus: string;
