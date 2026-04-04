@@ -85,9 +85,9 @@ const B2BShipmentDetail = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <div className="space-y-6">
+      <div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
         {/* Back + Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/portal/b2b/shipments"><ArrowLeft className="h-4 w-4" /></Link>
@@ -117,7 +117,7 @@ const B2BShipmentDetail = () => {
         </div>
 
         {/* Route Card */}
-        <div>
+        <div variants={itemVariants}>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -156,7 +156,7 @@ const B2BShipmentDetail = () => {
               onETAUpdate={handleETAUpdate}
             />
             {liveEta.minutes != null && (
-              <div>
+              <div variants={itemVariants}>
                 <ETADisplay
                   distanceKm={liveEta.distanceKm}
                   liveEtaMinutes={liveEta.minutes}
@@ -169,7 +169,7 @@ const B2BShipmentDetail = () => {
         )}
         {/* Tracking Code */}
         {shipment.trackingCode && (
-          <div>
+          <div variants={itemVariants}>
             <Card>
               <CardContent className="p-4 flex items-center gap-3">
                 <Hash className="h-4 w-4 text-primary" />
@@ -183,7 +183,7 @@ const B2BShipmentDetail = () => {
         )}
 
         {/* Details Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: Package, label: "Colli", value: shipment.parcels },
             { icon: Hash, label: "Gewicht", value: shipment.weight ? `${shipment.weight} kg` : "-" },
@@ -203,7 +203,7 @@ const B2BShipmentDetail = () => {
         </div>
 
         {/* Timeline */}
-        <div>
+        <div variants={itemVariants}>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">

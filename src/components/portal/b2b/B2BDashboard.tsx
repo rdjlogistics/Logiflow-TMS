@@ -154,7 +154,7 @@ export const B2BDashboard = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" initial="hidden" animate="visible">
       {/* Welcome Greeting */}
       <div
         className="relative rounded-2xl border border-border/20 bg-gradient-to-r from-primary/5 to-gold/5 backdrop-blur-sm p-5 overflow-hidden"

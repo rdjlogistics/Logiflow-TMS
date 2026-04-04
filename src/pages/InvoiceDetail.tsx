@@ -63,7 +63,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
   const currentIndex = statusOrder.indexOf(currentStatus);
 
   return (
-    <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+    <div variants={itemVariants} className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
       {STATUS_STEPS.map((step, index) => {
         const isActive = index <= currentIndex;
         const isCurrent = step.key === currentStatus;

@@ -185,9 +185,9 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
     >
       {/* Header info cards */}
       <motion.div 
-        
-        
-        
+        variants={containerVariants} 
+        initial="hidden" 
+        animate="visible" 
         className="grid grid-cols-2 sm:grid-cols-4 gap-2.5"
       >
         {[
@@ -280,7 +280,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             {photoUrls.map((url, idx) => (
               <motion.button
                 key={idx}
-               }
+                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 transition={spring}
                 onClick={() => setExpandedPhoto(url)}

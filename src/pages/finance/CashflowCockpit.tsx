@@ -283,7 +283,7 @@ Overig,${summary.costs.other}
         className="space-y-6"
       >
         {/* Header actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {/* Period selector */}
             <div className="flex rounded-lg border border-border/50 p-1 bg-muted/30">
@@ -340,7 +340,7 @@ Overig,${summary.costs.other}
         </div>
 
         {/* KPI Cards Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Revenue */}
           <Card variant="glass" className="relative overflow-hidden group cursor-pointer hover:border-emerald-500/30 transition-colors">
             <Link to="/invoices">
@@ -439,7 +439,7 @@ Overig,${summary.costs.other}
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cost Breakdown */}
-          <div className="lg:col-span-2">
+          <div variants={itemVariants} className="lg:col-span-2">
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -495,7 +495,7 @@ Overig,${summary.costs.other}
           </div>
 
           {/* Goals & Alerts */}
-          <div className="space-y-6">
+          <div variants={itemVariants} className="space-y-6">
             {/* Goals */}
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -745,7 +745,7 @@ Overig,${summary.costs.other}
         </div>
 
         {/* Cashflow Forecast */}
-        <div>
+        <div variants={itemVariants}>
           <Card variant="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -822,7 +822,7 @@ Overig,${summary.costs.other}
 
         {/* Recent Transactions */}
         {recentTransactions && recentTransactions.length > 0 && (
-          <div>
+          <div variants={itemVariants}>
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">

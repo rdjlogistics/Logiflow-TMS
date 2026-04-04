@@ -167,9 +167,9 @@ const VehicleDocs = () => {
 
   return (
     <DashboardLayout title="Voertuig Documenten" description="Keuringen, verzekeringen & lease">
-      <div className="space-y-6">
+      <div className="space-y-6" variants={containerVariants} initial="hidden" animate="visible">
         {/* Premium Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 via-background to-indigo-500/5 border border-blue-500/20 p-6 sm:p-8">
+        <div variants={itemVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 via-background to-indigo-500/5 border border-blue-500/20 p-6 sm:p-8">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -278,7 +278,7 @@ const VehicleDocs = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: 'Totaal', value: stats.total, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
             { label: 'Geldig', value: stats.valid, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -300,7 +300,7 @@ const VehicleDocs = () => {
         </div>
 
         {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoek documenten..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 h-11 bg-muted/30 text-base" />
@@ -333,7 +333,7 @@ const VehicleDocs = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div variants={itemVariants} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDocs.map((doc) => {
               const { status, daysLeft } = getExpiryStatus(doc.expiry_date);
               const config = statusConfig[status];

@@ -808,12 +808,12 @@ const RouteOptimization = () => {
     >
       <motion.div 
         className="space-y-6 overflow-x-hidden"
-       
-       
-       
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
         {/* Header with provider badge */}
-        <motion.div className="flex items-center justify-between gap-3 flex-wrap">
+        <motion.div variants={itemVariants} className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">
             {urlTripIds && (
               <Button
@@ -943,7 +943,7 @@ const RouteOptimization = () => {
         </AnimatePresence>
 
         {/* Map */}
-        <motion.div>
+        <motion.div variants={itemVariants}>
           <Card variant="ghost" className="overflow-hidden rounded-2xl">
             <CardContent className="p-0">
               <RouteOptimizationMap
@@ -958,7 +958,7 @@ const RouteOptimization = () => {
 
         <div className="flex flex-col md:grid md:grid-cols-3 gap-6">
           {/* Stops List */}
-          <motion.div className="md:col-span-2 space-y-4 order-2 md:order-1">
+          <motion.div variants={itemVariants} className="md:col-span-2 space-y-4 order-2 md:order-1">
             <Card variant="glass">
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
@@ -1011,6 +1011,7 @@ const RouteOptimization = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 16, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        whileHover={{ scale: 1.01, backgroundColor: "hsl(var(--muted) / 0.6)" }}
                         className={`p-2.5 sm:p-3 bg-muted/30 backdrop-blur-sm rounded-xl border group transition-all overflow-hidden cursor-pointer ${
                           draggedIndex === index ? 'opacity-50 border-primary/50' : 'border-border/20'
                         } ${
@@ -1590,7 +1591,7 @@ const RouteOptimization = () => {
             return (
               <>
                 {/* Desktop sidebar */}
-                <motion.div className="hidden md:block space-y-4 order-2">
+                <motion.div variants={itemVariants} className="hidden md:block space-y-4 order-2">
                   {settingsContent}
                 </motion.div>
 

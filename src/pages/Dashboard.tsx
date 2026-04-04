@@ -220,14 +220,14 @@ const Dashboard = () => {
     <DashboardLayout title="Command Center">
       <motion.div 
         className="space-y-4 sm:space-y-6"
-       
-       
-       
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
         {/* Mobile: Compact Header with Quick Actions */}
         {/* Desktop: Full Elite Header */}
         <motion.div 
-         
+          variants={itemVariants}
           className="relative overflow-hidden rounded-xl sm:rounded-2xl"
         >
         {/* Multi-layer mesh gradient background */}
@@ -375,7 +375,7 @@ const Dashboard = () => {
 
               {/* Right: Quick Actions */}
               <div className="flex items-center gap-3">
-                <motion.div whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="premium" size="default" className="shadow-lg shadow-primary/20 h-11">
                     <Link to="/orders">
                       <Plus className="h-4 w-4 mr-2" />
@@ -383,7 +383,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="outline" size="default" className="group h-11">
                     <Link to="/track-chauffeurs">
                       <Route className="h-4 w-4 mr-2" />
@@ -392,7 +392,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="ghost" size="icon" className="h-11 w-11 relative">
                     <Link to="/email">
                       <Mail className="h-5 w-5" />
@@ -404,7 +404,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsCustomizing(true)}>
                     <Settings2 className="h-5 w-5" />
                   </Button>
@@ -415,7 +415,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Mobile: iOS-Style Quick Stats Grid */}
-        <motion.div className="grid grid-cols-2 gap-2.5 sm:hidden">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2.5 sm:hidden">
           {loading ? (
             <StatsGridSkeleton count={4} />
           ) : (
@@ -453,7 +453,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Desktop: Full OPS Snapshot */}
-        <motion.section className="hidden sm:block">
+        <motion.section variants={itemVariants} className="hidden sm:block">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -475,7 +475,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* Mobile: Compact OPS Row (just critical alerts) */}
-        <motion.section className="sm:hidden">
+        <motion.section variants={itemVariants} className="sm:hidden">
           {(opsStats.chauffeurNodig > 0 || opsStats.atRisk > 0 || opsStats.podMissing > 0) && (
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">
@@ -545,7 +545,7 @@ const Dashboard = () => {
         <OnboardingChecklist />
 
         {/* Customizable Widget Grid */}
-        <motion.section>
+        <motion.section variants={itemVariants}>
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
               <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-gold to-gold/50" />
@@ -586,7 +586,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* Snelle acties */}
-        <motion.section>
+        <motion.section variants={itemVariants}>
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -602,7 +602,7 @@ const Dashboard = () => {
             ].map((action) => (
               <Link key={action.href} to={action.href}>
                 <motion.div
-                  }}
+                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 20 } }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
                     "action-card-3d",

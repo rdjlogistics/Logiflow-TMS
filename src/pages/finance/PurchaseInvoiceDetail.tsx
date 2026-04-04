@@ -188,8 +188,21 @@ const PurchaseInvoiceDetail = () => {
     <DashboardLayout title="Inkoopfactuur">
       {/* Premium animated background mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl opacity-50" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl opacity-40" />
+        <div
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.4, 0.6, 0.4],
+            x: [0, 20, 0],
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"
+          animate={{
+            scale: [1.1, 1, 1.1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+        />
       </div>
 
       <div 
@@ -291,7 +304,7 @@ const PurchaseInvoiceDetail = () => {
 
             {/* Quick Action Button */}
             {invoice.status === "concept" && (
-              <div>
+              <div variants={itemVariants}>
                 <Button
                   className="w-full h-14 text-base font-semibold gap-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-500"
                   onClick={() => updateStatusMutation.mutate("definitief")}

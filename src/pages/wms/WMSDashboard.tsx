@@ -285,7 +285,7 @@ export default function WMSDashboard() {
       <div
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6"
       >
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Magazijnen"
             value={statsLoading ? "-" : stats?.totalWarehouses || 0}
@@ -296,7 +296,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Producten"
             value={statsLoading ? "-" : (stats?.totalProducts?.toLocaleString("nl-NL") || "0")}
@@ -307,7 +307,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Totale Bezetting"
             value={`${warehouseUtilization}%`}
@@ -318,7 +318,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Voorraadwaarde"
             value={statsLoading ? "-" : formatCurrency(stats?.totalInventoryValue || 0)}
@@ -329,7 +329,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Lage Voorraad"
             value={statsLoading ? "-" : stats?.lowStockProducts || 0}
@@ -341,7 +341,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div className="col-span-1">
+        <div variants={item} className="col-span-1">
           <MetricCard
             title="Pick Efficiëntie"
             value={`${pickingEfficiency}%`}
@@ -356,7 +356,7 @@ export default function WMSDashboard() {
       <div
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
       >
-        <div>
+        <div variants={item}>
           <OperationsCard
             title="Ontvangst"
             icon={ArrowDownToLine}
@@ -370,7 +370,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div>
+        <div variants={item}>
           <OperationsCard
             title="Verzending"
             icon={ArrowUpFromLine}
@@ -384,7 +384,7 @@ export default function WMSDashboard() {
           />
         </div>
 
-        <div>
+        <div variants={item}>
           <OperationsCard
             title="Picking Waves"
             icon={Layers}
