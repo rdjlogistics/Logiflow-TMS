@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { LucideIcon, Clock, CheckCircle, XCircle, FileCheck, AlertTriangle, Calendar } from 'lucide-react';
 import { useRef, useState, useCallback, useEffect } from 'react';
@@ -55,15 +54,12 @@ function PerspectiveStatCard({ stat, index }: { stat: StatItem; index: number })
   }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, type: 'spring', stiffness: 100, damping: 15 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transform }}
-      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 md:p-5 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[var(--shadow-float)]"
+      style={{ transform, animationDelay: `${index * 80}ms` }}
+      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 md:p-5 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[var(--shadow-float)] animate-fade-in-up"
     >
       <div className="flex items-center gap-3">
         <div
@@ -77,7 +73,7 @@ function PerspectiveStatCard({ stat, index }: { stat: StatItem; index: number })
           <p className="text-xs text-muted-foreground truncate mt-0.5">{stat.label}</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

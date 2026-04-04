@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -131,13 +131,10 @@ export function DocumentDetailSheet({
             {imageLoading ? (
               <Skeleton className="w-full h-56" />
             ) : signedUrl ? (
-              <motion.img
+              <img
                 src={signedUrl}
                 alt="Document"
-                className="w-full max-h-72 object-contain"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                className="w-full max-h-72 object-contain animate-scale-fade-in"
               />
             ) : (
               <div className="w-full h-48 flex items-center justify-center">
@@ -172,13 +169,10 @@ export function DocumentDetailSheet({
                 </TabsTrigger>
               </TabsList>
 
-              <AnimatePresence mode="wait">
-                <motion.div
+
+                <div
                   key={activeAnalysisTab}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.15 }}
+                  className="animate-fade-in"
                 >
                   <TabsContent value="overview" className="mt-3 space-y-3">
                     <AnalysisSection title="AI Bevindingen" icon={Brain}>
@@ -264,8 +258,8 @@ export function DocumentDetailSheet({
                       )}
                     </AnalysisSection>
                   </TabsContent>
-                </motion.div>
-              </AnimatePresence>
+                </div>
+
             </Tabs>
           )}
 
@@ -278,13 +272,10 @@ export function DocumentDetailSheet({
           )}
 
           {/* Quick reject form */}
-          <AnimatePresence>
+
             {showRejectForm && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
+              <div
+                className="overflow-hidden animate-fade-in"
               >
                 <div className="space-y-3 p-3 rounded-xl border border-destructive/20 bg-destructive/5">
                   <p className="text-sm font-semibold text-destructive">Document afkeuren</p>
@@ -327,9 +318,8 @@ export function DocumentDetailSheet({
                     </Button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
 
         {/* Sticky action bar */}
