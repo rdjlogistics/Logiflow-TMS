@@ -106,7 +106,7 @@ export function useWeatherData(location: string = 'Nederland') {
 
         const [weatherRes, locationName] = await Promise.all([
           fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10,weather_code&timezone=auto`
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`
           ),
           reverseGeocode(lat, lng),
         ]);
@@ -125,7 +125,7 @@ export function useWeatherData(location: string = 'Nederland') {
           condition,
           icon,
           humidity: Math.round(current.relative_humidity_2m),
-          windSpeed: Math.round(current.wind_speed_10),
+          windSpeed: Math.round(current.wind_speed_10m),
           trafficExpected: traffic.level,
           trafficDescription: traffic.description,
           location: locationName,
