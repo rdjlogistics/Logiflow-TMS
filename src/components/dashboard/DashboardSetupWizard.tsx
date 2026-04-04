@@ -386,9 +386,8 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
               return (
                 <motion.button
                   key={preset.id}
-                 
                   onClick={() => { setSelectedPreset(preset); hapticSelection(); }}
-                 }
+                  whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
                     'relative flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all',

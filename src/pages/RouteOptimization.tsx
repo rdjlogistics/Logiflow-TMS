@@ -1011,7 +1011,6 @@ const RouteOptimization = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 16, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                       }
                         className={`p-2.5 sm:p-3 bg-muted/30 backdrop-blur-sm rounded-xl border group transition-all overflow-hidden cursor-pointer ${
                           draggedIndex === index ? 'opacity-50 border-primary/50' : 'border-border/20'
                         } ${
