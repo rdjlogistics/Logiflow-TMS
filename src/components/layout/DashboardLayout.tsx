@@ -86,7 +86,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
   }
 
   // Redirect to onboarding if not completed
-  if (!onboardingLoading && needsOnboarding) {
+  if (!onboardingLoading && !onboardingError && needsOnboarding) {
     return <Navigate to="/onboarding" replace />;
   }
 

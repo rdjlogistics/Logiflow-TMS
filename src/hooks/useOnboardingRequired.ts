@@ -2,16 +2,27 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-const MAX_POLL_MS = 5000;
-const POLL_INTERVAL_MS = 500;
+const MAX_POLL_MS = 10_000;
+const POLL_INTERVAL_MS = 600;
+const LS_PREFIX = 'onboarding-done-';
 
-/**
- * Polls for user_companies record (max 5s) to handle the race condition
- * where ensure-user-company hasn't finished yet.
- */
+function getLocalFlag(userId: string): boolean {
+  try { return localStorage.getItem(`${LS_PREFIX}${userId}`) === 'true'; } catch { return false; }
+}
+function setLocalFlag(userId: string) {
+  try { localStorage.setItem(`${LS_PREFIX}${userId}`, 'true'); } catch { /* noop */ }
+}
+
+/** Call on signOut to clear cached onboarding state */
+export function clearOnboardingCache() {
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(LS_PREFIX));
+    keys.forEach(k => localStorage.removeItem(k));
+  } catch { /* noop */ }
+}
+
 async function waitForCompanyLink(userId: string): Promise<string | null> {
   const deadline = Date.now() + MAX_POLL_MS;
-
   while (Date.now() < deadline) {
     const { data, error } = await supabase
       .from('user_companies')
@@ -19,31 +30,22 @@ async function waitForCompanyLink(userId: string): Promise<string | null> {
       .eq('user_id', userId)
       .eq('is_primary', true)
       .maybeSingle();
-
     if (!error && data?.company_id) return data.company_id;
-
-    // Wait before next poll
     await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
   }
-
   return null;
 }
 
-/**
- * Checks if the current user needs to complete the onboarding wizard.
- * Returns true if onboarding_completed_at is null in tenant_settings.
- * Handles the race condition with ensure-user-company by polling.
- */
 export const useOnboardingRequired = () => {
   const { user } = useAuth();
 
   const query = useQuery({
     queryKey: ['onboarding-required', user?.id],
     queryFn: async () => {
-      // Poll for the company link (handles race condition with ensure-user-company)
-      const companyId = await waitForCompanyLink(user!.id);
+      // Fast path: localStorage says done → skip all DB work
+      if (getLocalFlag(user!.id)) return false;
 
-      // No company link after polling → needs onboarding
+      const companyId = await waitForCompanyLink(user!.id);
       if (!companyId) return true;
 
       const { data, error } = await supabase
@@ -54,22 +56,28 @@ export const useOnboardingRequired = () => {
 
       if (error) {
         console.error('Error checking onboarding status:', error);
+        // Fail-safe: never redirect on transient errors
         return false;
       }
 
-      // No row → needs onboarding
       if (!data) return true;
 
-      // Row exists but onboarding not completed
-      return !(data as Record<string, unknown>).onboarding_completed_at;
+      const completed = !!(data as Record<string, unknown>).onboarding_completed_at;
+      if (completed) setLocalFlag(user!.id);
+      return !completed;
     },
     enabled: !!user,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 2,
+    retryDelay: 2000,
   });
 
   return {
-    needsOnboarding: query.data ?? false,
+    // If query errored out, never redirect (false)
+    needsOnboarding: query.isError ? false : (query.data ?? false),
     loading: query.isLoading,
+    error: query.isError,
     refetch: query.refetch,
   };
 };
