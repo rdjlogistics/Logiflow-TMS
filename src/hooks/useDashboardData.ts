@@ -194,20 +194,21 @@ export const useDashboardData = () => {
   const { company } = useCompany();
   const companyId = company?.id;
 
-  const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
+  const { data, isLoading, isFetching, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['dashboard-data', companyId],
     queryFn: () => fetchDashboardData(companyId!),
     enabled: !!companyId,
     staleTime: 30 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
-    refetchInterval: 2 * 60 * 1000, // 120s instead of 60s — reduces DB pressure by 50%
+    refetchInterval: 2 * 60 * 1000,
     refetchIntervalInBackground: false,
     retry: 2,
-    placeholderData: EMPTY_DATA,
   });
 
   const result = data ?? EMPTY_DATA;
+  // True only until first successful fetch — background refetches stay invisible
+  const isFirstLoad = isLoading || (isFetching && !dataUpdatedAt);
 
   const hasEnoughData = useMemo(() => {
     const totalTrips = result.tripStatusData.reduce((sum, item) => sum + item.count, 0);
