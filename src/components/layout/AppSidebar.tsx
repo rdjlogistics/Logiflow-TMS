@@ -579,36 +579,79 @@ const AppSidebar = () => {
         </SidebarContent>
 
         {/* Footer */}
-        <SidebarFooter className="border-t border-sidebar-border/15 p-2.5 flex-shrink-0 space-y-1">
-          {!isCollapsed && <PlanBadge />}
-          {isCollapsed && <PlanBadge compact />}
-          <Link to="/admin/settings">
-            <Button variant="ghost" size="sm"
-              className={`w-full h-9 text-[12px] rounded-lg ${isCollapsed ? 'px-0 justify-center' : 'justify-start'} text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 ${location.pathname.startsWith('/admin/settings') ? 'bg-sidebar-accent/60 text-sidebar-foreground' : ''}`}
-            >
-              <Settings className={`h-4 w-4 ${isCollapsed ? '' : 'mr-2'}`} />
-              {!isCollapsed && <span>Instellingen</span>}
-            </Button>
-          </Link>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={cycleTheme}
-              className={`flex-1 h-8 text-[11px] rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 ${isCollapsed ? 'px-0 justify-center' : 'justify-start'}`}
-            >
-              {isCollapsed ? (
-                resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />
-              ) : (
-                <>
+        <SidebarFooter className="border-t border-sidebar-border/15 p-2 flex-shrink-0">
+          {isCollapsed ? (
+            /* Collapsed: clean vertical stack of icon buttons, iOS-style */
+            <div className="flex flex-col items-center gap-1">
+              <PlanBadge compact />
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to="/admin/settings">
+                      <Button variant="ghost" size="sm"
+                        className={`h-9 w-9 p-0 rounded-xl transition-all duration-150 ${location.pathname.startsWith('/admin/settings') ? 'bg-sidebar-accent/60 text-sidebar-foreground' : 'text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'}`}
+                      >
+                        <Settings className="h-[18px] w-[18px]" />
+                      </Button>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs font-medium">Instellingen</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" onClick={cycleTheme}
+                      className="h-9 w-9 p-0 rounded-xl text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-all duration-150"
+                    >
+                      {resolvedTheme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs font-medium">
+                    {theme === "auto" ? "Auto thema" : theme === "dark" ? "Licht thema" : "Donker thema"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" onClick={() => signOut()}
+                      className="h-9 w-9 p-0 rounded-xl text-sidebar-foreground/45 hover:text-destructive hover:bg-destructive/10 transition-all duration-150"
+                    >
+                      <LogOut className="h-[18px] w-[18px]" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs font-medium">Uitloggen</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          ) : (
+            /* Expanded: full labels */
+            <div className="space-y-1">
+              <PlanBadge />
+              <Link to="/admin/settings">
+                <Button variant="ghost" size="sm"
+                  className={`w-full h-9 text-[12px] rounded-lg justify-start text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 ${location.pathname.startsWith('/admin/settings') ? 'bg-sidebar-accent/60 text-sidebar-foreground' : ''}`}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  <span>Instellingen</span>
+                </Button>
+              </Link>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="sm" onClick={cycleTheme}
+                  className="flex-1 h-8 text-[11px] rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 justify-start"
+                >
                   {theme === "auto" ? <Clock className="mr-1.5 h-3.5 w-3.5" /> : resolvedTheme === "dark" ? <Sun className="mr-1.5 h-3.5 w-3.5" /> : <Moon className="mr-1.5 h-3.5 w-3.5" />}
                   <span>{theme === "auto" ? "Auto" : theme === "dark" ? "Licht" : "Donker"}</span>
-                </>
-              )}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => signOut()}
-              className="text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 rounded-lg"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => signOut()}
+                  className="text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 rounded-lg"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          )}
         </SidebarFooter>
       </div>
     </Sidebar>
