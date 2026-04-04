@@ -82,7 +82,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
         content: m.content,
       }));
 
-      const { data, error } = await supabase.functions.invoke('smart-ai', {
+      const { data, error } = await supabase.functions.invoke('chatgpt', {
         body: {
           action: 'chat',
           mode: 'assistant',
