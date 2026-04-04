@@ -3,6 +3,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAuthStorage } from "@/lib/authStorage";
 import { clearAllRoleCache } from "./useUserRole";
+import { clearOnboardingCache } from "./useOnboardingRequired";
 
 interface AuthContextType {
   user: User | null;
