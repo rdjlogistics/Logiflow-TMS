@@ -382,7 +382,9 @@ export const B2BDashboard = ({
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-emerald-500"
-                            initial={{ width: 0 }}}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${paymentProgress}%` }}
+                            transition={{ duration: 1, ease: "easeOut" }}
                           />
                         </div>
                       </div>
