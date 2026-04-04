@@ -1,7 +1,6 @@
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Premium animation variants
+// Animation variants kept for components that still use framer-motion
 export const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -13,9 +12,7 @@ export const containerVariants = {
 export const itemVariants = {
   hidden: { opacity: 0, y: 16, scale: 0.98 },
   visible: { 
-    opacity: 1, 
-    y: 0, 
-    scale: 1,
+    opacity: 1, y: 0, scale: 1,
     transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
   }
 };
@@ -23,8 +20,7 @@ export const itemVariants = {
 export const tableRowVariants = {
   hidden: { opacity: 0, x: -12 },
   visible: { 
-    opacity: 1, 
-    x: 0,
+    opacity: 1, x: 0,
     transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }
   }
 };
@@ -33,12 +29,7 @@ export const shimmerVariants = {
   initial: { x: '-100%' },
   animate: { 
     x: '100%',
-    transition: { 
-      repeat: Infinity, 
-      duration: 3.5, 
-      ease: 'linear',
-      repeatDelay: 1.5
-    }
+    transition: { repeat: Infinity, duration: 3.5, ease: 'linear', repeatDelay: 1.5 }
   }
 };
 
@@ -51,11 +42,7 @@ interface PremiumGlassCardProps {
 }
 
 export const PremiumGlassCard = ({ 
-  children, 
-  className,
-  variant = "default",
-  hoverable = false,
-  glow = false,
+  children, className, variant = "default", hoverable = false, glow = false,
 }: PremiumGlassCardProps) => {
   const variantStyles = {
     default: "bg-card/70 border-border/40",
@@ -76,38 +63,23 @@ export const PremiumGlassCard = ({
   } : {};
 
   return (
-    <motion.div
-      variants={itemVariants}
+    <div
       className={cn(
-        "relative overflow-hidden rounded-2xl backdrop-blur-2xl border shadow-xl transition-all duration-500",
+        "relative overflow-hidden rounded-2xl backdrop-blur-2xl border shadow-xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-2 duration-500",
         variantStyles[variant],
         glow && glowStyles[variant],
-        hoverable && "hover:shadow-2xl hover:scale-[1.01] hover:border-primary/40 cursor-pointer",
+        hoverable && "hover:shadow-2xl hover:scale-[1.01] hover:-translate-y-0.5 hover:border-primary/40 cursor-pointer",
         className
       )}
-      whileHover={hoverable ? { y: -2 } : undefined}
     >
-      {/* Premium multi-layer gradient highlights */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/20 via-transparent to-transparent" />
-      
-      {/* Animated shimmer effect */}
-      <motion.div
-        variants={shimmerVariants}
-        initial="initial"
-        animate="animate"
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none"
-      />
-      
-      {/* Mesh gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.08),transparent)] pointer-events-none" />
-      
       {children}
-    </motion.div>
+    </div>
   );
 };
 
-// Premium Section Header with icon glow
 interface SectionHeaderProps {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -115,34 +87,22 @@ interface SectionHeaderProps {
   description?: string;
 }
 
-export const SectionHeader = ({ 
-  icon: Icon, 
-  title,
-  badge,
-  description,
-}: SectionHeaderProps) => (
+export const SectionHeader = ({ icon: Icon, title, badge, description }: SectionHeaderProps) => (
   <div className="flex items-center justify-between p-6 pb-2">
     <div className="flex items-center gap-4">
-      <motion.div 
-        className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary shadow-lg shadow-primary/20"
-        whileHover={{ scale: 1.05, rotate: 3 }}
-        transition={{ type: "spring", stiffness: 400, damping: 20 }}
-      >
+      <div className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary shadow-lg shadow-primary/20 hover:scale-105 hover:rotate-3 transition-transform duration-200">
         <Icon className="h-5 w-5" />
         <div className="absolute inset-0 rounded-xl bg-primary/10 blur-xl animate-pulse" />
-      </motion.div>
+      </div>
       <div>
         <h3 className="text-lg font-semibold text-foreground tracking-tight">{title}</h3>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
     </div>
     {badge}
   </div>
 );
 
-// Premium Data Row with animations
 interface DataRowProps {
   label: string;
   value: React.ReactNode;
@@ -151,19 +111,8 @@ interface DataRowProps {
   valueClassName?: string;
 }
 
-export const DataRow = ({ 
-  label, 
-  value, 
-  highlight,
-  icon: Icon,
-  valueClassName,
-}: DataRowProps) => (
-  <motion.div 
-    className="flex items-center justify-between py-3 group"
-    initial={{ opacity: 0, x: -8 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.3 }}
-  >
+export const DataRow = ({ label, value, highlight, icon: Icon, valueClassName }: DataRowProps) => (
+  <div className="flex items-center justify-between py-3 group animate-in fade-in slide-in-from-left-2 duration-300">
     <span className={cn(
       "text-sm flex items-center gap-2.5 transition-colors duration-300",
       highlight ? "text-foreground font-medium" : "text-muted-foreground group-hover:text-foreground/80"
@@ -178,5 +127,5 @@ export const DataRow = ({
     )}>
       {value}
     </span>
-  </motion.div>
+  </div>
 );
