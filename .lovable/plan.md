@@ -1,75 +1,43 @@
 
 
-# Fix: Echte weerdata via Open-Meteo API (gratis, geen API key)
+# Fix: Dashboard laadt glitcherig met dubbele render
 
-## Probleem
+## Root Cause
 
-`useWeatherData.ts` is 100% nep — `Math.random()` genereert willekeurige temperaturen op basis van seizoen. Geen API call, geen locatie, geen echte data.
+**`placeholderData: EMPTY_DATA`** in `useDashboardData.ts` zorgt ervoor dat `isLoading` direct `false` is. Het dashboard rendert dus meteen met allemaal nullen (0 ritten, 0 klanten, 0 omzet), en springt dan naar echte data wanneer de query klaar is. Dit veroorzaakt het "glitchy" effect — alles verschijnt twee keer.
 
-## Oplossing
+Daarnaast: het weer, de role, en de dashboard-data laden allemaal onafhankelijk, wat tot 3-4 re-renders leidt voordat het scherm stabiel is.
 
-**Open-Meteo API** — gratis, geen API key nodig, geen rate limits voor normaal gebruik, werkt wereldwijd.
+## Oplossing (2 bestanden)
 
-### 1 bestand: `src/hooks/useWeatherData.ts` — volledig herschrijven
+### 1. `src/hooks/useDashboardData.ts` — echte loading state
 
-**Stap 1: Browser geolocation ophalen**
-- `navigator.geolocation.getCurrentPosition()` met `maximumAge: 300000` (5 min cache), `timeout: 5000`
-- Fallback bij weigering: Amsterdam (52.37, 4.90)
+- Vervang `placeholderData: EMPTY_DATA` door `placeholderData: undefined`
+- Voeg `isPlaceholderData` of `isFetching` check toe zodat `loading` alleen `false` is wanneer echte data is opgehaald
+- Nieuwe logica: `loading: isLoading || (isFetching && !dataUpdatedAt)` — true tot eerste succesvolle fetch, daarna nooit meer (background refetches tonen geen loader)
 
-**Stap 2: Open-Meteo API aanroepen**
-- URL: `https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10,weather_code&timezone=auto`
-- Geen key, geen account, directe client-side fetch
-- WMO weather codes mappen naar bestaande icon types (`sunny`, `cloudy`, `rainy`, `snowy`, `foggy`, `stormy`, `partly-cloudy`)
-- Nederlandse condition labels behouden (`Zonnig`, `Bewolkt`, `Regen`, etc.)
+### 2. `src/pages/Dashboard.tsx` — top-level loading gate
 
-**Stap 3: Traffic schatting behouden**
-- Traffic logica (spits + weer-conditie) blijft lokaal berekend — dit is geen weer-API functie
-- Gebruikt de echte weer-conditie i.p.v. random
+- Voeg direct na de hooks een check toe: als `loading === true`, render een volledig **DashboardSkeleton** in plaats van het hele dashboard
+- Dit skeleton bevat: header-blok, 4 stat-kaarten, en 3 widget-placeholders
+- Zodra data er is, rendert het dashboard **eenmalig** met alle echte waarden — geen dubbele render, geen 0→echte waarden sprong
+- Weer-sectie: toon alleen wanneer `!weatherLoading && weather` (al zo, maar nu pas zichtbaar na eerste volledige render)
 
-**Stap 4: Caching & error handling**
-- `staleTime: 15 min` — weerdata verandert niet per seconde
-- Bij API-fout: fallback naar laatste bekende waarde (useState behoudt vorige data)
-- Bij geolocation-weigering: gebruik Amsterdam als default, toon echte data voor die locatie
-
-**Stap 5: Reverse geocoding voor locatienaam**
-- Open-Meteo geeft geen plaatsnaam → gebruik `https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lng}&format=json` (ook gratis)
-- Toon echte stad/regio i.p.v. hardcoded "Nederland"
-
-### Interface blijft 100% identiek
+## Technisch Detail
 
 ```text
-WeatherData {
-  temperature: number      ← echte API waarde
-  condition: string        ← WMO code → Nederlandse tekst
-  icon: string             ← WMO code → icon type
-  humidity: number         ← echte API waarde
-  windSpeed: number        ← echte API waarde
-  trafficExpected: string  ← berekend op basis van echte weer + tijd
-  trafficDescription: string
-  location: string         ← reverse geocoded plaatsnaam
-}
+Huidige flow:
+  t=0ms   → placeholderData → render met 0en → "glitch"
+  t=800ms → echte data      → re-render → content springt
+
+Nieuwe flow:
+  t=0ms   → loading=true → skeleton
+  t=800ms → echte data   → render eenmalig met echte waarden → klaar
 ```
 
-Dashboard.tsx heeft **zero wijzigingen** nodig.
-
-### WMO Weather Code mapping
-
-| Code | Conditie | Icon |
-|------|----------|------|
-| 0 | Onbewolkt | sunny |
-| 1-2 | Halfbewolkt | partly-cloudy |
-| 3 | Bewolkt | cloudy |
-| 45, 48 | Mist | foggy |
-| 51-67 | Regen/Motregen | rainy |
-| 71-77 | Sneeuw | snowy |
-| 80-82 | Buien | rainy |
-| 85-86 | Sneeuwbuien | snowy |
-| 95-99 | Onweer | stormy |
-
-### Resultaat
-- Echte temperatuur op basis van GPS-locatie van de gebruiker
-- Werkt in heel Europa (en wereldwijd)
-- Geen API key nodig, geen kosten, geen edge function
-- Fallback naar Amsterdam bij geolocation-weigering
-- 1 bestand gewijzigd, 0 breaking changes
+## Resultaat
+- Dashboard laadt 1x schoon met skeleton, dan direct de echte data
+- Geen springende nullen, geen dubbele render
+- Background refetches (elke 2 min) tonen geen loader — data update stil op de achtergrond
+- 0 nieuwe dependencies, 2 bestanden gewijzigd
 
