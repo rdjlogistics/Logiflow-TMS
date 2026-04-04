@@ -129,7 +129,7 @@ const FleetManagement = () => {
           </AnimatePresence>
         </Tabs>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
