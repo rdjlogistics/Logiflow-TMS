@@ -52,14 +52,9 @@ const FleetManagement = () => {
         )}
 
         {/* Critical alert banner */}
-        <AnimatePresence>
-          {alerts.filter(a => a.severity === 'critical').length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-              className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/8 border border-destructive/15 backdrop-blur-xl text-sm"
+        {alerts.filter(a => a.severity === 'critical').length > 0 && (
+            <div
+              className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/8 border border-destructive/15 backdrop-blur-xl text-sm animate-fade-in-blur"
             >
               <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-destructive/12">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -75,9 +70,8 @@ const FleetManagement = () => {
               >
                 Bekijk
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+        )}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
