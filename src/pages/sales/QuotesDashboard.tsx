@@ -108,11 +108,11 @@ const QuotesDashboard = () => {
       const { data } = await supabase
         .from("customers")
         .select("id, company_name")
-        .eq("company_id", companyId)
-        .eq("is_active", true)
+        .eq("company_id", companyId as any)
+        .eq("is_active", true as any)
         .order("company_name")
         .limit(200);
-      return data ?? [];
+      return (data ?? []) as any[];
     },
     enabled: !!companyId,
   });
