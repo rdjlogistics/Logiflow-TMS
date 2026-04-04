@@ -311,6 +311,7 @@ export function ContractTemplateList({
             ))}
           </div>
         )}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
