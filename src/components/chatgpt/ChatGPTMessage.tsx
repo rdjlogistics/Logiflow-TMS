@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+
 
 interface ChatGPTMessageProps {
   message: ChatMessage;
@@ -21,11 +21,8 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
+    <div
+      className={`flex gap-3 animate-fade-in-up ${isUser ? 'flex-row-reverse' : ''}`
     >
       {/* Avatar */}
       <div className={`
@@ -95,6 +92,6 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
           {format(new Date(message.createdAt), 'HH:mm', { locale: nl })}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 };

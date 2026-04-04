@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,17 +29,14 @@ export const OnboardingInput = ({
   return (
     <div className={cn('relative', className)}>
       {/* Floating label */}
-      <motion.label
+      <label
         className={cn(
           'absolute left-0 transition-all duration-300 pointer-events-none z-10',
-          (isFocused || hasValue) ? 'text-xs text-primary -top-5' : 'text-lg text-muted-foreground top-3.5 left-4'
+          (isFocused || hasValue) ? 'text-xs text-primary -top-5 scale-[0.85]' : 'text-lg text-muted-foreground top-3.5 left-4 scale-100'
         )}
-        animate={{
-          scale: (isFocused || hasValue) ? 0.85 : 1,
-        }}
       >
         {placeholder}
-      </motion.label>
+      </label>
 
       {/* Gradient border wrapper */}
       <div
@@ -70,42 +66,31 @@ export const OnboardingInput = ({
 
           {/* Clear button & Password toggle */}
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-            <AnimatePresence>
-              {hasValue && type !== 'password' && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => onChange('')}
-                  className="p-1.5 rounded-full bg-muted text-muted-foreground hover:bg-muted-foreground/30 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {hasValue && type !== 'password' && (
+              <button
+                onClick={() => onChange('')}
+                className="p-1.5 rounded-full bg-muted text-muted-foreground hover:bg-muted-foreground/30 transition-colors animate-fade-in"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
 
             {type === 'password' && hasValue && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+              <button
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-1.5 rounded-full bg-muted text-muted-foreground hover:bg-muted-foreground/30 transition-colors"
+                className="p-1.5 rounded-full bg-muted text-muted-foreground hover:bg-muted-foreground/30 transition-colors animate-fade-in"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </motion.button>
+              </button>
             )}
           </div>
         </div>
       </div>
 
       {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-destructive text-sm mt-2"
-        >
+        <p className="text-destructive text-sm mt-2 animate-fade-in-up">
           {error}
-        </motion.p>
+        </p>
       )}
     </div>
   );

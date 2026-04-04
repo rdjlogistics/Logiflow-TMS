@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
+
 import { 
   Mail, 
   MessageSquare, 
@@ -170,17 +170,15 @@ export function DispatchChannelStatus() {
             const stats = channelStatus?.channelStats?.[channel.id];
 
             return (
-              <motion.div
+              <div
                 key={channel.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
                 className={cn(
-                  "p-3 rounded-xl border transition-all",
+                  "p-3 rounded-xl border transition-all animate-fade-in-up",
                   status === 'active' || status === 'ready'
                     ? channel.color
                     : "bg-muted/30 border-border/50 opacity-60"
                 )}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className={cn(
@@ -210,7 +208,7 @@ export function DispatchChannelStatus() {
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
