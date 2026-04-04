@@ -18,10 +18,6 @@ import { nl } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 
-const staggerItem = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-};
 
 const FEATURE_LABELS: Record<string, string> = {
   order_management: 'Orderbeheer',
