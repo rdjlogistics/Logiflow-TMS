@@ -146,7 +146,7 @@ const WidgetCustomizer = ({
           <div className="flex items-center gap-3">
             <motion.div 
               className="relative"
-
+              whileHover={{ scale: 1.08, rotate: 5 }}
             >
               <div className="absolute -inset-0.5 bg-gradient-to-br from-primary to-primary/50 rounded-xl blur opacity-40" />
               <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
@@ -390,7 +390,7 @@ const WidgetCustomizer = ({
                         key={widget.id}
                         initial={{ opacity: 0, scale: 0.9 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-}
+                        whileHover={{ y: -3, transition: { type: "spring", stiffness: 400, damping: 20 } }}
                         onClick={() => handleAddWidget(widget.id)}
                         className={cn(
                           "flex flex-col items-center gap-2.5 p-4 rounded-xl",
@@ -402,7 +402,7 @@ const WidgetCustomizer = ({
                       >
                         <motion.div
                           className="p-3 rounded-xl bg-background/50 border border-border/20 group-hover:border-primary/30 group-hover:shadow-[0_0_20px_-8px_hsl(var(--primary)/0.2)] transition-all"
-
+                          whileHover={{ scale: 1.08, rotate: 3 }}
                         >
                           <widget.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                         </motion.div>

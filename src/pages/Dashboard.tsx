@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import PeriodSelector, { type PeriodKey } from "@/components/dashboard/PeriodSelector";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { motion } from "framer-motion";
@@ -53,7 +52,6 @@ import { nl } from "date-fns/locale";
 const Dashboard = () => {
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
-  const [period, setPeriod] = useState<PeriodKey>("this_month");
   const { 
     stats, 
     opsStats, 
@@ -67,7 +65,7 @@ const Dashboard = () => {
     hasEnoughData,
     loading,
     error 
-  } = useDashboardData(period);
+  } = useDashboardData();
   
   const { weather, loading: weatherLoading } = useWeatherData();
   const { 
@@ -220,12 +218,14 @@ const Dashboard = () => {
     <DashboardLayout title="Command Center">
       <motion.div 
         className="space-y-4 sm:space-y-6"
-       
-       
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
         {/* Mobile: Compact Header with Quick Actions */}
         {/* Desktop: Full Elite Header */}
-        <motion.div
+        <motion.div 
+          variants={itemVariants}
           className="relative overflow-hidden rounded-xl sm:rounded-2xl"
         >
         {/* Multi-layer mesh gradient background */}
@@ -275,10 +275,7 @@ const Dashboard = () => {
                 </Badge>
               </div>
               
-              {/* Period selector - mobile */}
-              <PeriodSelector value={period} onChange={setPeriod} />
-
-              {/* Mobile Quick Actions */}
+              {/* Mobile Quick Actions - Fixed at bottom, prominent */}
               <div className="flex gap-2">
                 <Button asChild variant="premium" size="sm" className="flex-1 h-10 shadow-lg shadow-primary/20">
                   <Link to="/orders">
@@ -304,7 +301,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-4">
                   <motion.div 
                     className="relative"
-
+                    whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
                     <div className="absolute -inset-1 bg-gradient-to-br from-primary via-primary/50 to-gold/50 rounded-xl blur opacity-40" />
@@ -361,7 +358,6 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3 text-sm">
-                  <PeriodSelector value={period} onChange={setPeriod} />
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg glass-panel-subtle">
                     <TrendingUp className="h-3.5 w-3.5 text-success" />
                     <span className="text-muted-foreground">Vandaag:</span>
@@ -373,7 +369,7 @@ const Dashboard = () => {
 
               {/* Right: Quick Actions */}
               <div className="flex items-center gap-3">
-                <motion.div>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="premium" size="default" className="shadow-lg shadow-primary/20 h-11">
                     <Link to="/orders">
                       <Plus className="h-4 w-4 mr-2" />
@@ -381,7 +377,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="outline" size="default" className="group h-11">
                     <Link to="/track-chauffeurs">
                       <Route className="h-4 w-4 mr-2" />
@@ -390,7 +386,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="ghost" size="icon" className="h-11 w-11 relative">
                     <Link to="/email">
                       <Mail className="h-5 w-5" />
@@ -402,7 +398,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsCustomizing(true)}>
                     <Settings2 className="h-5 w-5" />
                   </Button>
@@ -413,14 +409,14 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Mobile: iOS-Style Quick Stats Grid */}
-        <motion.div className="grid grid-cols-2 gap-2.5 sm:hidden">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2.5 sm:hidden">
           {loading ? (
             <StatsGridSkeleton count={4} />
           ) : (
             quickStats.map((stat, index) => (
               <Link key={stat.label} to={stat.href}>
                 <motion.div
-
+                  whileTap={{ scale: 0.97 }}
                   className={cn(
                     "relative p-3.5 rounded-2xl glass-panel-subtle",
                     "bg-gradient-to-br from-card/80 to-card/40",
@@ -451,7 +447,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Desktop: Full OPS Snapshot */}
-        <motion.section className="hidden sm:block">
+        <motion.section variants={itemVariants} className="hidden sm:block">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -473,7 +469,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* Mobile: Compact OPS Row (just critical alerts) */}
-        <motion.section className="sm:hidden">
+        <motion.section variants={itemVariants} className="sm:hidden">
           {(opsStats.chauffeurNodig > 0 || opsStats.atRisk > 0 || opsStats.podMissing > 0) && (
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">
@@ -483,7 +479,7 @@ const Dashboard = () => {
                 {opsStats.chauffeurNodig > 0 && (
                   <Link to="/driver/assign" className="block">
                     <motion.div 
-
+                      whileTap={{ scale: 0.98 }}
                       className="flex items-center justify-between p-3 rounded-xl bg-destructive/10 border border-destructive/20"
                     >
                       <div className="flex items-center gap-2.5">
@@ -501,7 +497,7 @@ const Dashboard = () => {
                 {opsStats.atRisk > 0 && (
                   <Link to="/trips?filter=at-risk" className="block">
                     <motion.div 
-
+                      whileTap={{ scale: 0.98 }}
                       className="flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20"
                     >
                       <div className="flex items-center gap-2.5">
@@ -519,7 +515,7 @@ const Dashboard = () => {
                 {opsStats.podMissing > 0 && (
                   <Link to="/operations/pod?tab=pending" className="block">
                     <motion.div 
-
+                      whileTap={{ scale: 0.98 }}
                       className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20"
                     >
                       <div className="flex items-center gap-2.5">
@@ -543,7 +539,7 @@ const Dashboard = () => {
         <OnboardingChecklist />
 
         {/* Customizable Widget Grid */}
-        <motion.section>
+        <motion.section variants={itemVariants}>
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
               <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-gold to-gold/50" />
@@ -584,7 +580,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* Snelle acties */}
-        <motion.section>
+        <motion.section variants={itemVariants}>
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -600,8 +596,8 @@ const Dashboard = () => {
             ].map((action) => (
               <Link key={action.href} to={action.href}>
                 <motion.div
-}
-
+                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 20 } }}
+                  whileTap={{ scale: 0.97 }}
                   className={cn(
                     "action-card-3d",
                     "relative flex flex-col items-center justify-center gap-3 p-5 cursor-pointer",

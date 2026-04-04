@@ -185,8 +185,9 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
     >
       {/* Header info cards */}
       <motion.div 
-        
-        
+        variants={containerVariants} 
+        initial="hidden" 
+        animate="visible" 
         className="grid grid-cols-2 sm:grid-cols-4 gap-2.5"
       >
         {[
@@ -196,7 +197,8 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
           { icon: <MapPin className="h-4 w-4" />, label: "Locatie", value: pod.stop_city || '-', color: 'text-amber-500' },
         ].map((item, i) => (
           <motion.div
-            key={item.label}, visible: { opacity: 1, y: 0 } }}
+            key={item.label}
+            variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
             transition={{ ...spring, delay: i * 0.05 }}
             className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm p-3 space-y-1.5"
           >
@@ -278,8 +280,8 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             {photoUrls.map((url, idx) => (
               <motion.button
                 key={idx}
-
-
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
                 transition={spring}
                 onClick={() => setExpandedPhoto(url)}
                 className="aspect-video rounded-xl overflow-hidden border-2 border-transparent hover:border-primary/40 transition-colors cursor-pointer group relative ring-0 hover:ring-2 hover:ring-primary/20"
@@ -498,7 +500,7 @@ function TabButton({ active, label, count, onClick }: { active: boolean; label: 
           ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
           : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
       )}
-
+      whileTap={{ scale: 0.97 }}
       transition={spring}
     >
       {label}
@@ -592,7 +594,7 @@ export default function DigitalPOD() {
                       onBlur={() => setSearchFocused(false)}
                     />
                   </motion.div>
-                  <motion.div transition={spring}>
+                  <motion.div whileTap={{ scale: 0.92, rotate: -90 }} transition={spring}>
                     <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-border/50" onClick={refetch}>
                       <RefreshCw className="h-4 w-4" />
                     </Button>
