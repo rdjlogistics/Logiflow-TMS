@@ -162,6 +162,7 @@ const AIUsage = lazyWithRetry(() => import("./pages/admin/AIUsage"));
 const SuperAdminDashboard = lazyWithRetry(() => import("./pages/admin/SuperAdminDashboard"));
 const LaunchChecklist = lazyWithRetry(() => import("./pages/admin/LaunchChecklist"));
 const StressTest = lazyWithRetry(() => import("./pages/admin/StressTest"));
+const Locations = lazyWithRetry(() => import("./pages/admin/Locations"));
 
 // AI & Integrations
 const TelematicsIntegration = lazyWithRetry(() => import("./pages/integrations/TelematicsIntegration"));
@@ -389,6 +390,7 @@ const App = () => (
                           <Route path="/admin/launch-checklist" element={<AdminPR><LaunchChecklist /></AdminPR>} />
                           <Route path="/admin/stress-test" element={<AdminPR><StressTest /></AdminPR>} />
                           <Route path="/admin/document-verification" element={<AdminPR><DocumentVerification /></AdminPR>} />
+                          <Route path="/admin/locations" element={<AdminPR><Locations /></AdminPR>} />
                           <Route path="/email-dashboard" element={<AdminPR><EmailDashboard /></AdminPR>} />
                           <Route path="/network" element={<PR><Network /></PR>} />
                           {/* CRM */}
