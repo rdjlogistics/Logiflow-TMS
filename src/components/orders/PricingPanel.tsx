@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { TollIndicator } from "./TollIndicator";
 import AutoPriceIndicator from "./AutoPriceIndicator";
-import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import type { TollDetectionResult } from "@/hooks/useTollDetection";
 import type { AutoPriceResult } from "@/hooks/useAutoPrice";
@@ -181,8 +180,7 @@ const PricingPanel = ({
   const TARIFF_GRID = isFullwidth ? TARIFF_GRID_FW : TARIFF_GRID_SB;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: isFullwidth ? 16 : 0 }}
+    <div
     >
     <Card 
       className={cn(
@@ -468,7 +466,7 @@ const PricingPanel = ({
         </div>
 
         {/* === Marge — prominent full-width bar === */}
-        <motion.div 
+        <div 
           className="border-t border-border/30 pt-4"
         >
           {/* Progress bar for margin visualization */}
@@ -524,12 +522,12 @@ const PricingPanel = ({
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         <div className="h-0 sm:h-0" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
       </CardContent>
     </Card>
-    </motion.div>
+    </div>
   );
 };
 

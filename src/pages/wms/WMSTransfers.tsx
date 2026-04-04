@@ -35,7 +35,6 @@ import {
 import { useWarehouseTransfers, useCreateWarehouseTransfer, useWarehouses } from "@/hooks/useWMS";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
-import { motion } from "framer-motion";
 import { WMSGlassCard, WMSCardTitle, WMSStatCard } from "@/components/wms";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,7 +103,7 @@ export default function WMSTransfers() {
 
   return (
     <DashboardLayout title="Inter-Warehouse Transfers">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <p className="text-muted-foreground">Beheer voorraadtransfers tussen magazijnen</p>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild><Button className="gap-2"><Plus className="h-4 w-4" />Nieuwe Transfer</Button></DialogTrigger>
@@ -136,7 +135,7 @@ export default function WMSTransfers() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <WMSStatCard title="Concept" value={counts.draft} icon={<Clock className="h-full w-full" />} variant="default" />
@@ -158,7 +157,7 @@ export default function WMSTransfers() {
                 <div className="space-y-3">{filteredTransfers?.map((transfer, i) => {
                   const status = statusConfig[transfer.status] || statusConfig.draft;
                   return (
-                    <motion.div key={transfer.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+                    <div key={transfer.id} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div><p className="font-mono font-medium">{transfer.transfer_number}</p>{transfer.shipped_date && <p className="text-xs text-muted-foreground">Verzonden: {format(new Date(transfer.shipped_date), "dd MMM yyyy", { locale: nl })}</p>}</div>
                         <div className="flex items-center gap-2">
@@ -176,7 +175,7 @@ export default function WMSTransfers() {
                         <ArrowRight className="h-5 w-5 text-muted-foreground" />
                         <div className="flex items-center gap-2 flex-1"><div className="p-2 rounded-lg bg-primary/10"><Warehouse className="h-4 w-4 text-primary" /></div><div><p className="font-medium text-sm">{transfer.to_warehouse?.name}</p><p className="text-xs text-muted-foreground">Naar</p></div></div>
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}</div>
               )}

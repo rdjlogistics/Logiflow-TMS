@@ -1,5 +1,4 @@
 import React, { memo, useMemo } from "react";
-import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -201,13 +200,11 @@ const ExecutivePLWidget = () => {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <motion.div
-          initial="hidden"
-          animate="visible"
+        <div
           className="grid grid-cols-2 gap-3"
         >
           {/* Revenue */}
-          <motion.div
+          <div
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -237,10 +234,10 @@ const ExecutivePLWidget = () => {
             <p className="text-[10px] text-muted-foreground mt-0.5">
               {data.totalOrders} orders
             </p>
-          </motion.div>
+          </div>
 
           {/* Gross Profit */}
-          <motion.div
+          <div
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -255,10 +252,10 @@ const ExecutivePLWidget = () => {
             <p className="text-[10px] text-muted-foreground mt-0.5">
               Kosten: {formatCurrencyCompact(data.costs)}
             </p>
-          </motion.div>
+          </div>
 
           {/* Margin */}
-          <motion.div
+          <div
             className={cn(
               "relative p-3 rounded-xl border",
               marginColors[marginStatus]
@@ -282,10 +279,10 @@ const ExecutivePLWidget = () => {
               value={Math.min(data.margin, 40)} 
               className="h-1.5 mt-2 bg-background/50" 
             />
-          </motion.div>
+          </div>
 
           {/* Avg Order Value */}
-          <motion.div
+          <div
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -300,13 +297,11 @@ const ExecutivePLWidget = () => {
             <p className="text-[10px] text-muted-foreground mt-0.5">
               Per zending
             </p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Bottom Stats Row */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
+        <div
           className="flex items-center justify-between p-3 rounded-xl border border-border/30 bg-muted/20"
         >
           <div className="flex items-center gap-4">
@@ -338,7 +333,7 @@ const ExecutivePLWidget = () => {
               <ChevronRight className="h-3.5 w-3.5 ml-1 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </Link>
           </Button>
-        </motion.div>
+        </div>
       </CardContent>
     </Card>
   );

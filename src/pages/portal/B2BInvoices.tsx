@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalData } from "@/components/portal/shared/usePortalData";
 import { usePortalAuth } from "@/hooks/usePortalAuth";
@@ -78,14 +77,14 @@ const B2BInvoices = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} onRefresh={refetch}>
-      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
+      <div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
         {/* Header */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Facturen</h1>
             <p className="text-sm text-muted-foreground">{invoices.length} facturen in totaal</p>
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <div>
             <Button 
               variant="outline" className="gap-2"
               disabled={exporting || invoices.length === 0}
@@ -94,40 +93,36 @@ const B2BInvoices = () => {
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Exporteer CSV
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Summary Cards */}
-        <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={containerVariants}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={containerVariants}>
           {summaryCards.map((card, index) => (
-            <motion.div key={card.key} variants={itemVariants} whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 25 } }}>
+            <div key={card.key} variants={itemVariants} whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 25 } }}>
               <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <motion.div
-                      whileHover={{ rotate: 10, scale: 1.1 }}
+                    <div
                       className={cn("p-1.5 rounded-lg flex-shrink-0", card.key === 'overdue' ? 'bg-red-500/10' : card.key === 'paid' ? 'bg-emerald-500/10' : card.key === 'open' ? 'bg-amber-500/10' : 'bg-muted/50')}
                     >
                       <card.icon className={cn("h-4 w-4", card.colorClass)} />
-                    </motion.div>
+                    </div>
                     <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</span>
                   </div>
-                  <motion.p
+                  <p
                     className={cn("text-xl font-display font-bold", card.colorClass)}
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15, delay: index * 0.08 }}
                   >
                     €{totals[card.key].toFixed(2)}
-                  </motion.p>
+                  </p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Filters */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken op factuurnummer..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
@@ -139,7 +134,7 @@ const B2BInvoices = () => {
               { key: 'paid', label: 'Betaald' },
               { key: 'overdue', label: 'Achterstallig' },
             ].map(tab => (
-              <motion.div key={tab.key || 'all'} whileTap={{ scale: 0.95 }} className="snap-start">
+              <div key={tab.key || 'all'} className="snap-start">
                 <Button
                   variant={statusFilter === tab.key ? "default" : "outline"}
                   size="sm"
@@ -148,10 +143,10 @@ const B2BInvoices = () => {
                 >
                   {tab.label}
                 </Button>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-3">
@@ -161,13 +156,8 @@ const B2BInvoices = () => {
             const isOverdue = invoice.status === 'overdue';
             
             return (
-              <motion.div
+              <div
                 key={invoice.id}
-                custom={index}
-                variants={rowVariants}
-                initial="hidden"
-                animate="show"
-                whileTap={{ scale: 0.98 }}
                 className="touch-manipulation"
               >
                 <div className={cn(
@@ -187,13 +177,11 @@ const B2BInvoices = () => {
                       <p>Vervalt: {format(new Date(invoice.dueDate), "d MMM yyyy", { locale: nl })}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <motion.span
+                      <span
                         className={cn("text-xl font-bold tabular-nums", isOverdue && "text-red-400")}
-                        animate={isOverdue ? { opacity: [1, 0.6, 1] } : {}}
-                        transition={isOverdue ? { repeat: Infinity, duration: 2 } : {}}
                       >
                         €{invoice.amount.toFixed(2)}
-                      </motion.span>
+                      </span>
                       <Button
                         variant={isOverdue ? "destructive" : "outline"}
                         size="sm"
@@ -232,13 +220,13 @@ const B2BInvoices = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Desktop Table */}
-        <motion.div variants={itemVariants} className="hidden md:block bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden shadow-sm">
+        <div variants={itemVariants} className="hidden md:block bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full w-full">
               <thead>
@@ -258,13 +246,8 @@ const B2BInvoices = () => {
                   const isOverdue = invoice.status === 'overdue';
                   
                   return (
-                    <motion.tr
+                    <tr
                       key={invoice.id}
-                      custom={index}
-                      variants={rowVariants}
-                      initial="hidden"
-                      animate="show"
-                      whileHover={{ backgroundColor: "hsl(var(--muted) / 0.2)", x: 4 }}
                       className="transition-colors"
                     >
                       <td className="px-4 py-3"><span className="font-medium text-sm">{invoice.number}</span></td>
@@ -277,16 +260,14 @@ const B2BInvoices = () => {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <motion.span
+                        <span
                           className={cn("text-sm font-semibold", isOverdue && "text-red-400")}
-                          animate={isOverdue ? { opacity: [1, 0.6, 1] } : {}}
-                          transition={isOverdue ? { repeat: Infinity, duration: 2 } : {}}
                         >
                           €{invoice.amount.toFixed(2)}
-                        </motion.span>
+                        </span>
                       </td>
                       <td className="px-4 py-3">
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <div>
                           <Button 
                             variant="ghost" size="sm" className="gap-1"
                             onClick={async () => {
@@ -319,30 +300,28 @@ const B2BInvoices = () => {
                             <Download className="h-4 w-4" />
                             PDF
                           </Button>
-                        </motion.div>
+                        </div>
                       </td>
-                    </motion.tr>
+                    </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </div>
 
         {filteredInvoices.length === 0 && (
-          <motion.div 
+          <div 
             className="text-center py-16"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
           >
             <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <FileText className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold mb-1">Geen facturen gevonden</h3>
             <p className="text-sm text-muted-foreground">Probeer een andere zoekopdracht of filter</p>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
     </B2BLayout>
   );
 };

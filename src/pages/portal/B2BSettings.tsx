@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalAuth, useNotificationPreferences, useCustomerSettings } from "@/hooks/usePortalAuth";
 import { usePortalCostCenters } from "@/hooks/usePortalCostCenters";
@@ -189,7 +188,7 @@ const B2BSettings = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <motion.div className="max-w-4xl mx-auto space-y-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display font-bold">Instellingen</h1>
@@ -523,7 +522,7 @@ const B2BSettings = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </motion.div>
+      </div>
 
       {/* Cost Center Dialog */}
       <Dialog open={showCostCenterDialog} onOpenChange={setShowCostCenterDialog}>

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -63,10 +62,8 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
               </TableHeader>
               <TableBody>
                 {lines.map((line, idx) => (
-                  <motion.tr
+                  <tr
                     key={line.id}
-                    initial="hidden"
-                    animate="visible"
                     className="border-border/30 hover:bg-primary/5 transition-all duration-300 group"
                   >
                     <TableCell className="py-5">
@@ -87,10 +84,10 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
                       {line.trips ? (
                         <div className="flex items-center gap-2.5 text-sm">
                           <span className="font-medium text-foreground">{line.trips.pickup_city}</span>
-                          <motion.div
+                          <div
                           >
                             <ArrowRight className="h-4 w-4 text-primary" />
-                          </motion.div>
+                          </div>
                           <span className="font-medium text-foreground">{line.trips.delivery_city}</span>
                         </div>
                       ) : (
@@ -119,15 +116,14 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
                         {formatCurrency(Number(line.total_price))}
                       </span>
                     </TableCell>
-                  </motion.tr>
+                  </tr>
                 ))}
               </TableBody>
             </Table>
           </div>
         ) : (
-          <motion.div 
+          <div 
             className="flex flex-col items-center justify-center py-16 text-center"
-            initial={{ opacity: 0, scale: 0.95 }}
           >
             <div className="relative mb-6">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-lg">
@@ -137,7 +133,7 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
             </div>
             <p className="text-lg font-medium text-muted-foreground">Geen orderregels gevonden</p>
             <p className="text-sm text-muted-foreground/60 mt-1">Voeg orders toe om regels te zien</p>
-          </motion.div>
+          </div>
         )}
       </div>
     </PremiumGlassCard>

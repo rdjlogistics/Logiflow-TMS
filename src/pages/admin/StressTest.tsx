@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   Zap, Play, Square, CheckCircle2, XCircle, Loader2,
@@ -434,9 +433,7 @@ const StressTest = () => {
 
   return (
     <DashboardLayout title="Stress Test" description="Performance benchmarks en belastingstest">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="space-y-6"
       >
         {/* Header */}
@@ -624,7 +621,7 @@ const StressTest = () => {
             </CardContent>
           </Card>
         )}
-      </motion.div>
+      </div>
     </DashboardLayout>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -218,11 +217,8 @@ ${driverPerformance.map(d =>
         {/* KPI Cards */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           {kpiSummary.map((kpi, i) => (
-            <motion.div
+            <div
               key={kpi.name}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
             >
             <Card className="relative overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -254,7 +250,7 @@ ${driverPerformance.map(d =>
                 />
               </CardContent>
             </Card>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -380,11 +376,8 @@ ${driverPerformance.map(d =>
               <CardContent>
                 <div className="space-y-4">
                   {driverPerformance.map((driver, index) => (
-                    <motion.div
+                    <div
                       key={driver.name}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.06 }}
                       className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-muted/50 rounded-lg"
                     >
                       <div className="flex items-center gap-4">
@@ -415,7 +408,7 @@ ${driverPerformance.map(d =>
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </CardContent>
