@@ -42,7 +42,7 @@ import {
   Info,
 } from 'lucide-react';
 import { ContractTemplate, MERGE_FIELDS, TEMPLATE_TYPES, MergeField } from '@/hooks/useContractTemplates';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 interface ContractTemplateEditorProps {
   template: ContractTemplate;
@@ -158,21 +158,19 @@ export function ContractTemplateEditor({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 sm:p-6"
+      <div 
+        className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 sm:p-6 animate-fade-in-up"
       >
         {/* Background effects */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <div>
               <Button variant="ghost" size="icon" onClick={onBack} className="h-10 w-10 rounded-xl bg-background/50 backdrop-blur-sm hover:bg-background/80">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-            </motion.div>
+            </div>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/30 rounded-lg blur-md" />
@@ -197,7 +195,7 @@ export function ContractTemplateEditor({
             </div>
           </div>
           
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <div>
             <Button 
               onClick={handleSave} 
               disabled={saving} 
@@ -210,9 +208,9 @@ export function ContractTemplateEditor({
               )}
               Opslaan
             </Button>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Editor */}
@@ -287,7 +285,7 @@ export function ContractTemplateEditor({
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Content Editor Card */}
           <motion.div
@@ -322,21 +320,18 @@ export function ContractTemplateEditor({
                 </div>
               </CardHeader>
               <CardContent>
-                <AnimatePresence mode="wait">
+
                   {activeTab === 'edit' ? (
-                    <motion.div
+                    <div
                       key="edit"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-fade-in"
                     >
                       {/* Quick Insert Bar */}
                       <div className="flex flex-wrap items-center gap-2 p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-lg border border-primary/20">
                         <Zap className="h-4 w-4 text-primary" />
                         <span className="text-xs text-muted-foreground font-medium">Sneltoetsen:</span>
                         {quickFields.map((field) => (
-                          <motion.div key={field.key} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <div key={field.key}>
                             <Badge 
                               variant="outline" 
                               className={`text-xs cursor-pointer transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:border-primary ${
@@ -346,7 +341,7 @@ export function ContractTemplateEditor({
                             >
                               {`{{${field.key}}}`}
                             </Badge>
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                       
@@ -374,33 +369,27 @@ export function ContractTemplateEditor({
                         <Info className="h-3 w-3" />
                         <span>Tip: Gebruik HTML opmaak zoals {'<h1>'}, {'<h2>'}, {'<p>'}, {'<strong>'}, {'<em>'} voor structuur.</span>
                       </div>
-                    </motion.div>
+                    </div>
                   ) : (
-                    <motion.div
+                    <div
                       key="preview"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      className="min-h-[400px] p-6 border rounded-lg bg-background"
+                      className="min-h-[400px] p-6 border rounded-lg bg-background animate-fade-in"
                     >
                       <div 
                         className="prose prose-sm max-w-none dark:prose-invert"
                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(renderPreview()) }}
                       />
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
 
         {/* Merge Fields Sidebar */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15 }}
-          className="space-y-4"
+        <div
+          className="space-y-4 animate-fade-in-up"
+          style={{ animationDelay: '150ms' }}
         >
           <Card className="sticky top-4 border-border/50 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
             <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-transparent">
@@ -430,18 +419,17 @@ export function ContractTemplateEditor({
                     const colorClass = CATEGORY_COLORS[category] || 'from-gray-500/20 to-gray-500/5 border-gray-500/30';
                     
                     return (
-                      <motion.div
+                      <div
                         key={category}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: categoryIndex * 0.03 }}
+                        className="animate-fade-in-up"
+                        style={{ animationDelay: `${categoryIndex * 30}ms` }}
                       >
                         <Collapsible 
                           open={isOpen}
                           onOpenChange={() => toggleCategory(category)}
                         >
                           <CollapsibleTrigger asChild>
-                            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                            <div>
                               <Button
                                 variant="ghost"
                                 className={`w-full justify-between px-3 py-3 h-auto rounded-lg bg-gradient-to-r ${colorClass} border transition-all duration-200`}
@@ -455,24 +443,17 @@ export function ContractTemplateEditor({
                                 </div>
                                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                               </Button>
-                            </motion.div>
+                            </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent>
-                            <motion.div 
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="pl-2 pr-1 py-2 space-y-1"
+                            <div 
+                              className="pl-2 pr-1 py-2 space-y-1 animate-fade-in"
                             >
                               {fields.map((field, fieldIndex) => (
-                                <motion.button
+                                <button
                                   key={field.key}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: fieldIndex * 0.02 }}
-                                  whileHover={{ scale: 1.02, x: 4 }}
-                                  whileTap={{ scale: 0.98 }}
                                   onClick={() => insertMergeField(field)}
-                                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group ${
+                                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group hover:translate-x-1 ${
                                     recentlyInserted === field.key 
                                       ? 'bg-primary/20 border border-primary/30' 
                                       : 'hover:bg-muted/80 border border-transparent hover:border-border/50'
@@ -489,19 +470,19 @@ export function ContractTemplateEditor({
                                   <code className="text-[11px] text-muted-foreground font-mono">
                                     {`{{${field.key}}}`}
                                   </code>
-                                </motion.button>
+                                </button>
                               ))}
-                            </motion.div>
+                            </div>
                           </CollapsibleContent>
                         </Collapsible>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
               </ScrollArea>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
