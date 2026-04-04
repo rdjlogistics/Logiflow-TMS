@@ -153,8 +153,10 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("node_modules/mapbox-gl")) {
             return "vendor-map";
           }
+          if (id.includes("node_modules/framer-motion")) {
+            return "vendor-motion";
+          }
           // 3d, pdf, excel, charts, animation: NOT chunked separately
-          // They stay inside their lazy-loaded page chunks for zero wasted preload
           if (id.includes("node_modules/date-fns")) {
             return "vendor-date";
           }
