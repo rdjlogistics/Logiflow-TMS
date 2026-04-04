@@ -77,9 +77,9 @@ const B2BInvoices = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} onRefresh={refetch}>
-      <div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
+      <div className="space-y-6">
         {/* Header */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Facturen</h1>
             <p className="text-sm text-muted-foreground">{invoices.length} facturen in totaal</p>
@@ -97,9 +97,9 @@ const B2BInvoices = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={containerVariants}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {summaryCards.map((card, index) => (
-            <div key={card.key} variants={itemVariants} whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 25 } }}>
+            <div key={card.key} }}>
               <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -122,7 +122,7 @@ const B2BInvoices = () => {
         </div>
 
         {/* Filters */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken op factuurnummer..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
@@ -226,7 +226,7 @@ const B2BInvoices = () => {
         </div>
 
         {/* Desktop Table */}
-        <div variants={itemVariants} className="hidden md:block bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden shadow-sm">
+        <div className="hidden md:block bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full w-full">
               <thead>
