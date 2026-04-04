@@ -4,9 +4,9 @@
  */
 import { useEffect } from 'react';
 
-const APP_NAME = 'RDJ Logistics';
+const APP_NAME = 'LogiFlow TMS';
 const DEFAULT_TITLE = APP_NAME;
-const BASE_URL = 'https://rdjlogistics.lovable.app';
+const BASE_URL = 'https://logiflowtms.eu';
 
 function upsertMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
   let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
@@ -34,7 +34,7 @@ interface PageSEOOptions {
 }
 
 /**
- * @param title  Page-specific title. " | RDJ Logistics" is appended if not already present.
+ * @param title  Page-specific title. " | LogiFlow TMS" is appended if not already present.
  * @param options  Optional description and resetOnUnmount flag.
  */
 export function usePageTitle(title: string, options: PageSEOOptions | boolean = true): void {

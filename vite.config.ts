@@ -38,9 +38,9 @@ export default defineConfig(({ mode }) => ({
         enabled: false,
       },
       manifest: {
-        name: "RDJ Logistics - Transport Management",
-        short_name: "RDJ Logistics",
-        description: "Modern Transport Management System voor chauffeurs en planners",
+        name: "LogiFlow TMS — Transport Management",
+        short_name: "LogiFlow TMS",
+        description: "De slimste transport management software voor ritplanning, tracking en facturatie.",
         theme_color: "#0F172A",
         background_color: "#0F172A",
         display: "standalone",

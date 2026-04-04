@@ -51,7 +51,7 @@ function renderBootError(error: unknown) {
             <path d="M12 9v4"/><path d="M12 17h.01"/>
           </svg>
         </div>
-        <h1 style="font-size:20px;font-weight:600;margin:0 0 8px;">RDJ Logistics kan niet opstarten</h1>
+        <h1 style="font-size:20px;font-weight:600;margin:0 0 8px;">LogiFlow kan niet opstarten</h1>
         <p style="font-size:14px;color:#94a3b8;margin:0 0 20px;line-height:1.6;">
           De app kon niet worden geladen. Dit komt meestal doordat de backend-configuratie ontbreekt na een publicatie.
         </p>
