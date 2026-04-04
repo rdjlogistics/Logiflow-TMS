@@ -81,7 +81,7 @@
   <body>
     <div id="root">
       <div id="boot-fallback" style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;">
-        <p style="color:hsl(210 40% 70%);font-size:14px;">LogiFlow wordt geladen…</p>
+        <p style="color:hsl(210 40% 70%);font-size:14px;">RDJ Logistics wordt geladen…</p>
       </div>
     </div>
     <script type="module" src="/src/main.tsx" fetchpriority="high"></script>
@@ -89,7 +89,7 @@
       setTimeout(function(){
         var f=document.getElementById("boot-fallback");
         if(!f)return;
-        f.innerHTML='<div style="text-align:center;max-width:400px;padding:24px;"><h2 style="color:#e2e8f0;font-size:18px;margin:0 0 8px;">LogiFlow kon niet laden</h2><p style="color:#94a3b8;font-size:13px;margin:0 0 16px;line-height:1.5;">De pagina reageert niet. Probeer te verversen of je sessie te resetten.</p><div style="display:flex;gap:10px;justify-content:center;"><button onclick="localStorage.clear();sessionStorage.clear();location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.1);color:#e2e8f0;border:1px solid rgba(255,255,255,0.15);cursor:pointer;font-size:13px;">Sessie resetten</button><button onclick="location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);cursor:pointer;font-size:13px;">Verversen</button></div></div>';
+        f.innerHTML='<div style="text-align:center;max-width:400px;padding:24px;"><h2 style="color:#e2e8f0;font-size:18px;margin:0 0 8px;">RDJ Logistics kon niet laden</h2><p style="color:#94a3b8;font-size:13px;margin:0 0 16px;line-height:1.5;">De pagina reageert niet. Probeer te verversen of je sessie te resetten.</p><div style="display:flex;gap:10px;justify-content:center;"><button onclick="localStorage.clear();sessionStorage.clear();location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.1);color:#e2e8f0;border:1px solid rgba(255,255,255,0.15);cursor:pointer;font-size:13px;">Sessie resetten</button><button onclick="location.reload()" style="padding:8px 16px;border-radius:8px;background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);cursor:pointer;font-size:13px;">Verversen</button></div></div>';
       },12000);
     </script>
   </body>
