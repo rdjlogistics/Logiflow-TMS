@@ -1042,7 +1042,7 @@ const OrderForm = () => {
       description={orderId ? `Status: ${statusLabels[orderStatus] || orderStatus}` : 'Vul de ordergegevens in'}
     >
       {/* Dynamic bottom padding based on actual action bar height */}
-      <div style={{ paddingBottom: 'calc(var(--action-bar-h, 5rem) + 1.5rem)' >
+      <div style={{ paddingBottom: 'calc(var(--action-bar-h, 5rem) + 1.5rem)' }}>
         {/* Header with status - Mobile optimized */}
         {orderId && (
           <div className="flex items-center gap-3 mb-4 px-1">

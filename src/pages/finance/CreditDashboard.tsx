@@ -548,7 +548,7 @@ export function CreditDashboardContent() {
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dsoTrendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 >
+                <LineChart data={dsoTrendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="month" className="text-xs" />
                   <YAxis domain={[0, 50]} className="text-xs" />
@@ -596,7 +596,7 @@ export function CreditDashboardContent() {
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={agingData} margin={{ top: 5, right: 20, left: 0, bottom: 5 >
+                <BarChart data={agingData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="label" className="text-xs" />
                   <YAxis 
@@ -769,7 +769,7 @@ export function CreditDashboardContent() {
         <CardContent>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={cashflowForecast} margin={{ top: 5, right: 20, left: 0, bottom: 5 >
+              <AreaChart data={cashflowForecast} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="week" className="text-xs" />
                 <YAxis 

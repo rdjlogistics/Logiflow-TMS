@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -76,7 +77,10 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
   icon: any; label: string; value: string; sub?: string; color: string;
 }) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
     >
       <Card className="relative overflow-hidden rounded-2xl border border-border/25 bg-card/50 backdrop-blur-2xl shadow-xl group hover:ring-2 hover:ring-primary/30 transition-all">
         <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.04] pointer-events-none" style={{
@@ -90,13 +94,13 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
               <p className="text-2xl font-bold tabular-nums">{value}</p>
               {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
             </div>
-            <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` >
+            <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
               <Icon className="h-5 w-5" style={{ color }} />
             </div>
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 
@@ -350,7 +354,10 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
   );
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: index * 0.05 }}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn(
@@ -485,6 +492,6 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
           </CollapsibleContent>
         </Card>
       </Collapsible>
-    </div>
+    </motion.div>
   );
 }

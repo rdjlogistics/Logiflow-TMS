@@ -457,7 +457,7 @@ export function FuelStationsMapGeoJSON({
   }, [selectedStationId, geoJSON, mapStatus, updateSelectedFilter, smoothFlyTo]);
 
   return (
-    <div className={cn('relative w-full h-full overflow-hidden', className)} style={{ minHeight: 0 >
+    <div className={cn('relative w-full h-full overflow-hidden', className)} style={{ minHeight: 0 }}>
       <div
         ref={containerRef}
         className="absolute inset-0 w-full h-full"

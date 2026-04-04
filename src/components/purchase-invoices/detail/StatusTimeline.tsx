@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { CheckCircle2, Sparkles, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { itemVariants } from "./PremiumGlassCard";
@@ -19,7 +20,7 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
   const currentStatusIndex = statusSteps.findIndex(s => s.key === currentStatus);
 
   return (
-    <div
+    <motion.div
       className="relative w-full"
     >
       {/* Desktop: Centered timeline */}
@@ -30,17 +31,19 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
           
           return (
             <div key={status.key} className="flex items-center gap-2">
-              <div 
+              <motion.div 
                 className={cn(
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-medium transition-all duration-500",
                   isActive && "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/30",
                   isPast && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
                   !isActive && !isPast && "bg-muted/50 text-muted-foreground border border-border/50"
-                )}}}
+                )}
+                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, scale: 0.9 }}
               >
                 {/* Glow effect for active */}
                 {isActive && (
-                  <div
+                  <motion.div
                     className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl"
                   />
                 )}
@@ -48,22 +51,23 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
                 <span className="relative z-10 flex items-center gap-2">
                   {isPast && <CheckCircle2 className="h-4 w-4" />}
                   {isActive && (
-                    <div
+                    <motion.div
                     >
                       <Sparkles className="h-4 w-4" />
-                    </div>
+                    </motion.div>
                   )}
                   {!isActive && !isPast && <Circle className="h-3.5 w-3.5" />}
                   <span className="capitalize">{status.label}</span>
                 </span>
-              </div>
+              </motion.div>
               
               {idx < arr.length - 1 && (
-                <div 
+                <motion.div 
                   className={cn(
                     "w-12 h-1 rounded-full transition-all duration-500",
                     isPast ? "bg-gradient-to-r from-emerald-500/50 to-emerald-500/30" : "bg-border"
-                  )}}
+                  )}
+                  initial={{ scaleX: 0 }}
                 />
               )}
             </div>
@@ -88,7 +92,7 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
             
             return (
               <div key={status.key} className="flex items-center gap-2 flex-shrink-0">
-                <div
+                <motion.div
                   className={cn(
                     "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap",
                     isActive && "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25",
@@ -99,7 +103,7 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
                   {isPast && <CheckCircle2 className="h-3 w-3 flex-shrink-0" />}
                   {isActive && <Sparkles className="h-3 w-3 flex-shrink-0" />}
                   <span className="capitalize">{status.label}</span>
-                </div>
+                </motion.div>
                 {idx < arr.length - 1 && (
                   <div className={cn(
                     "w-6 h-0.5 rounded-full flex-shrink-0",
@@ -113,6 +117,6 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
           <div className="flex-shrink-0 w-2" />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

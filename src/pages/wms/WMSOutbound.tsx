@@ -45,6 +45,7 @@ import {
 import { useOutboundOrders, useCreateOutboundOrder, useWarehouses } from "@/hooks/useWMS";
 import { format, formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
+import { motion } from "framer-motion";
 import { WMSGlassCard, WMSCardTitle, WMSStatCard } from "@/components/wms";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,7 +149,9 @@ export default function WMSOutbound() {
   return (
     <DashboardLayout title="Verzending (Outbound)">
       {/* Header */}
-      <div
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -249,7 +252,7 @@ export default function WMSOutbound() {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
+      </motion.div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -328,8 +331,11 @@ export default function WMSOutbound() {
                         const status = statusConfig[order.status] || statusConfig.pending;
 
                         return (
-                          <tr
+                          <motion.tr
                             key={order.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.02 }}
                             className="border-b border-border/50 hover:bg-muted/30"
                           >
                             <TableCell>
@@ -418,7 +424,7 @@ export default function WMSOutbound() {
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
-                          </tr>
+                          </motion.tr>
                         );
                       })}
                     </TableBody>

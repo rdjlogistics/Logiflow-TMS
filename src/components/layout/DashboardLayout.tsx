@@ -125,7 +125,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
         
         <main className="flex-1 flex flex-col relative min-w-0">
           {/* Header - Always visible, outside error boundary */}
-          <header className="sticky flex items-center justify-between px-3 md:px-6 top-0 z-20 bg-background/80 backdrop-blur-md border-b border-border/40" role="banner" style={{ minHeight: "3.25rem", paddingTop: "max(0px, env(safe-area-inset-top))" >
+          <header className="sticky flex items-center justify-between px-3 md:px-6 top-0 z-20 bg-background/80 backdrop-blur-md border-b border-border/40" role="banner" style={{ minHeight: "3.25rem", paddingTop: "max(0px, env(safe-area-inset-top))" }}>
             <div className="flex items-center gap-3 min-w-0">
               <SidebarTrigger className="h-9 w-9 rounded-lg hover:bg-muted transition-colors flex-shrink-0" aria-label="Toggle sidebar menu">
                 <Menu className="h-5 w-5" />
@@ -204,7 +204,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
           </header>
           
           {/* Content - isolated error boundary for page content */}
-          <div id="main-content" className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-auto" tabIndex={-1} style={{ paddingBottom: "max(6rem, calc(1rem + env(safe-area-inset-bottom)))" >
+          <div id="main-content" className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-auto" tabIndex={-1} style={{ paddingBottom: "max(6rem, calc(1rem + env(safe-area-inset-bottom)))" }}>
             <SubscriptionGate>
               <IsolatedErrorBoundary name="PageContent">
                 <Suspense fallback={

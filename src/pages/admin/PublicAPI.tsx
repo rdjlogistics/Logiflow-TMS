@@ -258,7 +258,7 @@ export default function PublicAPI() {
                 setSelectedScopes([]);
                 setRateLimit('60');
               }
-            >
+            }}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -340,7 +340,8 @@ export default function PublicAPI() {
                   {newlyCreatedKey ? (
                     <Button onClick={() => {
                       setShowCreateDialog(false);
-                      setNewlyCreatedKey(null); }}>
+                      setNewlyCreatedKey(null);
+                    }}>
                       Sluiten
                     </Button>
                   ) : (

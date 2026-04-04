@@ -45,6 +45,7 @@ import { useWMSProducts, useCreateWMSProduct } from "@/hooks/useWMS";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { WMSGlassCard, WMSCardTitle, WMSStatCard } from "@/components/wms";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 
@@ -227,7 +228,9 @@ export default function WMSProducts() {
   return (
     <DashboardLayout title="Producten / SKU's">
       {/* Header */}
-      <div
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -237,7 +240,8 @@ export default function WMSProducts() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
-          if (!open) resetForm(); }}>
+          if (!open) resetForm();
+        }}>
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
@@ -419,7 +423,8 @@ export default function WMSProducts() {
             <DialogFooter>
               <Button variant="outline" onClick={() => {
                 setIsDialogOpen(false);
-                resetForm(); }}>
+                resetForm();
+              }}>
                 Annuleren
               </Button>
               <Button
@@ -431,7 +436,7 @@ export default function WMSProducts() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -516,8 +521,11 @@ export default function WMSProducts() {
                 </TableHeader>
                 <TableBody>
                   {filteredProducts?.map((product, index) => (
-                    <tr
+                    <motion.tr
                       key={product.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.02 }}
                       className="border-b border-border/50 hover:bg-muted/30"
                     >
                       <TableCell>
@@ -596,7 +604,7 @@ export default function WMSProducts() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </TableBody>
               </Table>

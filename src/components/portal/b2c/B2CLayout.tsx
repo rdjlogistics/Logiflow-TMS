@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { 
   Package, 
   PlusCircle, 
@@ -47,30 +48,31 @@ export const B2CLayout = ({
       <header className="sticky top-0 z-40 bg-card/60 backdrop-blur-xl border-b border-border/30 pt-safe">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
-          <div 
+          <motion.div 
             className="flex items-center gap-2"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold">
               <Truck className="h-5 w-5 text-gold-foreground" />
             </div>
             <span className="font-display font-bold text-base hidden sm:block">LogiFlow</span>
-          </div>
+          </motion.div>
 
           {/* Notifications */}
-          <button 
+          <motion.button 
             onClick={onNotificationsClick || (() => toast.info("Notificaties", { description: "Je hebt geen nieuwe notificaties." }))}
             className="relative p-3 rounded-xl hover:bg-muted/50 transition-colors touch-manipulation"
             aria-label={`Notificaties${unreadNotifications > 0 ? `, ${unreadNotifications} ongelezen` : ''}`}
           >
             <Bell className="h-5 w-5 text-muted-foreground" />
             {unreadNotifications > 0 && (
-              <span 
-                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-gold text-[10px] font-bold text-gold-foreground flex items-center justify-center shadow-lg"}
+              <motion.span 
+                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-gold text-[10px] font-bold text-gold-foreground flex items-center justify-center shadow-lg"
+                initial={{ scale: 0 }}
               >
                 {unreadNotifications > 9 ? '9+' : unreadNotifications}
-              </span>
+              </motion.span>
             )}
-          </button>
+          </motion.button>
         </div>
       </header>
 
@@ -91,7 +93,7 @@ export const B2CLayout = ({
             const isBook = item.id === "book";
             
             return (
-              <button
+              <motion.button
                 key={item.id}
                 onClick={() => navigate(item.href)}
                 className={cn(
@@ -104,11 +106,12 @@ export const B2CLayout = ({
                 aria-current={active ? "page" : undefined}
               >
                 {isBook ? (
-                  <div 
-                    className="w-14 h-14 -mt-7 rounded-2xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold"}
+                  <motion.div 
+                    className="w-14 h-14 -mt-7 rounded-2xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold"
+                    whileHover={{ scale: 1.05 }}
                   >
                     <item.icon className="h-7 w-7 text-gold-foreground" />
-                  </div>
+                  </motion.div>
                 ) : (
                   <item.icon className={cn("h-6 w-6 transition-colors", active && "text-primary")} />
                 )}
@@ -119,7 +122,7 @@ export const B2CLayout = ({
                 )}>
                   {item.label}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>

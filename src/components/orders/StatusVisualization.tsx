@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -174,7 +175,9 @@ export const StatusVisualization = ({
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileHover={{ scale: 1.05 }}
                 className="cursor-default"
               >
                 <Badge
@@ -191,7 +194,7 @@ export const StatusVisualization = ({
                   <Icon className={cn(sizeClasses[size].icon)} />
                   {config.label}
                 </Badge>
-              </div>
+              </motion.div>
             </TooltipTrigger>
             <TooltipContent>
               <div className="text-xs space-y-1">
@@ -265,13 +268,14 @@ export const StatusVisualization = ({
 
         {/* Progress bar */}
         {showProgress && (
-          <div
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
           >
             <Progress 
               value={config.progressValue} 
               className="h-1.5"
             />
-          </div>
+          </motion.div>
         )}
       </div>
     </TooltipProvider>
@@ -296,7 +300,8 @@ export const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => 
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center">
-                  <div
+                  <motion.div
+                    initial={{ scale: 0 }}
                     className={cn(
                       "w-6 h-6 rounded-full flex items-center justify-center transition-all",
                       isActive && cn(config.bgColor, "ring-2 ring-offset-2 ring-offset-background", config.borderColor.replace("border-", "ring-")),
@@ -312,7 +317,7 @@ export const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => 
                         !isActive && !isCompleted && "text-muted-foreground/50"
                       )} 
                     />
-                  </div>
+                  </motion.div>
                   {index < statuses.length - 1 && (
                     <div 
                       className={cn(

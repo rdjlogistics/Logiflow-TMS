@@ -98,7 +98,7 @@ const B2BCases = () => {
               {statusCounts.open} open, {statusCounts.in_progress} in behandeling
             </p>
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 bg-gold hover:bg-gold/90 text-gold-foreground">
               <Plus className="h-4 w-4" /> Nieuwe Case
             </Button>
@@ -108,7 +108,7 @@ const B2BCases = () => {
         {/* Status Cards */}
         <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4" variants={containerVariants}>
           {statusCards.map((sc, index) => (
-            <motion.div key={sc.key} variants={itemVariants} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 >
+            <motion.div key={sc.key} variants={itemVariants} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
               <Card 
                 className={cn(
                   "cursor-pointer transition-all border-2 backdrop-blur-sm bg-card/60",
@@ -211,7 +211,7 @@ const B2BCases = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.1 >
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.1 }}>
               <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="h-8 w-8 text-emerald-400" />
               </div>
@@ -233,7 +233,7 @@ const B2BCases = () => {
               <SheetDescription>{selectedCase?.description}</SheetDescription>
             </SheetHeader>
             {selectedCase && (
-              <motion.div className="mt-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 >
+              <motion.div className="mt-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className={cn(caseStatusConfig[selectedCase.status]?.bgColor, caseStatusConfig[selectedCase.status]?.color, "border-0")}>
                     {caseStatusConfig[selectedCase.status]?.label}
@@ -264,7 +264,7 @@ const B2BCases = () => {
                   <h4 className="font-medium mb-3">Berichten</h4>
                   <ScrollArea className="h-48 pr-4">
                     <div className="space-y-3">
-                      <motion.div className="p-3 rounded-lg bg-muted/30 backdrop-blur-sm" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 >
+                      <motion.div className="p-3 rounded-lg bg-muted/30 backdrop-blur-sm" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
                         <p className="text-sm">{selectedCase.description}</p>
                         <p className="text-xs text-muted-foreground mt-1">{format(new Date(selectedCase.createdAt), "d MMM, HH:mm", { locale: nl })}</p>
                       </motion.div>
@@ -297,7 +297,7 @@ const B2BCases = () => {
                   <div className="space-y-3">
                     <Textarea placeholder="Typ je bericht..." value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)} rows={3} />
                     <div className="flex gap-2">
-                      <motion.div className="flex-1" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 >
+                      <motion.div className="flex-1" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                         <Button className="w-full" onClick={handleSendMessage} disabled={!replyMessage.trim() || sendMessage.isPending}>
                           {sendMessage.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                           Versturen

@@ -447,7 +447,7 @@ const AppSidebar = () => {
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="px-2 py-2 overflow-y-auto" role="navigation" aria-label="Hoofdnavigatie" style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" >
+        <SidebarContent className="px-2 py-2 overflow-y-auto" role="navigation" aria-label="Hoofdnavigatie" style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" }}>
           {/* Search bar */}
           {!isCollapsed && (
             <div className="px-2 pb-2">

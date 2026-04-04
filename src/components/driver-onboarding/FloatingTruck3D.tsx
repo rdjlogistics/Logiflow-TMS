@@ -46,14 +46,14 @@ export const FloatingTruck3D = () => {
           <div className="absolute -right-4 top-1/2 -translate-y-1/2 animate-pulse">
             <Navigation className="w-6 h-6 text-pink-500 rotate-45" />
           </div>
-          <div className="absolute -left-4 top-1/4 animate-bounce" style={{ animationDuration: '2.5s' >
+          <div className="absolute -left-4 top-1/4 animate-bounce" style={{ animationDuration: '2.5s' }}>
             <MapPin className="w-5 h-5 text-emerald-400 fill-emerald-400/30" />
           </div>
         </div>
       </div>
 
       {/* Speed lines */}
-      <div className="absolute left-10 top-1/2 -translate-y-1/2 space-y-3 animate-pulse" style={{ animationDuration: '2s' >
+      <div className="absolute left-10 top-1/2 -translate-y-1/2 space-y-3 animate-pulse" style={{ animationDuration: '2s' }}>
         <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
         <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-pink-500 to-transparent rounded-full ml-4" />
         <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent rounded-full" />

@@ -37,7 +37,7 @@ const LazyWidget = ({ children, minHeight = 120 }: LazyWidgetProps) => {
   }
 
   return (
-    <div ref={ref} style={{ minHeight >
+    <div ref={ref} style={{ minHeight }}>
       <div className="p-4 space-y-3">
         <Skeleton className="h-4 w-1/3" />
         <Skeleton className="h-20 w-full" />

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CalendarClock, Clock } from "lucide-react";
 import { format, getISOWeek } from "date-fns";
@@ -43,8 +44,9 @@ export const InvoiceDatesCard = ({ invoice, paymentColor }: InvoiceDatesCardProp
         
         {/* Due date with status coloring */}
         {invoice.due_date ? (
-          <div 
-            className="flex items-center justify-between py-3 group"}
+          <motion.div 
+            className="flex items-center justify-between py-3 group"
+            initial={{ opacity: 0, x: -8 }}
           >
             <span className="text-sm flex items-center gap-2.5 text-muted-foreground group-hover:text-foreground/80 transition-colors">
               <CalendarClock className="h-4 w-4" />
@@ -56,15 +58,16 @@ export const InvoiceDatesCard = ({ invoice, paymentColor }: InvoiceDatesCardProp
             )}>
               {format(new Date(invoice.due_date), "d MMMM yyyy", { locale: nl })}
             </span>
-          </div>
+          </motion.div>
         ) : (
           <DataRow label="Vervaldatum" value="-" />
         )}
         
         {/* Period with week badges */}
         {invoice.period_from && invoice.period_to && (
-          <div 
-            className="flex items-center justify-between py-3 pt-4 mt-2 border-t border-border/40"}
+          <motion.div 
+            className="flex items-center justify-between py-3 pt-4 mt-2 border-t border-border/40"
+            initial={{ opacity: 0, x: -8 }}
           >
             <span className="text-sm flex items-center gap-2.5 text-muted-foreground">
               <Clock className="h-4 w-4" />
@@ -84,7 +87,7 @@ export const InvoiceDatesCard = ({ invoice, paymentColor }: InvoiceDatesCardProp
                 {format(new Date(invoice.period_to), "d MMM yyyy", { locale: nl })}
               </span>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </PremiumGlassCard>

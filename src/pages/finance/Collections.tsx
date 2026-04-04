@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -255,8 +256,11 @@ export function CollectionsContent() {
                     <p className="font-medium">Geen incasso cases</p>
                   </div>
                 ) : filteredCollections.map((coll: any) => (
-                  <div
+                  <motion.div
                     key={coll.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedCase(coll)}
                     className="p-4 cursor-pointer active:bg-muted/30 transition-colors touch-manipulation"
                   >
@@ -278,7 +282,7 @@ export function CollectionsContent() {
                       </span>
                       <span className="font-bold text-base tabular-nums">€{coll.amount?.toLocaleString()}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
               {/* Desktop table */}
@@ -346,8 +350,11 @@ export function CollectionsContent() {
                   const usagePercent = (profile.exposure / profile.credit_limit) * 100;
                   const isOverLimit = usagePercent > 100;
                   return (
-                    <div
+                    <motion.div
                       key={profile.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setSelectedProfile(profile);
                         setEditCreditLimit(profile.credit_limit || 0);
@@ -393,7 +400,7 @@ export function CollectionsContent() {
                           {profile.proforma && <Badge variant="outline" className="text-amber-500 text-[10px]">Proforma</Badge>}
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -425,7 +432,8 @@ export function CollectionsContent() {
                           setEditPaymentTerms(profile.payment_terms || 30);
                           setEditRiskLevel(profile.risk_level || 'low');
                           setEditProforma(profile.proforma || false);
-                          setEditStopShipping(profile.stop_shipping || false); }}>
+                          setEditStopShipping(profile.stop_shipping || false);
+                        }}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -522,7 +530,7 @@ export function CollectionsContent() {
                   } else {
                     toast({ title: "Geen telefoonnummer", description: `Er is geen telefoonnummer beschikbaar voor ${selectedCase.customer}.`, variant: "destructive" });
                   }
-                ><Phone className="h-4 w-4 mr-2" />Bellen</Button>
+                }}><Phone className="h-4 w-4 mr-2" />Bellen</Button>
                 <Button variant="outline" onClick={() => {
                   if (!selectedCase.customer_email) {
                     toast({ title: "Geen e-mailadres", description: `Er is geen e-mailadres beschikbaar voor ${selectedCase.customer}.`, variant: "destructive" });
@@ -531,7 +539,8 @@ export function CollectionsContent() {
                   const subject = encodeURIComponent(`Herinnering: Openstaande factuur ${selectedCase.invoice}`);
                   const body = encodeURIComponent(`Geachte heer/mevrouw,\n\nUit onze administratie blijkt dat de volgende factuur nog openstaat:\n\nFactuurnummer: ${selectedCase.invoice}\nBedrag: €${selectedCase.amount?.toLocaleString()}\nVervaldatum: ${selectedCase.due_date}\nDagen te laat: ${selectedCase.days_overdue}\n\nGraag ontvangen wij uw betaling zo spoedig mogelijk.\n\nMet vriendelijke groet`);
                   window.open(`mailto:${selectedCase.customer_email}?subject=${subject}&body=${body}`, '_blank');
-                  toast({ title: "E-mail geopend ✓", description: `Herinneringsmail voor ${selectedCase.invoice} is voorbereid.` }); }}><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
+                  toast({ title: "E-mail geopend ✓", description: `Herinneringsmail voor ${selectedCase.invoice} is voorbereid.` });
+                }}><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
                 <Button variant="outline" onClick={() => {
                   const promiseDate = new Date();
                   promiseDate.setDate(promiseDate.getDate() + 7);
@@ -541,7 +550,8 @@ export function CollectionsContent() {
                     promised_date: promiseDate.toISOString(),
                     promised_amount: selectedCase.amount || 0,
                     notes: `Betalingsbelofte geregistreerd voor ${promiseDate.toLocaleDateString('nl-NL')}`,
-                  }); }}><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
+                  });
+                }}><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
               </div>
 
               <div className="space-y-2">
@@ -582,7 +592,7 @@ export function CollectionsContent() {
                   } else {
                     toast({ title: "Geen wijzigingen", description: "Selecteer een status of voeg een notitie toe.", variant: "destructive" });
                   }
-                >Opslaan</Button>
+                }}>Opslaan</Button>
               </div>
             </div>
           )}
@@ -652,7 +662,8 @@ export function CollectionsContent() {
                     stop_shipping_on_overdue: editStopShipping,
                   }, {
                     onSuccess: () => setSelectedProfile(null),
-                  }); }}>Opslaan</Button>
+                  });
+                }}>Opslaan</Button>
               </DialogFooter>
             </div>
           )}

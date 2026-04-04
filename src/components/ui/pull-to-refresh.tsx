@@ -103,7 +103,7 @@ export function PullToRefresh({
           {isRefreshing ? (
             <RefreshCw className="h-5 w-5 text-primary animate-spin" />
           ) : (
-            <motion.div style={{ rotate: rotation >
+            <motion.div style={{ rotate: rotation }}>
               <ArrowDown className="h-5 w-5 text-muted-foreground" />
             </motion.div>
           )}

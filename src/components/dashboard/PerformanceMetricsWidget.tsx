@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -131,11 +132,12 @@ const PerformanceMetricsWidget = ({
       <CardHeader className="pb-4 border-b border-border/30 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div 
-              className="p-2.5 rounded-xl bg-success/15"}
+            <motion.div 
+              className="p-2.5 rounded-xl bg-success/15"
+              whileHover={{ rotate: 10, scale: 1.05 }}
             >
               <Gauge className="h-5 w-5 text-success" />
-            </div>
+            </motion.div>
             <div>
               <div className="flex items-center gap-2">
                 <CardTitle className="text-lg font-bold">Performance KPIs</CardTitle>
@@ -152,11 +154,13 @@ const PerformanceMetricsWidget = ({
       </CardHeader>
       
       <CardContent className="p-3 sm:p-4 relative">
-        <div 
+        <motion.div 
           className="space-y-3 sm:space-y-5"
+          initial="hidden"
+          animate="visible"
         >
           {/* OTIF Rate - Hero Metric */}
-          <div>
+          <motion.div>
             <Link to="/enterprise/recommendations" className="block group touch-manipulation">
               <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-success/10 via-success/5 to-transparent border border-success/20 hover:border-success/40 transition-all active:scale-[0.98]">
                 <div className="flex items-center justify-between mb-2 sm:mb-3">
@@ -174,24 +178,26 @@ const PerformanceMetricsWidget = ({
                   </div>
                 </div>
                 <div className="flex items-end gap-2 sm:gap-3">
-                  <span 
-                    className="text-3xl sm:text-4xl font-bold text-success tabular-nums"}
+                  <motion.span 
+                    className="text-3xl sm:text-4xl font-bold text-success tabular-nums"
+                    initial={{ scale: 0.8 }}
                   >
                     {data.otifRate}%
-                  </span>
+                  </motion.span>
                   <span className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">On Time In Full</span>
                 </div>
                 <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 rounded-full bg-muted/30 overflow-hidden">
-                  <div 
-                    className="h-full rounded-full bg-gradient-to-r from-success to-success/70"}
+                  <motion.div 
+                    className="h-full rounded-full bg-gradient-to-r from-success to-success/70"
+                    initial={{ width: 0 }}
                   />
                 </div>
               </div>
             </Link>
-          </div>
+          </motion.div>
 
           {/* Utilization & Delivery Metrics Grid */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          <motion.div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Utilization Rate */}
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
@@ -210,8 +216,9 @@ const PerformanceMetricsWidget = ({
                 </div>
               </div>
               <div className="mt-1.5 sm:mt-2 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
-                <div 
-                  className={cn("h-full rounded-full", getProgressColor(data.utilizationRate, { good: 80, warn: 60 }))}}
+                <motion.div 
+                  className={cn("h-full rounded-full", getProgressColor(data.utilizationRate, { good: 80, warn: 60 }))}
+                  initial={{ width: 0 }}
                 />
               </div>
             </div>
@@ -234,10 +241,10 @@ const PerformanceMetricsWidget = ({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* On-Time Metrics */}
-          <div className="space-y-2 sm:space-y-3">
+          <motion.div className="space-y-2 sm:space-y-3">
             {/* On-Time Pickup */}
             <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-muted/10 border border-border/30">
               <div className="flex items-center gap-2 sm:gap-2.5">
@@ -248,8 +255,9 @@ const PerformanceMetricsWidget = ({
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-16 sm:w-24 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
-                  <div 
-                    className="h-full rounded-full bg-success"}
+                  <motion.div 
+                    className="h-full rounded-full bg-success"
+                    initial={{ width: 0 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-success tabular-nums w-10 sm:w-12 text-right">
@@ -268,8 +276,9 @@ const PerformanceMetricsWidget = ({
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-16 sm:w-24 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
-                  <div 
-                    className="h-full rounded-full bg-primary"}
+                  <motion.div 
+                    className="h-full rounded-full bg-primary"
+                    initial={{ width: 0 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-primary tabular-nums w-10 sm:w-12 text-right">
@@ -277,10 +286,10 @@ const PerformanceMetricsWidget = ({
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Bottom Stats */}
-          <div
+          <motion.div
             className="flex items-center justify-between pt-2 sm:pt-3 border-t border-border/30"
           >
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
@@ -295,8 +304,8 @@ const PerformanceMetricsWidget = ({
             >
               {data.successRate}% success
             </Badge>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </CardContent>
     </Card>
   );

@@ -400,7 +400,7 @@ const BrandingSettings = () => {
                   <Textarea
                     value={settings.documentFooterHtml || ''}
                     onChange={(e) => updateSettings({ ...settings, documentFooterHtml: e.target.value })}
-                    placeholder="<div style='font-size: 10px;'>KvK: {{kvk_number} | BTW: {{vat_number}}</div>"
+                    placeholder="<div style='font-size: 10px;'>KvK: {{kvk_number}} | BTW: {{vat_number}}</div>"
                     rows={6}
                     className="font-mono text-sm"
                   />

@@ -2,6 +2,7 @@ import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalData } from "@/components/portal/shared/usePortalData";
 import { usePortalAuth } from "@/hooks/usePortalAuth";
 import { usePortalExport } from "@/hooks/usePortalExport";
+import { motion } from "framer-motion";
 import { 
   Search,
   Download,
@@ -81,16 +82,19 @@ const B2BShipments = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} onRefresh={refetch}>
-      <div
+      <motion.div
         className="space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Zendingen</h1>
             <p className="text-sm text-muted-foreground">{shipments.length} zendingen in totaal</p>
           </div>
-          <div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button 
               variant="outline" 
               className="gap-2"
@@ -103,11 +107,11 @@ const B2BShipments = () => {
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Exporteren
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -125,7 +129,7 @@ const B2BShipments = () => {
               { key: 'delivered', label: 'Afgeleverd', count: statusCounts.delivered },
               { key: 'problems', label: 'Problemen', count: statusCounts.problems },
             ].map(tab => (
-              <div key={tab.key || 'all'}} className="snap-start">
+              <motion.div key={tab.key || 'all'} whileTap={{ scale: 0.95 }} className="snap-start">
                 <Button
                   variant={statusFilter === tab.key ? "default" : "outline"}
                   size="sm"
@@ -135,18 +139,23 @@ const B2BShipments = () => {
                   {tab.label}
                   <span className="ml-1.5 text-xs opacity-70">({tab.count})</span>
                 </Button>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-3">
           {filteredShipments.map((shipment, index) => {
             const status = statusConfig[shipment.status];
             return (
-              <div
+              <motion.div
                 key={shipment.id}
+                custom={index}
+                variants={rowVariants}
+                initial="hidden"
+                animate="show"
+                whileTap={{ scale: 0.98 }}
                 className="touch-manipulation"
                 onClick={() => navigate(`/portal/b2b/shipments/${shipment.id}`)}
               >
@@ -181,13 +190,13 @@ const B2BShipments = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
         {/* Desktop Table */}
-        <div className="hidden md:block bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm">
+        <motion.div variants={itemVariants} className="hidden md:block bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full w-full">
               <thead>
@@ -205,8 +214,13 @@ const B2BShipments = () => {
                 {filteredShipments.map((shipment, index) => {
                   const status = statusConfig[shipment.status];
                   return (
-                    <tr
+                    <motion.tr
                       key={shipment.id}
+                      custom={index}
+                      variants={rowVariants}
+                      initial="hidden"
+                      animate="show"
+                      whileHover={{ backgroundColor: "hsl(var(--muted) / 0.2)", x: 4 }}
                       className="transition-colors cursor-pointer"
                       onClick={() => navigate(`/portal/b2b/shipments/${shipment.id}`)}
                     >
@@ -255,38 +269,44 @@ const B2BShipments = () => {
                           <ArrowUpRight className="h-4 w-4" />
                         </Link>
                       </td>
-                    </tr>
+                    </motion.tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
           
         {filteredShipments.length === 0 && (
-          <div 
+          <motion.div 
             className="text-center py-16"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <div
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.1 }}
             >
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                 <Package className="h-8 w-8 text-muted-foreground" />
               </div>
-            </div>
+            </motion.div>
             <h3 className="text-lg font-semibold mb-1">Geen zendingen gevonden</h3>
             <p className="text-sm text-muted-foreground mb-4">
               {search ? 'Probeer een andere zoekopdracht' : 'Je hebt nog geen zendingen'}
             </p>
             {!search && (
-              <div>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Button asChild className="bg-gold hover:bg-gold/90 text-gold-foreground">
                   <Link to="/portal/b2b/book">Eerste zending aanmaken</Link>
                 </Button>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </B2BLayout>
   );
 };

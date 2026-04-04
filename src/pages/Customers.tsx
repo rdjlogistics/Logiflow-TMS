@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingState } from "@/components/common/LoadingState";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -797,7 +798,9 @@ const Customers = () => {
 
         {/* Bulk Actions Toolbar */}
         {someSelected && (
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 p-3 backdrop-blur-xl bg-card/60 rounded-2xl border border-border/20 shadow-xl"
           >
             <CheckSquare className="h-4 w-4 text-primary" />
@@ -809,7 +812,7 @@ const Customers = () => {
                 </Button>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         <div className="rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 overflow-hidden shadow-lg">
@@ -838,7 +841,10 @@ const Customers = () => {
                           leftActions={[swipeActions.more(() => handleEdit(customer))]}
                           rightActions={isAdmin ? [swipeActions.delete(() => handleDeleteRequest(customer))] : []}
                         >
-                          <div
+                          <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: 'spring', stiffness: 260, damping: 24 }}
                           >
                           <div className="relative rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 shadow-lg overflow-hidden">
                             {/* Premium top highlight */}
@@ -924,7 +930,7 @@ const Customers = () => {
                               </div>
                             </div>
                           </div>
-                          </div>
+                          </motion.div>
                         </SwipeableCard>
                       ))}
                     </div>

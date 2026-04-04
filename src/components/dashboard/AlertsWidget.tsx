@@ -156,7 +156,7 @@ const AlertsWidget = ({ alerts = [], loading }: AlertsWidgetProps) => {
               const config = getAlertConfig(alert.type);
               const Icon = config.icon;
               return (
-                <div key={alert.id} className="group animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 40}ms` >
+                <div key={alert.id} className="group animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 40}ms` }}>
                   <Link to={alert.href} className="block touch-manipulation">
                     <div className={cn(
                       "relative p-3 sm:p-3.5 rounded-xl border transition-all",

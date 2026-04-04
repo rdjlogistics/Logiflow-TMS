@@ -440,7 +440,8 @@ const LaneMap = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => {
                 setShowLinkCustomerDialog(false);
-                setSelectedCustomerId(''); }}>Annuleren</Button>
+                setSelectedCustomerId('');
+              }}>Annuleren</Button>
               <Button 
                 onClick={async () => {
                   if (!selectedLane || !selectedCustomerId) return;

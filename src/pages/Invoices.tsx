@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingState } from "@/components/common/LoadingState";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -377,11 +378,14 @@ const Invoices = () => {
     <DashboardLayout title="Facturen">
       <div className="space-y-4 sm:space-y-6">
         {/* KPI Cards - Premium Animated */}
-        <div
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"
         >
           {kpiCards.map((kpi) => (
-            <div key={kpi.id} className="h-full">
+            <motion.div key={kpi.id} variants={itemVariants} className="h-full">
               <Card 
                 className={cn(
                   "relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-2xl shadow-lg transition-all duration-300 group h-full",
@@ -396,8 +400,11 @@ const Invoices = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.06),transparent)] pointer-events-none" />
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 {/* Shimmer sweep */}
-                <div
+                <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ repeat: Infinity, duration: 3.5, ease: 'linear', repeatDelay: 2 }}
                 />
                 <CardContent className="relative p-3 sm:p-5 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-1.5 sm:mb-3">
@@ -420,12 +427,12 @@ const Invoices = () => {
                   <div className="min-h-[20px] sm:min-h-[24px] mt-auto" />
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Filters & Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex flex-1 gap-3 flex-col sm:flex-row">
             <div className="relative flex-1 max-w-full sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -467,10 +474,10 @@ const Invoices = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
+        </motion.div>
 
         {/* Desktop Table */}
-        <div className="hidden md:block">
+        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="hidden md:block">
           <Card className="relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-sm shadow-lg">
             <CardContent className="relative p-0">
               <div className="overflow-x-auto">
@@ -620,10 +627,13 @@ const Invoices = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Mobile Cards */}
-        <div
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           className="md:hidden space-y-3"
         >
           {loading ? (
@@ -648,8 +658,10 @@ const Invoices = () => {
             filteredInvoices.map((invoice, index) => {
               const overdue = isOverdue(invoice);
               return (
-                <div
+                <motion.div
                   key={invoice.id}
+                  variants={mobileCardVariants}
+                  whileTap={{ scale: 0.98 }}
                   className="touch-manipulation"
                 >
                   <Card 
@@ -738,11 +750,11 @@ const Invoices = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               );
             })
           )}
-        </div>
+        </motion.div>
 
         {/* View Sheet (Premium slide-in) */}
         <Sheet open={isViewSheetOpen} onOpenChange={setIsViewSheetOpen}>

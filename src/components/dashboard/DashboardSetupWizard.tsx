@@ -832,7 +832,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             className="bg-background px-5 pb-2 pointer-events-auto"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
           >
-            <motion.div whileTap={{ scale: 0.97 >
+            <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 onClick={handleNext}
                 className={cn(
@@ -1121,7 +1121,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                           '0 0 0 6px hsl(var(--primary) / 0.15)',
                           '0 0 0 0 hsl(var(--primary) / 0)',
                         ],
-                      } : {}
+                      } : {}}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
                       {isCompleted ? (
@@ -1265,7 +1265,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/10">
                   <div>
                     {step > 0 && step < 3 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1278,7 +1278,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                       </motion.div>
                     )}
                     {step === 0 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1291,7 +1291,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                     )}
                   </div>
 
-                  <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 >
+                  <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
                     <Button
                       size="lg"
                       onClick={handleNext}

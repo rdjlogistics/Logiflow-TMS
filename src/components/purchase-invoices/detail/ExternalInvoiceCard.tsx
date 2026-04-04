@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Link2, AlertTriangle, CheckCircle2, FileCheck } from "lucide-react";
 import { format } from "date-fns";
@@ -46,18 +47,20 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
       
       <div className="p-6 pt-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          <div 
-            className="space-y-1.5"}
+          <motion.div 
+            className="space-y-1.5"
+            initial={{ opacity: 0, y: 10 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
               <FileCheck className="h-3.5 w-3.5" />
               Factuurnummer
             </p>
             <p className="font-bold text-foreground text-lg">{invoice.external_invoice_number}</p>
-          </div>
+          </motion.div>
           
-          <div 
-            className="space-y-1.5"}
+          <motion.div 
+            className="space-y-1.5"
+            initial={{ opacity: 0, y: 10 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Factuurdatum</p>
             <p className="font-semibold text-foreground">
@@ -65,10 +68,11 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
                 ? format(new Date(invoice.external_invoice_date), "d MMM yyyy", { locale: nl })
                 : "-"}
             </p>
-          </div>
+          </motion.div>
           
-          <div 
-            className="space-y-1.5"}
+          <motion.div 
+            className="space-y-1.5"
+            initial={{ opacity: 0, y: 10 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Bedrag</p>
             <p className="font-bold text-foreground text-lg">
@@ -76,10 +80,11 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
                 ? formatCurrency(Number(invoice.external_invoice_amount))
                 : "-"}
             </p>
-          </div>
+          </motion.div>
           
-          <div 
-            className="space-y-1.5"}
+          <motion.div 
+            className="space-y-1.5"
+            initial={{ opacity: 0, y: 10 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Verschil</p>
             <p className={cn(
@@ -91,7 +96,7 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
                 : "€ 0,00"
               }
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     </PremiumGlassCard>

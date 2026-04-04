@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Plus, 
@@ -39,25 +40,27 @@ const QuickLinksWidget = () => {
       <CardContent className="p-3">
         <div className="grid grid-cols-2 gap-2">
           {quickLinks.map((link, index) => (
-            <div
+            <motion.div
               key={link.href}
+              initial={{ opacity: 0, y: 5 }}
             >
               <Link to={link.href}>
-                <div
+                <motion.div
                   className={cn(
                     "flex items-center gap-2 p-2.5 rounded-xl",
                     "bg-muted/30 hover:bg-muted/50 border border-border/20 hover:border-border/40",
                     "transition-all duration-150 group cursor-pointer"
-                  )}}
+                  )}
+                  whileHover={{ scale: 1.02, x: 2 }}
                 >
                   <div className={cn("p-1.5 rounded-lg bg-background/50", link.color)}>
                     <link.icon className="h-3.5 w-3.5" />
                   </div>
                   <span className="text-xs font-medium flex-1 truncate">{link.label}</span>
                   <ChevronRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+                </motion.div>
               </Link>
-            </div>
+            </motion.div>
           ))}
         </div>
       </CardContent>

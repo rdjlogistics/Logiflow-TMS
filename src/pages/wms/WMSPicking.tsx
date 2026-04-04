@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePickWaves, usePickTasks, useCreatePickWave, useWarehouses } from "@/hooks/useWMS";
+import { motion } from "framer-motion";
 import { WMSGlassCard, WMSCardTitle, WMSStatCard } from "@/components/wms";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -163,7 +164,9 @@ export default function WMSPicking() {
   return (
     <DashboardLayout title="Picking">
       {/* Header */}
-      <div
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -211,7 +214,7 @@ export default function WMSPicking() {
             } catch (error) {
               toast({ title: "Fout", description: "Auto-wave generatie mislukt.", variant: "destructive" });
             }
-          >
+          }}>
             <Zap className="h-4 w-4" />
             Auto-Wave
           </Button>
@@ -276,7 +279,7 @@ export default function WMSPicking() {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
+      </motion.div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -338,8 +341,11 @@ export default function WMSPicking() {
                       : 0;
 
                     return (
-                      <div
+                      <motion.div
                         key={wave.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.03 }}
                         onClick={() => setSelectedWaveId(wave.id)}
                         className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                           selectedWaveId === wave.id
@@ -401,7 +407,7 @@ export default function WMSPicking() {
                         {wave.status === "in_progress" && (
                           <Progress value={progress} className="h-2" />
                         )}
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -440,8 +446,11 @@ export default function WMSPicking() {
                 const status = taskStatusConfig[task.status] || taskStatusConfig.pending;
 
                 return (
-                  <div
+                  <motion.div
                     key={task.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.02 }}
                     className="p-3 rounded-lg border bg-muted/30 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
@@ -481,7 +490,7 @@ export default function WMSPicking() {
                         </Button>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>

@@ -84,14 +84,14 @@ const B2BLabels = () => {
               { label: 'PDF', icon: Download, onClick: () => downloadLabels(getSelectedShipments(), 'pdf') },
               { label: 'ZPL', icon: FileText, onClick: () => downloadLabels(getSelectedShipments(), 'zpl') },
             ].map(btn => (
-              <motion.div key={btn.label} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 >
+              <motion.div key={btn.label} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Button variant="outline" disabled={selected.length === 0 || generating} onClick={btn.onClick} className="gap-2">
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <btn.icon className="h-4 w-4" />}
                   {btn.label}
                 </Button>
               </motion.div>
             ))}
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 >
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Button 
                 disabled={selected.length === 0 || generating}
                 onClick={() => printLabels(getSelectedShipments())}
@@ -110,7 +110,7 @@ const B2BLabels = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken op referentie of tracking..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button variant="outline" onClick={selectAll} disabled={filteredShipments.length === 0}>
               {selected.length === filteredShipments.length && filteredShipments.length > 0 ? 'Deselecteer alles' : 'Selecteer alles'}
             </Button>
@@ -154,7 +154,7 @@ const B2BLabels = () => {
                           >
                             <AnimatePresence>
                               {isSelected && (
-                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 >
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
                                   <Check className="h-3 w-3 text-gold-foreground" />
                                 </motion.div>
                               )}

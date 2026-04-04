@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { format, getISOWeek } from "date-fns";
 import { nl } from "date-fns/locale";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -124,10 +125,10 @@ export const PurchaseInvoiceContentPreview = ({
         
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <div
+            <motion.div
             >
               <FileText className="h-5 w-5 text-primary" />
-            </div>
+            </motion.div>
             Factuurinhoud
           </CardTitle>
         </CardHeader>
@@ -181,8 +182,10 @@ export const PurchaseInvoiceContentPreview = ({
               </TableHeader>
               <TableBody>
                 {lines?.map((line, idx) => (
-                  <tr
+                  <motion.tr
                     key={line.id}
+                    initial="hidden"
+                    animate="visible"
                     className={cn(
                       "group transition-all duration-200 hover:bg-primary/5",
                       idx % 2 === 0 ? "bg-background" : "bg-muted/10"
@@ -231,7 +234,7 @@ export const PurchaseInvoiceContentPreview = ({
                     <TableCell className="text-right font-semibold tabular-nums">
                       {formatCurrency(Number(line.total_price))}
                     </TableCell>
-                  </tr>
+                  </motion.tr>
                 ))}
               </TableBody>
             </Table>
@@ -254,11 +257,12 @@ export const PurchaseInvoiceContentPreview = ({
             
             <div className="flex justify-between items-center pt-2">
               <span className="text-lg font-bold">Totaal</span>
-              <span
+              <motion.span 
+                initial={{ scale: 0.9, opacity: 0 }}
                 className="text-2xl font-bold text-primary"
               >
                 {formatCurrency(Number(invoice.total_amount))}
-              </span>
+              </motion.span>
             </div>
           </div>
         </CardContent>

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useNotifications } from "@/components/notifications/NotificationCenter";
 import { AlertTriangle, ChevronRight, Clock, CalendarClock } from "lucide-react";
@@ -128,7 +129,8 @@ export const PaymentAlertBanner = () => {
       {/* Overdue Alert */}
       {hasOverdue && (
         <Link to="/purchase-invoices?status=verlopen">
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-red-500/10 border-red-500/30 hover:bg-red-500/15"
@@ -148,14 +150,15 @@ export const PaymentAlertBanner = () => {
               </div>
               <ChevronRight className="h-5 w-5 text-red-500" />
             </div>
-          </div>
+          </motion.div>
         </Link>
       )}
 
       {/* Soon Due Alert */}
       {hasSoonDue && (
         <Link to="/purchase-invoices">
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/15"
@@ -175,7 +178,7 @@ export const PaymentAlertBanner = () => {
               </div>
               <ChevronRight className="h-5 w-5 text-amber-500" />
             </div>
-          </div>
+          </motion.div>
         </Link>
       )}
     </div>

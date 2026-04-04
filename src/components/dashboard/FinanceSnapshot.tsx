@@ -75,7 +75,7 @@ const FinanceSnapshot = ({
       <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4 relative">
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {metrics.map((metric, index) => (
-            <div key={metric.label} className="animate-in fade-in zoom-in-95 duration-300" style={{ animationDelay: `${index * 40}ms` >
+            <div key={metric.label} className="animate-in fade-in zoom-in-95 duration-300" style={{ animationDelay: `${index * 40}ms` }}>
               <Link to={metric.href} className="block touch-manipulation">
                 <div className={cn(
                   "p-3 sm:p-4 rounded-xl border border-border/30 transition-all group cursor-pointer",

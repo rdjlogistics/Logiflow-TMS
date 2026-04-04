@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Warehouse,
   Package,
@@ -87,7 +88,9 @@ function MetricCard({
   const styles = colorStyles[color];
 
   const content = (
-    <div
+    <motion.div 
+      whileHover={{ scale: 1.01, y: -1 }}
+      transition={{ type: "tween", duration: 0.1 }}
       className={cn(
         "relative h-full overflow-hidden rounded-xl border bg-card/60 backdrop-blur-md p-5",
         "transition-all duration-300 group cursor-pointer",
@@ -114,16 +117,17 @@ function MetricCard({
         </div>
         
         {/* Right side: Icon */}
-        <div
+        <motion.div 
+          whileHover={{ rotate: 5, scale: 1.1 }}
           className={cn(
             "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ml-3",
             styles.bg, "border", styles.border
           )}
         >
           <Icon className={cn("h-6 w-6", styles.text)} />
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 
   if (href) {
@@ -214,7 +218,9 @@ export default function WMSDashboard() {
   return (
     <DashboardLayout title="WMS Control Tower">
       {/* Imperial Header */}
-      <div
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
         className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6"
       >
         <div className="flex items-center gap-4">
@@ -272,20 +278,26 @@ export default function WMSDashboard() {
             AI Optimalisatie
           </Button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Quick Actions - Compact */}
-      <div
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
         className="mb-6"
       >
         <WMSQuickActions />
-      </div>
+      </motion.div>
 
       {/* Main Metrics Grid - 6 Columns, Properly Centered */}
-      <div
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6"
       >
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Magazijnen"
             value={statsLoading ? "-" : stats?.totalWarehouses || 0}
@@ -294,9 +306,9 @@ export default function WMSDashboard() {
             color="primary"
             href="/wms/warehouses"
           />
-        </div>
+        </motion.div>
 
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Producten"
             value={statsLoading ? "-" : (stats?.totalProducts?.toLocaleString("nl-NL") || "0")}
@@ -305,9 +317,9 @@ export default function WMSDashboard() {
             color="blue"
             href="/wms/products"
           />
-        </div>
+        </motion.div>
 
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Totale Bezetting"
             value={`${warehouseUtilization}%`}
@@ -316,9 +328,9 @@ export default function WMSDashboard() {
             color="violet"
             href="/wms/warehouses"
           />
-        </div>
+        </motion.div>
 
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Voorraadwaarde"
             value={statsLoading ? "-" : formatCurrency(stats?.totalInventoryValue || 0)}
@@ -327,9 +339,9 @@ export default function WMSDashboard() {
             color="gold"
             trend={{ value: 12.5, positive: true }}
           />
-        </div>
+        </motion.div>
 
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Lage Voorraad"
             value={statsLoading ? "-" : stats?.lowStockProducts || 0}
@@ -339,9 +351,9 @@ export default function WMSDashboard() {
             pulse={(stats?.lowStockProducts || 0) > 0}
             href="/wms/inventory"
           />
-        </div>
+        </motion.div>
 
-        <div className="col-span-1">
+        <motion.div variants={item} className="col-span-1">
           <MetricCard
             title="Pick Efficiëntie"
             value={`${pickingEfficiency}%`}
@@ -349,14 +361,17 @@ export default function WMSDashboard() {
             icon={Zap}
             color="emerald"
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Operations Status - 3 Column */}
-      <div
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
       >
-        <div>
+        <motion.div variants={item}>
           <OperationsCard
             title="Ontvangst"
             icon={ArrowDownToLine}
@@ -368,9 +383,9 @@ export default function WMSDashboard() {
               { label: "Gereed", value: 15, status: "success" },
             ]}
           />
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div variants={item}>
           <OperationsCard
             title="Verzending"
             icon={ArrowUpFromLine}
@@ -382,9 +397,9 @@ export default function WMSDashboard() {
               { label: "Verzonden", value: 42, status: "success" },
             ]}
           />
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div variants={item}>
           <OperationsCard
             title="Picking Waves"
             icon={Layers}
@@ -396,8 +411,8 @@ export default function WMSDashboard() {
               { label: "Voltooid", value: 12, status: "success" },
             ]}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Main Content - 3 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -493,9 +508,12 @@ export default function WMSDashboard() {
                   </thead>
                   <tbody className="divide-y divide-border/30">
                     {pendingOutbound?.slice(0, 6).map((order, index) => (
-                      <tr 
+                      <motion.tr 
                         key={order.id} 
                         className="hover:bg-muted/20 transition-colors"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
                       >
                         <td className="py-3 px-4">
                           <span className="font-mono text-xs font-medium text-primary">{order.order_number}</span>
@@ -526,7 +544,7 @@ export default function WMSDashboard() {
                         <td className="py-3 px-4">
                           <Badge variant="outline" className="capitalize text-xs">{order.status}</Badge>
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
@@ -570,8 +588,11 @@ export default function WMSDashboard() {
             ) : (
               <div className="space-y-2">
                 {warehouses?.slice(0, 4).map((wh, i) => (
-                  <div
+                  <motion.div
                     key={wh.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
                     className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors"
                   >
                     <div className={cn(
@@ -588,7 +609,7 @@ export default function WMSDashboard() {
                       "w-2 h-2 rounded-full",
                       wh.is_active ? "bg-emerald-500" : "bg-muted-foreground"
                     )} />
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -617,8 +638,11 @@ export default function WMSDashboard() {
             ) : (
               <div className="space-y-2">
                 {lowStock?.slice(0, 5).map((inv, i) => (
-                  <div
+                  <motion.div
                     key={inv.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
                     className="flex items-center gap-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/5"
                   >
                     <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
@@ -630,7 +654,7 @@ export default function WMSDashboard() {
                       <p className="font-bold text-amber-600">{inv.available_quantity}</p>
                       <p className="text-[10px] text-muted-foreground">min: {inv.product?.min_stock_level}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}

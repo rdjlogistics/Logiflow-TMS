@@ -334,7 +334,7 @@ const DriversTab = () => {
   ];
 
   const formDialog = (isEdit: boolean) => (
-    <Dialog open={isEdit ? !!editDriver : addOpen} onOpenChange={(o) => { if (!o) { isEdit ? setEditDriver(null) : setAddOpen(false); resetForm(); } >
+    <Dialog open={isEdit ? !!editDriver : addOpen} onOpenChange={(o) => { if (!o) { isEdit ? setEditDriver(null) : setAddOpen(false); resetForm(); } }}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Chauffeur bewerken" : "Chauffeur toevoegen"}</DialogTitle>

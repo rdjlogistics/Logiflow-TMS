@@ -6,6 +6,7 @@ import { clearAuthStorage } from "@/lib/authStorage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
 import { Truck, Loader2, AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
@@ -134,29 +135,35 @@ const PortalLogin = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="relative w-full max-w-md"
       >
         <div className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-8 shadow-2xl">
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
-            <div
-              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg mb-4"}
+            <motion.div
+              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg mb-4"
+              whileHover={{ scale: 1.05 }}
             >
               <Truck className="h-8 w-8 text-primary-foreground" />
-            </div>
+            </motion.div>
             <h1 className="font-display text-2xl font-bold text-foreground">Klantenportaal</h1>
             <p className="text-sm text-muted-foreground mt-1">Log in om uw zendingen te beheren</p>
           </div>
 
           {/* Error */}
           {error && (
-            <div
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
               className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm"
             >
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>{error}</span>
-            </div>
+            </motion.div>
           )}
 
           {forgotMode ? (
@@ -273,7 +280,7 @@ const PortalLogin = () => {
         <p className="text-center text-[11px] text-muted-foreground mt-4">
           Geen account? Neem contact op met uw charter.
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -247,7 +247,7 @@ const DriverPortal = () => {
       </div>
 
       {/* Premium Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 md:absolute bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/98 to-[#0a0a0f]/90 backdrop-blur-2xl border-t border-white/5 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' >
+      <nav className="fixed bottom-0 left-0 right-0 md:absolute bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/98 to-[#0a0a0f]/90 backdrop-blur-2xl border-t border-white/5 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="grid grid-cols-5 gap-0.5 px-3 py-2">
           {[
             { id: 'home' as DriverTab, icon: Home, label: 'Home', badge: 0 },

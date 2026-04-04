@@ -219,7 +219,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
       </ScrollArea>
 
       {/* Input */}
-      <div className="flex-shrink-0 p-4 border-t border-white/5 bg-[#0a0a0f]/90 backdrop-blur-xl" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' >
+      <div className="flex-shrink-0 p-4 border-t border-white/5 bg-[#0a0a0f]/90 backdrop-blur-xl" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
         <div className="flex gap-2">
           <Input
             value={newMessage}

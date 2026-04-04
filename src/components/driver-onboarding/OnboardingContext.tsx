@@ -199,7 +199,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     <OnboardingContext.Provider value={{
       data, updateData, currentStep, setCurrentStep, totalSteps,
       isOnline, pendingUploads, setPendingUploads, clearDraft, hasDraft,
-    >
+    }}>
       {children}
     </OnboardingContext.Provider>
   );

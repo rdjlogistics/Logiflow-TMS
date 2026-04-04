@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from "react";
+import { motion } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -110,11 +111,12 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
       <CardHeader className="pb-4 border-b border-border/30 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div 
-              className="p-2.5 rounded-xl bg-success/15"}
+            <motion.div 
+              className="p-2.5 rounded-xl bg-success/15"
+              whileHover={{ rotate: 10, scale: 1.05 }}
             >
               <TrendingUp className="h-5 w-5 text-success" />
-            </div>
+            </motion.div>
             <div>
               <CardTitle className="text-lg font-bold">Omzet & Marge Trends</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -144,8 +146,9 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
       
       <CardContent className="p-3 sm:p-4 relative">
         {/* Summary cards */}
-        <div 
-          className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-5"}
+        <motion.div 
+          className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-5"
+          initial={{ opacity: 0, y: 10 }}
         >
           <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-success/10 to-transparent border border-success/20">
             <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
@@ -184,7 +187,7 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Chart */}
         <Tabs defaultValue="revenue" className="w-full">
@@ -196,7 +199,7 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
           <TabsContent value="revenue" className="mt-0">
             <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 >
+                <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenueTrend" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
@@ -258,7 +261,7 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
           <TabsContent value="margin" className="mt-0">
             <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 >
+                <ComposedChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorMargin" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(45 93% 47%)" stopOpacity={0.4} />

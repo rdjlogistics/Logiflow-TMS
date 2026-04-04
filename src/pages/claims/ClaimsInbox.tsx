@@ -57,7 +57,8 @@ const SettlementSection = ({
         </Select>
         <Button className="rounded-xl" onClick={() => {
           const amount = parseFloat(settlementAmount) || 0;
-          onSettle(amount, settlementLiability); }}>Afwikkelen</Button>
+          onSettle(amount, settlementLiability);
+        }}>Afwikkelen</Button>
       </div>
     </div>
   );
@@ -183,7 +184,7 @@ const PODCard = ({ pod }: any) => {
               if (viewWindow) { viewWindow.document.write(htmlContent); viewWindow.document.close(); }
             }
           } catch { toast.error("POD kon niet worden geladen"); }
-        ><Eye className="h-4 w-4" /></Button>
+        }}><Eye className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={async (e) => {
           e.stopPropagation();
           toast.info(`POD download gestart voor ${orderNumber}`);
@@ -205,7 +206,7 @@ const PODCard = ({ pod }: any) => {
               toast.success("POD gedownload");
             }
           } catch { toast.error("Download mislukt"); }
-        ><Download className="h-4 w-4" /></Button>
+        }}><Download className="h-4 w-4" /></Button>
       </div>
     </div>
   </motion.div>
@@ -255,7 +256,8 @@ const ClaimDetailContent = ({ claim, resolveClaim, onClose, getTypeBadge, getSta
         if (claim?.id && !claim.id.startsWith('demo')) {
           try { await supabase.from('claim_cases').update({ status: 'awaiting_info' }).eq('id', claim.id); } catch (e) { console.error(e); }
         }
-        toast.success('Informatie aangevraagd ✓', { description: `E-mail verstuurd voor claim ${claim?.order_number}.` }); }}><MessageSquare className="h-4 w-4 mr-2" />Vraag info op</Button>
+        toast.success('Informatie aangevraagd ✓', { description: `E-mail verstuurd voor claim ${claim?.order_number}.` });
+      }}><MessageSquare className="h-4 w-4 mr-2" />Vraag info op</Button>
 
       <Button variant="outline" className="rounded-xl" onClick={async () => {
         if (claim?.id && !claim.id.startsWith('demo')) {
@@ -264,21 +266,24 @@ const ClaimDetailContent = ({ claim, resolveClaim, onClose, getTypeBadge, getSta
         const subject = encodeURIComponent(`Claim doorgestuurd: ${claim?.order_number}`);
         const body = encodeURIComponent(`Geachte charter,\n\nHierbij sturen wij u de claim door voor order ${claim?.order_number}.\n\nType: ${claim?.claim_type}\nBedrag: €${claim?.claimed_amount}\n\nGraag uw reactie binnen 5 werkdagen.\n\nMet vriendelijke groet`);
         window.open(`mailto:charter@example.com?subject=${subject}&body=${body}`, '_blank');
-        toast.success('Claim doorgestuurd ✓'); }}><Send className="h-4 w-4 mr-2" />Stuur naar charter</Button>
+        toast.success('Claim doorgestuurd ✓');
+      }}><Send className="h-4 w-4 mr-2" />Stuur naar charter</Button>
 
       <Button variant="outline" className="rounded-xl text-green-500 hover:text-green-600" onClick={async () => {
         if (claim?.id && !claim.id.startsWith('demo')) {
           await resolveClaim.mutateAsync({ id: claim.id, status: 'approved', approved_amount: claim.claimed_amount });
         }
         toast.success('Claim goedgekeurd ✓');
-        onClose(); }}><CheckCircle2 className="h-4 w-4 mr-2" />Goedkeuren</Button>
+        onClose();
+      }}><CheckCircle2 className="h-4 w-4 mr-2" />Goedkeuren</Button>
 
       <Button variant="outline" className="rounded-xl text-red-500 hover:text-red-600" onClick={async () => {
         if (claim?.id && !claim.id.startsWith('demo')) {
           await resolveClaim.mutateAsync({ id: claim.id, status: 'rejected' });
         }
         toast.error('Claim afgewezen');
-        onClose(); }}><XCircle className="h-4 w-4 mr-2" />Afwijzen</Button>
+        onClose();
+      }}><XCircle className="h-4 w-4 mr-2" />Afwijzen</Button>
     </div>
 
     <SettlementSection

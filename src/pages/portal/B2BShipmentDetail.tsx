@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalAuth } from "@/hooks/usePortalAuth";
 import { useShipmentById } from "@/components/portal/shared/usePortalData";
@@ -85,9 +86,9 @@ const B2BShipmentDetail = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <div className="space-y-6">
+      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
         {/* Back + Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" asChild>
               <Link to="/portal/b2b/shipments"><ArrowLeft className="h-4 w-4" /></Link>
@@ -114,10 +115,10 @@ const B2BShipmentDetail = () => {
               </Button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Route Card */}
-        <div>
+        <motion.div variants={itemVariants}>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -142,7 +143,7 @@ const B2BShipmentDetail = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Live Tracking (only for in_transit with tripId) */}
         {shipment.status === 'in_transit' && shipment.tripId && (
@@ -156,20 +157,20 @@ const B2BShipmentDetail = () => {
               onETAUpdate={handleETAUpdate}
             />
             {liveEta.minutes != null && (
-              <div>
+              <motion.div variants={itemVariants}>
                 <ETADisplay
                   distanceKm={liveEta.distanceKm}
                   liveEtaMinutes={liveEta.minutes}
                   routeDistanceKm={liveEta.distanceKm}
                   isCalculating={liveEta.calculating}
                 />
-              </div>
+              </motion.div>
             )}
           </>
         )}
         {/* Tracking Code */}
         {shipment.trackingCode && (
-          <div>
+          <motion.div variants={itemVariants}>
             <Card>
               <CardContent className="p-4 flex items-center gap-3">
                 <Hash className="h-4 w-4 text-primary" />
@@ -179,11 +180,11 @@ const B2BShipmentDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
         )}
 
         {/* Details Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: Package, label: "Colli", value: shipment.parcels },
             { icon: Hash, label: "Gewicht", value: shipment.weight ? `${shipment.weight} kg` : "-" },
@@ -200,10 +201,10 @@ const B2BShipmentDetail = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </motion.div>
 
         {/* Timeline */}
-        <div>
+        <motion.div variants={itemVariants}>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -228,11 +229,14 @@ const B2BShipmentDetail = () => {
 
                     return (
                       <div key={step.key} className="flex items-center flex-shrink-0">
-                        <div
+                        <motion.div
                           className={cn(
                             "flex flex-col items-center gap-1 px-2",
                             isCurrent && "scale-110"
-                          )}}}}
+                          )}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.1 }}
                         >
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
@@ -246,7 +250,7 @@ const B2BShipmentDetail = () => {
                           )}>
                             {step.label}
                           </span>
-                        </div>
+                        </motion.div>
                         {i < timelineSteps.length - 1 && (
                           <div className={cn(
                             "w-8 h-0.5 flex-shrink-0",
@@ -260,8 +264,8 @@ const B2BShipmentDetail = () => {
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </B2BLayout>
   );
 };

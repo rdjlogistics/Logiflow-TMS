@@ -304,7 +304,8 @@ const AutomationSimulator = () => {
                     </DialogContent>
                   </Dialog>
                   <Button onClick={() => {
-                    toast({ title: "Automation gepubliceerd", description: "De automation is succesvol gepubliceerd en actief." }); }}>
+                    toast({ title: "Automation gepubliceerd", description: "De automation is succesvol gepubliceerd en actief." });
+                  }}>
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Publiceer Automation
                   </Button>
@@ -379,7 +380,8 @@ const AutomationSimulator = () => {
                       <Button onClick={() => {
                         toast({ title: "Automation aangemaakt", description: `${newAutomation.name || 'Nieuwe automation'} is toegevoegd als draft.` });
                         setShowNewAutomationDialog(false);
-                        setNewAutomation({ name: '', trigger: '', description: '' }); }}>
+                        setNewAutomation({ name: '', trigger: '', description: '' });
+                      }}>
                         Aanmaken
                       </Button>
                     </DialogFooter>

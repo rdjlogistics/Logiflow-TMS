@@ -93,7 +93,8 @@ const LocalFallbackMap: React.FC<LocalFallbackMapProps> = ({
           return (
             <g key={stop.id} className="cursor-pointer" onClick={() => {
               setActivePopup(activePopup === stop.id ? null : stop.id);
-              onStopClick?.(stop.id); }}>
+              onStopClick?.(stop.id);
+            }}>
               <circle cx={p.x} cy={p.y} r="14" fill={color} stroke="white" strokeWidth="2" />
               <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="central" fill="white" fontSize="10" fontWeight="bold">
                 {index + 1}
@@ -133,12 +134,12 @@ const LocalFallbackMap: React.FC<LocalFallbackMapProps> = ({
           >
             <button onClick={() => setActivePopup(null)} className="absolute top-1 right-2 text-muted-foreground hover:text-foreground text-lg leading-none">×</button>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-6 h-6 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ backgroundColor: color >{idx + 1}</span>
+              <span className="w-6 h-6 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ backgroundColor: color }}>{idx + 1}</span>
               <span className="font-semibold text-sm">{stop.companyName || `Stop ${idx + 1}`}</span>
             </div>
             <p className="text-xs text-muted-foreground">{stop.address}{stop.city ? `, ${stop.city}` : ""}</p>
             <div className="flex gap-1 mt-2">
-              <span className="text-[10px] px-2 py-0.5 rounded" style={{ backgroundColor: `${color}20`, color >{isPickup ? "Ophalen" : isDelivery ? "Afleveren" : "Tussenstop"}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded" style={{ backgroundColor: `${color}20`, color }}>{isPickup ? "Ophalen" : isDelivery ? "Afleveren" : "Tussenstop"}</span>
               {stop.priority === "urgent" && <span className="text-[10px] px-2 py-0.5 rounded bg-destructive/10 text-destructive">Urgent</span>}
             </div>
             {etaLabel && (

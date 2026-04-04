@@ -166,7 +166,7 @@ const RecentActivityFeed = ({ loading: externalLoading }: RecentActivityFeedProp
                 const config = getActivityConfig(activity.type);
                 const Icon = config.icon;
                 return (
-                  <div key={`${activity.type}-${activity.id}`} className="animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 30}ms` >
+                  <div key={`${activity.type}-${activity.id}`} className="animate-in fade-in slide-in-from-left-2 duration-300" style={{ animationDelay: `${index * 30}ms` }}>
                     <Link to={activity.link || "#"} className="block">
                       <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/30 border border-transparent hover:border-border/30 transition-all group cursor-pointer hover:translate-x-1">
                         <div className={cn("p-2 rounded-lg shrink-0 transition-all group-hover:scale-105", config.bg)}>

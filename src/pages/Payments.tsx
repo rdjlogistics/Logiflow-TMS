@@ -165,7 +165,7 @@ const Payments = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "0ms" >
+          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "0ms" }}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -179,7 +179,7 @@ const Payments = () => {
             </CardContent>
           </Card>
 
-          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "100ms" >
+          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -193,7 +193,7 @@ const Payments = () => {
             </CardContent>
           </Card>
 
-          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "200ms" >
+          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -207,7 +207,7 @@ const Payments = () => {
             </CardContent>
           </Card>
 
-          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "300ms" >
+          <Card variant="stat" className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

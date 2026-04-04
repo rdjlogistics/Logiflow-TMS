@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { 
   Truck, 
   Package, 
@@ -83,18 +84,21 @@ export const Step2PreviewSection = ({
 
   if (carrierGroups.length === 0) {
     return (
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-card/90 via-card/80 to-muted/50 backdrop-blur-2xl border border-border/40 p-8 sm:p-12"
       >
         {/* Ambient glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.08),transparent)] pointer-events-none" />
         
         <div className="relative text-center space-y-4">
-          <div
+          <motion.div
+            initial="initial"
+            animate="animate"
             className="mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center"
           >
             <Package className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
-          </div>
+          </motion.div>
           <h3 className="text-lg sm:text-xl font-semibold text-foreground">Geen orders gevonden</h3>
           <p className="text-sm sm:text-base text-muted-foreground max-w-sm mx-auto">
             Er zijn geen afgeronde orders voor deze periode die nog niet gefactureerd zijn.
@@ -108,20 +112,23 @@ export const Step2PreviewSection = ({
             Terug naar selectie
           </Button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
+    <motion.div
+      initial="hidden"
+      animate="visible"
       className="space-y-4 sm:space-y-6"
     >
       {/* Premium Header Card */}
-      <div
+      <motion.div
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
       >
         {/* Shimmer effect */}
-        <div
+        <motion.div
+          initial={{ x: '-100%' }}
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
         />
         
@@ -130,12 +137,13 @@ export const Step2PreviewSection = ({
         
         <div className="relative space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 sm:gap-4">
-            <div 
-              className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"}
+            <motion.div 
+              className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
+              whileHover={{ scale: 1.05, rotate: 3 }}
             >
               <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
               <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-primary/10 blur-xl animate-pulse" />
-            </div>
+            </motion.div>
             <div className="min-w-0">
               <h2 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
                 <span className="truncate">Preview Tarieven</span>
@@ -159,13 +167,14 @@ export const Step2PreviewSection = ({
             </Badge>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Carrier Cards */}
       <div className="space-y-3 sm:space-y-4">
         {carrierGroups.map((group, idx) => (
-          <div
+          <motion.div
             key={group.carrier_id}
+            custom={idx}
             className={cn(
               "relative overflow-hidden rounded-xl sm:rounded-2xl backdrop-blur-xl border transition-all duration-500",
               group.selected 
@@ -184,7 +193,7 @@ export const Step2PreviewSection = ({
             <div className="relative p-3 sm:p-5">
               <div className="flex items-start gap-3 sm:gap-4">
                 {/* Checkbox */}
-                <div
+                <motion.div
                   className="pt-0.5 sm:pt-1"
                 >
                   <Checkbox
@@ -192,7 +201,7 @@ export const Step2PreviewSection = ({
                     onCheckedChange={() => onToggleCarrier(group.carrier_id)}
                     className="h-5 w-5 sm:h-5 sm:w-5 rounded-md border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary touch-manipulation"
                   />
-                </div>
+                </motion.div>
                 
                 <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
                   {/* Carrier Header */}
@@ -219,16 +228,17 @@ export const Step2PreviewSection = ({
                       <div className="text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
                         Totaal incl. BTW
                       </div>
-                      <div 
+                      <motion.div 
                         className={cn(
                           "text-lg sm:text-2xl font-black tracking-tight",
                           group.selected 
                             ? "bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent" 
                             : "text-muted-foreground"
-                        )}}
+                        )}
+                        initial={{ scale: 1 }}
                       >
                         {formatCurrency(group.subtotal * 1.21)}
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                   
@@ -242,12 +252,12 @@ export const Step2PreviewSection = ({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Summary Footer */}
-      <div
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent backdrop-blur-xl border border-emerald-500/30"
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(142_76%_36%/0.1),transparent)] pointer-events-none" />
@@ -255,11 +265,11 @@ export const Step2PreviewSection = ({
         <div className="relative p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div 
+              <motion.div 
                 className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex-shrink-0"
               >
                 <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
+              </motion.div>
               <div className="min-w-0">
                 <div className="font-semibold text-foreground text-sm sm:text-base">
                   {selectedCount} factuur{selectedCount !== 1 ? 'en' : ''}
@@ -280,10 +290,10 @@ export const Step2PreviewSection = ({
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Action Buttons */}
-      <div
+      <motion.div
         className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 pb-safe"
       >
         <Button
@@ -308,7 +318,7 @@ export const Step2PreviewSection = ({
           <span className="truncate">{selectedCount} {selectedCount === 1 ? 'factuur' : 'facturen'} aanmaken</span>
           <ArrowRight className="h-4 w-4 hidden sm:block" />
         </Button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

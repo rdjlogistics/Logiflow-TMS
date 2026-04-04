@@ -26,6 +26,7 @@ import { useCompany } from "@/hooks/useCompany";
 import { format, differenceInDays, addDays } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const containerVariants = { hidden: { opacity: 1 }, visible: { opacity: 1, transition: { staggerChildren: 0.03 } } };
@@ -120,9 +121,9 @@ const ExpiryAlerts = () => {
 
   return (
     <DashboardLayout title="Vervaldata & Alerts" description="Proactieve compliance monitoring">
-      <div className="space-y-6">
+      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="visible">
         {/* Premium Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-background to-orange-500/5 border border-amber-500/20 p-6 sm:p-8">
+        <motion.div variants={itemVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-background to-orange-500/5 border border-amber-500/20 p-6 sm:p-8">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
           
@@ -155,10 +156,10 @@ const ExpiryAlerts = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3">
+        <motion.div variants={itemVariants} className="grid grid-cols-3 gap-3">
           <Card variant="glass" className={cn("border-red-500/20 hover:border-red-500/40 transition-colors cursor-pointer", activeTab === 'expired' && "ring-1 ring-red-500/50")} onClick={() => setActiveTab('expired')}>
             <CardContent className="p-4 text-center">
               <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center mx-auto mb-2">
@@ -188,10 +189,10 @@ const ExpiryAlerts = () => {
               <p className="text-xs text-muted-foreground">&lt; 30 dagen</p>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Filter Tabs */}
-        <div>
+        <motion.div variants={itemVariants}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full grid grid-cols-4 h-11 bg-muted/30">
               <TabsTrigger value="all" className="data-[state=active]:bg-background">
@@ -208,7 +209,7 @@ const ExpiryAlerts = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
+        </motion.div>
 
         {/* Alerts List */}
         {isLoading ? (
@@ -219,7 +220,7 @@ const ExpiryAlerts = () => {
             </CardContent>
           </Card>
         ) : filteredDocs.length === 0 ? (
-          <div>
+          <motion.div variants={itemVariants}>
             <Card variant="glass" className="border-emerald-500/20">
               <CardContent className="py-16 text-center">
                 <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
@@ -245,9 +246,9 @@ const ExpiryAlerts = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-3">
+          <motion.div variants={itemVariants} className="space-y-3">
             {filteredDocs.map((doc) => {
               const { status, daysLeft } = getExpiryStatus(doc.expiry_date);
               const config = getStatusConfig(status);
@@ -257,13 +258,15 @@ const ExpiryAlerts = () => {
                 : (doc.vehicles as any)?.license_plate;
               
               return (
-                <div
+                <motion.div
                   key={doc.id}
                   className={cn(
                     "group relative rounded-xl border bg-gradient-to-br p-4 transition-all hover:shadow-lg",
                     config.gradient,
                     "border-border/50 hover:border-primary/30 cursor-pointer active:scale-[0.99]"
-                  )}}}
+                  )}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.99 }}
                 >
                   <div className="flex items-center gap-4">
                     {/* Status Icon */}
@@ -312,12 +315,12 @@ const ExpiryAlerts = () => {
                       </Link>
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 };

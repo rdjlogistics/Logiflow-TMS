@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -46,7 +47,7 @@ export const InvoiceHeader = ({
   onShowPaymentModal,
 }: InvoiceHeaderProps) => {
   return (
-    <div
+    <motion.div
       className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card/90 via-card/80 to-primary/5 backdrop-blur-2xl border border-border/40 shadow-2xl"
     >
       {/* Multi-layer gradient effects */}
@@ -55,15 +56,17 @@ export const InvoiceHeader = ({
       <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/30 via-transparent to-transparent" />
       
       {/* Animated shine effect */}
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
+        initial={{ x: '-100%' }}
       />
       
       <div className="relative p-6 lg:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           {/* Left: Back + Info */}
           <div className="flex items-start gap-5">
-            <div
+            <motion.div
+              whileHover={{ scale: 1.05, x: -2 }}
             >
               <Button 
                 variant="ghost" 
@@ -73,15 +76,16 @@ export const InvoiceHeader = ({
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-            </div>
+            </motion.div>
             
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h1 
-                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"}
+                <motion.h1 
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"
+                  initial={{ opacity: 0, y: -10 }}
                 >
                   {invoice.invoice_number}
-                </h1>
+                </motion.h1>
                 <PurchaseInvoiceStatusBadge 
                   status={invoice.status as PurchaseInvoiceStatus} 
                   isOverdue={isOverdue}
@@ -97,17 +101,19 @@ export const InvoiceHeader = ({
                   </Badge>
                 )}
               </div>
-              <p 
-                className="text-muted-foreground text-base sm:text-lg"}
+              <motion.p 
+                className="text-muted-foreground text-base sm:text-lg"
+                initial={{ opacity: 0 }}
               >
                 Inkoopfactuur van <span className="font-semibold text-foreground">{carrier.company_name}</span>
-              </p>
+              </motion.p>
             </div>
           </div>
           
           {/* Right: Actions */}
-          <div 
-            className="flex flex-wrap gap-3 pl-17 lg:pl-0"}
+          <motion.div 
+            className="flex flex-wrap gap-3 pl-17 lg:pl-0"
+            initial={{ opacity: 0, x: 20 }}
           >
             <Button 
               asChild 
@@ -119,7 +125,7 @@ export const InvoiceHeader = ({
                 <span className="sm:hidden">Versturen</span>
               </Link>
             </Button>
-            <div>
+            <motion.div whileHover={{ scale: 1.02 }}>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -134,8 +140,8 @@ export const InvoiceHeader = ({
                 <span className="hidden sm:inline">Download PDF</span>
                 <span className="sm:hidden">PDF</span>
               </Button>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }}>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -145,9 +151,9 @@ export const InvoiceHeader = ({
                 <span className="hidden sm:inline">Factuur koppelen</span>
                 <span className="sm:hidden">Koppelen</span>
               </Button>
-            </div>
+            </motion.div>
             {invoice.status !== "betaald" && (
-              <div>
+              <motion.div whileHover={{ scale: 1.02 }}>
                 <Button 
                   variant="outline" 
                   className="gap-2.5 h-11 px-5 border-border/60 hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-600 transition-all duration-300"
@@ -157,11 +163,11 @@ export const InvoiceHeader = ({
                   <span className="hidden sm:inline">Betaling registreren</span>
                   <span className="sm:hidden">Betaling</span>
                 </Button>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -175,7 +176,10 @@ export default function EmailDashboard() {
 
   return (
     <DashboardLayout title="E-mail Dashboard" description="Overzicht van alle verzonden e-mails">
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
         className="space-y-6"
       >
         {/* Stats Cards */}
@@ -376,7 +380,7 @@ export default function EmailDashboard() {
             Laatst bijgewerkt: {format(new Date(dataUpdatedAt), "HH:mm:ss")}
           </p>
         )}
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 }

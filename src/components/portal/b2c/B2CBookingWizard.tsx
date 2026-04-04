@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { 
   MapPin, 
   Package, 
@@ -170,13 +171,14 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
           
           return (
             <div key={step.id} className="flex items-center">
-              <div 
+              <motion.div 
                 className={cn(
                   "w-11 h-11 rounded-xl flex items-center justify-center transition-all",
                   isCompleted ? "bg-gold text-gold-foreground shadow-glow-gold" :
                   isCurrent ? "bg-primary text-primary-foreground" :
                   "bg-muted/50 text-muted-foreground"
                 )}
+                initial={false}
                 aria-label={`Stap ${index + 1}: ${step.label}${isCompleted ? ' (voltooid)' : isCurrent ? ' (huidige stap)' : ''}`}
               >
                 {isCompleted ? (
@@ -184,13 +186,14 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                 ) : (
                   <step.icon className="h-5 w-5" />
                 )}
-              </div>
+              </motion.div>
               {index < steps.length - 1 && (
-                <div 
+                <motion.div 
                   className={cn(
                     "w-8 sm:w-12 h-1 mx-1 rounded-full transition-colors",
                     index < currentStepIndex ? "bg-gold" : "bg-muted/50"
                   )}
+                  initial={false}
                 />
               )}
             </div>
@@ -457,7 +460,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       {/* Actions - Touch Optimized */}
       <div className="flex gap-3">
         {currentStepIndex > 0 && (
-          <div className="flex-1">
+          <motion.div className="flex-1">
             <Button
               variant="outline"
               onClick={prevStep}
@@ -467,9 +470,9 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
               <ChevronLeft className="h-5 w-5 mr-2" />
               Terug
             </Button>
-          </div>
+          </motion.div>
         )}
-        <div className="flex-1">
+        <motion.div className="flex-1">
           <Button
             onClick={nextStep}
             disabled={!canProceed() || submitting}
@@ -490,7 +493,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
               </>
             )}
           </Button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

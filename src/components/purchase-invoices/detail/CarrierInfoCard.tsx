@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Truck, MapPin, Building2, CreditCard, Copy, Check, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -51,18 +52,20 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
       
       <div className="p-6 pt-2 space-y-5">
         {/* Company name with premium styling */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
         >
           <p className="font-bold text-xl text-foreground tracking-tight">{carrier.company_name}</p>
           {carrier.contact_name && (
             <p className="text-sm text-muted-foreground mt-1">{carrier.contact_name}</p>
           )}
-        </div>
+        </motion.div>
         
         {/* Address with icon */}
         {carrier.address && (
-          <div 
-            className="flex items-start gap-3"}
+          <motion.div 
+            className="flex items-start gap-3"
+            initial={{ opacity: 0, x: -10 }}
           >
             <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0 border border-border/50">
               <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -71,15 +74,16 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
               <p>{carrier.address}</p>
               <p>{carrier.postal_code} {carrier.city}</p>
             </div>
-          </div>
+          </motion.div>
         )}
         
         {/* VAT and IBAN with copy functionality */}
         {(carrier.vat_number || carrier.iban) && (
           <div className="pt-4 mt-4 border-t border-border/40 space-y-4">
             {carrier.vat_number && (
-              <div
-                className="group"}
+              <motion.div
+                className="group"
+                initial={{ opacity: 0, x: -10 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -104,11 +108,12 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
                     )}
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             )}
             {carrier.iban && (
-              <div
-                className="group"}
+              <motion.div
+                className="group"
+                initial={{ opacity: 0, x: -10 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -133,7 +138,7 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
                     )}
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         )}

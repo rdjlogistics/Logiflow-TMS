@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalAuth, useNotificationPreferences, useCustomerSettings } from "@/hooks/usePortalAuth";
 import { usePortalCostCenters } from "@/hooks/usePortalCostCenters";
@@ -188,7 +189,7 @@ const B2BSettings = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <motion.div className="max-w-4xl mx-auto space-y-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display font-bold">Instellingen</h1>
@@ -522,7 +523,7 @@ const B2BSettings = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </motion.div>
 
       {/* Cost Center Dialog */}
       <Dialog open={showCostCenterDialog} onOpenChange={setShowCostCenterDialog}>
@@ -568,7 +569,7 @@ const B2BSettings = () => {
                 } else {
                   toast.error("Vul alle velden in");
                 }
-              >
+              }}>
               {isCreatingCostCenter ? "Bezig..." : "Toevoegen"}
             </Button>
           </DialogFooter>
@@ -625,7 +626,7 @@ const B2BSettings = () => {
                 } else {
                   toast.error("Vul een e-mailadres in");
                 }
-              >
+              }}>
               {isInviting ? "Bezig..." : "Uitnodigen"}
             </Button>
           </DialogFooter>
