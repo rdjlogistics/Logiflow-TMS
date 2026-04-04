@@ -59,7 +59,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 const QuotesDashboard = () => {
-  const { companyId } = useCompanyId();
+  const { company } = useCompany();
+  const companyId = company?.id;
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");

@@ -84,7 +84,8 @@ function calculateSurcharge(staffel: DieselStaffel): number {
 }
 
 const DieselModule = () => {
-  const { companyId } = useCompanyId();
+  const { company } = useCompany();
+  const companyId = company?.id;
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStaffel, setEditingStaffel] = useState<DieselStaffel | null>(null);
