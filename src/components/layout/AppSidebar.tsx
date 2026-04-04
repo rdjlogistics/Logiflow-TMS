@@ -244,7 +244,6 @@ const CollapsibleMenuSection = ({
 }) => {
   const location = useLocation();
   const { setOpenMobile, isMobile } = useSidebar();
-  // No auto-close on internal navigation — user closes menu manually
 
   const storageKey = `sidebar:section:${section.title}`;
   const [isOpen, setIsOpen] = React.useState(() => {
@@ -268,29 +267,44 @@ const CollapsibleMenuSection = ({
 
   if (isCollapsed) {
     return (
-      <SidebarMenu className="space-y-0.5">
-        {section.items.map((item) => {
-          const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
-          return (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}
-                className={`relative h-9 rounded-lg transition-all duration-150 justify-center ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
-              >
-                <Link to={item.href} className="flex items-center justify-center" aria-current={isActive ? "page" : undefined}>
-                  <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          );
-        })}
-      </SidebarMenu>
+      <div className="py-1">
+        <div className="mx-auto w-5 h-px bg-sidebar-border/20 mb-1" />
+        <SidebarMenu className="space-y-0.5">
+          {section.items.map((item) => {
+            const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
+            return (
+              <SidebarMenuItem key={item.href}>
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild isActive={isActive}
+                        className={`relative h-9 w-9 mx-auto rounded-xl transition-all duration-150 justify-center ${isActive ? "bg-primary/15 text-primary shadow-sm" : "text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"}`}
+                      >
+                        <Link to={item.href} className="flex items-center justify-center" aria-current={isActive ? "page" : undefined}>
+                          <item.icon className="h-[18px] w-[18px]" />
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="text-xs font-medium">
+                      {item.title}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </div>
     );
   }
 
   return (
     <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-colors group/trigger">
-        <span className="text-[11px] tracking-wide font-medium">{section.title}</span>
+      <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-sidebar-foreground/40 hover:text-sidebar-foreground/70 transition-colors group/trigger">
+        <span className="text-[10px] uppercase tracking-widest font-semibold">{section.title}</span>
         <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "" : "-rotate-90"}`} />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -305,7 +319,7 @@ const CollapsibleMenuSection = ({
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild className="relative h-9 rounded-lg opacity-40 cursor-not-allowed">
+                        <SidebarMenuButton asChild className="relative h-9 rounded-lg opacity-30 cursor-not-allowed">
                           <span className="flex items-center gap-3 px-3">
                             <item.icon className="h-4 w-4" />
                             <span className="text-[13px]">{item.title}</span>
@@ -320,16 +334,16 @@ const CollapsibleMenuSection = ({
                   </TooltipProvider>
                 ) : (
                   <SidebarMenuButton asChild isActive={isActive}
-                    className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+                    className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"}`}
                   >
                     <Link to={item.href} className="flex items-center gap-3 px-3" aria-current={isActive ? "page" : undefined}
                       target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
                     >
                       <item.icon className={`h-4 w-4 flex-shrink-0 ${isActive ? "text-primary" : ""}`} />
                       <span className="text-[13px] truncate">{item.title}</span>
-                      {item.external && <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0 opacity-50" />}
+                      {item.external && <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0 opacity-40" />}
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
                       )}
                     </Link>
                   </SidebarMenuButton>
