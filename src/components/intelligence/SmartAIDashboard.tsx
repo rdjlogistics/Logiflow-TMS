@@ -337,7 +337,7 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                       {predictions.slice(0, 10).map((prediction, index) => (
                         <div
                           key={prediction.id}
-                          layout
+
                           className={cn(
                             'p-4 rounded-lg border transition-all hover:shadow-md',
                             prediction.confidence >= 80 && 'border-l-2 border-l-primary'

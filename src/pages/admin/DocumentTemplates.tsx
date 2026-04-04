@@ -160,7 +160,7 @@ const DocumentTemplates = () => {
               return (
                 <div
                   key={template.id}
-                  layout
+
                 >
                   <Card className="group hover:shadow-lg transition-all duration-200">
                     <CardHeader className="pb-3">

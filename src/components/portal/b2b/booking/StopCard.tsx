@@ -104,7 +104,7 @@ export const StopCard = ({
 
   return (
     <div
-      layout
+
       className={cn(
         "group relative rounded-xl border bg-card/80 backdrop-blur-sm overflow-hidden transition-all",
         isDragging ? "shadow-2xl ring-2 ring-primary scale-[1.02]" : "border-border/50 hover:border-border"

@@ -131,7 +131,7 @@ const B2BRecurringOrders = () => {
               {templates.map((template, i) => (
                 <div
                   key={template.id}
-                  layout
+
                   className={cn(
                     "group rounded-xl border bg-card/80 backdrop-blur-sm p-4 transition-all",
                     template.is_active ? "border-primary/30" : "border-border/50 opacity-70"

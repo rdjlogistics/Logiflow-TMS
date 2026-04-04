@@ -227,7 +227,7 @@ const AddressCard = ({
   onToggleFavorite: () => void;
 }) => (
   <div
-    layout
+
     className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-4 hover:border-border transition-all"
   >
     <div className="flex items-start justify-between mb-2">
