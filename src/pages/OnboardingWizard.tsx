@@ -293,7 +293,7 @@ const OnboardingWizard = () => {
       {step > 0 && (
         <div className="relative z-10 h-[2px] bg-white/[0.04]">
           <div
-            className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary/50"}
+            className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary/50"
             style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.4)' }}
           />
         </div>
