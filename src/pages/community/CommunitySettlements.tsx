@@ -17,11 +17,11 @@ const CommunitySettlements = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("purchase_invoices")
-        .select("id, invoice_number, supplier_name, total_amount, status, invoice_date, due_date, paid_amount")
+        .select("id, invoice_number, total_amount, status, invoice_date, due_date, paid_amount, carrier_id, carriers(company_name)")
         .order("invoice_date", { ascending: false })
         .limit(50);
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
   });
 
@@ -91,7 +91,7 @@ const CommunitySettlements = () => {
                       {settlements.map(s => (
                         <TableRow key={s.id}>
                           <TableCell className="font-medium">{s.invoice_number || "-"}</TableCell>
-                          <TableCell>{s.supplier_name || "-"}</TableCell>
+                          <TableCell>{(s.carriers as any)?.company_name || "-"}</TableCell>
                           <TableCell className="hidden sm:table-cell text-muted-foreground">
                             {s.invoice_date ? new Date(s.invoice_date).toLocaleDateString("nl-NL") : "-"}
                           </TableCell>

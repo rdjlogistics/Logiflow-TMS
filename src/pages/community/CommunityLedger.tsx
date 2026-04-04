@@ -17,11 +17,11 @@ const CommunityLedger = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("finance_transactions")
-        .select("id, description, amount, transaction_type, category, transaction_date, status, reference_number")
+        .select("id, description, amount, transaction_type, transaction_date, status, external_id, cost_center")
         .order("transaction_date", { ascending: false })
         .limit(100);
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
   });
 
@@ -84,9 +84,9 @@ const CommunityLedger = () => {
                             {t.transaction_date ? new Date(t.transaction_date).toLocaleDateString("nl-NL") : "-"}
                           </TableCell>
                           <TableCell className="font-medium">{t.description || "-"}</TableCell>
-                          <TableCell className="hidden sm:table-cell text-muted-foreground">{t.reference_number || "-"}</TableCell>
+                          <TableCell className="hidden sm:table-cell text-muted-foreground">{t.external_id || "-"}</TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {t.category ? <Badge variant="outline">{t.category}</Badge> : "-"}
+                            {t.cost_center ? <Badge variant="outline">{t.cost_center}</Badge> : "-"}
                           </TableCell>
                           <TableCell className={`text-right font-medium ${t.transaction_type === "income" ? "text-emerald-600" : "text-destructive"}`}>
                             {t.transaction_type === "income" ? "+" : "-"}

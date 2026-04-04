@@ -30,13 +30,13 @@ const JointOrders = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trips")
-        .select("id, order_number, status, trip_date, pickup_city, delivery_city, carrier_id, carrier_name, customer_id, customers(company_name), sales_total, purchase_total")
+        .select("id, order_number, status, trip_date, pickup_city, delivery_city, carrier_id, customer_id, customers(company_name), sales_total, purchase_total, carriers(company_name)")
         .not("carrier_id", "is", null)
         .is("deleted_at", null)
         .order("trip_date", { ascending: false })
         .limit(100);
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
   });
 
@@ -44,7 +44,7 @@ const JointOrders = () => {
     t.order_number?.toLowerCase().includes(search.toLowerCase()) ||
     t.pickup_city?.toLowerCase().includes(search.toLowerCase()) ||
     t.delivery_city?.toLowerCase().includes(search.toLowerCase()) ||
-    t.carrier_name?.toLowerCase().includes(search.toLowerCase())
+    (t.carriers as any)?.company_name?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -116,7 +116,7 @@ const JointOrders = () => {
                               {t.trip_date ? format(new Date(t.trip_date), "d MMM yyyy", { locale: nl }) : "-"}
                             </TableCell>
                             <TableCell>{t.pickup_city} → {t.delivery_city}</TableCell>
-                            <TableCell className="hidden md:table-cell">{t.carrier_name || "-"}</TableCell>
+                            <TableCell className="hidden md:table-cell">{(t.carriers as any)?.company_name || "-"}</TableCell>
                             <TableCell className="hidden md:table-cell">{(t.customers as any)?.company_name || "-"}</TableCell>
                             <TableCell><Badge variant={s.variant}>{s.label}</Badge></TableCell>
                             <TableCell className={`hidden sm:table-cell text-right font-medium ${margin >= 0 ? "text-emerald-600" : "text-destructive"}`}>
