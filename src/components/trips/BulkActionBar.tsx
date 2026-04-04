@@ -90,9 +90,9 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
 
   return (
         <div
-          className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
+          className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
         >
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-2xl px-5 py-3.5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-2xl px-3 sm:px-5 py-3.5">
             {loading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
 
             <span className="text-sm font-semibold text-foreground whitespace-nowrap">
@@ -102,9 +102,9 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
             <div className="flex-1" />
 
             <Select onValueChange={handleStatusChange} disabled={loading}>
-              <SelectTrigger className="w-[160px] h-9">
+              <SelectTrigger className="w-[130px] sm:w-[160px] h-9">
                 <CheckCircle2 className="h-4 w-4 mr-1.5 text-muted-foreground" />
-                <SelectValue placeholder="Status wijzigen" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 {ALL_STATUSES.map(s => (
@@ -114,9 +114,9 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
             </Select>
 
             <Select onValueChange={handleDriverAssign} disabled={loading || drivers.length === 0}>
-              <SelectTrigger className="w-[180px] h-9">
+              <SelectTrigger className="w-[130px] sm:w-[180px] h-9">
                 <UserRound className="h-4 w-4 mr-1.5 text-muted-foreground" />
-                <SelectValue placeholder="Chauffeur toewijzen" />
+                <SelectValue placeholder="Chauffeur" />
               </SelectTrigger>
               <SelectContent>
                 {drivers.map(d => (

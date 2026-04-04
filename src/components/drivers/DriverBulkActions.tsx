@@ -63,10 +63,10 @@ export function DriverBulkActions({
 
   return (
         <div
-          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-fit"
         >
           <div className={cn(
-            'flex items-center gap-1.5 pl-4 pr-2 py-2 rounded-2xl',
+            'flex items-center gap-1.5 pl-4 pr-2 py-2 rounded-2xl overflow-x-auto scrollbar-none',
             'border border-border/20 bg-card/80 backdrop-blur-2xl',
             'shadow-[0_12px_48px_-8px_hsl(var(--foreground)/0.15),0_0_0_1px_hsl(var(--border)/0.1)]',
           )}>
