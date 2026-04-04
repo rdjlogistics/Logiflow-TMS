@@ -32,10 +32,6 @@ const PLAN_ICONS: Record<string, React.ElementType> = {
   scale: Crown,
 };
 
-const staggerItem = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-};
 
 export function UpgradePricingTab() {
   const { toast } = useToast();

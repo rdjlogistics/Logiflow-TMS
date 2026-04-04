@@ -62,15 +62,6 @@ const ROLE_FILTERS: { key: FilterKey; label: string; roles?: AppRole[] }[] = [
   { key: 'klant', label: 'Klanten', roles: ['klant'] },
 ];
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-};
 
 export function UserRolesTab() {
   const { toast } = useToast();
