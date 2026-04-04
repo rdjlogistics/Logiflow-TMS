@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ImageOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -35,22 +34,14 @@ export function ImageLoader({
   const [hasError, setHasError] = React.useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
 
-  // Calculate aspect ratio value
   const aspectRatioValue = React.useMemo(() => {
     if (typeof aspectRatio === "number") return aspectRatio;
-    const ratios = {
-      square: 1,
-      video: 16 / 9,
-      portrait: 3 / 4,
-      wide: 21 / 9,
-    };
+    const ratios = { square: 1, video: 16 / 9, portrait: 3 / 4, wide: 21 / 9 };
     return ratios[aspectRatio];
   }, [aspectRatio]);
 
-  // Intersection observer for lazy loading
   React.useEffect(() => {
     if (priority) return;
-
     const img = imgRef.current;
     if (!img) return;
 
@@ -58,10 +49,7 @@ export function ImageLoader({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Trigger load by setting src
-            if (img.dataset.src) {
-              img.src = img.dataset.src;
-            }
+            if (img.dataset.src) img.src = img.dataset.src;
             observer.unobserve(img);
           }
         });
@@ -78,20 +66,12 @@ export function ImageLoader({
     onLoadComplete?.();
   };
 
-  const handleError = () => {
-    setHasError(true);
-  };
-
-  // Generate blur placeholder
-  const blurPlaceholder = blurDataUrl || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${aspectRatioValue * 10} 10'%3E%3Crect fill='%23${getComputedStyle(document.documentElement).getPropertyValue('--muted').trim().replace(/\s/g, '').split(',')[0] || '1a1a2e'}' width='100%25' height='100%25'/%3E%3C/svg%3E`;
+  const blurPlaceholder = blurDataUrl || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${aspectRatioValue * 10} 10'%3E%3Crect fill='%231a1a2e' width='100%25' height='100%25'/%3E%3C/svg%3E`;
 
   if (hasError) {
     return (
       <div
-        className={cn(
-          "relative overflow-hidden rounded-xl bg-muted flex items-center justify-center",
-          className
-        )}
+        className={cn("relative overflow-hidden rounded-xl bg-muted flex items-center justify-center", className)}
         style={{ aspectRatio: aspectRatioValue }}
       >
         {fallback || (
@@ -110,22 +90,18 @@ export function ImageLoader({
       style={{ aspectRatio: aspectRatioValue }}
     >
       {/* Blur placeholder */}
-      <AnimatePresence>
-        {blur && !isLoaded && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 animate-pulse"
-            style={{
-              backgroundImage: `url("${blurPlaceholder}")`,
-              backgroundSize: "cover",
-              filter: "blur(20px)",
-              transform: "scale(1.1)",
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {blur && !isLoaded && (
+        <div
+          className="absolute inset-0 animate-pulse transition-opacity duration-300"
+          style={{
+            backgroundImage: `url("${blurPlaceholder}")`,
+            backgroundSize: "cover",
+            filter: "blur(20px)",
+            transform: "scale(1.1)",
+            opacity: isLoaded ? 0 : 1,
+          }}
+        />
+      )}
 
       {/* Actual image */}
       <img
@@ -134,7 +110,7 @@ export function ImageLoader({
         data-src={!priority ? src : undefined}
         alt={alt}
         onLoad={handleLoad}
-        onError={handleError}
+        onError={() => setHasError(true)}
         className={cn(
           "absolute inset-0 h-full w-full object-cover transition-opacity duration-300",
           isLoaded ? "opacity-100" : "opacity-0 invisible"
@@ -171,59 +147,33 @@ const avatarSizes = {
   xl: "h-16 w-16 text-lg",
 };
 
-export function LazyAvatar({
-  src,
-  alt,
-  fallback,
-  size = "md",
-  className,
-}: LazyAvatarProps) {
+export function LazyAvatar({ src, alt, fallback, size = "md", className }: LazyAvatarProps) {
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
 
-  // Generate initials from alt text
   const initials = React.useMemo(() => {
     if (fallback) return fallback;
-    return alt
-      .split(" ")
-      .map((word) => word[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
+    return alt.split(" ").map((word) => word[0]).slice(0, 2).join("").toUpperCase();
   }, [alt, fallback]);
 
   const showFallback = !src || hasError;
 
   return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-full bg-muted flex items-center justify-center",
-        avatarSizes[size],
-        className
-      )}
-    >
-      {/* Fallback initials */}
+    <div className={cn("relative overflow-hidden rounded-full bg-muted flex items-center justify-center", avatarSizes[size], className)}>
       {showFallback ? (
-        <span className="font-semibold text-muted-foreground">
-          {initials}
-        </span>
+        <span className="font-semibold text-muted-foreground">{initials}</span>
       ) : (
         <>
-          {/* Loading state */}
-          {!isLoaded && (
-            <div className="absolute inset-0 skeleton-shimmer rounded-full" />
-          )}
-          
-          {/* Image */}
-          <motion.img
+          {!isLoaded && <div className="absolute inset-0 skeleton-shimmer rounded-full" />}
+          <img
             src={src}
             alt={alt}
             onLoad={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isLoaded ? 1 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
+              isLoaded ? "opacity-100" : "opacity-0"
+            )}
             loading="lazy"
           />
         </>
@@ -244,17 +194,10 @@ interface LazyBackgroundProps {
   blur?: boolean;
 }
 
-export function LazyBackground({
-  src,
-  children,
-  className,
-  overlayClassName,
-  blur = true,
-}: LazyBackgroundProps) {
+export function LazyBackground({ src, children, className, overlayClassName, blur = true }: LazyBackgroundProps) {
   const [isLoaded, setIsLoaded] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Lazy load background image
   React.useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -278,32 +221,23 @@ export function LazyBackground({
   }, [src]);
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("relative overflow-hidden", className)}
-    >
+    <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
       {/* Background */}
-      <motion.div
-        initial={{ opacity: 0, scale: blur ? 1.1 : 1 }}
-        animate={{ 
-          opacity: isLoaded ? 1 : 0, 
-          scale: 1,
-          filter: isLoaded ? "blur(0px)" : blur ? "blur(20px)" : "none"
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+        style={{
+          backgroundImage: isLoaded ? `url(${src})` : undefined,
+          opacity: isLoaded ? 1 : 0,
+          transform: isLoaded ? "scale(1)" : blur ? "scale(1.1)" : "scale(1)",
+          filter: isLoaded ? "blur(0px)" : blur ? "blur(20px)" : "none",
         }}
-        transition={{ duration: 0.5 }}
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: isLoaded ? `url(${src})` : undefined }}
       />
 
       {/* Loading placeholder */}
-      {!isLoaded && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
-      )}
+      {!isLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
       {/* Overlay */}
-      {overlayClassName && (
-        <div className={cn("absolute inset-0", overlayClassName)} />
-      )}
+      {overlayClassName && <div className={cn("absolute inset-0", overlayClassName)} />}
 
       {/* Content */}
       <div className="relative z-10">{children}</div>

@@ -90,9 +90,31 @@ export function initErrorReporter(): void {
   if (isInitialized) return;
   isInitialized = true;
 
+  // Catch unhandled JS errors
+  window.addEventListener('error', (event) => {
+    if (event.error) {
+      reportError(event.error, {
+        componentName: 'window.onerror',
+        metadata: { filename: event.filename, lineno: event.lineno, colno: event.colno },
+      });
+    }
+  });
+
+  // Catch unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    const message = event.reason instanceof Error
+      ? event.reason.message
+      : String(event.reason ?? 'Unhandled promise rejection');
+    const stack = event.reason instanceof Error ? event.reason.stack : undefined;
+
+    reportError(event.reason instanceof Error ? event.reason : message, {
+      componentName: 'unhandledrejection',
+    });
+  });
+
+  // Flush remaining errors on page unload
   window.addEventListener('beforeunload', () => {
     if (buffer.length > 0) {
-      // Use sendBeacon for reliability on page unload
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-client-error`;
       const body = JSON.stringify({ errors: buffer });
       try {

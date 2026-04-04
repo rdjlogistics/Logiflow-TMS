@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,14 +52,9 @@ const FleetManagement = () => {
         )}
 
         {/* Critical alert banner */}
-        <AnimatePresence>
-          {alerts.filter(a => a.severity === 'critical').length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-              className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/8 border border-destructive/15 backdrop-blur-xl text-sm"
+        {alerts.filter(a => a.severity === 'critical').length > 0 && (
+            <div
+              className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/8 border border-destructive/15 backdrop-blur-xl text-sm animate-fade-in-blur"
             >
               <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-destructive/12">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -75,9 +70,8 @@ const FleetManagement = () => {
               >
                 Bekijk
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+        )}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -105,13 +99,9 @@ const FleetManagement = () => {
             </TabsTrigger>
           </TabsList>
 
-          <AnimatePresence mode="wait">
-            <motion.div
+            <div
               key={activeTab}
-              initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="animate-fade-in-blur"
             >
               <TabsContent value="overview" className="mt-0" forceMount={activeTab === 'overview' ? true : undefined}>
                 {activeTab === 'overview' && <VehicleOverview />}
@@ -125,8 +115,7 @@ const FleetManagement = () => {
               <TabsContent value="valuation" className="mt-0" forceMount={activeTab === 'valuation' ? true : undefined}>
                 {activeTab === 'valuation' && <VehicleValuation />}
               </TabsContent>
-            </motion.div>
-          </AnimatePresence>
+            </div>
         </Tabs>
       </div>
     </DashboardLayout>
@@ -165,15 +154,12 @@ function EliteStatCard({ stat, index }: EliteStatProps) {
   }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ delay: index * 0.06, type: 'spring', stiffness: 120, damping: 18 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transform }}
-      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.15)] active:scale-[0.97]"
+      style={{ transform, animationDelay: `${index * 60}ms` }}
+      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.15)] active:scale-[0.97] animate-fade-in-blur"
     >
       <div className="flex items-center gap-3">
         <div
@@ -187,7 +173,7 @@ function EliteStatCard({ stat, index }: EliteStatProps) {
           <p className="text-xs text-muted-foreground truncate mt-0.5">{stat.label}</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

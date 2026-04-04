@@ -1,5 +1,4 @@
 import { ReactNode, useRef, useEffect, useState } from "react";
-import { motion, useInView, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ScrollRevealProps {
@@ -12,31 +11,13 @@ interface ScrollRevealProps {
   threshold?: number;
 }
 
-const variants: Record<string, Variants> = {
-  fade: {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  },
-  "slide-up": {
-    hidden: { opacity: 0, y: 24 },
-    visible: { opacity: 1, y: 0 },
-  },
-  "slide-left": {
-    hidden: { opacity: 0, x: 24 },
-    visible: { opacity: 1, x: 0 },
-  },
-  "slide-right": {
-    hidden: { opacity: 0, x: -24 },
-    visible: { opacity: 1, x: 0 },
-  },
-  scale: {
-    hidden: { opacity: 0, scale: 0.92 },
-    visible: { opacity: 1, scale: 1 },
-  },
-  blur: {
-    hidden: { opacity: 0, filter: "blur(8px)" },
-    visible: { opacity: 1, filter: "blur(0px)" },
-  },
+const variantClasses: Record<string, string> = {
+  fade: "",
+  "slide-up": "",
+  "slide-left": "reveal-slide-left",
+  "slide-right": "reveal-slide-right",
+  scale: "reveal-scale",
+  blur: "reveal-blur",
 };
 
 export function ScrollReveal({
@@ -49,23 +30,42 @@ export function ScrollReveal({
   threshold = 0.1,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, amount: threshold });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setIsVisible(false);
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [once, threshold]);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      variants={variants[variant]}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      transition={{
-        duration,
-        delay,
-        ease: [0.25, 0.1, 0.25, 1],
+      className={cn(
+        isVisible ? "reveal-visible" : `reveal-hidden ${variantClasses[variant] || ""}`,
+        className
+      )}
+      style={{
+        transitionDelay: `${delay}s`,
+        transitionDuration: `${duration}s`,
       }}
-      className={className}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -86,39 +86,52 @@ export function StaggeredReveal({
   once = true,
 }: StaggeredRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, amount: 0.1 });
+  const [isVisible, setIsVisible] = useState(false);
 
-  const containerVariants: Variants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: staggerDelay,
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setIsVisible(false);
+        }
       },
-    },
-  };
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [once]);
 
   return (
-    <motion.div
-      ref={ref}
-      variants={containerVariants}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      className={className}
-    >
+    <div ref={ref} className={className}>
       {children.map((child, index) => (
-        <motion.div key={index} variants={variants[variant]}>
+        <div
+          key={index}
+          className={cn(
+            isVisible ? "reveal-visible" : `reveal-hidden ${variantClasses[variant] || ""}`
+          )}
+          style={{
+            transitionDelay: `${index * staggerDelay}s`,
+          }}
+        >
           {child}
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 
-// Parallax scroll effect
+// Parallax scroll effect — pure JS, no framer-motion
 interface ParallaxProps {
   children: ReactNode;
   className?: string;
-  speed?: number; // -1 to 1, negative = slower, positive = faster
+  speed?: number;
 }
 
 export function Parallax({ children, className, speed = 0.2 }: ParallaxProps) {
@@ -151,7 +164,7 @@ export function Parallax({ children, className, speed = 0.2 }: ParallaxProps) {
   );
 }
 
-// Counter animation for numbers
+// Counter animation for numbers — pure JS
 interface AnimatedCounterProps {
   value: number;
   duration?: number;
@@ -170,24 +183,37 @@ export function AnimatedCounter({
   decimals = 0,
 }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
   const [displayValue, setDisplayValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
-    if (!isInView) return;
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasAnimated]);
+
+  useEffect(() => {
+    if (!hasAnimated) return;
 
     const startTime = Date.now();
-    const startValue = 0;
 
     const animate = () => {
       const elapsed = (Date.now() - startTime) / 1000;
       const progress = Math.min(elapsed / duration, 1);
-      
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
-      const current = startValue + (value - startValue) * eased;
-      
-      setDisplayValue(current);
+      setDisplayValue(value * eased);
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -195,7 +221,7 @@ export function AnimatedCounter({
     };
 
     requestAnimationFrame(animate);
-  }, [value, duration, isInView]);
+  }, [value, duration, hasAnimated]);
 
   return (
     <span ref={ref} className={className}>
@@ -206,7 +232,7 @@ export function AnimatedCounter({
   );
 }
 
-// Reveal on scroll with blur effect
+// Blur reveal — CSS only
 export function BlurReveal({ 
   children, 
   className,
@@ -217,17 +243,36 @@ export function BlurReveal({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
-      animate={isInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={className}
+      className={cn(
+        isVisible ? "reveal-visible" : "reveal-hidden reveal-blur",
+        className
+      )}
+      style={{ transitionDelay: `${delay}s` }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

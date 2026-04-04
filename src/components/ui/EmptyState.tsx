@@ -1,9 +1,8 @@
 /**
- * Batch T2: EmptyState Component
+ * EmptyState Component
  * Reusable empty-state for list pages with icon, title, description and optional action.
- * Glassmorphism styling + Framer Motion entrance animation.
+ * Glassmorphism styling + CSS entrance animation (no framer-motion).
  */
-import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +12,6 @@ interface EmptyStateProps {
   description?: string;
   action?: React.ReactNode;
   className?: string;
-  /** compact = smaller padding, useful inside cards */
   compact?: boolean;
 }
 
@@ -26,23 +24,17 @@ export function EmptyState({
   compact = false,
 }: EmptyStateProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 24 }}
+    <div
       className={cn(
-        'flex flex-col items-center justify-center text-center',
+        'flex flex-col items-center justify-center text-center animate-fade-in-up',
         compact ? 'py-8 px-4' : 'py-16 px-6',
         className
       )}
     >
       {Icon && (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.05 }}
+        <div
           className={cn(
-            'flex items-center justify-center rounded-2xl mb-4',
+            'flex items-center justify-center rounded-2xl mb-4 animate-fade-in-scale animate-delay-50',
             'bg-white/5 border border-white/10 backdrop-blur-xl',
             compact ? 'w-12 h-12' : 'w-16 h-16'
           )}
@@ -53,45 +45,34 @@ export function EmptyState({
               compact ? 'w-6 h-6' : 'w-8 h-8'
             )}
           />
-        </motion.div>
+        </div>
       )}
 
-      <motion.h3
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
+      <h3
         className={cn(
-          'font-semibold text-white/80 mb-1',
+          'font-semibold text-white/80 mb-1 animate-fade-in animate-delay-100',
           compact ? 'text-sm' : 'text-base'
         )}
       >
         {title}
-      </motion.h3>
+      </h3>
 
       {description && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
+        <p
           className={cn(
-            'text-white/40 max-w-xs leading-relaxed',
+            'text-white/40 max-w-xs leading-relaxed animate-fade-in animate-delay-150',
             compact ? 'text-xs' : 'text-sm'
           )}
         >
           {description}
-        </motion.p>
+        </p>
       )}
 
       {action && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-4"
-        >
+        <div className="mt-4 animate-fade-in-up-sm animate-delay-200">
           {action}
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
