@@ -515,20 +515,42 @@ const AppSidebar = () => {
                   <SidebarMenu className="space-y-0.5">
                     {mainItems.map((item) => {
                       const isActive = location.pathname === item.href;
+                      if (isCollapsed) {
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <TooltipProvider delayDuration={0}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <SidebarMenuButton asChild isActive={isActive}
+                                    className={`relative h-9 w-9 mx-auto rounded-xl transition-all duration-150 justify-center ${isActive ? 'bg-primary/15 text-primary shadow-sm' : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'}`}
+                                  >
+                                    <Link to={item.href} className="flex items-center justify-center" aria-current={isActive ? "page" : undefined}>
+                                      <item.icon className="h-[18px] w-[18px]" />
+                                      {isActive && (
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
+                                      )}
+                                    </Link>
+                                  </SidebarMenuButton>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="text-xs font-medium">
+                                  {item.title}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </SidebarMenuItem>
+                        );
+                      }
                       return (
                         <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}
-                            className={`relative ${isCollapsed ? 'h-9 w-9 mx-auto rounded-xl justify-center' : 'h-10 rounded-lg'} transition-all duration-150 ${isActive ? (isCollapsed ? 'bg-primary/15 text-primary shadow-sm' : 'bg-sidebar-accent text-sidebar-accent-foreground') : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'}`}
+                          <SidebarMenuButton asChild isActive={isActive}
+                            className={`relative h-10 rounded-lg transition-all duration-150 ${isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'}`}
                           >
                             <Link to={item.href} aria-current={isActive ? "page" : undefined}
-                              className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-3'}`}
+                              className="flex items-center gap-3 px-3"
                             >
-                              <item.icon className={`h-[18px] w-[18px] ${isCollapsed ? '' : 'h-4 w-4'} ${isActive ? 'text-primary' : ''}`} />
-                              {!isCollapsed && <span className="font-medium text-[13px]">{item.title}</span>}
-                              {isActive && !isCollapsed && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
-                              )}
-                              {isActive && isCollapsed && (
+                              <item.icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
+                              <span className="font-medium text-[13px]">{item.title}</span>
+                              {isActive && (
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
                               )}
                             </Link>
