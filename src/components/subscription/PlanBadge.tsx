@@ -44,13 +44,14 @@ export const PlanBadge = ({ compact = false, className }: PlanBadgeProps) => {
     return (
       <Link
         to={linkTo}
-        className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium cursor-pointer transition-all hover:shadow-md active:scale-[0.97]", statusColor, className)}
-      >
-        <Crown className="h-3 w-3" />
-        {plan.name}
-        {isTrialing && trialDaysLeft > 0 && (
-          <span className="opacity-75">· {trialDaysLeft}d</span>
+        className={cn(
+          "flex items-center justify-center w-9 h-9 mx-auto rounded-xl cursor-pointer transition-all hover:shadow-lg active:scale-[0.95]",
+          "bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/25 hover:border-amber-500/40",
+          className
         )}
+        title={`${plan.name}${isTrialing && trialDaysLeft > 0 ? ` · Trial ${trialDaysLeft}d` : ''}`}
+      >
+        <Crown className="h-4 w-4 text-amber-500 drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]" />
       </Link>
     );
   }
