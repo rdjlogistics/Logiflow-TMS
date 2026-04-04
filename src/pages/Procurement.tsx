@@ -28,7 +28,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, ShoppingCart, FileText, CheckCircle, XCircle, Clock, Euro, Truck, MapPin, Calendar, Weight } from "lucide-react";
-import { motion } from "framer-motion";
 
 // ===== TYPES =====
 interface RFQRequest {
@@ -244,10 +243,8 @@ const Procurement = () => {
             { label: "Toegewezen", value: rfqRequests.filter(r => r.status === "toegewezen").length, icon: CheckCircle, color: "text-emerald-500" },
             { label: "Gesloten", value: rfqRequests.filter(r => r.status === "gesloten").length, icon: XCircle, color: "text-gray-500" },
           ].map((kpi) => (
-            <motion.div
+            <div
               key={kpi.label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
               className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-xl p-4 space-y-1"
             >
               <div className="flex items-center gap-2">
@@ -255,7 +252,7 @@ const Procurement = () => {
                 <span className="text-xs text-muted-foreground font-medium">{kpi.label}</span>
               </div>
               <p className="text-2xl font-bold tracking-tight">{kpi.value}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -462,11 +459,8 @@ const Procurement = () => {
                           </TableHeader>
                           <TableBody>
                             {offertes.map((offerte, idx) => (
-                              <motion.tr
+                              <tr
                                 key={offerte.id}
-                                initial={{ opacity: 0, x: -8 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.05 }}
                                 className={`border-b ${idx === 0 ? 'bg-emerald-500/5' : ''}`}
                               >
                                 <TableCell className="font-medium">
@@ -514,7 +508,7 @@ const Procurement = () => {
                                     </div>
                                   )}
                                 </TableCell>
-                              </motion.tr>
+                              </tr>
                             ))}
                           </TableBody>
                         </Table>

@@ -31,7 +31,6 @@ import { useWarehouses, useCreateWarehouse, useWarehouseZones, useStorageLocatio
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { WMSGlassCard, WMSCardTitle, WMSStatCard } from "@/components/wms";
 import { useCompany } from "@/hooks/useCompany";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
@@ -216,9 +215,7 @@ export default function WMSWarehouses() {
   return (
     <DashboardLayout title="Magazijnen">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div 
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -355,7 +352,7 @@ export default function WMSWarehouses() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </motion.div>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -412,11 +409,8 @@ export default function WMSWarehouses() {
             ) : (
               <div className="space-y-2">
                 {warehouses?.map((wh, index) => (
-                  <motion.div
+                  <div
                     key={wh.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
                     onClick={() => setSelectedWarehouse(wh.id)}
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                       selectedWarehouse === wh.id
@@ -439,7 +433,7 @@ export default function WMSWarehouses() {
                         {wh.city}
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             )}
@@ -577,11 +571,8 @@ export default function WMSWarehouses() {
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {zones?.map((zone, i) => (
-                      <motion.div
+                      <div
                         key={zone.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.03 }}
                         className="p-3 rounded-lg border bg-muted/30"
                       >
                         <p className="font-medium text-sm">{zone.name}</p>
@@ -593,7 +584,7 @@ export default function WMSWarehouses() {
                             {zone.code}
                           </span>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -669,11 +660,8 @@ export default function WMSWarehouses() {
                 ) : (
                   <div className="grid grid-cols-4 md:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto">
                     {locations?.map((loc, i) => (
-                      <motion.div
+                      <div
                         key={loc.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.01 }}
                         className={`p-2 rounded border text-center ${
                           loc.is_pickable
                             ? "bg-emerald-500/10 border-emerald-500/30"
@@ -682,7 +670,7 @@ export default function WMSWarehouses() {
                       >
                         <p className="font-mono text-xs font-medium">{loc.code}</p>
                         <p className="text-[10px] text-muted-foreground">{loc.location_type}</p>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}

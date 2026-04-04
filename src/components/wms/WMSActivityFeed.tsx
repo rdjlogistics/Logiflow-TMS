@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
 import {
@@ -60,9 +59,8 @@ export function WMSActivityFeed({
   return (
     <div className={cn("space-y-1", className)}>
       {displayedActivities.map((activity, index) => (
-        <motion.div
+        <div
           key={activity.id}
-          initial={{ opacity: 0, x: -10 }}
           className="group relative flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
         >
           {/* Timeline connector */}
@@ -113,7 +111,7 @@ export function WMSActivityFeed({
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
 
       {activities.length === 0 && (

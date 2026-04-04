@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -241,14 +240,11 @@ const PurchaseInvoices = () => {
         </div>
 
         {/* KPI Cards - Premium Animated */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+        <div
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4"
         >
           {kpiCards.map((kpi) => (
-            <motion.div key={kpi.id} variants={itemVariants} className="h-full">
+            <div key={kpi.id} variants={itemVariants} className="h-full">
               <Card 
                 className={cn(
                   "relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-sm shadow-lg cursor-pointer transition-all duration-300 group h-full",
@@ -280,12 +276,12 @@ const PurchaseInvoices = () => {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Filters */}
-        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+        <div variants={itemVariants} initial="hidden" animate="visible">
           <Card className="border-border/40 bg-card/90 backdrop-blur-sm">
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row gap-4">
@@ -325,10 +321,10 @@ const PurchaseInvoices = () => {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Table - Desktop */}
-        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="hidden md:block">
+        <div variants={itemVariants} initial="hidden" animate="visible" className="hidden md:block">
           <Card className="border-border/40 bg-card/90 backdrop-blur-sm shadow-lg">
             <CardContent className="p-0">
               <Table>
@@ -425,13 +421,10 @@ const PurchaseInvoices = () => {
               </Table>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Mobile Cards */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+        <div
           className="md:hidden space-y-3"
         >
           {isLoading ? (
@@ -459,10 +452,8 @@ const PurchaseInvoices = () => {
             const overdue = isInvoiceOverdue(invoice);
             
             return (
-              <motion.div
+              <div
                 key={invoice.id}
-                variants={mobileCardVariants}
-                whileTap={{ scale: 0.98 }}
                 className="touch-manipulation"
               >
                 <Card 
@@ -561,10 +552,10 @@ const PurchaseInvoices = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
 
       {/* Bulk Actions Bar */}

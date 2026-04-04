@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -111,13 +110,11 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
 
   return (
     <TooltipProvider>
-      <motion.div
-        initial="hidden"
-        animate="visible"
+      <div
         className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5"
       >
         {statCards.map((card) => (
-          <motion.div key={card.id} className="h-full">
+          <div key={card.id} className="h-full">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Card 
@@ -165,13 +162,12 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                 <p>{card.onClick ? "Klik om te filteren" : card.title}</p>
               </TooltipContent>
             </Tooltip>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Status distribution bar */}
-      <motion.div 
-        initial={{ opacity: 0, scaleX: 0 }}
+      <div 
         className="mt-3 sm:mt-4"
       >
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -183,8 +179,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.div
-                    initial={{ width: 0 }}
+                  <div
                     className="bg-muted-foreground/40 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("gepland")}
                   />
@@ -198,8 +193,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.div
-                    initial={{ width: 0 }}
+                  <div
                     className="bg-blue-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("onderweg")}
                   />
@@ -213,8 +207,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.div
-                    initial={{ width: 0 }}
+                  <div
                     className="bg-green-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("afgerond")}
                   />
@@ -228,8 +221,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.div
-                    initial={{ width: 0 }}
+                  <div
                     className="bg-destructive cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("needs_driver")}
                   />
@@ -264,7 +256,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
             </span>
           </div>
         </div>
-      </motion.div>
+      </div>
     </TooltipProvider>
   );
 };

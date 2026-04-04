@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingState } from "@/components/common/LoadingState";
-import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
@@ -832,10 +831,7 @@ const Drivers = () => {
                             leftActions={canManageDrivers ? [swipeActions.more(() => handleEdit(driver))] : []}
                             rightActions={canDelete ? [swipeActions.delete(() => handleDeleteClick(driver.id))] : []}
                           >
-                            <motion.div
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: i * 0.04 }}
+                            <div
                               className="bg-card border border-border rounded-xl p-4"
                             >
                               <div className="flex items-center justify-between mb-3">
@@ -928,7 +924,7 @@ const Drivers = () => {
                                   )}
                                 </div>
                               </div>
-                            </motion.div>
+                            </div>
                           </SwipeableCard>
                         );
                       })}

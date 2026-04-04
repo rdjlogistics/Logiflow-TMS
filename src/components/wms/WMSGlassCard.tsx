@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 interface WMSGlassCardProps {
   children: ReactNode;
@@ -20,8 +19,7 @@ export function WMSGlassCard({
   noPadding = false,
 }: WMSGlassCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
+    <div
       className={cn(
         "relative overflow-hidden rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm",
         variant === "elevated" && "shadow-lg shadow-black/5",
@@ -45,7 +43,7 @@ export function WMSGlassCard({
 
       {/* Content */}
       <div className={cn("relative", !noPadding && "p-5")}>{children}</div>
-    </motion.div>
+    </div>
   );
 }
 

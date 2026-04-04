@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
 import { Mail, MessageSquare, Phone, Bell, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -72,9 +71,8 @@ export function InvoiceReminderHistory({ invoiceId }: InvoiceReminderHistoryProp
         const date = new Date(r.created_at);
 
         return (
-          <motion.div
+          <div
             key={r.id}
-            initial={{ opacity: 0, x: -12 }}
             className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-muted/20 transition-colors duration-200 group"
           >
             <div className={cn(
@@ -110,7 +108,7 @@ export function InvoiceReminderHistory({ invoiceId }: InvoiceReminderHistoryProp
                 {date.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}
               </span>
             </span>
-          </motion.div>
+          </div>
         );
       })}
     </div>

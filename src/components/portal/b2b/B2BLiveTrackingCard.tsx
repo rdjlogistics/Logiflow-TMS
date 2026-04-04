@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
 import type mapboxgl from 'mapbox-gl';
 import { loadMapboxGL } from '@/utils/mapbox-loader';
 import { useMapboxToken } from "@/hooks/useMapboxToken";
@@ -147,7 +146,7 @@ export const B2BLiveTrackingCard = ({ tripId, deliveryCity, deliveryAddress, cus
   const speedKmh = location?.speed ? Math.round(location.speed * 3.6) : null;
 
   return (
-    <motion.div>
+    <div>
       <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -193,8 +192,7 @@ export const B2BLiveTrackingCard = ({ tripId, deliveryCity, deliveryAddress, cus
 
           {/* Stats bar */}
           {location && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
+            <div
               className={cn("grid gap-px bg-border/20", etaMinutes != null ? "grid-cols-4" : "grid-cols-3")}
             >
               <div className="bg-card/80 px-3 py-2.5 flex items-center gap-2">
@@ -229,7 +227,7 @@ export const B2BLiveTrackingCard = ({ tripId, deliveryCity, deliveryAddress, cus
                   </div>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -273,6 +271,6 @@ export const B2BLiveTrackingCard = ({ tripId, deliveryCity, deliveryAddress, cus
           100% { transform: scale(2.2); opacity: 0; }
         }
       `}</style>
-    </motion.div>
+    </div>
   );
 };

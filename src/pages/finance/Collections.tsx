@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -256,11 +255,8 @@ export function CollectionsContent() {
                     <p className="font-medium">Geen incasso cases</p>
                   </div>
                 ) : filteredCollections.map((coll: any) => (
-                  <motion.div
+                  <div
                     key={coll.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedCase(coll)}
                     className="p-4 cursor-pointer active:bg-muted/30 transition-colors touch-manipulation"
                   >
@@ -282,7 +278,7 @@ export function CollectionsContent() {
                       </span>
                       <span className="font-bold text-base tabular-nums">€{coll.amount?.toLocaleString()}</span>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
               {/* Desktop table */}
@@ -350,11 +346,8 @@ export function CollectionsContent() {
                   const usagePercent = (profile.exposure / profile.credit_limit) * 100;
                   const isOverLimit = usagePercent > 100;
                   return (
-                    <motion.div
+                    <div
                       key={profile.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setSelectedProfile(profile);
                         setEditCreditLimit(profile.credit_limit || 0);
@@ -400,7 +393,7 @@ export function CollectionsContent() {
                           {profile.proforma && <Badge variant="outline" className="text-amber-500 text-[10px]">Proforma</Badge>}
                         </div>
                       )}
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>

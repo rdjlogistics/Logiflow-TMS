@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Euro, Mail, CheckCircle2, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
@@ -35,28 +34,25 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
         
         {/* Total with premium styling */}
         <div className="pt-4 mt-4 border-t border-border/50">
-          <motion.div 
+          <div 
             className="flex items-center justify-between py-3 px-4 -mx-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent"
-            initial={{ opacity: 0, scale: 0.98 }}
           >
             <span className="text-base font-semibold flex items-center gap-2 text-foreground">
               <TrendingUp className="h-4 w-4 text-primary" />
               Totaal
             </span>
-            <motion.span 
+            <span 
               className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-primary-glow bg-clip-text text-transparent"
-              initial={{ scale: 0.9 }}
             >
               {formatCurrency(Number(invoice.total_amount))}
-            </motion.span>
-          </motion.div>
+            </span>
+          </div>
         </div>
         
         {/* Sent status */}
         {invoice.sent_at && (
-          <motion.div 
+          <div 
             className="pt-4 mt-4 border-t border-border/50"
-            initial={{ opacity: 0, y: 10 }}
           >
             <div className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
               <span className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2 font-medium">
@@ -67,14 +63,13 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
                 {format(new Date(invoice.sent_at), "d MMM yyyy", { locale: nl })}
               </span>
             </div>
-          </motion.div>
+          </div>
         )}
         
         {/* Paid status */}
         {invoice.paid_at && (
-          <motion.div 
+          <div 
             className={cn(!invoice.sent_at && "pt-4 mt-4 border-t border-border/50")}
-            initial={{ opacity: 0, y: 10 }}
           >
             <div className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <span className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2 font-medium">
@@ -85,7 +80,7 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
                 {format(new Date(invoice.paid_at), "d MMM yyyy", { locale: nl })}
               </span>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </PremiumGlassCard>
