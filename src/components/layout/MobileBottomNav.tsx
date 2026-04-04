@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Home, FileText, Plus, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
@@ -21,9 +20,7 @@ const tabs: NavTab[] = [
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  if (pathname.startsWith("/admin/settings")) {
-    return "instellingen";
-  }
+  if (pathname.startsWith("/admin/settings")) return "instellingen";
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
   return "home";
@@ -42,76 +39,67 @@ export function MobileBottomNav() {
       aria-label="Hoofdnavigatie"
     >
       <div
-        className="border-t border-white/[0.06]"
+        className="border-t border-white/[0.08]"
         style={{
-          background: "linear-gradient(180deg, hsl(228 60% 9% / 0.92), hsl(228 60% 7% / 0.97))",
-          backdropFilter: "blur(48px) saturate(200%)",
-          WebkitBackdropFilter: "blur(48px) saturate(200%)",
+          background: "rgba(10, 12, 20, 0.82)",
+          backdropFilter: "blur(40px) saturate(180%)",
+          WebkitBackdropFilter: "blur(40px) saturate(180%)",
         }}
       >
-        <div className="grid grid-cols-4 px-2 py-1.5">
+        <div className="grid grid-cols-4 px-2 py-1">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
 
             if (tab.isCta) {
               return (
-                <motion.button
+                <button
                   key={tab.id}
                   onClick={() => {
                     haptic("medium");
                     navigate(tab.path);
                   }}
-                  whileTap={{ scale: 0.9 }}
-                  className="flex items-center justify-center -mt-3 touch-manipulation select-none"
+                  className="flex items-center justify-center -mt-3.5 touch-manipulation select-none active:scale-90 transition-transform duration-100"
                   aria-label={tab.label}
                 >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25 ring-[3px] ring-background flex items-center justify-center">
-                    <Plus className="h-[18px] w-[18px] text-primary-foreground" strokeWidth={2.4} />
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30 ring-2 ring-white/[0.08] flex items-center justify-center">
+                    <Plus className="h-5 w-5 text-primary-foreground" strokeWidth={2.2} />
                   </div>
-                </motion.button>
+                </button>
               );
             }
 
             return (
-              <motion.button
+              <button
                 key={tab.id}
                 onClick={() => {
                   haptic("selection");
                   navigate(tab.path + (tab.search || ""));
                 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative flex flex-col items-center justify-center gap-0.5 py-1 min-h-[42px] touch-manipulation select-none"
+                className="relative flex flex-col items-center justify-center gap-0.5 py-1.5 min-h-[48px] touch-manipulation select-none active:scale-90 transition-transform duration-100"
                 aria-label={tab.label}
                 aria-current={isActive ? "page" : undefined}
               >
-                {/* Active pill indicator */}
                 {isActive && (
-                  <motion.div
-                    layoutId="nav-pill"
-                    className="absolute -top-1.5 w-4 h-[3px] rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.5)]"
-                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
-                  />
+                  <div className="absolute -top-1 w-5 h-[2.5px] rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.6)] transition-all duration-300" />
                 )}
 
                 <tab.icon
                   className={cn(
-                    "h-5 w-5 transition-colors duration-150",
-                    isActive ? "text-white" : "text-white/35"
+                    "h-[22px] w-[22px] transition-colors duration-200",
+                    isActive ? "text-white" : "text-white/40"
                   )}
-                  strokeWidth={isActive ? 2 : 1.5}
+                  strokeWidth={isActive ? 1.8 : 1.5}
                 />
 
                 <span
                   className={cn(
-                    "text-[10px] leading-none tracking-wide transition-colors duration-150",
-                    isActive
-                      ? "font-semibold text-white"
-                      : "font-normal text-white/35"
+                    "text-[10px] leading-none tracking-wide transition-colors duration-200",
+                    isActive ? "font-medium text-white" : "font-normal text-white/40"
                   )}
                 >
                   {tab.label}
                 </span>
-              </motion.button>
+              </button>
             );
           })}
         </div>
