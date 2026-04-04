@@ -363,6 +363,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <PeriodSelector value={period} onChange={setPeriod} />
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg glass-panel-subtle">
                     <TrendingUp className="h-3.5 w-3.5 text-success" />
                     <span className="text-muted-foreground">Vandaag:</span>
