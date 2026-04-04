@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import PeriodSelector, { type PeriodKey } from "@/components/dashboard/PeriodSelector";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { motion } from "framer-motion";
@@ -52,6 +53,7 @@ import { nl } from "date-fns/locale";
 const Dashboard = () => {
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
+  const [period, setPeriod] = useState<PeriodKey>("this_month");
   const { 
     stats, 
     opsStats, 
@@ -65,7 +67,7 @@ const Dashboard = () => {
     hasEnoughData,
     loading,
     error 
-  } = useDashboardData();
+  } = useDashboardData(period);
   
   const { weather, loading: weatherLoading } = useWeatherData();
   const { 
@@ -275,7 +277,10 @@ const Dashboard = () => {
                 </Badge>
               </div>
               
-              {/* Mobile Quick Actions - Fixed at bottom, prominent */}
+              {/* Period selector - mobile */}
+              <PeriodSelector value={period} onChange={setPeriod} />
+
+              {/* Mobile Quick Actions */}
               <div className="flex gap-2">
                 <Button asChild variant="premium" size="sm" className="flex-1 h-10 shadow-lg shadow-primary/20">
                   <Link to="/orders">
@@ -358,6 +363,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <PeriodSelector value={period} onChange={setPeriod} />
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg glass-panel-subtle">
                     <TrendingUp className="h-3.5 w-3.5 text-success" />
                     <span className="text-muted-foreground">Vandaag:</span>

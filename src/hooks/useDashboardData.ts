@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, subMonths, format, eachWeekOfInterval, subWeeks, endOfWeek } from "date-fns";
 import { getNlLocale } from "@/lib/locale";
 import { useCompany } from "@/hooks/useCompany";
+import { type PeriodKey, getPeriodRange } from "@/components/dashboard/PeriodSelector";
 
 // --- Types ---
 
@@ -39,16 +40,27 @@ const EMPTY_DATA: DashboardData = {
   unreadEmailCount: 0,
 };
 
-// --- Data fetcher (tenant-scoped, uses server-side RPCs) ---
+const STATUS_LABELS: Record<string, string> = {
+  aanvraag: "Aanvraag",
+  offerte: "Offerte",
+  gepland: "Gepland",
+  geladen: "Geladen",
+  onderweg: "Onderweg",
+  afgeleverd: "Afgeleverd",
+  afgerond: "Afgerond",
+  gecontroleerd: "Gecontroleerd",
+  gefactureerd: "Gefactureerd",
+  geannuleerd: "Geannuleerd",
+};
 
-async function fetchDashboardData(companyId: string): Promise<DashboardData> {
+// --- Data fetcher ---
+
+async function fetchDashboardData(companyId: string, periodStart: Date): Promise<DashboardData> {
   const now = new Date();
   const sixMonthsAgo = subMonths(startOfMonth(now), 5);
-  const monthStart = startOfMonth(now);
 
   const nlLocalePromise = getNlLocale();
 
-  // 3 RPCs + 2 light queries instead of 6 heavy queries
   const [
     countsResult,
     invoiceStatsResult,
@@ -56,12 +68,11 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
     { data: submissions },
     unreadEmailResult,
   ] = await Promise.all([
-    supabase.rpc('get_dashboard_counts', { p_month_start: monthStart.toISOString() }),
+    supabase.rpc('get_dashboard_counts', { p_month_start: periodStart.toISOString() }),
     supabase.rpc('get_invoice_stats', { p_company_id: companyId }),
-    // New consolidated RPC — replaces 2 unbounded trips queries + client-side aggregation
     supabase.rpc('get_dashboard_ops', {
       p_company_id: companyId,
-      p_month_start: monthStart.toISOString(),
+      p_month_start: periodStart.toISOString(),
       p_six_months_ago: sixMonthsAgo.toISOString(),
     }),
     supabase.from("customer_submissions").select("id, pickup_company, delivery_company, status, created_at").eq("status", "pending").order("created_at", { ascending: false }).limit(10),
@@ -75,13 +86,11 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   const pendingSubmissionsCount = counts.pending_submissions || 0;
   const purchaseInvoiceCount = counts.purchase_invoices || 0;
 
-  // Invoice stats from RPC
   const invStats = (invoiceStatsResult.data as any) || {};
   const openInvoices = invStats.open_invoices || 0;
   const totalRevenue = invStats.total_paid || 0;
   const pendingPayments = invStats.pending_payments || 0;
 
-  // Ops data from consolidated RPC
   const ops = (opsResult.data as any) || {};
   const opsData = ops.ops || {};
   const chauffeurNodig = opsData.chauffeur_nodig || 0;
@@ -92,7 +101,7 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   const readyToInvoice = ops.ready_to_invoice || 0;
   const completedCount = ops.completed_count || 0;
 
-  // Action queue from RPC data
+  // Action queue
   const actions: ActionItem[] = [];
   const unassigned = ops.unassigned_today || [];
   for (const trip of unassigned) {
@@ -123,7 +132,7 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
 
   const nl = await nlLocalePromise;
 
-  // Revenue by month — map RPC month_key (YYYY-MM) to display format
+  // Revenue by month
   const monthlyRevenue: Record<string, { revenue: number; costs: number }> = {};
   for (let i = 5; i >= 0; i--) {
     monthlyRevenue[format(subMonths(now, i), "MMM", { locale: nl })] = { revenue: 0, costs: 0 };
@@ -139,16 +148,24 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   }
   const revenueData = Object.entries(monthlyRevenue).map(([month, data]) => ({ month, revenue: data.revenue, costs: data.costs }));
 
-  // Trip status distribution from RPC
-  const statusLabels: Record<string, string> = { gepland: "Gepland", onderweg: "Onderweg", afgerond: "Afgerond", geannuleerd: "Geannuleerd" };
+  // Trip status distribution — all statuses
   const rpcStatusCounts = ops.status_counts || {};
-  const tripStatusData = ['gepland', 'onderweg', 'afgerond', 'geannuleerd'].map(status => ({
-    status,
-    count: rpcStatusCounts[status] || 0,
-    label: statusLabels[status] || status,
-  }));
+  const tripStatusData = Object.keys(STATUS_LABELS)
+    .filter(status => (rpcStatusCounts[status] || 0) > 0)
+    .map(status => ({
+      status,
+      count: rpcStatusCounts[status] || 0,
+      label: STATUS_LABELS[status] || status,
+    }));
 
-  // Weekly trips from RPC
+  // If no statuses have data, show the 4 main ones with 0
+  if (tripStatusData.length === 0) {
+    ['gepland', 'onderweg', 'afgerond', 'geannuleerd'].forEach(status => {
+      tripStatusData.push({ status, count: 0, label: STATUS_LABELS[status] });
+    });
+  }
+
+  // Weekly trips
   const rpcWeekly = ops.weekly || [];
   const weeks = eachWeekOfInterval({ start: subWeeks(now, 5), end: now });
   const weeklyTripsData = weeks.map(weekStart => {
@@ -161,7 +178,8 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
   });
 
   // OTIF
-  const otifPercentage = completedCount > 0 ? 100 : 0;
+  const totalInPeriod = Object.values(rpcStatusCounts).reduce((s: number, c: any) => s + (Number(c) || 0), 0);
+  const otifPercentage = totalInPeriod > 0 ? Math.round((completedCount / totalInPeriod) * 100) : 0;
 
   return {
     stats: {
@@ -190,13 +208,15 @@ async function fetchDashboardData(companyId: string): Promise<DashboardData> {
 
 // --- Hook ---
 
-export const useDashboardData = () => {
+export const useDashboardData = (period: PeriodKey = "this_month") => {
   const { company } = useCompany();
   const companyId = company?.id;
 
+  const periodStart = useMemo(() => getPeriodRange(period).start, [period]);
+
   const { data, isLoading, isFetching, error, refetch, dataUpdatedAt } = useQuery({
-    queryKey: ['dashboard-data', companyId],
-    queryFn: () => fetchDashboardData(companyId!),
+    queryKey: ['dashboard-data', companyId, period],
+    queryFn: () => fetchDashboardData(companyId!, periodStart),
     enabled: !!companyId,
     staleTime: 30 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -207,7 +227,6 @@ export const useDashboardData = () => {
   });
 
   const result = data ?? EMPTY_DATA;
-  // True only until first successful fetch — background refetches stay invisible
   const isFirstLoad = isLoading || (isFetching && !dataUpdatedAt);
 
   const hasEnoughData = useMemo(() => {
