@@ -88,15 +88,15 @@ const QuotesDashboard = () => {
     queryKey: ["quotes", companyId, filterStatus],
     queryFn: async () => {
       if (!companyId) return [];
-      let query = supabase
+      let query = (supabase as any)
         .from("quotes")
         .select("*, customers(company_name)")
         .eq("tenant_id", companyId)
         .order("created_at", { ascending: false });
-      if (filterStatus !== "all") query = query.eq("status", filterStatus as any);
+      if (filterStatus !== "all") query = query.eq("status", filterStatus);
       const { data, error } = await query;
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any[];
     },
     enabled: !!companyId,
   });
