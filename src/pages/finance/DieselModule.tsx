@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanyId } from "@/hooks/useCompanyId";
+import { useCompany } from "@/hooks/useCompany";
 import { toast } from "sonner";
 import {
   AreaChart,
