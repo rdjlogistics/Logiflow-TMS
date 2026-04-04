@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -75,15 +74,15 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
   const selectedProvider = providers.find(p => p.value === settings.route_optimization_provider) || providers[0];
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4 md:space-y-6 mt-0">
+    <div className="space-y-4 md:space-y-6 mt-0">
       {/* Provider */}
-      <motion.div variants={cardVariants}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
                 <Zap className="h-5 w-5 text-primary-foreground" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Optimalisatie Provider</CardTitle>
                 <CardDescription>Kies de provider voor routeberekeningen</CardDescription>
@@ -95,7 +94,7 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
               {providers.map((provider) => {
                 const isSelected = settings.route_optimization_provider === provider.value;
                 return (
-                  <motion.button
+                  <button
                     key={provider.value}
                     type="button"
                     onClick={() => onSettingsChange({ route_optimization_provider: provider.value, route_speed_percentage: provider.defaultSpeed })}
@@ -105,8 +104,6 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                         ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-lg shadow-primary/10"
                         : "border-border/30 hover:border-primary/30 bg-card/40 backdrop-blur-sm"
                     )}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
                   >
                     {isSelected && <div className="absolute top-3 right-3"><div className="h-3 w-3 rounded-full bg-primary animate-pulse" /></div>}
                     <h3 className="font-semibold text-sm md:text-base mb-1">{provider.name}</h3>
@@ -122,22 +119,22 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                     <div className="mt-3 pt-3 border-t border-border/30">
                       <Badge variant="secondary" className="text-xs bg-muted/50"><Gauge className="h-3 w-3 mr-1" />{provider.speedHint}</Badge>
                     </div>
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Vehicle & Speed */}
-      <motion.div variants={cardVariants}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Truck className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Voertuig & Snelheid</CardTitle>
                 <CardDescription>Type voertuig en snelheidscorrectie voor reisduur</CardDescription>
@@ -152,7 +149,7 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                   const isSelected = settings.route_vehicle_type === vt.value;
                   const VIcon = vt.icon;
                   return (
-                    <motion.button
+                    <button
                       key={vt.value}
                       type="button"
                       onClick={() => onSettingsChange({ route_vehicle_type: vt.value })}
@@ -162,13 +159,11 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                           ? "border-primary bg-primary/10 shadow-md shadow-primary/10"
                           : "border-border/30 hover:border-primary/30 bg-card/40 backdrop-blur-sm"
                       )}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
                     >
                       <VIcon className={cn("h-5 w-5 md:h-6 md:w-6", isSelected ? "text-primary" : "text-muted-foreground")} />
                       <span className={cn("text-xs md:text-sm font-medium", isSelected ? "text-primary" : "text-foreground")}>{vt.label}</span>
                       <span className="text-[10px] md:text-xs text-muted-foreground">{vt.desc}</span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
@@ -192,16 +187,16 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Service Time & ETA */}
-      <motion.div variants={cardVariants}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Clock className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Servicetijd & Tijdvenster</CardTitle>
                 <CardDescription>Gemiddelde stoptijd en ETA marge op Track & Trace</CardDescription>
@@ -240,16 +235,16 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Start & End Location */}
-      <motion.div variants={cardVariants}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Navigation className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Start & Eindlocatie</CardTitle>
                 <CardDescription>Waar beginnen en eindigen de routes</CardDescription>
@@ -272,7 +267,7 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                   <Label className="text-sm font-medium">{section.label}</Label>
                   <div className="space-y-2">
                     {section.options.map((option) => (
-                      <motion.button
+                      <button
                         key={option.value}
                         type="button"
                         onClick={() => onSettingsChange({ [section.key]: option.value } as any)}
@@ -282,7 +277,6 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                             ? "border-primary bg-primary/5"
                             : "border-border/30 hover:border-primary/30 bg-card/40 backdrop-blur-sm"
                         )}
-                        whileTap={{ scale: 0.98 }}
                       >
                         <div className="flex items-center gap-3">
                           <MapPin className={cn("h-4 w-4", (settings as any)[section.key] === option.value ? "text-primary" : "text-muted-foreground")} />
@@ -291,7 +285,7 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
                             <p className="text-xs text-muted-foreground">{option.desc}</p>
                           </div>
                         </div>
-                      </motion.button>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -299,16 +293,16 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Composite Routes */}
-      <motion.div variants={cardVariants}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Package className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Samengestelde Routes</CardTitle>
                 <CardDescription>Product voor orders die worden samengevoegd tot één route</CardDescription>
@@ -335,7 +329,7 @@ export const RouteplanningTab = ({ settings, onSettingsChange }: RouteplanningTa
             </div>
           </CardContent>
         </Card>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };

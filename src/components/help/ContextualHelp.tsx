@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X, ExternalLink, Lightbulb, BookOpen, Video, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -113,10 +112,7 @@ export function InfoCard({
   const Icon = icons[variant];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+    <div
       className={cn(
         'relative p-4 rounded-lg border',
         variantStyles[variant],
@@ -150,7 +146,7 @@ export function InfoCard({
           </button>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

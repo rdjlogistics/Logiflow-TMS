@@ -10,7 +10,6 @@ import { ExportButton } from '@/components/reporting/ExportButton';
 import { FileText, Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuditRealtimeAlerts } from '@/hooks/useAuditRealtimeAlerts';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -223,13 +222,9 @@ export const AuditLogTab = () => {
                 colSpan={6}
               />
             )}
-            <AnimatePresence>
               {filtered.slice(0, 100).map((log, i) => (
-                <motion.tr
+                <tr
                   key={log.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.01 }}
                   className="border-b border-border/30 cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                 >
@@ -249,9 +244,8 @@ export const AuditLogTab = () => {
                   <TableCell className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">
                     {log.user_id ? log.user_id.slice(0, 8) + '...' : '—'}
                   </TableCell>
-                </motion.tr>
+                </tr>
               ))}
-            </AnimatePresence>
             {/* Expanded details rows rendered separately */}
             {filtered.slice(0, 100).map((log) =>
               expandedId === log.id && log.details ? (

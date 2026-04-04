@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/hooks/useCompany';
 import { Button } from '@/components/ui/button';
@@ -242,11 +241,8 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
   return (
     <div className="fixed inset-0 z-[300] flex items-stretch">
       {/* ── LEFT PANEL — branding ───────────────────────────────────────────── */}
-      <motion.div
+      <div
         className={`hidden lg:flex flex-col justify-between w-[42%] bg-gradient-to-br ${currentGradient} p-12 relative overflow-hidden`}
-        initial={{ x: -60, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         {/* Decorative blobs */}
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -263,13 +259,8 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
         </div>
 
         {/* Big visual */}
-        <AnimatePresence mode="wait">
-          <motion.div
+          <div
             key={step.id}
-            initial={{ scale: 0.7, opacity: 0, rotate: -10 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.7, opacity: 0, rotate: 10 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             className="flex flex-col items-center justify-center gap-6"
           >
             <div className="text-[100px] leading-none select-none drop-shadow-2xl">
@@ -281,16 +272,12 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
                 {step.subtitle}
               </p>
             </div>
-          </motion.div>
-        </AnimatePresence>
-
+          </div>
         {/* Step dots */}
         <div className="flex items-center gap-2 relative">
           {STEPS.map((s, i) => (
-            <motion.div
+            <div
               key={s.id}
-              animate={{ width: i === stepIndex ? 28 : 8, opacity: i <= stepIndex ? 1 : 0.4 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="h-2 rounded-full bg-white"
             />
           ))}
@@ -298,14 +285,11 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
             {stepIndex + 1} / {totalSteps}
           </span>
         </div>
-      </motion.div>
+      </div>
 
       {/* ── RIGHT PANEL — form ──────────────────────────────────────────────── */}
-      <motion.div
+      <div
         className="flex-1 bg-background flex flex-col"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
       >
         {/* Top bar */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-border/40">
@@ -317,10 +301,9 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
           {/* Progress bar */}
           <div className="hidden lg:flex items-center gap-3 flex-1">
             <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-              <motion.div
+              <div
                 className={`h-full rounded-full bg-gradient-to-r ${currentGradient}`}
                 animate={{ width: `${((stepIndex) / (totalSteps - 1)) * 100}%` }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
               />
             </div>
             <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
@@ -341,15 +324,8 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
         {/* Form area */}
         <div className="flex-1 overflow-y-auto flex items-center justify-center px-8 py-10">
           <div className="w-full max-w-md">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
+              <div
                 key={step.id}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ type: 'spring', stiffness: 380, damping: 34 }}
               >
                 {/* Step header (mobile) */}
                 <div className="mb-8 lg:hidden">
@@ -532,21 +508,17 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
                       { icon: '✅', label: 'Eerste rit gepland' },
                       { icon: '🚀', label: 'LogiFlow staat voor je klaar' },
                     ].map((item, i) => (
-                      <motion.div
+                      <div
                         key={item.label}
-                        initial={{ opacity: 0, x: -16 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
                         className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40"
                       >
                         <span className="text-lg">{item.icon}</span>
                         <span className="text-sm font-medium">{item.label}</span>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
-              </motion.div>
-            </AnimatePresence>
+              </div>
           </div>
         </div>
 
@@ -577,7 +549,7 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
             )}
           </Button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

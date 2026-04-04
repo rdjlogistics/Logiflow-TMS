@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Truck, ArrowRight, ArrowLeft, Check, Sparkles,
   Building2, Package, Bot, LayoutDashboard, Rocket,
@@ -261,7 +260,7 @@ const OnboardingWizard = () => {
             ].join(', '),
           }}
         />
-        <motion.div
+        <div
           className="absolute w-[300px] h-[300px] rounded-full opacity-30"
           style={{
             background: 'radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 70%)',
@@ -269,18 +268,12 @@ const OnboardingWizard = () => {
             top: '10%',
             right: '15%',
           }}
-          animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
         />
       </div>
 
       {/* Header — hidden during cinematic intro */}
-      <AnimatePresence>
         {step > 0 && (
-          <motion.header
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+          <header
             className="relative z-10 bg-white/[0.03] dark:bg-white/[0.02] backdrop-blur-2xl border-b border-white/[0.06]"
           >
             <div className="max-w-5xl mx-auto px-5 sm:px-6 h-14 flex items-center justify-between">
@@ -294,18 +287,14 @@ const OnboardingWizard = () => {
                 {step + 1} / {STEPS.length}
               </span>
             </div>
-          </motion.header>
+          </header>
         )}
-      </AnimatePresence>
-
       {/* Progress bar — hidden during cinematic intro */}
       {step > 0 && (
         <div className="relative z-10 h-[2px] bg-white/[0.04]">
-          <motion.div
+          <div
             className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary/50"
-            initial={{ width: '0%' }}
             animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            transition={{ type: 'spring', stiffness: 80, damping: 20 }}
             style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.4)' }}
           />
         </div>
@@ -318,11 +307,8 @@ const OnboardingWizard = () => {
             const isCompleted = i < step;
             const isActive = i === step;
             return (
-              <motion.div
+              <div
                 key={label}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04, duration: 0.4 }}
                 className={cn(
                   'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all duration-500 backdrop-blur-xl',
                   isActive && 'bg-white/[0.08] border border-white/[0.12] text-foreground shadow-[0_0_20px_-4px_hsl(var(--primary)/0.3)]',
@@ -332,7 +318,7 @@ const OnboardingWizard = () => {
               >
                 {isCompleted ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
                 <span className="hidden sm:inline">{label}</span>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -343,15 +329,8 @@ const OnboardingWizard = () => {
         "relative z-10 flex-1 max-w-5xl mx-auto w-full px-5 sm:px-6 lg:px-8 overflow-y-auto",
         step === 0 ? "flex items-center justify-center" : "pb-28 sm:pb-32",
       )}>
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
+          <div
             key={step}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="w-full"
           >
             {/* Step 0: Cinematic Intro */}
@@ -395,39 +374,28 @@ const OnboardingWizard = () => {
               <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
                 {/* Apple-style header */}
                 <div className="text-center space-y-3">
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <p
                     className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
                   >
                     Stap 5 van 6
-                  </motion.p>
+                  </p>
 
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                  <div
                     className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg shadow-amber-500/20"
                   >
                     <LayoutDashboard className="h-7 w-7 text-white" />
-                  </motion.div>
+                  </div>
 
-                  <motion.h2
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
+                  <h2
                     className="text-2xl sm:text-3xl font-display font-light tracking-tight"
                   >
                     Jouw <span className="font-semibold">dashboard</span>
-                  </motion.h2>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
+                  </h2>
+                  <p
                     className="text-sm text-muted-foreground/50 font-light"
                   >
                     Kies een startlayout en thema
-                  </motion.p>
+                  </p>
                 </div>
 
                 {/* Preset cards */}
@@ -436,13 +404,8 @@ const OnboardingWizard = () => {
                     const isSelected = selectedPreset?.id === preset.id;
                     const PresetIcon = preset.icon;
                     return (
-                      <motion.button
+                      <button
                         key={preset.id}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.12 + index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        whileHover={{ y: -4, scale: 1.01, rotateY: 2, rotateX: -1 }}
-                        whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedPreset(preset)}
                         style={{ perspective: 800, transformStyle: 'preserve-3d' }}
                         className={cn(
@@ -470,24 +433,19 @@ const OnboardingWizard = () => {
                           </div>
                         </div>
                         {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
+                          <div
                             className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center"
                           >
                             <Check className="h-3 w-3 text-primary-foreground" />
-                          </motion.div>
+                          </div>
                         )}
-                      </motion.button>
+                      </button>
                     );
                   })}
                 </div>
 
                 {/* Glassmorphism theme toggle */}
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                <div
                   className="flex items-center justify-center"
                 >
                   <div className="relative inline-flex items-center gap-0 rounded-2xl backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] p-1">
@@ -515,17 +473,16 @@ const OnboardingWizard = () => {
                       </button>
                     ))}
                     {/* Sliding indicator */}
-                    <motion.div
+                    <div
                       layout
                       className="absolute top-1 bottom-1 rounded-xl bg-white/[0.08] border border-white/[0.1]"
                       style={{
                         width: 'calc(33.333% - 2px)',
                         left: `calc(${['light', 'dark', 'system'].indexOf(theme) * 33.333}% + 4px)`,
                       }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     />
                   </div>
-                </motion.div>
+                </div>
               </div>
             )}
 
@@ -540,17 +497,12 @@ const OnboardingWizard = () => {
                 onLaunch={handleComplete}
               />
             )}
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
 
       {/* Bottom navigation — hidden during cinematic intro and launch */}
-      <AnimatePresence>
         {showBottomNav && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+          <div
             className="fixed bottom-0 inset-x-0 z-20 backdrop-blur-2xl bg-background/60 border-t border-white/[0.06]"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
           >
@@ -581,9 +533,8 @@ const OnboardingWizard = () => {
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 };

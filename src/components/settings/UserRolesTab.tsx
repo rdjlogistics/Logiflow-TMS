@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -260,18 +259,17 @@ export function UserRolesTab() {
   };
 
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
+    <div className="space-y-6">
       {/* --- Invite Card --- */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div
+              <div
                 className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center"
-                whileHover={{ rotate: 10, scale: 1.1 }}
               >
                 <UserPlus className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Gebruiker uitnodigen</CardTitle>
                 <CardDescription>Voeg een nieuwe gebruiker toe — medewerker, chauffeur of klant</CardDescription>
@@ -335,19 +333,18 @@ export function UserRolesTab() {
             </Button>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* --- Users Table --- */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div
+              <div
                 className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center"
-                whileHover={{ rotate: 10, scale: 1.1 }}
               >
                 <Users className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Gebruikersbeheer</CardTitle>
                 <CardDescription>Beheer alle accounts binnen je transportbedrijf</CardDescription>
@@ -497,7 +494,7 @@ export function UserRolesTab() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* --- Delete Dialog --- */}
       <DeleteConfirmDialog
@@ -510,6 +507,6 @@ export function UserRolesTab() {
         confirmText="Verwijderen"
         cancelText="Annuleren"
       />
-    </motion.div>
+    </div>
   );
 }

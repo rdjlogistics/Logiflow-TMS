@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { clearAuthCachesOnly } from '@/lib/authStorage';
 import { FloatingTruckMini } from '@/components/driver/FloatingTruckMini';
@@ -127,69 +126,55 @@ const DriverLogin = () => {
   return (
     <div className="min-h-screen-safe bg-gradient-to-b from-[#0a0a0f] via-[#0f0f18] to-[#0a0a12] flex flex-col items-center justify-center overscroll-contain relative overflow-hidden">
       {/* Animated background orbs */}
-      <motion.div
+      <div
         className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 via-pink-500/10 to-transparent blur-3xl pointer-events-none"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <motion.div
+      <div
         className="absolute -bottom-60 -left-40 w-96 h-96 rounded-full bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       {/* Login card */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="relative z-10 w-full max-w-sm mx-auto px-6"
       >
         {/* Logo / Truck icon */}
-        <motion.div variants={itemVariants} className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-8">
           <FloatingTruckMini size="lg" />
-          <motion.h1
+          <h1
             className="mt-4 text-2xl font-bold text-white/95 tracking-tight"
-            variants={itemVariants}
           >
             Chauffeur Portal
-          </motion.h1>
-          <motion.p
+          </h1>
+          <p
             className="text-sm text-white/40 mt-1"
-            variants={itemVariants}
           >
             Log in om verder te gaan
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
         {/* Offline warning */}
         {!isOnline && (
-          <motion.div
-            variants={itemVariants}
+          <div
             className="mb-4 flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 p-3 text-amber-300 text-sm"
           >
             <WifiOff className="h-4 w-4 flex-shrink-0" />
             <span>Geen internetverbinding</span>
-          </motion.div>
+          </div>
         )}
 
         {/* Error message */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="mb-4 flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-red-300 text-sm"
           >
             <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
-          </motion.div>
+          </div>
         )}
 
         {/* Forgot password - reset sent */}
         {forgotPassword && resetSent ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+          <div
             className="flex flex-col items-center gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-6 text-center"
           >
             <Mail className="h-8 w-8 text-emerald-400" />
@@ -202,11 +187,11 @@ const DriverLogin = () => {
             >
               ← Terug naar inloggen
             </button>
-          </motion.div>
+          </div>
         ) : forgotPassword ? (
           /* Forgot password form */
-          <motion.form onSubmit={handleForgotPassword} className="space-y-4">
-            <motion.div variants={itemVariants} className="space-y-2">
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-white/60 text-sm">E-mailadres</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -221,9 +206,9 @@ const DriverLogin = () => {
                   className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants}>
+            <div>
               <Button
                 type="submit"
                 disabled={loading || !isOnline}
@@ -231,9 +216,9 @@ const DriverLogin = () => {
               >
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Verstuur reset-link'}
               </Button>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="text-center">
+            <div className="text-center">
               <button
                 type="button"
                 onClick={() => { setForgotPassword(false); setError(null); }}
@@ -241,14 +226,14 @@ const DriverLogin = () => {
               >
                 ← Terug naar inloggen
               </button>
-            </motion.div>
-          </motion.form>
+            </div>
+          </form>
         ) : (
           /* Login form */
-          <motion.form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Biometric login button */}
             {biometricSupported && hasBiometric && (
-              <motion.div variants={itemVariants}>
+              <div>
                 <Button
                   type="button"
                   disabled={biometricLoading || !isOnline}
@@ -276,10 +261,10 @@ const DriverLogin = () => {
                   <span className="text-xs text-white/30">of</span>
                   <div className="flex-1 h-px bg-white/10" />
                 </div>
-              </motion.div>
+              </div>
             )}
 
-            <motion.div variants={itemVariants} className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-white/60 text-sm">E-mailadres</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -294,9 +279,9 @@ const DriverLogin = () => {
                   className="pl-10 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="password" className="text-white/60 text-sm">Wachtwoord</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -319,9 +304,9 @@ const DriverLogin = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="text-right">
+            <div className="text-right">
               <button
                 type="button"
                 onClick={() => { setForgotPassword(true); setError(null); }}
@@ -329,9 +314,9 @@ const DriverLogin = () => {
               >
                 Wachtwoord vergeten?
               </button>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants}>
+            <div>
               <Button
                 type="submit"
                 disabled={loading || !isOnline}
@@ -346,12 +331,12 @@ const DriverLogin = () => {
                   </>
                 )}
               </Button>
-            </motion.div>
-          </motion.form>
+            </div>
+          </form>
         )}
 
         {/* Reset session link */}
-        <motion.div variants={itemVariants} className="mt-6 text-center">
+        <div className="mt-6 text-center">
           <button
             onClick={handleResetSession}
             className="text-xs text-white/25 hover:text-white/50 transition-colors flex items-center gap-1.5 mx-auto"
@@ -359,8 +344,8 @@ const DriverLogin = () => {
             <RefreshCw className="h-3 w-3" />
             Sessie resetten
           </button>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

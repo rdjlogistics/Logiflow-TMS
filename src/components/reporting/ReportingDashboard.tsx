@@ -28,7 +28,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { motion } from 'framer-motion';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { writeExcelFile } from '@/lib/excelUtils';
 
@@ -395,11 +394,8 @@ export const ReportingDashboard: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {kpis.map((kpi, index) => (
-          <motion.div
+          <div
             key={kpi.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
           >
             <Card className="relative overflow-hidden">
               <CardContent className="p-4">
@@ -419,7 +415,7 @@ export const ReportingDashboard: React.FC = () => {
                 <p className="text-xs text-muted-foreground">{kpi.label}</p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 

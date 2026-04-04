@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -142,16 +141,14 @@ export function UpgradePricingTab() {
   }
 
   return (
-    <motion.div variants={staggerItem} className="space-y-8">
+    <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <motion.h2
+        <h2
           className="text-2xl md:text-3xl font-bold tracking-tight"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
         >
           Upgrade je pakket
-        </motion.h2>
+        </h2>
         <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
           Kies het plan dat het beste past bij jouw transportbedrijf
         </p>
@@ -168,10 +165,8 @@ export function UpgradePricingTab() {
             )}
           >
             {billingCycle === 'monthly' && (
-              <motion.div
+              <div
                 className="absolute inset-0 rounded-full bg-primary shadow-md shadow-primary/25"
-                layoutId="billingToggle"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
             <span className="relative">Maandelijks</span>
@@ -184,10 +179,8 @@ export function UpgradePricingTab() {
             )}
           >
             {billingCycle === 'yearly' && (
-              <motion.div
+              <div
                 className="absolute inset-0 rounded-full bg-primary shadow-md shadow-primary/25"
-                layoutId="billingToggle"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
             <span className="relative flex items-center gap-1.5">
@@ -210,11 +203,8 @@ export function UpgradePricingTab() {
           const price = getPrice(plan);
 
           return (
-            <motion.div
+            <div
               key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, type: 'spring', stiffness: 300, damping: 24 }}
             >
               <Card
                 variant={isPopular ? 'glow' : 'glass'}
@@ -258,17 +248,11 @@ export function UpgradePricingTab() {
                   {/* Price */}
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold tracking-tight">
-                      <AnimatePresence mode="wait">
-                        <motion.span
+                        <span
                           key={`${plan.slug}-${billingCycle}`}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.2 }}
                         >
                           €{price}
-                        </motion.span>
-                      </AnimatePresence>
+                        </span>
                     </span>
                     <span className="text-sm text-muted-foreground">/maand</span>
                   </div>
@@ -308,7 +292,7 @@ export function UpgradePricingTab() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -317,6 +301,6 @@ export function UpgradePricingTab() {
       <p className="text-center text-xs text-muted-foreground">
         Alle prijzen zijn exclusief BTW. Je kunt op elk moment upgraden of downgraden.
       </p>
-    </motion.div>
+    </div>
   );
 }

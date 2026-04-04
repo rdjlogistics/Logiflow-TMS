@@ -63,7 +63,6 @@ import {
   Send,
   Route,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { writeExcelFile } from '@/lib/excelUtils';
 import { notifyCustomerStatusChange } from '@/lib/customerNotifications';
@@ -816,13 +815,8 @@ export const EnhancedBulkActionsBar: React.FC<EnhancedBulkActionsBarProps> = ({
 
   return (
     <>
-      <AnimatePresence>
         {count > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-            transition={{ type: 'spring', stiffness: 200, damping: 24 }}
+          <div
             className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit"
           >
             <div className={cn(
@@ -973,10 +967,8 @@ export const EnhancedBulkActionsBar: React.FC<EnhancedBulkActionsBarProps> = ({
                 <TooltipContent side="top" className="text-xs">Selectie wissen</TooltipContent>
               </Tooltip>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-
       {/* Assign Driver Dialog */}
       <Dialog open={assignDriverDialogOpen} onOpenChange={setAssignDriverDialogOpen}>
         <DialogContent>

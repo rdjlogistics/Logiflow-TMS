@@ -1,5 +1,4 @@
 import { ReactNode, forwardRef } from 'react';
-import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
@@ -24,7 +23,7 @@ export const PullToRefresh = forwardRef<HTMLDivElement, PullToRefreshProps>(
         className={cn("relative overflow-auto", className)}
       >
         {/* Pull indicator */}
-        <motion.div
+        <div
           className="absolute left-1/2 -translate-x-1/2 z-50 flex items-center justify-center"
           style={{
             top: Math.max(pullDistance - 40, -40),
@@ -44,17 +43,17 @@ export const PullToRefresh = forwardRef<HTMLDivElement, PullToRefreshProps>(
               }}
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Content with pull transform */}
-        <motion.div
+        <div
           style={{
             transform: `translateY(${pullDistance}px)`,
           }}
           className="min-h-full"
         >
           {children}
-        </motion.div>
+        </div>
       </div>
     );
   }

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Shield, MapPin, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,9 +53,7 @@ const TollCountryCard = ({ estimate }: { estimate: TollCostEstimate }) => {
   const badgeColor = getCostBadgeColor(estimate.estimatedCost.max);
 
   return (
-    <motion.div
-      variants={cardVariants}
-      whileHover={{ scale: 1.02, y: -2 }}
+    <div
       className={`relative rounded-xl border bg-gradient-to-br ${colorClass} backdrop-blur-xl p-4 space-y-3 transition-shadow hover:shadow-lg`}
     >
       {/* Header */}
@@ -99,7 +96,7 @@ const TollCountryCard = ({ estimate }: { estimate: TollCostEstimate }) => {
 
       {/* Purchase button */}
       {estimate.purchaseUrl && (
-        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+        <div>
           <Button
             variant="outline"
             size="sm"
@@ -111,18 +108,16 @@ const TollCountryCard = ({ estimate }: { estimate: TollCostEstimate }) => {
               {estimate.purchaseLabel || 'Koop hier'}
             </a>
           </Button>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
 const TollCostPanel: React.FC<TollCostPanelProps> = ({ result, isLoading, vehicleType }) => {
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <div
         className="rounded-xl border border-border/30 bg-card/50 backdrop-blur-xl p-6"
       >
         <div className="flex items-center gap-3">
@@ -132,7 +127,7 @@ const TollCostPanel: React.FC<TollCostPanelProps> = ({ result, isLoading, vehicl
             <p className="text-[10px] text-muted-foreground">Analyse per land en voertuigtype</p>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
@@ -140,9 +135,7 @@ const TollCostPanel: React.FC<TollCostPanelProps> = ({ result, isLoading, vehicl
 
   if (!result.hasTolls) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl p-4"
       >
         <div className="flex items-center gap-2">
@@ -151,20 +144,16 @@ const TollCostPanel: React.FC<TollCostPanelProps> = ({ result, isLoading, vehicl
             Geen tolkosten op deze route
           </p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+    <div
       className="space-y-4"
     >
       {/* Total cost header */}
-      <motion.div
-        variants={cardVariants}
+      <div
         className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 backdrop-blur-xl p-4"
       >
         <div className="flex items-center justify-between">
@@ -191,17 +180,15 @@ const TollCostPanel: React.FC<TollCostPanelProps> = ({ result, isLoading, vehicl
         <p className="text-[10px] text-muted-foreground mt-2">
           {result.countriesWithToll.length} {result.countriesWithToll.length === 1 ? 'land' : 'landen'} met tolheffing op route
         </p>
-      </motion.div>
+      </div>
 
       {/* Country cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <AnimatePresence>
           {result.countriesWithToll.map((estimate) => (
             <TollCountryCard key={estimate.countryCode} estimate={estimate} />
           ))}
-        </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

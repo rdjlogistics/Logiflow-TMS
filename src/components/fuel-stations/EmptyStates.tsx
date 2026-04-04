@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Fuel, MapPin, Wifi, WifiOff, Locate, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,9 +12,7 @@ interface EmptyStateProps {
  */
 export function NoStationsFound({ onRetry }: EmptyStateProps) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="text-center py-12 px-4"
     >
       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
@@ -31,7 +28,7 @@ export function NoStationsFound({ onRetry }: EmptyStateProps) {
           Opnieuw zoeken
         </Button>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -40,9 +37,7 @@ export function NoStationsFound({ onRetry }: EmptyStateProps) {
  */
 export function LocationDenied({ onRequestLocation }: EmptyStateProps) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="mx-3 mt-3"
     >
       <Card className="bg-amber-500/10 border-amber-500/30 backdrop-blur-lg">
@@ -68,7 +63,7 @@ export function LocationDenied({ onRequestLocation }: EmptyStateProps) {
           </div>
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -77,9 +72,7 @@ export function LocationDenied({ onRequestLocation }: EmptyStateProps) {
  */
 export function PricesUnavailable({ onRetry }: EmptyStateProps) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="mx-3 mt-3"
     >
       <Card className="bg-red-500/10 border-red-500/30 backdrop-blur-lg">
@@ -107,7 +100,7 @@ export function PricesUnavailable({ onRetry }: EmptyStateProps) {
           </div>
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -133,9 +126,7 @@ export function StationsLoading() {
  */
 export function MockModeBanner({ message }: { message?: string | null }) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
+    <div
       className="mx-3 mt-3"
     >
       <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
@@ -144,7 +135,7 @@ export function MockModeBanner({ message }: { message?: string | null }) {
           {message || 'Demo-gegevens – live prijzen volgen zodra beschikbaar'}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 import { OnboardingProvider, useOnboarding } from '@/components/driver-onboarding/OnboardingContext';
 import { StepWelcome } from '@/components/driver-onboarding/steps/StepWelcome';
 import { StepName } from '@/components/driver-onboarding/steps/StepName';
@@ -74,18 +73,11 @@ const OnboardingFlow = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Draft restore dialog */}
-      <AnimatePresence>
         {showDraftDialog && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+            <div
               className="w-full max-w-sm p-6 rounded-2xl bg-card border border-border shadow-xl"
             >
               <h2 className="text-xl font-bold text-foreground mb-2">
@@ -108,14 +100,10 @@ const OnboardingFlow = () => {
                   Opnieuw beginnen
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="wait">
         {steps[currentStep]}
-      </AnimatePresence>
     </div>
   );
 };

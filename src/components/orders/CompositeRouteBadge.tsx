@@ -2,7 +2,6 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Route } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 interface CompositeRouteBadgeProps {
   childCount?: number;
@@ -21,9 +20,7 @@ const CompositeRouteBadge: React.FC<CompositeRouteBadgeProps> = ({
 }) => {
   if (isChild) {
     return (
-      <motion.div
-        initial={{ opacity: 0, x: -4 }}
-        animate={{ opacity: 1, x: 0 }}
+      <div
         className={cn("inline-flex items-center gap-1", className)}
       >
         <span className="text-muted-foreground text-xs">↳</span>
@@ -34,15 +31,12 @@ const CompositeRouteBadge: React.FC<CompositeRouteBadgeProps> = ({
         >
           Route {parentOrderNumber || ''}
         </Badge>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.05 }}
+    <div
       className={cn("inline-flex", className)}
     >
       <Badge
@@ -52,7 +46,7 @@ const CompositeRouteBadge: React.FC<CompositeRouteBadgeProps> = ({
         <Route className="h-2.5 w-2.5 mr-0.5" />
         Route · {childCount || 0}
       </Badge>
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -99,21 +98,14 @@ export function OnboardingTooltip({ steps, storageKey, onComplete }: OnboardingT
   return (
     <>
       {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
         className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
         onClick={handleSkip}
       />
 
       {/* Tooltip */}
-      <AnimatePresence mode="wait">
-        <motion.div
+        <div
           key={currentStep}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
           className="fixed z-50 w-[300px] p-4 rounded-xl bg-card border border-border shadow-xl"
           style={{ top: position.top, left: position.left }}
         >
@@ -169,8 +161,7 @@ export function OnboardingTooltip({ steps, storageKey, onComplete }: OnboardingT
               />
             ))}
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </>
   );
 }
@@ -216,10 +207,7 @@ export function ContextualHint({ id, children, className, dismissable = true }: 
   if (isDismissed) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+    <div
       className={cn(
         'flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm',
         className
@@ -235,7 +223,7 @@ export function ContextualHint({ id, children, className, dismissable = true }: 
           <X className="h-3 w-3" />
         </button>
       )}
-    </motion.div>
+    </div>
   );
 }
 

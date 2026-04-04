@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Check, AlertCircle, Loader2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -175,12 +174,7 @@ export function ValidationFeedback({ result, show, className }: ValidationFeedba
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: -4, height: 0 }}
-        animate={{ opacity: 1, y: 0, height: 'auto' }}
-        exit={{ opacity: 0, y: -4, height: 0 }}
-        transition={{ duration: 0.15 }}
+      <div
         className={cn(
           "flex items-center gap-1.5 mt-1.5 text-xs",
           colors[result.type || 'error'],
@@ -189,8 +183,7 @@ export function ValidationFeedback({ result, show, className }: ValidationFeedba
       >
         <Icon className="h-3.5 w-3.5 flex-shrink-0" />
         <span>{result.message}</span>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 }
 
@@ -289,12 +282,8 @@ export function ValidatedInput({
             className
           )}
         />
-        <AnimatePresence>
           {(isValidating || hasSuccess || hasError) && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+            <div
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
               {isValidating ? (
@@ -304,9 +293,8 @@ export function ValidatedInput({
               ) : hasError ? (
                 <AlertCircle className="h-4 w-4 text-destructive" />
               ) : null}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </div>
       {hint && !showFeedback && (
         <p className="text-xs text-muted-foreground">{hint}</p>

@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, File, Image, FileText, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -177,23 +176,16 @@ export function FileUpload({
       </div>
 
       {/* File list */}
-      <AnimatePresence>
         {files.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+          <div
             className="space-y-2"
           >
             {files.map((uploadedFile) => {
               const FileIcon = getFileIcon(uploadedFile.file.type);
               
               return (
-                <motion.div
+                <div
                   key={uploadedFile.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
                   className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border"
                 >
                   <FileIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -228,13 +220,11 @@ export function FileUpload({
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-
       {/* Actions */}
       {files.length > 0 && (
         <div className="flex items-center gap-2">

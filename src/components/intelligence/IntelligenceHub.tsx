@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,10 +47,7 @@ const AnomalyCard: React.FC<{
   const config = severityConfig[anomaly.severity];
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+    <div
       className={cn(
         'p-4 rounded-lg border transition-all',
         config.bg
@@ -97,7 +93,7 @@ const AnomalyCard: React.FC<{
           </Button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -112,9 +108,7 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
+    <div
       className="p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
     >
       <div className="flex items-center gap-3">
@@ -135,7 +129,7 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -302,17 +296,14 @@ export const IntelligenceHub: React.FC<{ companyId?: string }> = ({ companyId })
               </div>
 
               <ScrollArea className="h-[300px]">
-                <AnimatePresence mode="popLayout">
                   {anomalies.length === 0 ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                    <div
                       className="flex flex-col items-center justify-center h-[200px] text-muted-foreground"
                     >
                       <CheckCircle className="w-10 h-10 mb-3 text-green-500" />
                       <p className="font-medium">Geen anomalieën gedetecteerd</p>
                       <p className="text-sm">Alle systemen opereren normaal</p>
-                    </motion.div>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {anomalies.map(anomaly => (
@@ -324,7 +315,6 @@ export const IntelligenceHub: React.FC<{ companyId?: string }> = ({ companyId })
                       ))}
                     </div>
                   )}
-                </AnimatePresence>
               </ScrollArea>
             </TabsContent>
 

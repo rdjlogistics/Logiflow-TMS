@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -191,14 +190,14 @@ export const EmailDomainTab = () => {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Setup Card */}
       <Card variant="glass" className="overflow-hidden">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
               <Mail className="h-5 w-5 text-primary" />
-            </motion.div>
+            </div>
             <div className="flex-1 min-w-0">
               <CardTitle className="text-base md:text-lg">E-mail Afzenderdomein</CardTitle>
               <CardDescription>Configureer een eigen afzenderadres voor alle uitgaande emails</CardDescription>
@@ -276,15 +275,14 @@ export const EmailDomainTab = () => {
       </Card>
 
       {/* DNS Records Card */}
-      <AnimatePresence>
         {emailDomain && emailDomain.dns_records && (emailDomain.dns_records as DnsRecord[]).length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
+          <div>
             <Card variant="glass">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3">
-                  <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                  <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                     <Shield className="h-5 w-5 text-primary" />
-                  </motion.div>
+                  </div>
                   <div>
                     <CardTitle className="text-base md:text-lg">DNS Records</CardTitle>
                     <CardDescription>Voeg deze records toe bij je domeinprovider</CardDescription>
@@ -295,11 +293,8 @@ export const EmailDomainTab = () => {
                 {/* Mobile: card-based DNS records */}
                 <div className="space-y-3 md:hidden">
                   {(emailDomain.dns_records as DnsRecord[]).map((record, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
                       className="p-3 rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm space-y-2"
                     >
                       <div className="flex items-center justify-between">
@@ -319,7 +314,7 @@ export const EmailDomainTab = () => {
                         <p className="text-[10px] text-muted-foreground">Waarde</p>
                         <p className="font-mono text-[11px] break-all">{record.value}</p>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
 
@@ -333,11 +328,8 @@ export const EmailDomainTab = () => {
                     <span></span>
                   </div>
                   {(emailDomain.dns_records as DnsRecord[]).map((record, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
                       className={cn(
                         "grid grid-cols-[60px_1fr_1fr_50px_40px] gap-2 p-3 items-center text-xs",
                         i < (emailDomain.dns_records as DnsRecord[]).length - 1 && "border-b border-border/20"
@@ -350,7 +342,7 @@ export const EmailDomainTab = () => {
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => copyToClipboard(record.value)} title="Kopieer waarde">
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
 
@@ -402,10 +394,8 @@ export const EmailDomainTab = () => {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -414,6 +404,6 @@ export const EmailDomainTab = () => {
         onConfirm={handleDelete}
         isLoading={deleting}
       />
-    </motion.div>
+    </div>
   );
 };

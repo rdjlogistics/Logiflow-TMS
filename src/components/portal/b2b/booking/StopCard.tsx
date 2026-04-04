@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, 
   GripVertical, 
@@ -104,11 +103,8 @@ export const StopCard = ({
   const config = stopTypeConfig[stop.type];
 
   return (
-    <motion.div
+    <div
       layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
       className={cn(
         "group relative rounded-xl border bg-card/80 backdrop-blur-sm overflow-hidden transition-all",
         isDragging ? "shadow-2xl ring-2 ring-primary scale-[1.02]" : "border-border/50 hover:border-border"
@@ -165,13 +161,8 @@ export const StopCard = ({
       </div>
 
       {/* Expanded Content */}
-      <AnimatePresence>
         {stop.isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+          <div
             className="overflow-hidden"
           >
             <div className="p-3 sm:p-4 pt-0 space-y-4 sm:space-y-6 border-t border-border/50">
@@ -370,8 +361,6 @@ export const StopCard = ({
                       Item toevoegen
                     </Button>
                   </div>
-                  
-                  <AnimatePresence>
                     {stop.loadItems.map((item, itemIndex) => (
                       <CargoItemCard
                         key={item.id}
@@ -381,8 +370,6 @@ export const StopCard = ({
                         onRemove={() => onRemoveCargo(item.id)}
                       />
                     ))}
-                  </AnimatePresence>
-
                   {stop.loadItems.length === 0 && (
                     <div className="text-center py-6 text-muted-foreground text-sm border border-dashed border-border rounded-lg">
                       <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -418,9 +405,8 @@ export const StopCard = ({
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-    </motion.div>
+    </div>
   );
 };

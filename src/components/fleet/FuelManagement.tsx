@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -246,11 +245,8 @@ const FuelManagement = () => {
               </TableHeader>
               <TableBody>
                 {transactions.map((tx, index) => (
-                  <motion.tr
+                  <tr
                     key={tx.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
                     className="group hover:bg-muted/30 transition-colors"
                   >
                     <TableCell className="font-medium">
@@ -271,7 +267,7 @@ const FuelManagement = () => {
                         <span className="text-sm">{tx.station_location}</span>
                       </div>
                     </TableCell>
-                  </motion.tr>
+                  </tr>
                 ))}
               </TableBody>
             </Table>

@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, createContext, useContext, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check, AlertTriangle, Info, Package, Truck, CreditCard, MessageSquare, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -160,24 +159,16 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const { notifications, markAsRead, markAllAsRead, removeNotification, clearAll, unreadCount } = useNotifications();
 
   return (
-    <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
             className="fixed inset-0 bg-black/20 z-40"
           />
           
           {/* Panel */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.15 }}
+          <div
             className="fixed right-4 top-16 w-96 max-h-[calc(100vh-5rem)] bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
           >
             {/* Header */}
@@ -213,11 +204,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
               ) : (
                 <div className="divide-y divide-border">
                   {notifications.map((notification) => (
-                    <motion.div
+                    <div
                       key={notification.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
                       className={cn(
                         "p-4 hover:bg-muted/50 transition-colors cursor-pointer relative",
                         !notification.read && "bg-primary/5"
@@ -252,7 +240,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                       {!notification.read && (
                         <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
                       )}
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               )}
@@ -266,10 +254,9 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                 </Button>
               </div>
             )}
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
   );
 }
 

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -36,7 +35,7 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
   }: { 
     icon: React.ElementType; label: string; description: string; checked: boolean; onCheckedChange: (v: boolean) => void; disabled?: boolean;
   }) => (
-    <motion.div
+    <div
       className={cn(
         "flex items-center justify-between p-4 rounded-xl min-h-[52px]",
         "bg-card/40 backdrop-blur-sm border border-border/30",
@@ -53,24 +52,21 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
         <p className="text-xs md:text-sm text-muted-foreground">{description}</p>
       </div>
       <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} className="shrink-0" />
-    </motion.div>
+    </div>
   );
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
+    <div
       className="space-y-4 md:space-y-6"
     >
       {/* Afmeldgedrag */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Clock className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Afmeldgedrag</CardTitle>
                 <CardDescription>Bepaal hoe tijden worden vastgelegd bij het afmelden</CardDescription>
@@ -82,16 +78,16 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
             <ToggleRow icon={FileText} label="Apart opmerkingenveld voor chauffeursopmerkingen" description="Opmerkingen zijn alleen zichtbaar in de planomgeving, niet voor klanten op Track & Trace." checked={settings.driver_app_separate_remarks_field} onCheckedChange={(v) => onSettingsChange({ driver_app_separate_remarks_field: v })} />
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Automatisch verwerken */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center">
                 <Timer className="h-5 w-5 text-accent" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Automatisch verwerken</CardTitle>
                 <CardDescription>Afmeldgegevens direct opslaan bij de prijsberekening van de order</CardDescription>
@@ -104,16 +100,16 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
             <ToggleRow icon={MapPin} label="Afstand totale rit direct opslaan in het inkoop afstand veld" description="De opgegeven gereden afstand bij de laatste stop wordt direct opgeslagen als inkoop afstand." checked={settings.driver_app_auto_save_distance} onCheckedChange={(v) => onSettingsChange({ driver_app_auto_save_distance: v })} />
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Weergave */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <FileText className="h-5 w-5 text-primary" />
-              </motion.div>
+              </div>
               <div>
                 <CardTitle className="text-base md:text-lg">Weergave in Chauffeurs App</CardTitle>
                 <CardDescription>Documenten en volgorde in de chauffeurs app</CardDescription>
@@ -126,7 +122,7 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
             <ToggleRow icon={List} label="Afgemelde bestemmingen onderaan weergeven" description="Afgemelde stops worden onderaan de lijst geplaatst. De volgende bestemming staat dan bovenaan." checked={settings.driver_app_completed_stops_bottom} onCheckedChange={(v) => onSettingsChange({ driver_app_completed_stops_bottom: v })} />
           </CardContent>
         </Card>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };

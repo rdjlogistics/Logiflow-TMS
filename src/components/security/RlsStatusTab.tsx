@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableSkeleton, TableEmpty } from '@/components/ui/table';
 import { Shield, ShieldAlert, ShieldCheck, Search, Database } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface RlsRow {
   table_name: string;
@@ -89,11 +88,8 @@ export const RlsStatusTab = () => {
             {filtered.map((row, i) => {
               const status = getStatus(row);
               return (
-                <motion.tr
+                <tr
                   key={row.table_name}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02 }}
                   className="border-b border-border/30 transition-colors hover:bg-muted/50"
                 >
                   <TableCell className="font-mono text-sm">{row.table_name}</TableCell>
@@ -104,7 +100,7 @@ export const RlsStatusTab = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center font-medium">{row.policy_count}</TableCell>
-                </motion.tr>
+                </tr>
               );
             })}
           </TableBody>

@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import type mapboxgl from 'mapbox-gl';
 import { useMapboxToken } from '@/hooks/useMapboxToken';
 import { useFuelStationsDE, FuelStationDE } from '@/hooks/useFuelStationsDE';
@@ -457,11 +456,8 @@ const FuelStationsMap = () => {
                 </div>
               ) : (
                 sortedStations.slice(0, 50).map((station, index) => (
-                  <motion.div
+                  <div
                     key={station.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.015, duration: 0.15 }}
                   >
                     <StationListItem
                       station={station}
@@ -470,7 +466,7 @@ const FuelStationsMap = () => {
                       onSelect={() => handleSelectStation(station)}
                       onNavigate={() => handleNavigate(station)}
                     />
-                  </motion.div>
+                  </div>
                 ))
               )}
             </div>
@@ -549,9 +545,7 @@ const FuelStationsMap = () => {
 
               {/* Location Permission Banner */}
               {locationStatus === 'denied' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <div
                   className="absolute left-3 right-3 lg:left-auto lg:right-3 lg:max-w-sm z-30"
                   style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}
                 >
@@ -575,7 +569,7 @@ const FuelStationsMap = () => {
                       </Button>
                     </div>
                   </Card>
-                </motion.div>
+                </div>
               )}
 
               {/* Layer Menu - Bottom Right above geolocate */}
@@ -646,13 +640,8 @@ const FuelStationsMap = () => {
           )}
 
           {/* ===== SELECTED STATION BOTTOM SHEET ===== */}
-          <AnimatePresence>
             {selectedStation && (
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+              <div
                 className="absolute bottom-0 left-0 right-0 z-40 lg:left-auto lg:right-4 lg:bottom-4 lg:w-[380px]"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
               >
@@ -662,9 +651,8 @@ const FuelStationsMap = () => {
                   onClose={() => setSelectedStation(null)}
                   onNavigate={() => handleNavigate(selectedStation)}
                 />
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       </div>
 
@@ -716,8 +704,7 @@ const StationListItem = ({
   const isCheapest = price !== null && cheapestPrice !== undefined && price <= cheapestPrice;
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.98 }}
+    <button
       className={cn(
         "w-full text-left p-3 rounded-xl bg-card border transition-all duration-75 touch-manipulation",
         isSelected 
@@ -783,7 +770,7 @@ const StationListItem = ({
           </Button>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 };
 

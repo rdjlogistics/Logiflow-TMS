@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Check, X, Crown, Zap, Rocket, Building2, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -186,10 +185,7 @@ const PricingPage = () => {
       {/* Hero */}
       <section className="py-16 md:py-24 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
           >
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">
               30 dagen gratis proberen — geen creditcard nodig
@@ -201,13 +197,10 @@ const PricingPage = () => {
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
               Kies het pakket dat past bij jouw transportbedrijf. Upgrade, downgrade of annuleer wanneer je wilt.
             </p>
-          </motion.div>
+          </div>
 
           {/* Billing toggle */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+          <div
             className="flex items-center justify-center gap-3"
           >
             <span className={cn('text-sm font-medium', !isYearly ? 'text-foreground' : 'text-muted-foreground')}>
@@ -222,7 +215,7 @@ const PricingPage = () => {
                 Bespaar ~17%
               </Badge>
             )}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -235,12 +228,8 @@ const PricingPage = () => {
             const savings = getSavings(plan);
 
             return (
-              <motion.div
+              <div
                 key={plan.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                transition={{ delay: 0.1 * index, type: 'spring', stiffness: 300, damping: 20 }}
                 className={cn(
                   'relative rounded-2xl border p-6 flex flex-col',
                   'bg-card/80 backdrop-blur-sm',
@@ -348,7 +337,7 @@ const PricingPage = () => {
                     )}
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

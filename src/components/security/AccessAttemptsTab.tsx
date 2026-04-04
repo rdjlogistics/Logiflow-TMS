@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableSke
 import { Users, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { motion } from 'framer-motion';
 
 interface UserActivity {
   user_id: string;
@@ -137,11 +136,8 @@ export const AccessAttemptsTab = () => {
               />
             )}
             {userActivities.map((user, i) => (
-              <motion.tr
+              <tr
                 key={`${user.user_id}-${user.source}`}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
                 className="border-b border-border/30 hover:bg-muted/50 transition-colors"
               >
                 <TableCell className="font-mono text-xs">{user.user_id.slice(0, 8)}...</TableCell>
@@ -168,7 +164,7 @@ export const AccessAttemptsTab = () => {
                     </Badge>
                   )}
                 </TableCell>
-              </motion.tr>
+              </tr>
             ))}
           </TableBody>
         </Table>

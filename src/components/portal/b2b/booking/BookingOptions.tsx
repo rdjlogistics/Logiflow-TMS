@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Zap, 
   Clock, 
@@ -64,9 +63,8 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
         <div className="p-3 sm:p-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {SERVICE_LEVELS.map((level) => (
-              <motion.button
+              <button
                 key={level.id}
-                whileTap={{ scale: 0.97 }}
                 onClick={() => onUpdate({ serviceLevel: level.id })}
                 className={cn(
                   "p-3 sm:p-4 rounded-xl border text-left transition-all touch-manipulation",
@@ -82,7 +80,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
                     Premium
                   </div>
                 )}
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>
@@ -99,9 +97,8 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
         <div className="p-3 sm:p-4">
           <div className="flex gap-2 sm:gap-3">
             {PRIORITY_OPTIONS.map((priority) => (
-              <motion.button
+              <button
                 key={priority.id}
-                whileTap={{ scale: 0.97 }}
                 onClick={() => onUpdate({ priority: priority.id })}
                 className={cn(
                   "flex-1 p-3 rounded-xl border text-center transition-all touch-manipulation",
@@ -111,7 +108,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
                 )}
               >
                 <span className={cn("text-sm font-medium", priority.color)}>{priority.label}</span>
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>
@@ -183,10 +180,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
           </label>
 
           {formData.insurance && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+            <div
               className="pl-11"
             >
               <Label className="text-xs text-muted-foreground">Verzekerde waarde (€)</Label>
@@ -197,7 +191,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
                 onChange={(e) => onUpdate({ insuranceValue: parseFloat(e.target.value) || undefined })}
                 className="h-9 mt-1"
               />
-            </motion.div>
+            </div>
           )}
         </div>
       </div>
@@ -300,10 +294,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
           </label>
 
           {formData.saveAsTemplate && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+            <div
               className="mt-3 pt-3 border-t border-border/50"
             >
               <Label className="text-xs">Template naam</Label>
@@ -313,7 +304,7 @@ export const BookingOptions = ({ formData, onUpdate, onSaveAsRecurring, existing
                 onChange={(e) => onUpdate({ templateName: e.target.value })}
                 className="h-9 mt-1"
               />
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

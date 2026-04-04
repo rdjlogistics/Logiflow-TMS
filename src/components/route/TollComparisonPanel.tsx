@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { ArrowRight, Clock, Fuel, MapPin, Route, Shield, TrendingUp, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -65,14 +64,12 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
   const netSavingsMax = tollCostMax - extraFuelCost;
 
   return (
-    <motion.div
+    <div
       variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-      initial="hidden"
-      animate="visible"
       className="space-y-3"
     >
       {/* Header */}
-      <motion.div variants={cardVariants} className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-semibold">Route Vergelijking</h3>
@@ -80,13 +77,12 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
             {VEHICLE_LABELS[vehicleType] || vehicleType}
           </Badge>
         </div>
-      </motion.div>
+      </div>
 
       {/* Comparison cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Current route (with tolls) */}
-        <motion.div
-          variants={cardVariants}
+        <div
           className="rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-xl p-4 space-y-3"
         >
           <div className="flex items-center justify-between">
@@ -125,11 +121,10 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
           <div className="text-[10px] text-muted-foreground">
             {currentToll.countriesWithToll.map(c => c.country).join(', ')}
           </div>
-        </motion.div>
+        </div>
 
         {/* Toll-free alternative */}
-        <motion.div
-          variants={cardVariants}
+        <div
           className={`rounded-xl border backdrop-blur-xl p-4 space-y-3 ${
             isLoadingAlt
               ? 'border-border/30 bg-card/50'
@@ -207,7 +202,7 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
                 </div>
               )}
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <div>
                 <Button
                   size="sm"
                   className="w-full text-xs h-8"
@@ -216,7 +211,7 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
                   <Check className="h-3 w-3 mr-1.5" />
                   Tolvrije route kiezen
                 </Button>
-              </motion.div>
+              </div>
             </>
           ) : (
             <div className="flex items-center gap-2 py-6 text-muted-foreground">
@@ -224,9 +219,9 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
               <p className="text-sm">Geen tolvrij alternatief beschikbaar</p>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

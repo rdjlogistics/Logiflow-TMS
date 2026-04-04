@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Layers, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -155,9 +154,7 @@ function MapPreviewImage({
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
       )}
       {isSelected && (
-        <motion.div 
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+        <div
           className={cn(
             "absolute flex items-center justify-center shadow-lg bg-primary",
             size === 'small' 
@@ -166,7 +163,7 @@ function MapPreviewImage({
           )}
         >
           <Check className={cn("text-primary-foreground", size === 'small' ? "h-2.5 w-2.5" : "h-3.5 w-3.5")} />
-        </motion.div>
+        </div>
       )}
     </div>
   );
@@ -285,28 +282,15 @@ export function MapStyleSelector({ currentStyle, onStyleChange, className }: Map
 
   // Mobile: Use bottom sheet (existing implementation)
   const bottomSheet = isOpen ? createPortal(
-    <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             style={{ zIndex: 9998 }}
             onClick={handleClose}
           />
           
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.5 }}
-            onDragEnd={handleDragEnd}
+          <div
             className="fixed bottom-0 left-0 right-0 touch-pan-y"
             style={{ 
               zIndex: 9999,
@@ -334,11 +318,8 @@ export function MapStyleSelector({ currentStyle, onStyleChange, className }: Map
                 {mapStyles.map((style, index) => {
                   const isSelected = currentStyle === style.id;
                   return (
-                    <motion.button
+                    <button
                       key={style.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.03, duration: 0.2 }}
                       className="flex flex-col items-center gap-1.5 touch-manipulation"
                       onClick={() => handleSelect(style.id)}
                     >
@@ -359,12 +340,12 @@ export function MapStyleSelector({ currentStyle, onStyleChange, className }: Map
                       )}>
                         {style.name}
                       </span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,

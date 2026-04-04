@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Lightbulb, Sparkles, Check, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -306,11 +305,7 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
   return (
     <>
       {/* Overlay with spotlight */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.4 }}
+      <div
         className="fixed inset-0 z-[100]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -320,13 +315,7 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
         
         {/* Spotlight cutout */}
         {targetRect && currentStepData.position !== 'center' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1,
-              ...spotlightPulse.animate 
-            }}
+          <div
             className="absolute rounded-xl"
             style={{
               top: targetRect.top - padding,
@@ -337,16 +326,11 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
             }}
           />
         )}
-      </motion.div>
+      </div>
 
       {/* Tooltip */}
-      <AnimatePresence mode="wait">
-        <motion.div
+        <div
           key={currentStep}
-          variants={tooltipVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
           className="fixed z-[101] w-[340px] max-w-[calc(100vw-24px)] rounded-2xl overflow-hidden touch-manipulation"
           style={{ 
             top: tooltipPosition.top, 
@@ -369,11 +353,8 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
             {/* Shimmer */}
-            <motion.div 
+            <div 
               className="absolute inset-0 pointer-events-none"
-              initial={{ x: '-100%' }}
-              animate={{ x: '200%' }}
-              transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
               style={{
                 background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)',
                 width: '50%',
@@ -385,59 +366,46 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
 
             <div className="relative p-5">
               {/* Header */}
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+              <div
                 className="flex items-center justify-between mb-4"
               >
-                <motion.div variants={childVariants} className="flex items-center gap-2.5">
-                  <motion.div 
+                <div className="flex items-center gap-2.5">
+                  <div 
                     className="relative p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
                   >
                     <Sparkles className="h-4 w-4 text-primary" />
                     <div className="absolute inset-0 rounded-xl bg-primary/10 blur-md -z-10" />
-                  </motion.div>
+                  </div>
                   <span className="text-xs text-muted-foreground font-medium tracking-wide uppercase">
                     Stap {currentStep + 1}/{steps.length}
                   </span>
-                </motion.div>
+                </div>
 
-                <motion.button
-                  variants={childVariants}
+                <button
                   onClick={handleSkip}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
                   className="p-2 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
                   aria-label="Sluiten (ESC)"
                 >
                   <X className="h-4 w-4" />
-                </motion.button>
-              </motion.div>
+                </button>
+              </div>
 
               {/* Content */}
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+              <div
               >
-                <motion.h4 
-                  variants={childVariants}
+                <h4
                   className="font-semibold text-foreground mb-2 text-[15px] leading-tight"
                 >
                   {currentStepData.title}
-                </motion.h4>
-                <motion.p 
-                  variants={childVariants}
+                </h4>
+                <p
                   className="text-sm text-muted-foreground mb-5 leading-relaxed"
                 >
                   {currentStepData.content}
-                </motion.p>
+                </p>
 
                 {currentStepData.action && (
-                  <motion.div variants={childVariants}>
+                  <div>
                     <Button
                       size="sm"
                       variant="outline"
@@ -446,12 +414,12 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
                     >
                       {currentStepData.action.label}
                     </Button>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Navigation */}
-                <motion.div variants={childVariants} className="flex items-center justify-between gap-2">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -462,10 +430,10 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
                       <ChevronLeft className="h-4 w-4" />
                       Vorige
                     </Button>
-                  </motion.div>
+                  </div>
 
                   <div className="flex items-center gap-2">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <div>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -475,8 +443,8 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
                         <SkipForward className="h-3.5 w-3.5 mr-1" />
                         Skip
                       </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}>
+                    </div>
+                    <div>
                       <Button 
                         size="sm" 
                         onClick={handleNext} 
@@ -494,33 +462,30 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
                           </>
                         )}
                       </Button>
-                    </motion.div>
+                    </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
 
               {/* Mini progress bar instead of dots */}
-              <motion.div 
-                variants={childVariants}
+              <div
                 className="mt-5 pt-4 border-t border-border/20"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-1 rounded-full bg-muted/30 overflow-hidden">
-                    <motion.div
+                    <div
                       className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
                       animate={{ width: `${progress}%` }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     />
                   </div>
                   <span className="text-[10px] text-muted-foreground font-medium tabular-nums">
                     {currentStep + 1}/{steps.length}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </>
   );
 }
