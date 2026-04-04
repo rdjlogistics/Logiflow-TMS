@@ -110,7 +110,7 @@ const DriverTrackDialog: React.FC<DriverTrackDialogProps> = ({
     if (!map.current || !mapLoaded || !location) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
       const { latitude, longitude, heading } = location;
 
       if (!driverMarker.current) {
