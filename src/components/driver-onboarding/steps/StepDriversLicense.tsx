@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, CheckCircle2, X, Camera, Loader2, Shield, Clock } from 'lucide-react';
 import { OnboardingButton } from '../OnboardingButton';
 import { OnboardingInput } from '../OnboardingInput';
@@ -25,41 +24,25 @@ export const StepDriversLicense = () => {
 
   const handleFileSelect = useCallback(async (file: File, side: Side) => {
     if (!file.type.startsWith('image/')) return;
-    
     const documentType = side === 'front' ? 'drivers_license_front' : 'drivers_license_back';
     
     if (!isOnline) {
-      // Queue for later upload
       const previewUrl = await queueUpload(file, documentType);
-      if (side === 'front') {
-        updateData({ driversLicenseFront: { file, url: previewUrl, uploaded: false } });
-      } else {
-        updateData({ driversLicenseBack: { file, url: previewUrl, uploaded: false } });
-      }
+      if (side === 'front') updateData({ driversLicenseFront: { file, url: previewUrl, uploaded: false } });
+      else updateData({ driversLicenseBack: { file, url: previewUrl, uploaded: false } });
       return;
     }
     
     const url = URL.createObjectURL(file);
     setUploadingSide(side);
-    
-    if (side === 'front') {
-      updateData({ driversLicenseFront: { file, url, uploaded: false } });
-    } else {
-      updateData({ driversLicenseBack: { file, url, uploaded: false } });
-    }
+    if (side === 'front') updateData({ driversLicenseFront: { file, url, uploaded: false } });
+    else updateData({ driversLicenseBack: { file, url, uploaded: false } });
 
-    const result = await uploadDocument(file, documentType, {
-      triggerAIAnalysis: true,
-    });
-
+    const result = await uploadDocument(file, documentType, { triggerAIAnalysis: true });
     if (result.success) {
-      if (side === 'front') {
-        updateData({ driversLicenseFront: { file, url: result.fileUrl || url, uploaded: true } });
-      } else {
-        updateData({ driversLicenseBack: { file, url: result.fileUrl || url, uploaded: true } });
-      }
+      if (side === 'front') updateData({ driversLicenseFront: { file, url: result.fileUrl || url, uploaded: true } });
+      else updateData({ driversLicenseBack: { file, url: result.fileUrl || url, uploaded: true } });
     }
-    
     setUploadingSide(null);
   }, [updateData, uploadDocument, isOnline, queueUpload]);
 
@@ -98,87 +81,36 @@ export const StepDriversLicense = () => {
   const inputRef = activeSide === 'front' ? frontInputRef : backInputRef;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      className="flex flex-col min-h-screen px-6 pt-12 pb-8"
-    >
-      {/* Hidden inputs */}
-      <input
-        ref={frontInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={(e) => handleInputChange(e, 'front')}
-        className="hidden"
-      />
-      <input
-        ref={backInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={(e) => handleInputChange(e, 'back')}
-        className="hidden"
-      />
+    <div className="flex flex-col min-h-screen px-6 pt-12 pb-8 animate-fade-in-up">
+      <input ref={frontInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleInputChange(e, 'front')} className="hidden" />
+      <input ref={backInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleInputChange(e, 'back')} className="hidden" />
 
-      {/* Offline banner */}
       <OfflineBanner isOnline={isOnline} pendingUploads={pendingCount} isSyncing={isSyncing} syncProgress={syncProgress} />
 
-      {/* Header */}
       <div className="mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-sm text-muted-foreground mb-2"
-        >
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl font-bold text-foreground mb-2"
-        >
-          Rijbewijs
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-muted-foreground"
-        >
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>Rijbewijs</h1>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Upload zowel de voor- als achterkant van je rijbewijs.
-        </motion.p>
+        </p>
       </div>
       
-      {/* AI verification badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20"
-      >
+      <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
         <div className="flex items-start gap-2">
           <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-xs text-primary">
-            <span className="font-medium">AI-verificatie actief:</span> Je rijbewijs wordt automatisch 
-            gecontroleerd na uploaden.
+            <span className="font-medium">AI-verificatie actief:</span> Je rijbewijs wordt automatisch gecontroleerd na uploaden.
           </p>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Side tabs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex gap-3 mb-6"
-      >
+      <div className="flex gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {(['front', 'back'] as Side[]).map((side) => {
           const isActive = activeSide === side;
-          const isUploaded = side === 'front' ? frontUploaded : backUploaded;
-          const isVerified = side === 'front' ? frontVerified : backVerified;
+          const sideUploaded = side === 'front' ? frontUploaded : backUploaded;
+          const sideVerified = side === 'front' ? frontVerified : backVerified;
           const isSideUploading = uploadingSide === side;
           
           return (
@@ -188,201 +120,105 @@ export const StepDriversLicense = () => {
               disabled={isUploading}
               className={cn(
                 "flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all",
-                isActive
-                  ? "bg-primary/20 border-2 border-primary text-primary"
-                  : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
+                isActive ? "bg-primary/20 border-2 border-primary text-primary" : "bg-white/5 border border-white/10 text-muted-foreground hover:bg-white/10"
               )}
             >
-              {isSideUploading ? (
-                <Loader2 className="w-4 h-4 text-primary animate-spin" />
-              ) : isVerified ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              ) : isUploaded && !isOnline ? (
-                <Clock className="w-4 h-4 text-amber-400" />
-              ) : isUploaded ? (
-                <CheckCircle2 className="w-4 h-4 text-primary/50" />
-              ) : null}
+              {isSideUploading ? <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                : sideVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                : sideUploaded && !isOnline ? <Clock className="w-4 h-4 text-amber-400" />
+                : sideUploaded ? <CheckCircle2 className="w-4 h-4 text-primary/50" />
+                : null}
               <span className="font-medium">{side === 'front' ? 'Voorkant' : 'Achterkant'}</span>
             </button>
           );
         })}
-      </motion.div>
+      </div>
 
-      {/* Upload area */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeSide}
-          initial={{ opacity: 0, x: activeSide === 'front' ? -20 : 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: activeSide === 'front' ? 20 : -20 }}
-          className="flex-1 mb-6"
-        >
-          {currentUpload.url ? (
-            <div className="relative">
-              <img
-                src={currentUpload.url}
-                alt={`Rijbewijs ${activeSide === 'front' ? 'voorkant' : 'achterkant'}`}
-                className={cn(
-                  "w-full aspect-[1.6] object-cover rounded-2xl border-2",
-                  isCurrentSideUploading 
-                    ? "border-primary/50" 
-                    : isCurrentVerified 
-                      ? "border-emerald-500/50" 
-                      : "border-primary/30"
-                )}
-              />
-              
-              {/* Upload progress overlay */}
-              {isCurrentSideUploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl">
-                  <div className="text-center">
-                    <Loader2 className="w-10 h-10 text-white animate-spin mx-auto mb-2" />
-                    <span className="text-white text-sm font-medium">{uploadProgress}%</span>
-                  </div>
-                </div>
-              )}
-              
-              {!isCurrentSideUploading && (
-                <button
-                  onClick={() => handleRemove(activeSide)}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-              
-              {!isCurrentSideUploading && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className={cn(
-                    "absolute bottom-3 right-3 p-2 rounded-full",
-                    isCurrentVerified ? "bg-emerald-500" : "bg-primary"
-                  )}
-                >
-                  {isCurrentVerified ? (
-                    <CheckCircle2 className="w-5 h-5 text-white" />
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-white animate-spin" />
-                  )}
-                </motion.div>
-              )}
-            </div>
-          ) : (
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onClick={() => inputRef.current?.click()}
+      <div className="flex-1 mb-6 animate-fade-in-up" style={{ animationDelay: '0.35s' }}>
+        {currentUpload.url ? (
+          <div className="relative">
+            <img
+              src={currentUpload.url}
+              alt={`Rijbewijs ${activeSide === 'front' ? 'voorkant' : 'achterkant'}`}
               className={cn(
-                "w-full aspect-[1.6] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all",
-                isDragging
-                  ? "border-primary bg-primary/10"
-                  : "border-muted-foreground/30 hover:border-primary/50 hover:bg-white/5"
+                "w-full aspect-[1.6] object-cover rounded-2xl border-2",
+                isCurrentSideUploading ? "border-primary/50" : isCurrentVerified ? "border-emerald-500/50" : "border-primary/30"
               )}
-            >
-              <div className="w-16 h-16 rounded-xl bg-muted/30 flex items-center justify-center mb-4">
-                <CreditCard className="w-8 h-8 text-muted-foreground" />
+            />
+            {isCurrentSideUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl">
+                <div className="text-center">
+                  <Loader2 className="w-10 h-10 text-white animate-spin mx-auto mb-2" />
+                  <span className="text-white text-sm font-medium">{uploadProgress}%</span>
+                </div>
               </div>
-              <p className="text-muted-foreground mb-2">
-                {activeSide === 'front' ? 'Voorkant rijbewijs' : 'Achterkant rijbewijs'}
-              </p>
-              <div className="flex items-center gap-2 text-sm text-primary">
-                <Camera className="w-4 h-4" />
-                <span>Tik om foto te maken</span>
+            )}
+            {!isCurrentSideUploading && (
+              <button onClick={() => handleRemove(activeSide)} className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            {!isCurrentSideUploading && (
+              <div className={cn("absolute bottom-3 right-3 p-2 rounded-full animate-scale-fade-in", isCurrentVerified ? "bg-emerald-500" : "bg-primary")}>
+                {isCurrentVerified ? <CheckCircle2 className="w-5 h-5 text-white" /> : <Loader2 className="w-5 h-5 text-white animate-spin" />}
               </div>
+            )}
+          </div>
+        ) : (
+          <div
+            onDrop={handleDrop}
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onClick={() => inputRef.current?.click()}
+            className={cn(
+              "w-full aspect-[1.6] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all",
+              isDragging ? "border-primary bg-primary/10" : "border-muted-foreground/30 hover:border-primary/50 hover:bg-white/5"
+            )}
+          >
+            <div className="w-16 h-16 rounded-xl bg-muted/30 flex items-center justify-center mb-4">
+              <CreditCard className="w-8 h-8 text-muted-foreground" />
             </div>
-          )}
-          
-          {/* Upload progress bar below image */}
-          {isCurrentSideUploading && (
-            <div className="mt-3">
-              <Progress value={uploadProgress} className="h-2" />
-              <p className="text-xs text-center text-muted-foreground mt-1">
-                Uploaden en analyseren...
-              </p>
+            <p className="text-muted-foreground mb-2">{activeSide === 'front' ? 'Voorkant rijbewijs' : 'Achterkant rijbewijs'}</p>
+            <div className="flex items-center gap-2 text-sm text-primary">
+              <Camera className="w-4 h-4" /><span>Tik om foto te maken</span>
             </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+          </div>
+        )}
+        {isCurrentSideUploading && (
+          <div className="mt-3">
+            <Progress value={uploadProgress} className="h-2" />
+            <p className="text-xs text-center text-muted-foreground mt-1">Uploaden en analyseren...</p>
+          </div>
+        )}
+      </div>
 
-      {/* License number */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="mb-6"
-      >
-        <OnboardingInput
-          value={data.driversLicenseNumber}
-          onChange={(value) => updateData({ driversLicenseNumber: value })}
-          placeholder="Rijbewijsnummer"
-        />
-      </motion.div>
+      <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <OnboardingInput value={data.driversLicenseNumber} onChange={(value) => updateData({ driversLicenseNumber: value })} placeholder="Rijbewijsnummer" />
+      </div>
 
-      {/* Status indicators */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="flex gap-4 mb-6 text-sm"
-      >
-        <div className={cn(
-          "flex items-center gap-2",
-          frontVerified ? "text-emerald-400" : frontUploaded ? "text-primary" : "text-muted-foreground"
-        )}>
-          {uploadingSide === 'front' ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : frontVerified ? (
-            <CheckCircle2 className="w-4 h-4" />
-          ) : frontUploaded ? (
-            <CheckCircle2 className="w-4 h-4" />
-          ) : (
-            <div className="w-4 h-4 rounded-full border-2 border-current" />
-          )}
+      <div className="flex gap-4 mb-6 text-sm animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <div className={cn("flex items-center gap-2", frontVerified ? "text-emerald-400" : frontUploaded ? "text-primary" : "text-muted-foreground")}>
+          {uploadingSide === 'front' ? <Loader2 className="w-4 h-4 animate-spin" /> : (frontVerified || frontUploaded) ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border-2 border-current" />}
           <span>Voorkant</span>
         </div>
-        <div className={cn(
-          "flex items-center gap-2",
-          backVerified ? "text-emerald-400" : backUploaded ? "text-primary" : "text-muted-foreground"
-        )}>
-          {uploadingSide === 'back' ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : backVerified ? (
-            <CheckCircle2 className="w-4 h-4" />
-          ) : backUploaded ? (
-            <CheckCircle2 className="w-4 h-4" />
-          ) : (
-            <div className="w-4 h-4 rounded-full border-2 border-current" />
-          )}
+        <div className={cn("flex items-center gap-2", backVerified ? "text-emerald-400" : backUploaded ? "text-primary" : "text-muted-foreground")}>
+          {uploadingSide === 'back' ? <Loader2 className="w-4 h-4 animate-spin" /> : (backVerified || backUploaded) ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border-2 border-current" />}
           <span>Achterkant</span>
         </div>
-        <div className={cn(
-          "flex items-center gap-2",
-          licenseNumberValid ? "text-emerald-400" : "text-muted-foreground"
-        )}>
+        <div className={cn("flex items-center gap-2", licenseNumberValid ? "text-emerald-400" : "text-muted-foreground")}>
           {licenseNumberValid ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border-2 border-current" />}
           <span>Nummer</span>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Buttons */}
       <div className="space-y-3">
-        <OnboardingButton
-          onClick={() => setCurrentStep(currentStep + 1)}
-          disabled={!canProceed}
-          loading={isUploading}
-        >
+        <OnboardingButton onClick={() => setCurrentStep(currentStep + 1)} disabled={!canProceed} loading={isUploading}>
           {isUploading ? 'Uploaden...' : 'Doorgaan'}
         </OnboardingButton>
-        <OnboardingButton
-          onClick={() => setCurrentStep(currentStep - 1)}
-          variant="ghost"
-          disabled={isUploading}
-        >
+        <OnboardingButton onClick={() => setCurrentStep(currentStep - 1)} variant="ghost" disabled={isUploading}>
           Terug
         </OnboardingButton>
       </div>
-    </motion.div>
+    </div>
   );
 };
