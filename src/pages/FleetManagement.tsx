@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
