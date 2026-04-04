@@ -1,76 +1,50 @@
 
 
-# Overzicht: Wat is er deze week bereikt + openstaande batches + go-live checklist
+# Status Overzicht — Wat is bereikt + wat staat nog open
 
-## Openstaande / onvoltooide batches
+## Openstaande batches
 
-| Batch | Status | Toelichting |
+| Batch | Status | Details |
 |---|---|---|
-| **Batch 3: framer-motion reduceren** | **~70% done** | 13 componenten geconverteerd (5 high-traffic + 8 dashboard widgets). Nog ~250 bestanden importeren framer-motion. Niet blokkerend voor launch — puur performance-optimalisatie. |
-| **Dynamic Mapbox imports** | **100% done** | Alle 11 bestanden geconverteerd op 20 maart. |
-| **PWA precache fix** | **100% done** | Van 11.8 MB naar ~1.5 MB. |
-| **Dead code cleanup** | **100% done** | 57+ bestanden verwijderd, 7 npm packages verwijderd, Three.js verwijderd. |
+| **Batch 3: framer-motion reduceren** | **~70%** | 13 componenten + 3 mobile navs geconverteerd. Nog ~260 bestanden importeren framer-motion. Niet blokkerend voor launch. |
+| **Alle andere batches** | **100%** | PWA precache, dynamic Mapbox, dead code cleanup, Three.js removal — allemaal volledig afgerond. |
 
-Conclusie: **Alleen Batch 3 (framer-motion)** is niet volledig afgerond, maar dat is een iteratieve optimalisatie, geen blocker.
+## Wat is bereikt deze week (1-4 april)
 
----
-
-## Wat is er deze week bereikt
-
-### Performance & Stabiliteit
-- PWA precache: 11.8 MB naar ~1.5 MB (87% reductie)
-- Three.js + html2canvas verwijderd (~1.1 MB bespaard)
+### Performance
+- PWA precache: 11.8 MB → ~1.5 MB (87% reductie)
+- Three.js + html2canvas + 3 npm packages verwijderd (~1.1 MB bespaard)
 - 57+ dode bestanden opgeruimd
-- Dynamic Mapbox imports in alle 11 bestanden
-- framer-motion vervangen in 13 high-traffic componenten
-- Bundle code-splitting voor jsPDF, mapbox, Three.js
-- Dashboard skeleton loading (geen glitchy dubbele render meer)
-- Database timeout diagnose + hardening
+- Dashboard skeleton loading (geen glitchy dubbele render)
+- Email queue cron: 5s → 30s (6x minder edge function calls)
 
 ### Bugfixes
-- Weer/verkeer Command Center: API parameter `wind_speed_10` naar `wind_speed_10m`
-- Vlootbeheer sidebar collapse: pagina in DashboardLayout gewrapped (structurele fix)
-- Onboarding redirect glitch: localStorage fallback + foutbestendig
-- Factuur PDF crash: Unicode `→` vervangen
-- Driver deletion: foreign key constraint fix
-- Portal account creation: edge function fix
-- Case-sensitive email domain validatie
-- Toast error patterns opgelost (3 bugs)
-- Claims & POD pagina: database JOINs gefixed
+- Weer API: `wind_speed_10` → `wind_speed_10m` (Command Center weer + verkeer werkt nu)
+- Vlootbeheer sidebar collapse: structureel gefixt (DashboardLayout wrapper)
+- Factuur PDF Unicode crash gefixt
 
-### Features & UI
-- iOS 27 mobile bottom nav: alle 3 navbars (admin, chauffeur, klantportaal) uniform
-- Claims & POD pagina redesign met interactieve filters
-- AI Assistant upgrade: 10 nieuwe tools, reasoning detectie, pro-actieve analyse
-- Workflow automation engine
-- Instellingen verplaatst naar sidebar footer
+### UI/UX
+- 3 mobile bottom navs unified naar iOS 27 frosted glass stijl
+- framer-motion verwijderd uit 8 dashboard widgets + 3 navbars
 
----
+## Wat moet nog voor go-live
 
-## Wat moet nog geregeld worden voor go-live
-
-### Kritiek (moet voor launch)
-1. **Database capaciteit** — Deze week waren er timeouts onder belasting. Test met meerdere gelijktijdige gebruikers of de huidige infra het aankan.
-2. **Edge function stabiliteit** — `process-email-queue` boot/shutdown cycled elke 5 seconden (zichtbaar in logs). Onderzoek of dit normaal is of een infinite loop.
-3. **Email delivery** — Verifieer dat Resend correct werkt voor factuur-emails, order confirmaties en portal uitnodigingen op productie.
-4. **Mapbox token** — Kaarten laden via edge function `get-mapbox-token`. Als de DB traag is, falen alle kaarten. Overweeg een hardcoded fallback of langere cache.
-5. **Authenticatie flow end-to-end** — Test nieuw account aanmaken, email verificatie, inloggen, onboarding wizard, dashboard laden.
-6. **Factuur PDF generatie** — Unicode fix is doorgevoerd maar test met echte factuurdata (meerdere ritten, speciale tekens).
+### Kritiek (blokkerend)
+1. **Authenticatie flow testen** — Nieuw account → email verificatie → inloggen → onboarding → dashboard. Dit moet end-to-end werken.
+2. **Email delivery verificatie** — Stuur testfactuur, check of Resend correct aflevert op productie.
+3. **Database stabiliteit** — Er waren timeouts eerder deze week. Test met meerdere gelijktijdige gebruikers.
+4. **Factuur PDF met echte data** — Unicode fix is door, maar test met echte facturen (speciale tekens, meerdere ritten).
 
 ### Belangrijk (kort na launch)
-7. **framer-motion Batch 3 afronden** — Nog ~250 bestanden. Iteratief oppakken voor verdere performance.
-8. **FuelStations pagina** — Staat nog buiten DashboardLayout (zelfde probleem als Vlootbeheer had). Follow-up fix.
-9. **Mobile responsive audit** — iOS 27 nav is gedaan, maar de rest van de pagina's op mobiel testen.
-10. **Error monitoring** — Geen Sentry of vergelijkbaar. Overweeg error tracking voor productie.
+5. **framer-motion Batch 3 afronden** — Nog ~260 bestanden. Iteratief, niet urgent.
+6. **Error monitoring** — Geen Sentry of vergelijkbaar. Productie-fouten zijn nu onzichtbaar.
+7. **Mobile responsive audit** — Navbars zijn gedaan, maar pagina-inhoud op mobiel moet nog getest.
 
-### Nice-to-have (na launch)
-11. Verdere framer-motion cleanup
-12. Lighthouse score optimalisatie
-13. Offline-first PWA improvements
+### Nice-to-have
+8. Lighthouse score optimalisatie
+9. Offline-first PWA verbeteringen
 
----
+## Aanbeveling
 
-## Technische details
-
-De `process-email-queue` edge function logt elke ~5 seconden een boot/shutdown cycle zonder zichtbare payload-verwerking. Dit duidt mogelijk op een cron-trigger met een te korte interval of een function die direct afsluit zonder werk. Dit moet onderzocht worden voor go-live om onnodige kosten en instabiliteit te voorkomen.
+De kritieke items (1-4) zijn **handmatige tests** die jullie zelf moeten uitvoeren. Ik kan helpen met het opzetten van test-scenarios of het fixen van wat er uit die tests komt. Items 5-7 kan ik direct oppakken als jullie dat willen.
 
