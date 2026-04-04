@@ -1193,8 +1193,8 @@ const OrderForm = () => {
                         </div>
                       </ScrollArea>
                       <motion.div
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.97 }}
+
+
                         className="mt-4"
                       >
                         <Button 

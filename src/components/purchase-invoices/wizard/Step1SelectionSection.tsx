@@ -83,8 +83,8 @@ export const Step1SelectionSection = ({
 }: Step1SelectionSectionProps) => {
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
+     
+     
       className="space-y-4 sm:space-y-6"
     >
       {/* Section Header */}
@@ -102,7 +102,7 @@ export const Step1SelectionSection = ({
         <div className="relative flex items-center gap-3 sm:gap-4">
           <motion.div 
             className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
-            whileHover={{ scale: 1.05, rotate: 3 }}
+
           >
             <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
             <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-primary/10 blur-xl animate-pulse" />

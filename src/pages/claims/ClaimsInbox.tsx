@@ -96,7 +96,7 @@ const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
-      whileTap={{ scale: 0.97 }}
+
       onClick={() => onSelect({ ...claim, order_number: orderNumber, customer: customerName, age_days: ageDays })}
       className={cn(
         "p-4 rounded-2xl cursor-pointer",
@@ -369,7 +369,7 @@ const ClaimsInbox = () => {
           return (
             <motion.button
               key={chip.key}
-              whileTap={{ scale: 0.95 }}
+
               onClick={() => setActiveFilter(isActive ? 'all' : chip.key)}
               className={cn(
                 "relative flex flex-col items-center gap-1.5 p-3 rounded-2xl",

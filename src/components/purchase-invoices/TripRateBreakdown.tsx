@@ -137,7 +137,7 @@ export const TripRateBreakdown = ({
             <motion.div
               key={type}
               initial={{ opacity: 0, scale: 0.9 }}
-              whileHover={{ scale: 1.03 }}
+
             >
               <Badge 
                 variant="outline" 
@@ -186,8 +186,8 @@ export const TripRateBreakdown = ({
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial="hidden"
-            animate="visible"
+           
+           
             exit="hidden"
             className="overflow-hidden"
           >
@@ -201,8 +201,8 @@ export const TripRateBreakdown = ({
                   <motion.div
                     key={trip.id}
                     custom={idx}
-                    initial="hidden"
-                    animate="visible"
+                   
+                   
                     className="relative overflow-hidden rounded-xl bg-gradient-to-br from-card/80 to-muted/30 backdrop-blur-sm border border-border/50 hover:border-border/80 transition-all duration-300 group"
                   >
                     {/* Top accent */}

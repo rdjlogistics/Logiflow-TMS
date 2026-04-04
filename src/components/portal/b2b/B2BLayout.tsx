@@ -111,7 +111,7 @@ export const B2BLayout = ({
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border/30">
           <motion.div 
             className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold"
-            whileHover={{ scale: 1.05 }}
+
           >
             <Truck className="h-5 w-5 text-gold-foreground" />
           </motion.div>

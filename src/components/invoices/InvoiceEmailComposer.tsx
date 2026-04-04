@@ -253,8 +253,8 @@ ${company?.name || ""}`);
 
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
+     
+     
       className="relative rounded-2xl overflow-hidden border border-border/30 shadow-xl"
       style={{
         background: 'hsl(var(--card) / 0.55)',
@@ -269,8 +269,8 @@ ${company?.name || ""}`);
 
       {/* Animated shimmer */}
       <motion.div
-        initial="initial"
-        animate="animate"
+       
+       
         className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.03] to-transparent pointer-events-none"
       />
 
@@ -288,7 +288,7 @@ ${company?.name || ""}`);
               background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))',
               boxShadow: '0 0 24px -8px hsl(var(--primary) / 0.25)',
             }}
-            whileHover={{ scale: 1.05, rotate: 3 }}
+
           >
             <Mail className="h-5 w-5 text-primary" />
             <div className="absolute inset-0 rounded-xl bg-primary/5 blur-xl animate-pulse" />
@@ -320,8 +320,8 @@ ${company?.name || ""}`);
                 return (
                   <motion.div
                     key={email}
-                    initial="initial"
-                    animate="animate"
+                   
+                   
                     exit="exit"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border border-primary/20"
                     style={{
@@ -334,7 +334,7 @@ ${company?.name || ""}`);
                     <motion.button
                       onClick={() => removeRecipient(email)}
                       className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
-                      whileHover={{ scale: 1.15 }}
+
                     >
                       <X className="h-3.5 w-3.5" />
                     </motion.button>
@@ -350,7 +350,7 @@ ${company?.name || ""}`);
                     key={contact.id}
                     onClick={() => toggleRecipient(contact.email)}
                     className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-border/40 rounded-full text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-200"
-                    whileHover={{ scale: 1.03, y: -1 }}
+
                   >
                     <Plus className="h-3.5 w-3.5" />
                     {contact.name}
@@ -359,7 +359,7 @@ ${company?.name || ""}`);
                 <motion.button
                   onClick={() => setShowCustomInput(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-border/40 rounded-full text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-200"
-                  whileHover={{ scale: 1.03, y: -1 }}
+
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ander adres
@@ -431,7 +431,7 @@ ${company?.name || ""}`);
                 style={{
                   background: attachments[att.key] ? 'hsl(var(--primary) / 0.04)' : 'transparent',
                 }}
-                whileHover={{ scale: 1.02 }}
+
               >
                 <Checkbox
                   checked={attachments[att.key]}
@@ -459,7 +459,7 @@ ${company?.name || ""}`);
                     style={{
                       background: selectedDocumentIds.has(doc.id) ? 'hsl(var(--primary) / 0.04)' : 'transparent',
                     }}
-                    whileHover={{ scale: 1.01 }}
+
                   >
                     <Checkbox
                       checked={selectedDocumentIds.has(doc.id)}
@@ -498,7 +498,7 @@ ${company?.name || ""}`);
           }}
           onClick={() => sendEmailMutation.mutate()}
           disabled={sendEmailMutation.isPending || !hasRecipients}
-          whileHover={hasRecipients ? { scale: 1.01, y: -1 } : undefined}
+
         >
           {/* Button shimmer */}
           {hasRecipients && (

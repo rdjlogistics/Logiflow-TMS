@@ -102,8 +102,8 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
         {activeShipments.length > 0 && (
           <motion.div 
             className="space-y-3"
-            initial="hidden"
-            animate="visible"
+           
+           
           >
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Actief ({activeShipments.length})
@@ -122,8 +122,8 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
         {completedShipments.length > 0 && (
           <motion.div 
             className="space-y-3"
-            initial="hidden"
-            animate="visible"
+           
+           
           >
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Afgerond ({completedShipments.length})

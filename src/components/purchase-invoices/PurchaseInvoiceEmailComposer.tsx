@@ -288,8 +288,8 @@ ${company || "Uw transportbedrijf"}`
                 {recipients.map((email) => (
                   <motion.div
                     key={email}
-                    initial="initial"
-                    animate="animate"
+                   
+                   
                     exit="exit"
                   >
                     <Badge 

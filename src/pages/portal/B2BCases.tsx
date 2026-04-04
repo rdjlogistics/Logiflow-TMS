@@ -89,16 +89,16 @@ const B2BCases = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} unreadNotifications={statusCounts.open} onRefresh={refetch}>
-      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
+      <motion.div className="space-y-6">
         {/* Header */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Cases</h1>
             <p className="text-sm text-muted-foreground">
               {statusCounts.open} open, {statusCounts.in_progress} in behandeling
             </p>
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <motion.div>
             <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 bg-gold hover:bg-gold/90 text-gold-foreground">
               <Plus className="h-4 w-4" /> Nieuwe Case
             </Button>
@@ -106,9 +106,9 @@ const B2BCases = () => {
         </motion.div>
 
         {/* Status Cards */}
-        <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4" variants={containerVariants}>
+        <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {statusCards.map((sc, index) => (
-            <motion.div key={sc.key} variants={itemVariants} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
+            <motion.div key={sc.key}>
               <Card 
                 className={cn(
                   "cursor-pointer transition-all border-2 backdrop-blur-sm bg-card/60",
@@ -118,7 +118,7 @@ const B2BCases = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <motion.div whileHover={{ rotate: 10 }} className={cn("p-1.5 rounded-lg", sc.bg)}>
+                    <motion.div className={cn("p-1.5 rounded-lg", sc.bg)}>
                       <sc.icon className={cn("h-4 w-4", sc.color)} />
                     </motion.div>
                     <span className="text-xs text-muted-foreground">{sc.label}</span>
@@ -138,7 +138,7 @@ const B2BCases = () => {
         </motion.div>
 
         {/* Search + Filter */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <motion.div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken in cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
@@ -156,11 +156,10 @@ const B2BCases = () => {
               <motion.div
                 key={caseItem.id}
                 custom={index}
-                variants={cardVariants}
-                initial="hidden"
-                animate="show"
-                whileHover={{ y: -2, x: 4 }}
-                whileTap={{ scale: 0.99 }}
+               
+               
+
+
               >
                 <Card 
                   className="border-border/30 hover:border-primary/30 transition-all cursor-pointer backdrop-blur-sm bg-card/60 touch-manipulation"
@@ -170,7 +169,7 @@ const B2BCases = () => {
                     <div className="flex items-start gap-4">
                       <motion.div
                         className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", status.bgColor)}
-                        whileHover={{ rotate: 10, scale: 1.1 }}
+
                       >
                         <StatusIcon className={cn("h-5 w-5", status.color)} />
                       </motion.div>
@@ -297,7 +296,7 @@ const B2BCases = () => {
                   <div className="space-y-3">
                     <Textarea placeholder="Typ je bericht..." value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)} rows={3} />
                     <div className="flex gap-2">
-                      <motion.div className="flex-1" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <motion.div className="flex-1">
                         <Button className="w-full" onClick={handleSendMessage} disabled={!replyMessage.trim() || sendMessage.isPending}>
                           {sendMessage.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                           Versturen
