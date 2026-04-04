@@ -99,13 +99,9 @@ const FleetManagement = () => {
             </TabsTrigger>
           </TabsList>
 
-          <AnimatePresence mode="wait">
-            <motion.div
+            <div
               key={activeTab}
-              initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="animate-fade-in-blur"
             >
               <TabsContent value="overview" className="mt-0" forceMount={activeTab === 'overview' ? true : undefined}>
                 {activeTab === 'overview' && <VehicleOverview />}
@@ -119,8 +115,7 @@ const FleetManagement = () => {
               <TabsContent value="valuation" className="mt-0" forceMount={activeTab === 'valuation' ? true : undefined}>
                 {activeTab === 'valuation' && <VehicleValuation />}
               </TabsContent>
-            </motion.div>
-          </AnimatePresence>
+            </div>
         </Tabs>
       </div>
     </DashboardLayout>
