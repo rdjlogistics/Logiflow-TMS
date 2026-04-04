@@ -381,7 +381,7 @@ const Invoices = () => {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"
         >
           {kpiCards.map((kpi) => (
-            <div key={kpi.id} className="h-full">
+            <div key={kpi.id} variants={itemVariants} className="h-full">
               <Card 
                 className={cn(
                   "relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-2xl shadow-lg transition-all duration-300 group h-full",
@@ -425,7 +425,7 @@ const Invoices = () => {
         </div>
 
         {/* Filters & Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <div variants={itemVariants} initial="hidden" animate="visible" className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex flex-1 gap-3 flex-col sm:flex-row">
             <div className="relative flex-1 max-w-full sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -470,7 +470,7 @@ const Invoices = () => {
         </div>
 
         {/* Desktop Table */}
-        <div className="hidden md:block">
+        <div variants={itemVariants} initial="hidden" animate="visible" className="hidden md:block">
           <Card className="relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-sm shadow-lg">
             <CardContent className="relative p-0">
               <div className="overflow-x-auto">

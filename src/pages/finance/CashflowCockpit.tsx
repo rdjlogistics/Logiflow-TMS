@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -280,14 +279,11 @@ Overig,${summary.costs.other}
 
   return (
     <DashboardLayout title="Cashflow Cockpit" description="Real-time financieel overzicht">
-      <motion.div 
+      <div 
         className="space-y-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
       >
         {/* Header actions */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {/* Period selector */}
             <div className="flex rounded-lg border border-border/50 p-1 bg-muted/30">
@@ -341,10 +337,10 @@ Overig,${summary.costs.other}
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
-        </motion.div>
+        </div>
 
         {/* KPI Cards Row */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Revenue */}
           <Card variant="glass" className="relative overflow-hidden group cursor-pointer hover:border-emerald-500/30 transition-colors">
             <Link to="/invoices">
@@ -438,12 +434,12 @@ Overig,${summary.costs.other}
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cost Breakdown */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <div variants={itemVariants} className="lg:col-span-2">
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -496,10 +492,10 @@ Overig,${summary.costs.other}
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Goals & Alerts */}
-          <motion.div variants={itemVariants} className="space-y-6">
+          <div variants={itemVariants} className="space-y-6">
             {/* Goals */}
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -536,7 +532,7 @@ Overig,${summary.costs.other}
                       const metricAction = getMetricAction(goal.metric_key);
                       
                       return (
-                        <motion.div 
+                        <div 
                           key={goal.id} 
                           className={cn(
                             "p-3 sm:p-4 rounded-xl border transition-all touch-manipulation",
@@ -547,7 +543,6 @@ Overig,${summary.costs.other}
                               ? "bg-amber-500/5 border-amber-500/20 hover:bg-amber-500/10"
                               : "bg-muted/20 border-border/50 hover:bg-muted/40"
                           )}
-                          whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             // Navigate to action on mobile tap
                             if (window.innerWidth < 640) {
@@ -638,7 +633,7 @@ Overig,${summary.costs.other}
                               </span>
                             )}
                           </div>
-                        </motion.div>
+                        </div>
                       );
                     })}
                     {goals.length > 4 && (
@@ -746,11 +741,11 @@ Overig,${summary.costs.other}
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
 
         {/* Cashflow Forecast */}
-        <motion.div variants={itemVariants}>
+        <div variants={itemVariants}>
           <Card variant="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -823,11 +818,11 @@ Overig,${summary.costs.other}
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Recent Transactions */}
         {recentTransactions && recentTransactions.length > 0 && (
-          <motion.div variants={itemVariants}>
+          <div variants={itemVariants}>
             <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -879,9 +874,9 @@ Overig,${summary.costs.other}
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Alerts Sheet */}
       <Sheet open={showAlerts} onOpenChange={setShowAlerts}>
