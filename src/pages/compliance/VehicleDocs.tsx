@@ -34,6 +34,8 @@ import { useCompany } from "@/hooks/useCompany";
 import { format, differenceInDays } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+
 const docTypes = [
   { value: 'vehicle_inspection', label: 'APK Keuring', icon: '🔧', color: 'from-blue-500/20 to-blue-600/10' },
   { value: 'vehicle_insurance', label: 'Verzekering', icon: '🛡️', color: 'from-emerald-500/20 to-emerald-600/10' },
@@ -166,9 +168,9 @@ const VehicleDocs = () => {
 
   return (
     <DashboardLayout title="Voertuig Documenten" description="Keuringen, verzekeringen & lease">
-      <div className="space-y-6">
+      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="visible">
         {/* Premium Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 via-background to-indigo-500/5 border border-blue-500/20 p-6 sm:p-8">
+        <motion.div variants={itemVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 via-background to-indigo-500/5 border border-blue-500/20 p-6 sm:p-8">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -232,7 +234,8 @@ const VehicleDocs = () => {
                       <Label className="text-xs uppercase text-muted-foreground tracking-wider">Type *</Label>
                       <Select value={form.doc_type} onValueChange={(val) => {
                         const docType = docTypes.find(d => d.value === val);
-                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name })); }}>
+                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name }));
+                      }}>
                         <SelectTrigger className="h-11 bg-muted/30 border-border/50">
                           <SelectValue placeholder="Selecteer type..." />
                         </SelectTrigger>
@@ -273,10 +276,10 @@ const VehicleDocs = () => {
               </Dialog>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: 'Totaal', value: stats.total, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
             { label: 'Geldig', value: stats.valid, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -295,10 +298,10 @@ const VehicleDocs = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </motion.div>
 
         {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoek documenten..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 h-11 bg-muted/30 text-base" />
@@ -312,7 +315,7 @@ const VehicleDocs = () => {
               {docTypes.map(type => <SelectItem key={type.value} value={type.value}>{type.icon} {type.label}</SelectItem>)}
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {/* Documents Grid */}
         {isLoading ? (
@@ -331,7 +334,7 @@ const VehicleDocs = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div variants={itemVariants} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDocs.map((doc) => {
               const { status, daysLeft } = getExpiryStatus(doc.expiry_date);
               const config = statusConfig[status];
@@ -339,7 +342,7 @@ const VehicleDocs = () => {
               const docType = docTypes.find(t => t.value === doc.doc_type);
               
               return (
-                <div key={doc.id} className={cn("group relative rounded-xl border bg-gradient-to-br p-4 transition-all hover:shadow-lg", docType?.color, "border-border/50 hover:border-primary/30")>
+                <motion.div key={doc.id} className={cn("group relative rounded-xl border bg-gradient-to-br p-4 transition-all hover:shadow-lg", docType?.color, "border-border/50 hover:border-primary/30")} whileHover={{ y: -2 }}>
                   <div className={cn("absolute top-3 right-3 w-2.5 h-2.5 rounded-full", status === 'valid' && "bg-emerald-500", status === 'expiring_soon' && "bg-amber-500 animate-pulse", status === 'expired' && "bg-red-500 animate-pulse")} />
                   
                   <div className="flex items-start gap-3">
@@ -361,12 +364,12 @@ const VehicleDocs = () => {
                   <Button variant="ghost" size="icon" className="absolute bottom-3 right-3 h-7 w-7 opacity-0 group-hover:opacity-100 text-destructive" onClick={() => deleteDocument.mutate(doc.id)}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 };
