@@ -304,7 +304,7 @@ const PurchaseInvoiceDetail = () => {
 
             {/* Quick Action Button */}
             {invoice.status === "concept" && (
-              <div variants={itemVariants}>
+              <div>
                 <Button
                   className="w-full h-14 text-base font-semibold gap-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-500"
                   onClick={() => updateStatusMutation.mutate("definitief")}
