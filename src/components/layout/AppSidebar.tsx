@@ -244,7 +244,6 @@ const CollapsibleMenuSection = ({
 }) => {
   const location = useLocation();
   const { setOpenMobile, isMobile } = useSidebar();
-  // No auto-close on internal navigation — user closes menu manually
 
   const storageKey = `sidebar:section:${section.title}`;
   const [isOpen, setIsOpen] = React.useState(() => {
@@ -268,29 +267,44 @@ const CollapsibleMenuSection = ({
 
   if (isCollapsed) {
     return (
-      <SidebarMenu className="space-y-0.5">
-        {section.items.map((item) => {
-          const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
-          return (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}
-                className={`relative h-9 rounded-lg transition-all duration-150 justify-center ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
-              >
-                <Link to={item.href} className="flex items-center justify-center" aria-current={isActive ? "page" : undefined}>
-                  <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          );
-        })}
-      </SidebarMenu>
+      <div className="py-1">
+        <div className="mx-auto w-5 h-px bg-sidebar-border/20 mb-1" />
+        <SidebarMenu className="space-y-0.5">
+          {section.items.map((item) => {
+            const isActive = location.pathname === item.href || (item.href !== "/" && location.pathname.startsWith(item.href));
+            return (
+              <SidebarMenuItem key={item.href}>
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild isActive={isActive}
+                        className={`relative h-9 w-9 mx-auto rounded-xl transition-all duration-150 justify-center ${isActive ? "bg-primary/15 text-primary shadow-sm" : "text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"}`}
+                      >
+                        <Link to={item.href} className="flex items-center justify-center" aria-current={isActive ? "page" : undefined}>
+                          <item.icon className="h-[18px] w-[18px]" />
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="text-xs font-medium">
+                      {item.title}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </div>
     );
   }
 
   return (
     <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-colors group/trigger">
-        <span className="text-[11px] tracking-wide font-medium">{section.title}</span>
+      <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-sidebar-foreground/40 hover:text-sidebar-foreground/70 transition-colors group/trigger">
+        <span className="text-[10px] uppercase tracking-widest font-semibold">{section.title}</span>
         <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "" : "-rotate-90"}`} />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -305,7 +319,7 @@ const CollapsibleMenuSection = ({
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild className="relative h-9 rounded-lg opacity-40 cursor-not-allowed">
+                        <SidebarMenuButton asChild className="relative h-9 rounded-lg opacity-30 cursor-not-allowed">
                           <span className="flex items-center gap-3 px-3">
                             <item.icon className="h-4 w-4" />
                             <span className="text-[13px]">{item.title}</span>
@@ -320,16 +334,16 @@ const CollapsibleMenuSection = ({
                   </TooltipProvider>
                 ) : (
                   <SidebarMenuButton asChild isActive={isActive}
-                    className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+                    className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"}`}
                   >
                     <Link to={item.href} className="flex items-center gap-3 px-3" aria-current={isActive ? "page" : undefined}
                       target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
                     >
                       <item.icon className={`h-4 w-4 flex-shrink-0 ${isActive ? "text-primary" : ""}`} />
                       <span className="text-[13px] truncate">{item.title}</span>
-                      {item.external && <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0 opacity-50" />}
+                      {item.external && <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0 opacity-40" />}
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
                       )}
                     </Link>
                   </SidebarMenuButton>
@@ -423,23 +437,23 @@ const AppSidebar = () => {
 
   return (
     <Sidebar className="border-r-0" collapsible="icon">
-      {/* Glassmorphism background */}
-      <div className="absolute inset-0 bg-sidebar/95 backdrop-blur-xl" />
+      {/* Clean background */}
+      <div className="absolute inset-0 bg-sidebar/98 backdrop-blur-2xl" />
       <div className="relative z-10 flex flex-col h-full min-h-0">
         {/* Header */}
-        <SidebarHeader className="border-b border-sidebar-border/20 p-4 flex-shrink-0">
+        <SidebarHeader className="border-b border-sidebar-border/15 p-3 flex-shrink-0">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden flex-shrink-0">
               {company?.logo_url ? (
-                <img src={company.logo_url} alt={company.name || 'Logo'} className="w-8 h-8 object-contain" />
+                <img src={company.logo_url} alt={company.name || 'Logo'} className="w-9 h-9 object-contain" />
               ) : (
-                <Truck className="h-4 w-4 text-primary-foreground" />
+                <Truck className="h-4.5 w-4.5 text-primary-foreground" />
               )}
             </div>
             {!isCollapsed && (
-              <div>
-                <h1 className="font-display font-bold text-sm text-sidebar-foreground tracking-tight">{company?.name || 'LogiFlow'}</h1>
-                <p className="text-[10px] text-sidebar-foreground/40">
+              <div className="min-w-0">
+                <h1 className="font-display font-bold text-sm text-sidebar-foreground tracking-tight truncate">{company?.name || 'LogiFlow'}</h1>
+                <p className="text-[10px] text-sidebar-foreground/35">
                   {currentPlan?.name || 'TMS'}{isTrialing && trialDaysLeft > 0 ? ` · Trial ${trialDaysLeft}d` : ''}
                 </p>
               </div>
@@ -447,18 +461,18 @@ const AppSidebar = () => {
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="px-2 py-2 overflow-y-auto" role="navigation" aria-label="Hoofdnavigatie" style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" }}>
+        <SidebarContent className="px-2 py-2 overflow-y-auto scrollbar-none" role="navigation" aria-label="Hoofdnavigatie" style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" }}>
           {/* Search bar */}
           {!isCollapsed && (
-            <div className="px-2 pb-2">
+            <div className="px-1 pb-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sidebar-foreground/30" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sidebar-foreground/25" />
                 <input
                   type="text"
                   placeholder="Zoeken..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-8 pl-8 pr-3 text-[13px] rounded-lg bg-sidebar-accent/40 border-0 text-sidebar-foreground placeholder:text-sidebar-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+                  className="w-full h-8 pl-8 pr-3 text-[13px] rounded-lg bg-sidebar-accent/30 border border-sidebar-border/10 text-sidebar-foreground placeholder:text-sidebar-foreground/25 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:bg-sidebar-accent/50 transition-all"
                 />
               </div>
             </div>
@@ -470,14 +484,14 @@ const AppSidebar = () => {
               <SidebarGroupContent>
                 <SidebarMenu className="space-y-0.5">
                   {filteredItems.length === 0 && (
-                    <p className="text-[12px] text-sidebar-foreground/40 px-3 py-4 text-center">Geen resultaten</p>
+                    <p className="text-[12px] text-sidebar-foreground/30 px-3 py-4 text-center">Geen resultaten</p>
                   )}
                   {filteredItems.map((item) => {
                     const isActive = location.pathname === item.href;
                     return (
                       <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton asChild isActive={isActive}
-                          className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+                          className={`relative h-9 rounded-lg transition-all duration-150 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"}`}
                         >
                           <Link to={item.href} className="flex items-center gap-3 px-3"
                             onClick={() => { setSearchQuery(""); }}
@@ -504,15 +518,18 @@ const AppSidebar = () => {
                       return (
                         <SidebarMenuItem key={item.title}>
                           <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}
-                            className={`relative h-10 rounded-lg transition-all duration-150 ${isCollapsed ? 'justify-center' : ''} ${isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'}`}
+                            className={`relative ${isCollapsed ? 'h-9 w-9 mx-auto rounded-xl justify-center' : 'h-10 rounded-lg'} transition-all duration-150 ${isActive ? (isCollapsed ? 'bg-primary/15 text-primary shadow-sm' : 'bg-sidebar-accent text-sidebar-accent-foreground') : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'}`}
                           >
                             <Link to={item.href} aria-current={isActive ? "page" : undefined}
                               className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-3'}`}
                             >
-                              <item.icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
+                              <item.icon className={`h-[18px] w-[18px] ${isCollapsed ? '' : 'h-4 w-4'} ${isActive ? 'text-primary' : ''}`} />
                               {!isCollapsed && <span className="font-medium text-[13px]">{item.title}</span>}
                               {isActive && !isCollapsed && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
+                              )}
+                              {isActive && isCollapsed && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
                               )}
                             </Link>
                           </SidebarMenuButton>
@@ -540,34 +557,34 @@ const AppSidebar = () => {
         </SidebarContent>
 
         {/* Footer */}
-        <SidebarFooter className="border-t border-sidebar-border/20 p-3 flex-shrink-0">
+        <SidebarFooter className="border-t border-sidebar-border/15 p-2.5 flex-shrink-0 space-y-1">
           {!isCollapsed && <PlanBadge />}
           {isCollapsed && <PlanBadge compact />}
           <Link to="/admin/settings">
             <Button variant="ghost" size="sm"
-              className={`w-full justify-start text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 h-9 text-[12px] mt-1 ${isCollapsed ? 'px-2 justify-center' : ''} ${location.pathname.startsWith('/admin/settings') ? 'bg-sidebar-accent text-sidebar-foreground font-medium' : ''}`}
+              className={`w-full h-9 text-[12px] rounded-lg ${isCollapsed ? 'px-0 justify-center' : 'justify-start'} text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 ${location.pathname.startsWith('/admin/settings') ? 'bg-sidebar-accent/60 text-sidebar-foreground' : ''}`}
             >
               <Settings className={`h-4 w-4 ${isCollapsed ? '' : 'mr-2'}`} />
               {!isCollapsed && <span>Instellingen</span>}
             </Button>
           </Link>
-          <div className="flex gap-1.5 mt-1">
+          <div className="flex gap-1">
             <Button variant="ghost" size="sm" onClick={cycleTheme}
-              className={`flex-1 justify-start text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 h-9 text-[12px] ${isCollapsed ? 'px-2 justify-center' : ''}`}
+              className={`flex-1 h-8 text-[11px] rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 ${isCollapsed ? 'px-0 justify-center' : 'justify-start'}`}
             >
               {isCollapsed ? (
-                resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />
+                resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />
               ) : (
                 <>
-                  {theme === "auto" ? <Clock className="mr-2 h-3.5 w-3.5" /> : resolvedTheme === "dark" ? <Sun className="mr-2 h-3.5 w-3.5" /> : <Moon className="mr-2 h-3.5 w-3.5" />}
+                  {theme === "auto" ? <Clock className="mr-1.5 h-3.5 w-3.5" /> : resolvedTheme === "dark" ? <Sun className="mr-1.5 h-3.5 w-3.5" /> : <Moon className="mr-1.5 h-3.5 w-3.5" />}
                   <span>{theme === "auto" ? "Auto" : theme === "dark" ? "Licht" : "Donker"}</span>
                 </>
               )}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => signOut()}
-              className="text-sidebar-foreground/50 hover:text-destructive hover:bg-destructive/10 h-9 px-2.5"
+              className="text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 rounded-lg"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
             </Button>
           </div>
         </SidebarFooter>
