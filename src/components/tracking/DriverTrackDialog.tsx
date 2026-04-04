@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import {
   Dialog,
   DialogContent,
