@@ -22,7 +22,7 @@ export const ChatGPTMessage = ({ message }: ChatGPTMessageProps) => {
 
   return (
     <div
-      className={`flex gap-3 animate-fade-in-up ${isUser ? 'flex-row-reverse' : ''}`
+      className={`flex gap-3 animate-fade-in-up ${isUser ? 'flex-row-reverse' : ''}`}
     >
       {/* Avatar */}
       <div className={`
