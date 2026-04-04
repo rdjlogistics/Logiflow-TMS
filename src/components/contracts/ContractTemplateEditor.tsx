@@ -216,10 +216,9 @@ export function ContractTemplateEditor({
         {/* Main Editor */}
         <div className="lg:col-span-2 space-y-6">
           {/* Metadata Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
+          <div
+            className="animate-fade-in-up"
+            style={{ animationDelay: '50ms' }}
           >
             <Card className="border-border/50 bg-gradient-to-br from-background to-muted/10">
               <CardHeader className="pb-4">
@@ -288,10 +287,9 @@ export function ContractTemplateEditor({
           </div>
 
           {/* Content Editor Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+          <div
+            className="animate-fade-in-up"
+            style={{ animationDelay: '100ms' }}
           >
             <Card className="border-border/50 bg-gradient-to-br from-background to-muted/10">
               <CardHeader className="pb-4">
