@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,23 +30,8 @@ const FleetManagement = () => {
   const { vehicles, vehiclesLoading, alerts, stats } = useFleetManagement();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Vlootbeheer</h1>
-            <p className="text-muted-foreground mt-1">
-              Voertuigen, brandstof en onderhoud
-            </p>
-          </div>
-          {/* Add vehicle button moved into VehicleOverview */}
-        </motion.div>
+    <DashboardLayout title="Vlootbeheer" description="Voertuigen, brandstof en onderhoud">
+      <div className="space-y-6">
 
         {/* Elite Stat Cards */}
         {vehiclesLoading ? (
@@ -143,7 +129,7 @@ const FleetManagement = () => {
           </AnimatePresence>
         </Tabs>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
