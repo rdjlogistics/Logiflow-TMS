@@ -232,7 +232,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
       <Card className={cn(
         "relative border-border/40 bg-card shadow-md hover:shadow-lg hover:ring-primary/20 transition-all touch-manipulation border-l-[3px] ring-1 ring-border/10 sm:bg-card/95 bg-muted/30",
         config.borderColor
-      )} style={{ WebkitFontSmoothing: 'antialiased' }}>
+      )} style={{ WebkitFontSmoothing: 'antialiased' >
         <CardHeader className="pb-2 pt-3 px-3 sm:px-5">
           <div className="flex items-center justify-between">
             <div 

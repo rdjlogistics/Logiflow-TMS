@@ -732,7 +732,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
   // ========== MOBILE LAYOUT ==========
   if (isMobile) {
     return (
-      <Dialog open onOpenChange={(open) => { if (!open) onSkip(); }}>
+      <Dialog open onOpenChange={(open) => { if (!open) onSkip(); >
         <DialogContent variant="sheet" size="full" hideCloseButton className="p-0 max-h-[92vh] flex flex-col overflow-hidden">
       <motion.div
         initial={{ opacity: 0 }}
@@ -832,7 +832,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
             className="bg-background px-5 pb-2 pointer-events-auto"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
           >
-            <motion.div whileTap={{ scale: 0.97 }}>
+            <motion.div whileTap={{ scale: 0.97 >
               <Button
                 onClick={handleNext}
                 className={cn(
@@ -883,7 +883,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
   const CurrentHeroIcon = stepHeroIcons[step] || Rocket;
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onSkip(); }}>
+    <Dialog open onOpenChange={(open) => { if (!open) onSkip(); >
       <DialogContent variant="default" size="full" hideCloseButton className="p-0 max-w-[95vw] max-h-[90vh] overflow-hidden rounded-2xl">
     <AnimatePresence>
       <motion.div
@@ -1265,7 +1265,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/10">
                   <div>
                     {step > 0 && step < 3 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1278,7 +1278,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                       </motion.div>
                     )}
                     {step === 0 && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 >
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1291,7 +1291,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                     )}
                   </div>
 
-                  <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 >
                     <Button
                       size="lg"
                       onClick={handleNext}

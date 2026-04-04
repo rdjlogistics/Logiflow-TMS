@@ -1404,7 +1404,7 @@ const RouteOptimization = () => {
 
                     {!isMobile && (
                       <div className="pt-2 space-y-2">
-                        <motion.div whileTap={{ scale: 0.98 }}>
+                        <motion.div whileTap={{ scale: 0.98 >
                           <Button 
                             className="w-full relative overflow-hidden h-9 text-xs" 
                             onClick={handleOptimize}

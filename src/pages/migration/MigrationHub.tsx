@@ -906,11 +906,11 @@ export default function MigrationHub() {
                                   setSelectedStagingRecord(record);
                                   setEditJson(JSON.stringify(record.normalized_json || record.source_row_json, null, 2));
                                   setEditDialogOpen(true);
-                                }}><Edit className="h-4 w-4" /></Button>
+                                ><Edit className="h-4 w-4" /></Button>
                                 <Button variant="ghost" size="icon" onClick={() => {
                                   setSelectedStagingRecord(record);
                                   setDeleteDialogOpen(true);
-                                }}><Trash2 className="h-4 w-4" /></Button>
+                                ><Trash2 className="h-4 w-4" /></Button>
                               </TableCell>
                             </TableRow>
                           ))}

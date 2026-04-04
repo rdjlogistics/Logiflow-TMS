@@ -93,7 +93,7 @@ const AlertsEscalations = () => {
                 <Bell className="h-5 w-5 text-primary" />
                 <CardTitle>Alert Regels</CardTitle>
               </div>
-              <Button size="sm" onClick={() => { setSelectedRule(null); setRuleDialogOpen(true); }}>
+              <Button size="sm" onClick={() => { setSelectedRule(null); setRuleDialogOpen(true); >
                 Nieuwe Regel
               </Button>
             </div>
@@ -128,7 +128,7 @@ const AlertsEscalations = () => {
                         )}
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => { setSelectedRule(rule); setRuleDialogOpen(true); }}>
+                    <Button size="sm" variant="outline" onClick={() => { setSelectedRule(rule); setRuleDialogOpen(true); >
                       Bewerken
                     </Button>
                   </div>

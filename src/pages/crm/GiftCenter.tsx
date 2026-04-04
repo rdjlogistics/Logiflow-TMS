@@ -506,7 +506,7 @@ const GiftCenter = () => {
                     const suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
                     setNewOrder({ ...newOrder, message_card_text: suggestion });
                     toast.success('AI Suggestie toegepast', { description: 'Bericht is ingevuld met een suggestie.' });
-                  }}>
+                  >
                     <Sparkles className="h-4 w-4 mr-1" />
                     AI Suggestie
                   </Button>

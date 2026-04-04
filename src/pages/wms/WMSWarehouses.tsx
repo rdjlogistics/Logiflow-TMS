@@ -226,7 +226,7 @@ export default function WMSWarehouses() {
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) resetWarehouseForm();
-        }}>
+        >
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
@@ -340,7 +340,7 @@ export default function WMSWarehouses() {
               <Button variant="outline" onClick={() => {
                 setIsDialogOpen(false);
                 resetWarehouseForm();
-              }}>
+              >
                 Annuleren
               </Button>
               <Button 

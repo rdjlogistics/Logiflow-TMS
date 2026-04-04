@@ -211,7 +211,7 @@ export default function WMSPicking() {
             } catch (error) {
               toast({ title: "Fout", description: "Auto-wave generatie mislukt.", variant: "destructive" });
             }
-          }}>
+          >
             <Zap className="h-4 w-4" />
             Auto-Wave
           </Button>

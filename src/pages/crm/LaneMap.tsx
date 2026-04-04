@@ -391,7 +391,7 @@ const LaneMap = () => {
         </Tabs>
 
         {/* Link Customer Dialog */}
-        <Dialog open={showLinkCustomerDialog} onOpenChange={(open) => { setShowLinkCustomerDialog(open); if (open) loadCustomers(); }}>
+        <Dialog open={showLinkCustomerDialog} onOpenChange={(open) => { setShowLinkCustomerDialog(open); if (open) loadCustomers(); >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Klant Koppelen aan Lane</DialogTitle>
@@ -441,7 +441,7 @@ const LaneMap = () => {
               <Button variant="outline" onClick={() => {
                 setShowLinkCustomerDialog(false);
                 setSelectedCustomerId('');
-              }}>Annuleren</Button>
+              >Annuleren</Button>
               <Button 
                 onClick={async () => {
                   if (!selectedLane || !selectedCustomerId) return;

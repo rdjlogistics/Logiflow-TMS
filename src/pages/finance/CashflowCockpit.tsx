@@ -606,7 +606,7 @@ Overig,${summary.costs.other}
                               <div className={cn(
                                 "absolute -top-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full",
                                 isAchieved ? "bg-emerald-500 text-white" : isWarning ? "bg-amber-500 text-white" : "bg-primary text-primary-foreground"
-                              )} style={{ left: `${Math.min(Math.max(progress - 5, 0), 85)}%` }}>
+                              )} style={{ left: `${Math.min(Math.max(progress - 5, 0), 85)}%` >
                                 {Math.min(progress, 100).toFixed(0)}%
                               </div>
                             </div>

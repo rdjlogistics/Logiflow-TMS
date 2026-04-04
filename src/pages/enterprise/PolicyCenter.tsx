@@ -375,7 +375,7 @@ const PolicyCenter = () => {
                         toast({ title: "Rol toegevoegd", description: `${newRole.name || 'Nieuwe rol'} is aangemaakt.` });
                         setShowNewRoleDialog(false);
                         setNewRole({ name: '', maxInvoice: '', maxPayout: '' });
-                      }}>
+                      >
                         Toevoegen
                       </Button>
                     </DialogFooter>

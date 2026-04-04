@@ -284,7 +284,7 @@ const Network = () => {
                           <Button variant="outline" size="sm" className="gap-1" onClick={() => {
                             setTargetCompanyForOrder({ id: connectedCompany.id, name: connectedCompany.name });
                             setSendOrderDialogOpen(true);
-                          }}>
+                          >
                             <Send className="h-4 w-4" />
                             Stuur opdracht
                           </Button>
@@ -450,7 +450,7 @@ const Network = () => {
                               <Dialog open={showConnectDialog && selectedCompany?.id === result.id} onOpenChange={(open) => {
                                 setShowConnectDialog(open);
                                 if (!open) setSelectedCompany(null);
-                              }}>
+                              >
                                 <DialogTrigger asChild>
                                   <Button
                                     size="sm"
@@ -480,7 +480,7 @@ const Network = () => {
                                     <Button variant="outline" onClick={() => {
                                       setShowConnectDialog(false);
                                       setSelectedCompany(null);
-                                    }}>
+                                    >
                                       Annuleren
                                     </Button>
                                     <Button onClick={handleConnect} className="gap-1">

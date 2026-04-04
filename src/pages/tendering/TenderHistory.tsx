@@ -322,7 +322,7 @@ const TenderHistory = () => {
                   <Button className="flex-1" onClick={() => {
                     const orderNum = (selectedItem.tender_sessions as any)?.trips?.order_number;
                     if (orderNum) navigate(`/orders?search=${orderNum}`);
-                  }}>
+                  >
                     Bekijk Order
                   </Button>
                 </div>

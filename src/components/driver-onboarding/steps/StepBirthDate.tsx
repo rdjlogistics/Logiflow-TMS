@@ -12,15 +12,15 @@ export const StepBirthDate = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
           Super!
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Wanneer ben je geboren? Dit helpt ons om je profiel compleet te maken.
         </p>
       </div>
 
-      <div className="flex-1 flex items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="flex-1 flex items-center animate-fade-in-up" style={{ animationDelay: '0.3s' >
         <DatePicker3D value={data.dateOfBirth} onChange={(date) => updateData({ dateOfBirth: date })} />
       </div>
 

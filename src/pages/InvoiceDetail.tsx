@@ -288,7 +288,7 @@ const InvoiceDetail = () => {
           <div className="relative p-6 lg:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-start gap-5">
-                <div}}>
+                <div>
                   <Button 
                     variant="ghost" size="icon" 
                     onClick={() => navigate("/invoices")}

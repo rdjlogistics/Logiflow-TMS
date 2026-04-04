@@ -84,7 +84,7 @@ const ActionQueue = ({ actions, loading }: ActionQueueProps) => {
         </CardHeader>
         <CardContent className="p-3 sm:p-4 space-y-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl bg-muted/10 border border-border/20 animate-in fade-in duration-300" style={{ animationDelay: `${i * 50}ms` }}>
+            <div key={i} className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl bg-muted/10 border border-border/20 animate-in fade-in duration-300" style={{ animationDelay: `${i * 50}ms` >
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-muted/30 animate-pulse shrink-0" />
               <div className="flex-1 space-y-1.5 sm:space-y-2 min-w-0">
                 <div className="h-3.5 sm:h-4 bg-muted/30 rounded w-2/3 animate-pulse" />

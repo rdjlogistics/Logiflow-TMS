@@ -305,7 +305,7 @@ const AutomationSimulator = () => {
                   </Dialog>
                   <Button onClick={() => {
                     toast({ title: "Automation gepubliceerd", description: "De automation is succesvol gepubliceerd en actief." });
-                  }}>
+                  >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Publiceer Automation
                   </Button>
@@ -381,7 +381,7 @@ const AutomationSimulator = () => {
                         toast({ title: "Automation aangemaakt", description: `${newAutomation.name || 'Nieuwe automation'} is toegevoegd als draft.` });
                         setShowNewAutomationDialog(false);
                         setNewAutomation({ name: '', trigger: '', description: '' });
-                      }}>
+                      >
                         Aanmaken
                       </Button>
                     </DialogFooter>
@@ -412,7 +412,7 @@ const AutomationSimulator = () => {
                       </TableCell>
                       <TableCell className="text-muted-foreground">2 uur geleden</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Auto-Invoice na Delivery", trigger: "OrderDelivered", version: "3", status: "Actief" }); setShowSettingsDialog(true); }}>
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Auto-Invoice na Delivery", trigger: "OrderDelivered", version: "3", status: "Actief" }); setShowSettingsDialog(true); >
                           <Settings2 className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -428,7 +428,7 @@ const AutomationSimulator = () => {
                       </TableCell>
                       <TableCell className="text-muted-foreground">1 dag geleden</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Payment Reminder", trigger: "InvoiceOverdue", version: "2", status: "Actief" }); setShowSettingsDialog(true); }}>
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Payment Reminder", trigger: "InvoiceOverdue", version: "2", status: "Actief" }); setShowSettingsDialog(true); >
                           <Settings2 className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -444,7 +444,7 @@ const AutomationSimulator = () => {
                       </TableCell>
                       <TableCell className="text-muted-foreground">Nooit</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Forecast Breach Alert", trigger: "ForecastBreach", version: "1", status: "Draft" }); setShowSettingsDialog(true); }}>
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedAutomationForSettings({ name: "Forecast Breach Alert", trigger: "ForecastBreach", version: "1", status: "Draft" }); setShowSettingsDialog(true); >
                           <Settings2 className="h-4 w-4" />
                         </Button>
                       </TableCell>

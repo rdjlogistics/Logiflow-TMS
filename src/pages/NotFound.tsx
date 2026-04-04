@@ -63,7 +63,7 @@ const NotFound = () => {
         </div>
 
         {/* Search bar */}
-        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' >
           <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
             <CardContent className="p-4">
               <div className="flex gap-2">
@@ -87,7 +87,7 @@ const NotFound = () => {
         </div>
 
         {/* Quick links */}
-        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '500ms' >
           <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
             <Compass className="h-4 w-4" />
             Snelle navigatie
@@ -115,7 +115,7 @@ const NotFound = () => {
 
         {/* Recent pages */}
         {recentPages.length > 0 && (
-          <div className="mb-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
+          <div className="mb-8 animate-fade-in" style={{ animationDelay: '800ms' >
             <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Recent bezocht
@@ -131,7 +131,7 @@ const NotFound = () => {
         )}
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '900ms' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '900ms' >
           <Button variant="default" size="lg" asChild>
             <Link to="/">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -147,7 +147,7 @@ const NotFound = () => {
         </div>
 
         {/* Contact support */}
-        <div className="mt-12 text-center animate-fade-in" style={{ animationDelay: '1000ms' }}>
+        <div className="mt-12 text-center animate-fade-in" style={{ animationDelay: '1000ms' >
           <p className="text-sm text-muted-foreground mb-3">
             Blijft het probleem? Neem contact op met support:
           </p>

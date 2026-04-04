@@ -348,7 +348,7 @@ const ReconciliationQueue = () => {
                 setShowAssignDialog(false);
                 setAssignee('');
                 setAssignNote('');
-              }}>Annuleren</Button>
+              >Annuleren</Button>
               <Button 
                 onClick={async () => {
                   if (!selectedIssue || !assignee) return;

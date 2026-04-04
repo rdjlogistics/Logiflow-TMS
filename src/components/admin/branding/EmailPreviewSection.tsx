@@ -63,8 +63,8 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
       case 'order_confirmation':
         return (
           <>
-            <p style={{ margin: '0 0 16px 0' }}>Beste {SAMPLE_DATA.customer_name},</p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >Beste {SAMPLE_DATA.customer_name},</p>
+            <p style={{ margin: '0 0 16px 0' >
               Bedankt voor uw order. Wij hebben uw aanvraag ontvangen en zullen deze zo spoedig mogelijk verwerken.
             </p>
             <div style={{ 
@@ -72,14 +72,14 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
               borderRadius: '8px', 
               padding: '16px', 
               margin: '16px 0' 
-            }}>
-              <p style={{ margin: '0', fontWeight: 600 }}>Order Details</p>
-              <p style={{ margin: '8px 0 0 0', color: '#64748b' }}>
+            >
+              <p style={{ margin: '0', fontWeight: 600 >Order Details</p>
+              <p style={{ margin: '8px 0 0 0', color: '#64748b' >
                 Order nummer: {SAMPLE_DATA.order_id}<br />
                 Verwachte levering: {SAMPLE_DATA.delivery_date}
               </p>
             </div>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >
               U ontvangt een tracking link zodra uw zending onderweg is.
             </p>
           </>
@@ -87,8 +87,8 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
       case 'pod_notification':
         return (
           <>
-            <p style={{ margin: '0 0 16px 0' }}>Beste {SAMPLE_DATA.customer_name},</p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >Beste {SAMPLE_DATA.customer_name},</p>
+            <p style={{ margin: '0 0 16px 0' >
               Goed nieuws! Uw zending is succesvol afgeleverd.
             </p>
             <div style={{ 
@@ -97,14 +97,14 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
               padding: '16px', 
               margin: '16px 0',
               borderLeft: '4px solid #10b981'
-            }}>
-              <p style={{ margin: '0', fontWeight: 600, color: '#059669' }}>✓ Afgeleverd</p>
-              <p style={{ margin: '8px 0 0 0', color: '#64748b' }}>
+            >
+              <p style={{ margin: '0', fontWeight: 600, color: '#059669' >✓ Afgeleverd</p>
+              <p style={{ margin: '8px 0 0 0', color: '#64748b' >
                 Order: {SAMPLE_DATA.order_id}<br />
                 Datum: {SAMPLE_DATA.delivery_date}
               </p>
             </div>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >
               De Proof of Delivery is bijgevoegd als bijlage.
             </p>
           </>
@@ -112,8 +112,8 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
       case 'invoice':
         return (
           <>
-            <p style={{ margin: '0 0 16px 0' }}>Beste {SAMPLE_DATA.customer_name},</p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >Beste {SAMPLE_DATA.customer_name},</p>
+            <p style={{ margin: '0 0 16px 0' >
               Hierbij ontvangt u de factuur voor uw recente zending.
             </p>
             <div style={{ 
@@ -121,14 +121,14 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
               borderRadius: '8px', 
               padding: '16px', 
               margin: '16px 0' 
-            }}>
-              <p style={{ margin: '0', fontWeight: 600 }}>Factuur Details</p>
-              <p style={{ margin: '8px 0 0 0', color: '#64748b' }}>
+            >
+              <p style={{ margin: '0', fontWeight: 600 >Factuur Details</p>
+              <p style={{ margin: '8px 0 0 0', color: '#64748b' >
                 Factuurnummer: INV-{SAMPLE_DATA.order_id}<br />
                 Bedrag: €125,00 (incl. BTW)
               </p>
             </div>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >
               Gelieve het bedrag binnen 30 dagen over te maken.
             </p>
           </>
@@ -136,8 +136,8 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
       case 'tracking_update':
         return (
           <>
-            <p style={{ margin: '0 0 16px 0' }}>Beste {SAMPLE_DATA.customer_name},</p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >Beste {SAMPLE_DATA.customer_name},</p>
+            <p style={{ margin: '0 0 16px 0' >
               Er is een update over uw zending.
             </p>
             <div style={{ 
@@ -146,9 +146,9 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
               padding: '16px', 
               margin: '16px 0',
               borderLeft: '4px solid #3b82f6'
-            }}>
-              <p style={{ margin: '0', fontWeight: 600, color: '#2563eb' }}>🚚 Onderweg</p>
-              <p style={{ margin: '8px 0 0 0', color: '#64748b' }}>
+            >
+              <p style={{ margin: '0', fontWeight: 600, color: '#2563eb' >🚚 Onderweg</p>
+              <p style={{ margin: '8px 0 0 0', color: '#64748b' >
                 Uw zending is onderweg naar het afleveradres.<br />
                 Verwachte aankomst: {SAMPLE_DATA.delivery_date}
               </p>
@@ -172,14 +172,14 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
       case 'welcome':
         return (
           <>
-            <p style={{ margin: '0 0 16px 0' }}>Beste {SAMPLE_DATA.customer_name},</p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >Beste {SAMPLE_DATA.customer_name},</p>
+            <p style={{ margin: '0 0 16px 0' >
               Welkom bij {SAMPLE_DATA.company_name}! We zijn verheugd dat u voor ons heeft gekozen.
             </p>
-            <p style={{ margin: '0 0 16px 0' }}>
+            <p style={{ margin: '0 0 16px 0' >
               Met ons platform kunt u:
             </p>
-            <ul style={{ margin: '0 0 16px 0', paddingLeft: '20px', color: '#64748b' }}>
+            <ul style={{ margin: '0 0 16px 0', paddingLeft: '20px', color: '#64748b' >
               <li>Zendingen real-time volgen</li>
               <li>Facturen bekijken en downloaden</li>
               <li>Nieuwe orders plaatsen</li>
@@ -257,7 +257,7 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
           
           {/* Email Content */}
           <div className="bg-white p-6">
-            <div style={{ maxWidth: '600px', margin: '0 auto', fontFamily: 'system-ui, sans-serif' }}>
+            <div style={{ maxWidth: '600px', margin: '0 auto', fontFamily: 'system-ui, sans-serif' >
               {/* Header */}
               {settings.emailHeaderHtml ? (
                 <div
@@ -269,7 +269,7 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
                   style={{ marginBottom: '24px' }}
                 />
               ) : settings.logoUrl ? (
-                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '24px' >
                   <img 
                     src={settings.logoUrl} 
                     alt="Logo" 
@@ -283,20 +283,20 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
                   padding: '16px',
                   backgroundColor: settings.primaryColor || '#3b82f6',
                   borderRadius: '8px'
-                }}>
-                  <span style={{ color: 'white', fontWeight: 600, fontSize: '18px' }}>
+                >
+                  <span style={{ color: 'white', fontWeight: 600, fontSize: '18px' >
                     {SAMPLE_DATA.company_name}
                   </span>
                 </div>
               )}
 
               {/* Body */}
-              <div style={{ color: '#1e293b', lineHeight: 1.6 }}>
+              <div style={{ color: '#1e293b', lineHeight: 1.6 >
                 {renderTemplateContent()}
               </div>
 
               {/* Footer */}
-              <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' >
                 {settings.emailFooterHtml ? (
                   <div
                     dangerouslySetInnerHTML={{
@@ -305,7 +305,7 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
                     }}
                   />
                 ) : (
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '14px' >
                     Met vriendelijke groet,<br />
                     <strong>{SAMPLE_DATA.company_name}</strong>
                   </p>
@@ -313,7 +313,7 @@ const EmailPreviewSection = ({ settings }: EmailPreviewSectionProps) => {
 
                 {/* Social Icons */}
                 {socialIcons.length > 0 && (
-                  <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
+                  <div style={{ marginTop: '16px', display: 'flex', gap: '12px' >
                     {socialIcons.map((social) => {
                       const Icon = social.icon;
                       return (

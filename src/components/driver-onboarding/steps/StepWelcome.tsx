@@ -13,11 +13,11 @@ export const StepWelcome = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Welkom bij de onboarding
         </div>
-        <h1 className="text-4xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <h1 className="text-4xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Chauffeur
           <span className="text-primary"> App</span>
         </h1>
-        <p className="text-muted-foreground text-lg animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+        <p className="text-muted-foreground text-lg animate-fade-in-up" style={{ animationDelay: '0.3s' >
           Je nieuwe partner onderweg
         </p>
       </div>
@@ -25,7 +25,7 @@ export const StepWelcome = () => {
       <FloatingTruck3D />
 
       {/* Features */}
-      <div className="space-y-4 mb-8 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+      <div className="space-y-4 mb-8 animate-fade-in-up" style={{ animationDelay: '0.5s' >
         {[
           { icon: Route, text: 'Bekijk je routes in realtime' },
           { icon: Clock, text: 'Check je rooster onderweg' },

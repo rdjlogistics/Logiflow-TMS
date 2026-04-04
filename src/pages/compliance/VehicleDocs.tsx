@@ -233,7 +233,7 @@ const VehicleDocs = () => {
                       <Select value={form.doc_type} onValueChange={(val) => {
                         const docType = docTypes.find(d => d.value === val);
                         setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name }));
-                      }}>
+                      >
                         <SelectTrigger className="h-11 bg-muted/30 border-border/50">
                           <SelectValue placeholder="Selecteer type..." />
                         </SelectTrigger>
@@ -340,7 +340,7 @@ const VehicleDocs = () => {
               const docType = docTypes.find(t => t.value === doc.doc_type);
               
               return (
-                <div key={doc.id} className={cn("group relative rounded-xl border bg-gradient-to-br p-4 transition-all hover:shadow-lg", docType?.color, "border-border/50 hover:border-primary/30")}}>
+                <div key={doc.id} className={cn("group relative rounded-xl border bg-gradient-to-br p-4 transition-all hover:shadow-lg", docType?.color, "border-border/50 hover:border-primary/30")>
                   <div className={cn("absolute top-3 right-3 w-2.5 h-2.5 rounded-full", status === 'valid' && "bg-emerald-500", status === 'expiring_soon' && "bg-amber-500 animate-pulse", status === 'expired' && "bg-red-500 animate-pulse")} />
                   
                   <div className="flex items-start gap-3">

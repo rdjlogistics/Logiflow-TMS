@@ -830,7 +830,7 @@ const Customers = () => {
               <>
                 {/* Mobile card view with pull-to-refresh and swipe gestures */}
                 <div className="md:hidden">
-                  <PullToRefresh onRefresh={async () => { await fetchCustomers(); }}>
+                  <PullToRefresh onRefresh={async () => { await fetchCustomers(); >
                     <div className="space-y-3 p-3">
                       {filteredCustomers.map((customer, i) => (
                         <SwipeableCard

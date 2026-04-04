@@ -19,15 +19,15 @@ export const StepEmergencyContact = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
           Noodcontact
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Wie moeten we bereiken in geval van nood?
         </p>
       </div>
 
-      <div className="mb-8 p-4 rounded-2xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="mb-8 p-4 rounded-2xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.3s' >
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
             <Shield className="w-5 h-5 text-primary" />
@@ -42,7 +42,7 @@ export const StepEmergencyContact = () => {
       </div>
 
       <div className="flex-1 space-y-8 mb-8">
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' >
           <OnboardingInput
             value={data.emergencyContactName}
             onChange={(value) => updateData({ emergencyContactName: value })}
@@ -50,7 +50,7 @@ export const StepEmergencyContact = () => {
           />
         </div>
 
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' >
           <OnboardingInput
             value={data.emergencyContactPhone}
             onChange={(value) => updateData({ emergencyContactPhone: value })}
@@ -59,7 +59,7 @@ export const StepEmergencyContact = () => {
           />
         </div>
 
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' >
           <p className="text-sm text-muted-foreground mb-3">Relatie (optioneel)</p>
           <div className="flex flex-wrap gap-2">
             {RELATIONSHIPS.map((rel) => {

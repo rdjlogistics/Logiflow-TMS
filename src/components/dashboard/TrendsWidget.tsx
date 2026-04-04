@@ -196,7 +196,7 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
           <TabsContent value="revenue" className="mt-0">
             <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 >
                   <defs>
                     <linearGradient id="colorRevenueTrend" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
@@ -258,7 +258,7 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
           <TabsContent value="margin" className="mt-0">
             <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <ComposedChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 >
                   <defs>
                     <linearGradient id="colorMargin" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(45 93% 47%)" stopOpacity={0.4} />

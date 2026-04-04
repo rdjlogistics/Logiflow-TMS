@@ -53,18 +53,18 @@ export const StepNotifications = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
           Blijf Op de Hoogte
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Ontvang meldingen over belangrijke updates. We spammen je niet.
         </p>
       </div>
 
-      <div className="relative mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="relative mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' >
         <div className="w-56 h-80 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 border-4 border-slate-700 p-4 overflow-hidden shadow-2xl">
           <div className="w-full h-full rounded-2xl bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-xl p-4 space-y-3">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.6s' >
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-primary/20">
                   <Bell className="w-4 h-4 text-primary" />
@@ -90,7 +90,7 @@ export const StepNotifications = () => {
         )}
       </div>
 
-      <div className="space-y-3 mb-auto animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+      <div className="space-y-3 mb-auto animate-fade-in-up" style={{ animationDelay: '0.4s' >
         {features.map((feature, index) => (
           <div
             key={index}

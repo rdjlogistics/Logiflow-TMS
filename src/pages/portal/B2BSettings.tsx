@@ -188,7 +188,7 @@ const B2BSettings = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <div className="max-w-4xl mx-auto space-y-6"}}}>
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display font-bold">Instellingen</h1>
@@ -568,7 +568,7 @@ const B2BSettings = () => {
                 } else {
                   toast.error("Vul alle velden in");
                 }
-              }}>
+              >
               {isCreatingCostCenter ? "Bezig..." : "Toevoegen"}
             </Button>
           </DialogFooter>
@@ -625,7 +625,7 @@ const B2BSettings = () => {
                 } else {
                   toast.error("Vul een e-mailadres in");
                 }
-              }}>
+              >
               {isInviting ? "Bezig..." : "Uitnodigen"}
             </Button>
           </DialogFooter>

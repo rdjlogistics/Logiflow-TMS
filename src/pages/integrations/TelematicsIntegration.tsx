@@ -354,7 +354,7 @@ export default function TelematicsIntegration() {
                         </div>
                       </div>
                     ) : (
-                      <Button variant="outline" className="w-full" onClick={() => { setSelectedProvider(provider.id); setIsAddDialogOpen(true); }}>
+                      <Button variant="outline" className="w-full" onClick={() => { setSelectedProvider(provider.id); setIsAddDialogOpen(true); >
                         <Plus className="h-4 w-4 mr-2" />Koppelen
                       </Button>
                     )}

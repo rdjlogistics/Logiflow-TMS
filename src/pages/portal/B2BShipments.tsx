@@ -90,7 +90,7 @@ const B2BShipments = () => {
             <h1 className="text-2xl font-display font-bold">Zendingen</h1>
             <p className="text-sm text-muted-foreground">{shipments.length} zendingen in totaal</p>
           </div>
-          <div}}>
+          <div>
             <Button 
               variant="outline" 
               className="gap-2"
@@ -278,7 +278,7 @@ const B2BShipments = () => {
               {search ? 'Probeer een andere zoekopdracht' : 'Je hebt nog geen zendingen'}
             </p>
             {!search && (
-              <div}}>
+              <div>
                 <Button asChild className="bg-gold hover:bg-gold/90 text-gold-foreground">
                   <Link to="/portal/b2b/book">Eerste zending aanmaken</Link>
                 </Button>

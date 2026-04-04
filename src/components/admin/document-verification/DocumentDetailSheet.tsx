@@ -85,7 +85,7 @@ export function DocumentDetailSheet({
         className="w-full sm:max-w-lg md:max-w-xl p-0 overflow-hidden flex flex-col [&>button]:top-4 [&>button]:right-4"
       >
         {/* Header with gradient */}
-        <div className="relative px-5 pt-5 pb-4 border-b border-border/30" style={{ background: 'var(--gradient-mesh)' }}>
+        <div className="relative px-5 pt-5 pb-4 border-b border-border/30" style={{ background: 'var(--gradient-mesh)' >
           <SheetHeader className="text-left">
             <SheetTitle className="flex items-center gap-2 text-lg">
               <Shield className="h-5 w-5 text-primary" />

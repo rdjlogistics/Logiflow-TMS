@@ -251,7 +251,7 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
                 </p>
               </div>
             </div>
-            <div className="relative flex-1" style={{ minWidth: TIME_SLOTS.length * HOUR_WIDTH }}>
+            <div className="relative flex-1" style={{ minWidth: TIME_SLOTS.length * HOUR_WIDTH >
               {/* Grid lines */}
               <div className="absolute inset-0 flex">
                 {TIME_SLOTS.map((hour) => (
@@ -335,7 +335,7 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
                   </Badge>
                 </div>
               </div>
-              <div className="relative flex-1" style={{ minWidth: TIME_SLOTS.length * HOUR_WIDTH }}>
+              <div className="relative flex-1" style={{ minWidth: TIME_SLOTS.length * HOUR_WIDTH >
                 {/* Grid lines */}
                 <div className="absolute inset-0 flex">
                   {TIME_SLOTS.map((hour) => (

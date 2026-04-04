@@ -109,7 +109,7 @@ const IntegrationLogs = () => {
                         payload: log.error_message ?? `${log.success_count ?? 0} succesvol verwerkt`,
                       });
                       setDetailOpen(true);
-                    }}>
+                    >
                       <div className="flex items-center gap-4 flex-1">
                         <div className={`w-2 h-2 rounded-full ${log.status === "completed" ? "bg-emerald-500" : log.status === "failed" ? "bg-destructive" : "bg-amber-500"}`} />
                         <div className="min-w-0 flex-1">

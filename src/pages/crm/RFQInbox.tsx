@@ -411,7 +411,7 @@ const RFQInbox = () => {
                             Converteer
                           </Button>
                         )}
-                        <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); setSelectedRFQ(rfq.id); }}>
+                        <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); setSelectedRFQ(rfq.id); >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>

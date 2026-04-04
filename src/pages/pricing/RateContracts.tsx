@@ -267,7 +267,7 @@ const RateContracts = () => {
               <Button onClick={() => {
                 setCreateType(activeTab === "zones" ? "zone" : activeTab === "accessorials" ? "accessorial" : "contract");
                 setShowCreateDialog(true);
-              }}>
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Nieuw
               </Button>

@@ -580,7 +580,7 @@ const RoutePlanning = () => {
 
 
               {/* Live map */}
-              <div className="flex-1 relative" style={{ minHeight: '400px' }}>
+              <div className="flex-1 relative" style={{ minHeight: '400px' >
                 <BaseMap
                   ref={liveMapRef}
                   style="light"

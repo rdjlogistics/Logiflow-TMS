@@ -208,7 +208,7 @@ const StaticMapFallback: React.FC<StaticMapFallbackProps> = ({
               style={{ left: pos.x, top: pos.y }}
               title={stop.companyName || `Stop ${index + 1}`}
             >
-              <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white text-white text-xs font-bold" style={{ backgroundColor: markerColor }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white text-white text-xs font-bold" style={{ backgroundColor: markerColor >
                 {index + 1}
               </div>
               {etaLabel && (
@@ -219,15 +219,15 @@ const StaticMapFallback: React.FC<StaticMapFallbackProps> = ({
             </button>
 
             {isActive && (
-              <div className="absolute z-20 bg-background rounded-lg shadow-xl border border-border p-3 min-w-[200px] max-w-[280px] -translate-x-1/2" style={{ left: pos.x, top: pos.y - 48 }}>
+              <div className="absolute z-20 bg-background rounded-lg shadow-xl border border-border p-3 min-w-[200px] max-w-[280px] -translate-x-1/2" style={{ left: pos.x, top: pos.y - 48 >
                 <button onClick={() => setActivePopup(null)} className="absolute top-1 right-2 text-muted-foreground hover:text-foreground text-lg leading-none">×</button>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="w-6 h-6 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ backgroundColor: markerColor }}>{index + 1}</span>
+                  <span className="w-6 h-6 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ backgroundColor: markerColor >{index + 1}</span>
                   <span className="font-semibold text-sm text-foreground">{stop.companyName || `Stop ${index + 1}`}</span>
                 </div>
-                <p className="text-xs text-muted-foreground" style={{ color: '#374151' }}>{stop.address}{stop.city ? `, ${stop.city}` : ""}</p>
+                <p className="text-xs text-muted-foreground" style={{ color: '#374151' >{stop.address}{stop.city ? `, ${stop.city}` : ""}</p>
                 <div className="flex gap-1 mt-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded" style={{ backgroundColor: `${markerColor}20`, color: markerColor }}>
+                  <span className="text-[10px] px-2 py-0.5 rounded" style={{ backgroundColor: `${markerColor}20`, color: markerColor >
                     {isPickup ? "Ophalen" : isDelivery ? "Afleveren" : "Tussenstop"}
                   </span>
                   {stop.priority === "urgent" && <span className="text-[10px] px-2 py-0.5 rounded bg-destructive/10 text-destructive">Urgent</span>}

@@ -84,7 +84,7 @@ const B2BInvoices = () => {
             <h1 className="text-2xl font-display font-bold">Facturen</h1>
             <p className="text-sm text-muted-foreground">{invoices.length} facturen in totaal</p>
           </div>
-          <div}}>
+          <div>
             <Button 
               variant="outline" className="gap-2"
               disabled={exporting || invoices.length === 0}
@@ -99,7 +99,7 @@ const B2BInvoices = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {summaryCards.map((card, index) => (
-            <div key={card.key} }}>
+            <div key={card.key} >
               <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -267,7 +267,7 @@ const B2BInvoices = () => {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div}}>
+                        <div>
                           <Button 
                             variant="ghost" size="sm" className="gap-1"
                             onClick={async () => {

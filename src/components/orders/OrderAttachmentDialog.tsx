@@ -134,7 +134,7 @@ const OrderAttachmentDialog = ({ open, onOpenChange, orderId }: OrderAttachmentD
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => { if (!open) resetForm(); onOpenChange(open); }}>
+    <Dialog open={open} onOpenChange={(open) => { if (!open) resetForm(); onOpenChange(open); >
       <DialogContent
         variant="sheet"
         className="max-h-[min(88dvh,calc(100dvh-1rem))] sm:max-h-[min(85dvh,calc(100dvh-3rem))] sm:max-w-md flex flex-col"

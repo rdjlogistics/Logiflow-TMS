@@ -375,7 +375,7 @@ const Dashboard = () => {
 
               {/* Right: Quick Actions */}
               <div className="flex items-center gap-3">
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 >
                   <Button asChild variant="premium" size="default" className="shadow-lg shadow-primary/20 h-11">
                     <Link to="/orders">
                       <Plus className="h-4 w-4 mr-2" />
@@ -383,7 +383,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 >
                   <Button asChild variant="outline" size="default" className="group h-11">
                     <Link to="/track-chauffeurs">
                       <Route className="h-4 w-4 mr-2" />
@@ -392,7 +392,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 >
                   <Button asChild variant="ghost" size="icon" className="h-11 w-11 relative">
                     <Link to="/email">
                       <Mail className="h-5 w-5" />
@@ -404,7 +404,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 >
                   <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsCustomizing(true)}>
                     <Settings2 className="h-5 w-5" />
                   </Button>

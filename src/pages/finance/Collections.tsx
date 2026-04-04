@@ -426,7 +426,7 @@ export function CollectionsContent() {
                           setEditRiskLevel(profile.risk_level || 'low');
                           setEditProforma(profile.proforma || false);
                           setEditStopShipping(profile.stop_shipping || false);
-                        }}>
+                        >
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -523,7 +523,7 @@ export function CollectionsContent() {
                   } else {
                     toast({ title: "Geen telefoonnummer", description: `Er is geen telefoonnummer beschikbaar voor ${selectedCase.customer}.`, variant: "destructive" });
                   }
-                }}><Phone className="h-4 w-4 mr-2" />Bellen</Button>
+                ><Phone className="h-4 w-4 mr-2" />Bellen</Button>
                 <Button variant="outline" onClick={() => {
                   if (!selectedCase.customer_email) {
                     toast({ title: "Geen e-mailadres", description: `Er is geen e-mailadres beschikbaar voor ${selectedCase.customer}.`, variant: "destructive" });
@@ -533,7 +533,7 @@ export function CollectionsContent() {
                   const body = encodeURIComponent(`Geachte heer/mevrouw,\n\nUit onze administratie blijkt dat de volgende factuur nog openstaat:\n\nFactuurnummer: ${selectedCase.invoice}\nBedrag: €${selectedCase.amount?.toLocaleString()}\nVervaldatum: ${selectedCase.due_date}\nDagen te laat: ${selectedCase.days_overdue}\n\nGraag ontvangen wij uw betaling zo spoedig mogelijk.\n\nMet vriendelijke groet`);
                   window.open(`mailto:${selectedCase.customer_email}?subject=${subject}&body=${body}`, '_blank');
                   toast({ title: "E-mail geopend ✓", description: `Herinneringsmail voor ${selectedCase.invoice} is voorbereid.` });
-                }}><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
+                ><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
                 <Button variant="outline" onClick={() => {
                   const promiseDate = new Date();
                   promiseDate.setDate(promiseDate.getDate() + 7);
@@ -544,7 +544,7 @@ export function CollectionsContent() {
                     promised_amount: selectedCase.amount || 0,
                     notes: `Betalingsbelofte geregistreerd voor ${promiseDate.toLocaleDateString('nl-NL')}`,
                   });
-                }}><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
+                ><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
               </div>
 
               <div className="space-y-2">
@@ -585,7 +585,7 @@ export function CollectionsContent() {
                   } else {
                     toast({ title: "Geen wijzigingen", description: "Selecteer een status of voeg een notitie toe.", variant: "destructive" });
                   }
-                }}>Opslaan</Button>
+                >Opslaan</Button>
               </div>
             </div>
           )}
@@ -656,7 +656,7 @@ export function CollectionsContent() {
                   }, {
                     onSuccess: () => setSelectedProfile(null),
                   });
-                }}>Opslaan</Button>
+                >Opslaan</Button>
               </DialogFooter>
             </div>
           )}

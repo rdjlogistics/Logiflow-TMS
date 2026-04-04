@@ -277,7 +277,7 @@ export const BulkBookingImport = ({
 
         {/* Actions */}
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={() => { setStep("upload"); setRows([]); }}>
+          <Button variant="outline" onClick={() => { setStep("upload"); setRows([]); >
             Annuleren
           </Button>
           <Button 
@@ -318,7 +318,7 @@ export const BulkBookingImport = ({
             {result.success} zending{result.success !== 1 ? "en" : ""} aangemaakt
             {result.failed > 0 && `, ${result.failed} mislukt`}
           </p>
-          <Button onClick={() => { setStep("upload"); setRows([]); setResult(null); }}>
+          <Button onClick={() => { setStep("upload"); setRows([]); setResult(null); >
             Nieuwe import
           </Button>
         </CardContent>

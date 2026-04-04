@@ -90,7 +90,7 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
               <p className="text-2xl font-bold tabular-nums">{value}</p>
               {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
             </div>
-            <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
+            <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}15` >
               <Icon className="h-5 w-5" style={{ color }} />
             </div>
           </div>

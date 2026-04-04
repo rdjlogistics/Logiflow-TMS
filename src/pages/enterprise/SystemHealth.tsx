@@ -204,7 +204,7 @@ const SystemHealth = () => {
                   a.click();
                   window.URL.revokeObjectURL(url);
                   toast.success('Export gedownload', { description: 'Job monitor data is geëxporteerd als CSV.' });
-                }}>
+                >
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
@@ -253,7 +253,7 @@ const SystemHealth = () => {
                             toast.info(`Job details: ${job.job_name}`, { 
                               description: `Status: ${job.status}, Verwerkt: ${job.processed_count}, Errors: ${job.error_count}${job.error_details ? `, Fout: ${JSON.stringify(job.error_details)}` : ''}`
                             });
-                          }}>
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                         </TableCell>

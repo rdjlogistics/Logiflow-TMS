@@ -113,15 +113,15 @@ export const StepAccount = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
           Maak je account aan
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Zo kun je altijd bij je ritten en rooster.
         </p>
       </div>
 
-      <div className="space-y-8 mb-auto animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="space-y-8 mb-auto animate-fade-in-up" style={{ animationDelay: '0.3s' >
         <OnboardingInput
           value={data.email}
           onChange={(value) => updateData({ email: value })}

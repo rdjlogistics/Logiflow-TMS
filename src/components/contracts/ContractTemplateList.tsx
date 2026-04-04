@@ -240,11 +240,11 @@ export function ContractTemplateList({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(template); }}>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(template); >
                             <Pencil className="h-4 w-4 mr-2" />
                             Bewerken
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(template); }}>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(template); >
                             <Copy className="h-4 w-4 mr-2" />
                             Dupliceren
                           </DropdownMenuItem>

@@ -113,7 +113,7 @@ const APIKeys = () => {
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
                         navigator.clipboard.writeText(k.key_prefix + "...");
                         toast({ title: "Key prefix gekopieerd" });
-                      }}>
+                      >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>

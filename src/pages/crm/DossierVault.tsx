@@ -343,13 +343,13 @@ const DossierVault = () => {
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {
                               const { data } = await supabase.storage.from('dossier-documents').createSignedUrl(doc.file_url, 3600);
                               if (data?.signedUrl) window.open(data.signedUrl, '_blank');
-                            }}>
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {
                               const { data } = await supabase.storage.from('dossier-documents').download(doc.file_url);
                               if (data) { const url = URL.createObjectURL(data); const a = document.createElement('a'); a.href = url; a.download = doc.file_name; a.click(); URL.revokeObjectURL(url); }
-                            }}>
+                            >
                               <Download className="h-4 w-4" />
                             </Button>
                           </div>

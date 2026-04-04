@@ -19,15 +19,15 @@ export const StepName = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
           Allereerst
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
           Hoe mogen we je noemen?
         </p>
       </div>
 
-      <div className="mb-auto animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="mb-auto animate-fade-in-up" style={{ animationDelay: '0.3s' >
         <OnboardingInput
           value={data.name}
           onChange={(value) => updateData({ name: value })}
