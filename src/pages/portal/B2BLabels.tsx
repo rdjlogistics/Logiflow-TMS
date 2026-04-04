@@ -128,8 +128,7 @@ const B2BLabels = () => {
                 <motion.div
                   key={shipment.id}
                   custom={index}
-                 
-                  }}
+                  whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Card 

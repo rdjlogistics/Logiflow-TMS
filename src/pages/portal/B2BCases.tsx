@@ -156,10 +156,7 @@ const B2BCases = () => {
               <motion.div
                 key={caseItem.id}
                 custom={index}
-               
-               
-               
-               }
+                whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
                 <Card 
