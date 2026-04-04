@@ -105,11 +105,11 @@ const QuotesDashboard = () => {
     queryKey: ["customers-select", companyId],
     queryFn: async () => {
       if (!companyId) return [];
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("customers")
         .select("id, company_name")
-        .eq("company_id", companyId as any)
-        .eq("is_active", true as any)
+        .eq("company_id", companyId)
+        .eq("is_active", true)
         .order("company_name")
         .limit(200);
       return (data ?? []) as any[];
