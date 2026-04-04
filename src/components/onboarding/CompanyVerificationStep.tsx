@@ -178,9 +178,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
       </div>
 
       {/* Fields */}
-      <div,
-          visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
-        }}
+      <div
         className="grid grid-cols-1 sm:grid-cols-2 gap-4"
       >
         {fields.map(({ key, label, placeholder, icon: Icon, span, hint }) => {
