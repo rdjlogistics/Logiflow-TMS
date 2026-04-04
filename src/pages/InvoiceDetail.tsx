@@ -77,7 +77,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
                 isActive
                   ? "bg-primary/10 border-primary/30 text-primary shadow-lg shadow-primary/10"
                   : "bg-muted/30 border-border/30 text-muted-foreground"
-              )} : {}
+              )} : {}}>
             >
               <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">{step.label}</span>

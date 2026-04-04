@@ -228,7 +228,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, authStalled, signOut: handleSignOut, refreshSession >
+    <AuthContext.Provider value={{ user, session, loading, authStalled, signOut: handleSignOut, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );
