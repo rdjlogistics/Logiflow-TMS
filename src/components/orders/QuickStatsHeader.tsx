@@ -184,7 +184,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.div
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                     className="bg-muted-foreground/40 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("gepland")}
                   />
@@ -199,7 +199,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.div
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                     className="bg-blue-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("onderweg")}
                   />
@@ -214,7 +214,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.div
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                     className="bg-green-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("afgerond")}
                   />
@@ -229,7 +229,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.div
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                     className="bg-destructive cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("needs_driver")}
                   />

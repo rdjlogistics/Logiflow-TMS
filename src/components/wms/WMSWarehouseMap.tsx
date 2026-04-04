@@ -165,7 +165,7 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                       {/* Utilization progress bar at bottom */}
                       <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-background/40 overflow-hidden rounded-b-lg">
                         <motion.div
-                          initial={{ width: 0 }}}
+                          initial={{ width: 0 }}
                           className={cn("h-full", utilStyle.bg)}
                         />
                       </div>

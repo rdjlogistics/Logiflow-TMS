@@ -189,7 +189,7 @@ const PerformanceMetricsWidget = ({
                 <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 rounded-full bg-muted/30 overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full bg-gradient-to-r from-success to-success/70"
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                   />
                 </div>
               </div>
@@ -218,7 +218,7 @@ const PerformanceMetricsWidget = ({
               <div className="mt-1.5 sm:mt-2 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
                 <motion.div 
                   className={cn("h-full rounded-full", getProgressColor(data.utilizationRate, { good: 80, warn: 60 }))}
-                  initial={{ width: 0 }}}
+                  initial={{ width: 0 }}
                 />
               </div>
             </div>
@@ -257,7 +257,7 @@ const PerformanceMetricsWidget = ({
                 <div className="w-16 sm:w-24 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full bg-success"
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-success tabular-nums w-10 sm:w-12 text-right">
@@ -278,7 +278,7 @@ const PerformanceMetricsWidget = ({
                 <div className="w-16 sm:w-24 h-1 sm:h-1.5 rounded-full bg-muted/30 overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full bg-primary"
-                    initial={{ width: 0 }}}
+                    initial={{ width: 0 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-primary tabular-nums w-10 sm:w-12 text-right">

@@ -533,7 +533,6 @@ export const DriverStopCard = ({
                   <div key={step.label} className="flex items-center flex-1 last:flex-initial">
                     <div className="flex flex-col items-center gap-1">
                       <div
-                        }
                         className={cn(
                           "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors duration-300",
                           step.status === 'completed' && "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/30",

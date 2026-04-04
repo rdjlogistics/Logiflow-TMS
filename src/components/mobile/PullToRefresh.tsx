@@ -28,7 +28,7 @@ export const PullToRefresh = forwardRef<HTMLDivElement, PullToRefreshProps>(
           style={{
             top: Math.max(pullDistance - 40, -40),
             opacity: progress,
-          }}}}
+          }}
         >
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20">
             <RefreshCw 
