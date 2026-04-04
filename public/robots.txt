@@ -1,3 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /driver/
+Disallow: /admin/
+Disallow: /portal/
+
 Sitemap: https://rdjlogistics.lovable.app/sitemap.xml
