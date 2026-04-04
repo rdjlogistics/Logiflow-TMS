@@ -2715,6 +2715,80 @@ export type Database = {
         }
         Relationships: []
       }
+      company_branches: {
+        Row: {
+          address: string | null
+          branch_code: string | null
+          city: string | null
+          contact_person: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          house_number: string | null
+          id: string
+          is_active: boolean | null
+          is_headquarters: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          phone: string | null
+          postal_code: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          branch_code?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          house_number?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_headquarters?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          branch_code?: string | null
+          city?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          house_number?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_headquarters?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_branches_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_connections: {
         Row: {
           created_at: string
