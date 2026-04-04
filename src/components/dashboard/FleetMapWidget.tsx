@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
 import { useAllDriverLocations } from "@/hooks/useAllDriverLocations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
