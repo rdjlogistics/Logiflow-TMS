@@ -1,69 +1,51 @@
 
 
-# Uitvoeringsplan — 3 Batches, Stap voor Stap
+# Fix: Onboarding redirect glitch bij bestaande accounts
 
-## Batch 1: useUserRole → React Query (auth crash fix)
+## Root Cause
 
-**1 bestand, 16 importeurs, zero breaking changes**
+De `useOnboardingRequired` hook heeft **3 faalscenario's** die bestaande gebruikers naar `/onboarding` sturen:
 
-**`src/hooks/useUserRole.ts`** — volledige herschrijving:
-- Vervang alle `useState`/`useEffect`/`useRef`/`roleCache` logica door `useQuery` met `queryKey: ['user-role', userId]`
-- React Query dedupliceert automatisch: 16 componenten = 1 DB query i.p.v. 16
-- Config: `staleTime: 5min`, `gcTime: 10min`, `retry: 3`, `retryDelay: 1500ms`
-- `clearAllRoleCache()` → roept `queryClient.removeQueries({ queryKey: ['user-role'] })` aan
-- `refetch` → `queryClient.invalidateQueries({ queryKey: ['user-role', userId] })`
-- Alle exports blijven 100% identiek: `role`, `loading`, `error`, `isAdmin`, `isMedewerker`, `isChauffeur`, `isKlant`, `canAccessChatGPT`, `canAccessPlanning`, `canAccessFinance`, `refetch`, `clearCache`
+1. **DB onder druk** → `waitForCompanyLink` pollt 5 seconden en faalt → `needsOnboarding = true`
+2. **Stale query refetch** → `staleTime: 30s` betekent dat elke 30s bij window-focus de query opnieuw draait. Bij DB-latentie faalt de poll → redirect
+3. **Geen geheugen** → de hook weet niet dat onboarding al eerder succesvol was gecheckt. Elke refetch kan een ander resultaat geven
 
-**Test**: Login → dashboard laadt → geen "Lock was released" console errors → role-based menu items tonen correct
+`DashboardLayout.tsx` regel 89: `if (!onboardingLoading && needsOnboarding)` → **redirect naar /onboarding**
 
----
+## Oplossing (2 bestanden)
 
-## Batch 2: Mapbox token + loader resilient maken
+### 1. `src/hooks/useOnboardingRequired.ts` — bulletproof maken
 
-**2 bestanden**
+- **localStorage cache**: bij eerste succesvolle check dat onboarding NIET nodig is → sla `onboarding-done-{userId}` op in localStorage
+- **Fallback bij fout**: als de query faalt (DB timeout, netwerk), check localStorage. Als daar staat dat onboarding al gedaan is → return `false` (geen redirect)
+- **staleTime verhogen**: van 30s naar 5 minuten. Onboarding-status verandert bijna nooit
+- **`waitForCompanyLink` timeout verdubbelen**: van 5s naar 10s voor trage DB
+- **Bij error niet redirecten**: als de query een error gooit → return `false` (fail-safe), niet `true`
 
-**`src/hooks/useMapboxToken.ts`**:
-- Bij succesvolle fetch: `localStorage.setItem('mapbox_token_cache', token)`
-- Bij fout na alle retries: probeer `localStorage.getItem('mapbox_token_cache')` als fallback
-- Als fallback bestaat: gebruik dat token, toon geen error → kaarten werken altijd
+### 2. `src/components/layout/DashboardLayout.tsx` — extra guard
 
-**`src/utils/mapbox-loader.ts`**:
-- Bij fout in `import('mapbox-gl')`: reset `_loading = null` zodat volgende aanroep opnieuw kan proberen
-- Voeg `catch` toe aan de promise chain die `_loading` reset
+- Voeg een extra check toe: als `onboardingLoading` is `false` EN de query heeft een error → NIET redirecten
+- Alleen redirecten als de query succesvol data heeft opgehaald EN `needsOnboarding === true`
 
-**Test**: Kaarten laden op dashboard (FleetMapWidget) en op GPS Tracking pagina
+## Kernlogica (nieuw)
 
----
+```text
+queryFn:
+  1. Check localStorage → "onboarding-done-{userId}" = "true"?
+     → JA: return false (skip DB check)
+  2. Poll user_companies (max 10s)
+     → geen result: return true
+  3. Check tenant_settings.onboarding_completed_at
+     → completed: localStorage.set("onboarding-done-{userId}", "true"), return false
+     → niet completed: return true
+     
+Error handling:
+  → Query faalt: check localStorage fallback → als "done" → false
+  → Query faalt + geen localStorage → return false (NOOIT redirecten bij fouten)
+```
 
-## Batch 3: 6 componenten consolideren naar `loadMapboxGL()`
-
-**6 bestanden** — per bestand alleen de import-regel wijzigen:
-
-| Component | Aantal `import("mapbox-gl")` calls | Actie |
-|-----------|-------------------------------------|-------|
-| `FleetMapWidget.tsx` | 2 | → `loadMapboxGL()` |
-| `TrackingMap.tsx` | 5 | → `loadMapboxGL()` |
-| `DriverTrackDialog.tsx` | 3 | → `loadMapboxGL()` |
-| `OrderRoutePreview.tsx` | 1 | → `loadMapboxGL()` |
-| `OrderRouteDialog.tsx` | 2 | → `loadMapboxGL()` |
-| `BaseMap.tsx` | 1 | → `loadMapboxGL()` |
-
-Per component:
-- Voeg `import { loadMapboxGL } from '@/utils/mapbox-loader'` toe
-- Vervang elke `(await import("mapbox-gl")).default` door `await loadMapboxGL()`
-- Verwijder de losse CSS imports (`import("mapbox-gl/dist/mapbox-gl.css")`, `import("@/styles/map-styles.css")`) — zitten al in `loadMapboxGL()`
-
-**Test**: Navigeer naar elke pagina met een kaart (Dashboard, GPS Tracking, Order detail, Driver tracking) — kaarten laden correct
-
----
-
-## Samenvatting
-
-| Batch | Bestanden | Risico | Impact |
-|-------|-----------|--------|--------|
-| 1 | 1 | Laag (API identiek) | Auth crashes opgelost |
-| 2 | 2 | Laag (fallback toevoegen) | Kaarten werken altijd |
-| 3 | 6 | Laag (alleen import-regels) | Consistente error recovery |
-
-**Totaal: 9 bestanden, 0 nieuwe dependencies, 0 database wijzigingen**
+## Verwacht resultaat
+- Bestaande accounts worden **nooit meer** naar onboarding gestuurd na een transient DB-fout
+- Nieuwe accounts worden nog steeds correct naar onboarding gestuurd
+- Na `signOut` wordt de localStorage-cache gewist zodat een ander account correct gecheckt wordt
 
