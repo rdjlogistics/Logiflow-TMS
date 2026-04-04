@@ -147,7 +147,7 @@ const DriverTrackDialog: React.FC<DriverTrackDialogProps> = ({
     if (!map.current || !mapLoaded || !destination || destMarker.current) return;
 
     const addDest = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
     const el = document.createElement("div");
     el.innerHTML = `
