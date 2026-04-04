@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-
 interface WMSStatCardProps {
   title: string;
   value: string | number;
@@ -69,9 +67,7 @@ export function WMSStatCard({
   const styles = variantStyles[variant];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+    <div} }}
       className={cn(
         "relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6",
         "transition-all duration-300",
@@ -129,6 +125,6 @@ export function WMSStatCard({
 
       {/* Bottom shimmer effect on hover */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-    </motion.div>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, memo, useCallback } from "react";
-import { motion } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
@@ -231,12 +230,11 @@ const FleetMapWidget = () => {
       <CardHeader className="pb-4 border-b border-border/30 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <motion.div 
-              className="p-2.5 rounded-xl bg-primary/15"
-              whileHover={{ rotate: 10, scale: 1.05 }}
+            <div 
+              className="p-2.5 rounded-xl bg-primary/15"}
             >
               <Map className="h-5 w-5 text-primary" />
-            </motion.div>
+            </div>
             <div>
               <div className="flex items-center gap-2">
                 <CardTitle className="text-lg font-bold">Live Fleet</CardTitle>
@@ -255,7 +253,7 @@ const FleetMapWidget = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            <motion.div whileHover={{ rotate: 180 }}>
+            <div}>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -265,7 +263,7 @@ const FleetMapWidget = () => {
               >
                 <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
               </Button>
-            </motion.div>
+            </div>
             <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
               <Link to="/track-chauffeurs">
                 <Maximize2 className="h-4 w-4" />
@@ -284,26 +282,24 @@ const FleetMapWidget = () => {
         
         {/* Quick stats overlay */}
         <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 pointer-events-none">
-          <motion.div 
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"
-            initial={{ opacity: 0, y: 10 }}
+          <div 
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"}
           >
             <Truck className="h-4 w-4 text-success" />
             <span className="text-sm font-bold">{activeVehicles}</span>
             <span className="text-xs text-muted-foreground">onderweg</span>
-          </motion.div>
+          </div>
           
           {locations.some(l => l.speed && l.speed > 0) && (
-            <motion.div 
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"
-              initial={{ opacity: 0, y: 10 }}
+            <div 
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"}
             >
               <Navigation2 className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold">
                 {Math.round(locations.reduce((sum, l) => sum + (l.speed || 0), 0) / Math.max(activeVehicles, 1))}
               </span>
               <span className="text-xs text-muted-foreground">gem. km/h</span>
-            </motion.div>
+            </div>
           )}
         </div>
         

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -70,22 +69,17 @@ const LoadingSkeleton = () => (
 
 // Not Found State
 const NotFoundState = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
+  <div}}
     className="flex flex-col items-center justify-center py-32"
   >
-    <motion.div 
-      className="relative mb-8"
-      initial={{ scale: 0.8 }}
-      animate={{ scale: 1 }}
-      transition={{ type: "spring", stiffness: 300 }}
+    <div 
+      className="relative mb-8"}}}
     >
       <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-xl">
         <FileText className="h-12 w-12 text-muted-foreground" />
       </div>
       <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-2xl" />
-    </motion.div>
+    </div>
     <p className="text-2xl font-bold text-foreground mb-2">Inkoopfactuur niet gevonden</p>
     <p className="text-muted-foreground mb-8">Deze factuur bestaat niet of is verwijderd.</p>
     <Button asChild className="gap-2 h-11 px-6">
@@ -94,7 +88,7 @@ const NotFoundState = () => (
         Terug naar overzicht
       </Link>
     </Button>
-  </motion.div>
+  </div>
 );
 
 const PurchaseInvoiceDetail = () => {
@@ -194,29 +188,15 @@ const PurchaseInvoiceDetail = () => {
     <DashboardLayout title="Inkoopfactuur">
       {/* Premium animated background mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <motion.div
-          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.4, 0.6, 0.4],
-            x: [0, 20, 0],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        <div
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"}}
         />
-        <motion.div
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"
-          animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        <div
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"}}
         />
       </div>
 
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="space-y-6"
       >
         {/* Premium Header */}
@@ -315,26 +295,24 @@ const PurchaseInvoiceDetail = () => {
 
             {/* Quick Action Button */}
             {invoice.status === "concept" && (
-              <motion.div variants={itemVariants}>
+              <div>
                 <Button
                   className="w-full h-14 text-base font-semibold gap-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-500"
                   onClick={() => updateStatusMutation.mutate("definitief")}
                   disabled={updateStatusMutation.isPending}
                 >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  <div}}
                   >
                     <Sparkles className="h-5 w-5" />
-                  </motion.div>
+                  </div>
                   Markeer als definitief
                   <CheckCircle2 className="h-5 w-5" />
                 </Button>
-              </motion.div>
+              </div>
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Modals */}
       <ExternalInvoiceMatchModal

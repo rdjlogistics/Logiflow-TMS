@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -147,9 +146,8 @@ const PurchaseInvoicesWidget = () => {
                   </div>
                 ) : (
                   stats?.recentInvoices?.map((invoice, index) => (
-                    <motion.div
-                      key={invoice.id}
-                      initial={{ opacity: 0, x: -10 }}
+                    <div
+                      key={invoice.id}}
                     >
                       <Link
                         to={`/purchase-invoices/${invoice.id}`}
@@ -183,7 +181,7 @@ const PurchaseInvoicesWidget = () => {
                           </p>
                         </div>
                       </Link>
-                    </motion.div>
+                    </div>
                   ))
                 )}
               </div>

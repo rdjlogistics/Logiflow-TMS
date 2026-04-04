@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   CheckCircle2, XCircle, AlertTriangle, Loader2, Play,
@@ -244,10 +243,7 @@ const LaunchChecklist = () => {
 
   return (
     <DashboardLayout title="Launch Checklist">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+      <div}}}
         className="space-y-6"
       >
         {/* Header */}
@@ -389,7 +385,7 @@ const LaunchChecklist = () => {
             })}
           </Accordion>
         )}
-      </motion.div>
+      </div>
     </DashboardLayout>
   );
 };

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Truck, Star, Euro, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
 import { vergelijkCarriers, type CarrierTarief, type CarrierQuote } from "@/lib/carrierRateEngine";
 import { useToast } from "@/hooks/use-toast";
 
@@ -107,11 +106,8 @@ const CarrierCompareWidget: React.FC<CarrierCompareWidgetProps> = ({
       </CardHeader>
       <CardContent className="space-y-3">
         {displayQuotes.map((quote, idx) => (
-          <motion.div
-            key={quote.carrier_id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.08 }}
+          <div
+            key={quote.carrier_id}}}}
             className="flex items-center justify-between rounded-xl border border-border/60 bg-card/60 p-3 gap-3"
           >
             <div className="flex-1 min-w-0">
@@ -148,7 +144,7 @@ const CarrierCompareWidget: React.FC<CarrierCompareWidgetProps> = ({
                 <CheckCircle className="h-3 w-3" /> Toewijzen
               </Button>
             </div>
-          </motion.div>
+          </div>
         ))}
       </CardContent>
     </Card>

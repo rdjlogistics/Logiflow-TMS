@@ -1,5 +1,4 @@
 import React, { memo, useMemo } from "react";
-import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,12 +133,11 @@ const GeographicHeatmapWidget = ({
       <CardHeader className="pb-4 border-b border-border/30 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <motion.div 
-              className="p-2.5 rounded-xl bg-primary/15"
-              whileHover={{ rotate: 10, scale: 1.05 }}
+            <div 
+              className="p-2.5 rounded-xl bg-primary/15"}
             >
               <MapPinned className="h-5 w-5 text-primary" />
-            </motion.div>
+            </div>
             <div>
               <CardTitle className="text-lg font-bold">Geografische Spreiding</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -158,9 +156,8 @@ const GeographicHeatmapWidget = ({
       
       <CardContent className="p-4 relative">
         {/* Summary stats */}
-        <motion.div 
-          className="grid grid-cols-2 gap-3 mb-4"
-          initial={{ opacity: 0, y: 10 }}
+        <div 
+          className="grid grid-cols-2 gap-3 mb-4"}
         >
           <div className="p-3 rounded-xl bg-muted/20 border border-border/30">
             <div className="flex items-center gap-2 mb-1">
@@ -178,26 +175,23 @@ const GeographicHeatmapWidget = ({
               €{(totalRevenue / 1000).toFixed(1)}k
             </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Region grid */}
-        <motion.div 
+        <div 
           className="grid grid-cols-2 sm:grid-cols-3 gap-2.5"
-          initial="hidden"
-          animate="visible"
         >
           {data.slice(0, 6).map((region, index) => (
-            <motion.div
+            <div
               key={region.id}
               className="group cursor-pointer"
               onClick={() => handleRegionClick(region)}
             >
-              <motion.div 
+              <div 
                 className={cn(
                   "relative p-3.5 rounded-xl border border-border/30 overflow-hidden transition-all",
                   "hover:border-primary/40 hover:shadow-lg"
-                )}
-                whileHover={{ y: -2, scale: 1.02 }}
+                )}}
               >
                 {/* Intensity background */}
                 <div className={cn(
@@ -251,10 +245,10 @@ const GeographicHeatmapWidget = ({
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Legend */}
         <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border/30">

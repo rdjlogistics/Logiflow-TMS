@@ -32,7 +32,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { ORDER_STATUS_CONFIG, type OrderStatus } from "@/types/orderStatus";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
 // ── Types ────────────────────────────────────────────────
@@ -496,9 +495,8 @@ const OrderTimelineSheet = ({ open, onOpenChange, orderId }: OrderTimelineSheetP
                 {entries.map((entry, i) => {
                   const styles = variantStyles[entry.variant];
                   return (
-                    <motion.div
-                      key={entry.id}
-                      initial={{ opacity: 0, x: -8, filter: "blur(4px)" }}
+                    <div
+                      key={entry.id}}
                       className="relative flex gap-3 group"
                     >
                       {/* Dot */}
@@ -527,7 +525,7 @@ const OrderTimelineSheet = ({ open, onOpenChange, orderId }: OrderTimelineSheetP
                           </p>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>

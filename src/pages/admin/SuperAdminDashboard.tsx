@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import {
@@ -176,10 +175,7 @@ const SuperAdminDashboard = () => {
 
   return (
     <DashboardLayout title="Super-Admin Dashboard">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+      <div}}}
         className="space-y-6"
       >
         {/* Header */}
@@ -353,7 +349,7 @@ const SuperAdminDashboard = () => {
             </Tabs>
           </>
         ) : null}
-      </motion.div>
+      </div>
     </DashboardLayout>
   );
 };
