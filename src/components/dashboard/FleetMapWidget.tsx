@@ -93,7 +93,7 @@ const FleetMapWidget = () => {
     if (!mapRef.current || !mapLoaded) return;
 
     const updateMarkers = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       // Clear existing markers
       markersRef.current.forEach(m => m.remove());

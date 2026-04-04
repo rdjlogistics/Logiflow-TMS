@@ -203,7 +203,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !showRoute) return;
 
     const drawRoute = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const points: [number, number][] = [];
       if (pickupLocation) points.push([pickupLocation.longitude, pickupLocation.latitude]);
