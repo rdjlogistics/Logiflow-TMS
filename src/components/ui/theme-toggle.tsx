@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -11,10 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-
-// ============================================
-// Animated Theme Toggle (UX Enhancement)
-// ============================================
 
 interface ThemeToggleProps {
   variant?: "icon" | "pill" | "dropdown";
@@ -39,7 +34,6 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
 
   const isDark = resolvedTheme === "dark";
 
-  // Icon variant - simple toggle
   if (variant === "icon") {
     return (
       <Button
@@ -54,26 +48,15 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
         )}
         aria-label={isDark ? "Lichte modus" : "Donkere modus"}
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={isDark ? "dark" : "light"}
-            initial={{ y: -10, opacity: 0, rotate: -90 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: 10, opacity: 0, rotate: 90 }}
-            transition={{ duration: 0.15 }}
-          >
-            {isDark ? (
-              <Moon className="h-5 w-5 text-primary" />
-            ) : (
-              <Sun className="h-5 w-5 text-warning" />
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {isDark ? (
+          <Moon className="h-5 w-5 text-primary transition-transform duration-200" />
+        ) : (
+          <Sun className="h-5 w-5 text-warning transition-transform duration-200" />
+        )}
       </Button>
     );
   }
 
-  // Pill variant - animated background
   if (variant === "pill") {
     return (
       <div
@@ -83,10 +66,8 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
           className
         )}
       >
-        <motion.div
-          className="absolute h-8 w-8 rounded-full bg-primary shadow-sm"
-          layoutId="theme-indicator"
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        <div
+          className="absolute h-8 w-8 rounded-full bg-primary shadow-sm transition-[left] duration-300 ease-out"
           style={{ left: isDark ? "calc(100% - 2.25rem)" : "0.25rem" }}
         />
         
@@ -117,7 +98,7 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
     );
   }
 
-  // Dropdown variant - includes system option
+  // Dropdown variant
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -127,21 +108,11 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
           className={cn("h-10 w-10 rounded-xl", className)}
           aria-label="Thema wijzigen"
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={resolvedTheme}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              {resolvedTheme === "dark" ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          {resolvedTheme === "dark" ? (
+            <Moon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[160px]">
@@ -171,10 +142,6 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
   );
 }
 
-// ============================================
-// Compact Theme Toggle for Headers
-// ============================================
-
 export function CompactThemeToggle({ className }: { className?: string }) {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -201,30 +168,19 @@ export function CompactThemeToggle({ className }: { className?: string }) {
       aria-checked={isDark}
       aria-label={isDark ? "Schakel naar lichte modus" : "Schakel naar donkere modus"}
     >
-      <motion.div
+      <div
         className={cn(
           "h-5 w-5 rounded-full flex items-center justify-center",
-          "bg-card shadow-sm"
+          "bg-card shadow-sm transition-transform duration-200 ease-out"
         )}
-        animate={{ x: isDark ? 20 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        style={{ transform: isDark ? "translateX(20px)" : "translateX(0)" }}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={isDark ? "moon" : "sun"}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 180 }}
-            transition={{ duration: 0.15 }}
-          >
-            {isDark ? (
-              <Moon className="h-3 w-3 text-primary" />
-            ) : (
-              <Sun className="h-3 w-3 text-warning" />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
+        {isDark ? (
+          <Moon className="h-3 w-3 text-primary" />
+        ) : (
+          <Sun className="h-3 w-3 text-warning" />
+        )}
+      </div>
     </button>
   );
 }

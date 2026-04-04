@@ -1,24 +1,18 @@
 /**
- * Batch T19: ProgressBar
- * Animated progress bar for KPIs and goals.
- * Props: value (0-100), label, color, showPercentage
- * Uses Framer Motion spring animation on mount.
+ * ProgressBar — Animated progress bar for KPIs and goals.
+ * Uses CSS transition (no framer-motion).
  */
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 type ProgressColor = 'blue' | 'emerald' | 'amber' | 'rose' | 'purple' | 'cyan' | 'auto';
 
 interface ProgressBarProps {
-  /** Value between 0 and 100 */
   value: number;
   label?: string;
   color?: ProgressColor;
   showPercentage?: boolean;
-  /** Height of the bar in pixels (default: 8) */
   height?: number;
   className?: string;
-  /** If true, shows a gradient fill */
   gradient?: boolean;
 }
 
@@ -86,11 +80,12 @@ export function ProgressBar({
         aria-valuemax={100}
         aria-label={label}
       >
-        <motion.div
-          className={cn('absolute inset-y-0 left-0 rounded-full', fillClass)}
-          initial={{ width: 0 }}
-          animate={{ width: `${clampedValue}%` }}
-          transition={{ type: 'spring', stiffness: 80, damping: 20, delay: 0.1 }}
+        <div
+          className={cn(
+            'absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out animate-progress-fill',
+            fillClass
+          )}
+          style={{ width: `${clampedValue}%` }}
         />
       </div>
     </div>
