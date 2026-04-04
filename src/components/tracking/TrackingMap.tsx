@@ -135,7 +135,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded || !deliveryLocation) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       const el = document.createElement("div");
       el.className = "delivery-marker";
