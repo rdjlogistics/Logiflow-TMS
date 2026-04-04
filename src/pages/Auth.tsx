@@ -728,7 +728,7 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
             </Tabs>
           </CardContent>
         </Card>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
