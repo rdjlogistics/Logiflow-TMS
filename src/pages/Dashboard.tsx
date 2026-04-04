@@ -53,6 +53,7 @@ import { nl } from "date-fns/locale";
 const Dashboard = () => {
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
+  const [period, setPeriod] = useState<PeriodKey>("this_month");
   const { 
     stats, 
     opsStats, 
@@ -66,7 +67,7 @@ const Dashboard = () => {
     hasEnoughData,
     loading,
     error 
-  } = useDashboardData();
+  } = useDashboardData(period);
   
   const { weather, loading: weatherLoading } = useWeatherData();
   const { 
