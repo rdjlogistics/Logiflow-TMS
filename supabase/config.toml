@@ -130,8 +130,6 @@ verify_jwt = false
 [functions.process-email-queue]
 verify_jwt = false
 
-[functions.smart-ai]
-verify_jwt = false
 
 [functions.intelligent-dispatch]
 verify_jwt = false
