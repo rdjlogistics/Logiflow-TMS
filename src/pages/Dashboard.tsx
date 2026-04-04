@@ -602,7 +602,7 @@ const Dashboard = () => {
             ].map((action) => (
               <Link key={action.href} to={action.href}>
                 <motion.div
-                  whileHover={{ scale: 1.03 }}
+                  }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
                     "action-card-3d",

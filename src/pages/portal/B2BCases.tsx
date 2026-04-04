@@ -98,7 +98,7 @@ const B2BCases = () => {
               {statusCounts.open} open, {statusCounts.in_progress} in behandeling
             </p>
           </div>
-          <motion.div whileTap={{ scale: 0.98 }}>
+          <motion.div} whileTap={{ scale: 0.98 }}>
             <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 bg-gold hover:bg-gold/90 text-gold-foreground">
               <Plus className="h-4 w-4" /> Nieuwe Case
             </Button>
@@ -108,7 +108,7 @@ const B2BCases = () => {
         {/* Status Cards */}
         <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {statusCards.map((sc, index) => (
-            <motion.div key={sc.key} whileTap={{ scale: 0.98 }}>
+            <motion.div key={sc.key}} whileTap={{ scale: 0.98 }}>
               <Card 
                 className={cn(
                   "cursor-pointer transition-all border-2 backdrop-blur-sm bg-card/60",
@@ -118,7 +118,7 @@ const B2BCases = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <motion.div className={cn("p-1.5 rounded-lg", sc.bg)}>
+                    <motion.div} className={cn("p-1.5 rounded-lg", sc.bg)}>
                       <sc.icon className={cn("h-4 w-4", sc.color)} />
                     </motion.div>
                     <span className="text-xs text-muted-foreground">{sc.label}</span>
@@ -156,7 +156,10 @@ const B2BCases = () => {
               <motion.div
                 key={caseItem.id}
                 custom={index}
-                whileHover={{ scale: 1.01 }}
+               
+               
+               
+               }
                 whileTap={{ scale: 0.99 }}
               >
                 <Card 

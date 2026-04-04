@@ -99,7 +99,7 @@ const B2BInvoices = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {summaryCards.map((card, index) => (
-            <div key={card.key}>
+            <div key={card.key} }}>
               <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
