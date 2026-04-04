@@ -217,7 +217,7 @@ export function DriverHomeTab({
                               : primaryState.type === 'next_route'
                                 ? "bg-primary/10"
                                 : "bg-primary/10"
-                          )}}
+                          )}
                         >
                           {primaryState.type === 'active_route' ? (
                             <Route className="h-6 w-6 text-blue-500" />

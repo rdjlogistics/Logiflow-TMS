@@ -75,7 +75,7 @@ export const WaitingTimer = ({ stopId, stopName, tripId, onComplete }: WaitingTi
           <div className="relative bg-muted/50 rounded-2xl p-6 mb-4">
             <div className="text-center">
               <p 
-                className={cn("text-5xl font-mono font-bold tracking-tight", isRunning && !isWithinGrace && "text-destructive")}}
+                className={cn("text-5xl font-mono font-bold tracking-tight", isRunning && !isWithinGrace && "text-destructive")}
               >
                 {formatElapsedTime()}
               </p>
@@ -84,7 +84,7 @@ export const WaitingTimer = ({ stopId, stopName, tripId, onComplete }: WaitingTi
               </p>
             </div>
             <div className="mt-4 h-2 bg-muted rounded-full overflow-hidden">
-              <div className={cn("h-full rounded-full", isWithinGrace ? "bg-warning" : "bg-destructive")}} />
+              <div className={cn("h-full rounded-full", isWithinGrace ? "bg-warning" : "bg-destructive")} />
             </div>
           </div>
             {billableMinutes > 0 && (

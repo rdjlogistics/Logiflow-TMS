@@ -169,7 +169,7 @@ export const GPSStatusBarPremium = ({
             className={cn(
               'relative w-12 h-12 rounded-xl flex items-center justify-center',
               'bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10'
-            )}}
+            )}
           >
             <StatusIcon className={cn(
               'w-6 h-6',

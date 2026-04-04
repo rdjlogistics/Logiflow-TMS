@@ -199,7 +199,7 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
                     activeType?.value === 'pauze' && "bg-amber-500",
                     activeType?.value === 'rust' && "bg-blue-500",
                     activeType?.value === 'wachttijd' && "bg-purple-500"
-                  )}}
+                  )}
                 />
               </div>
 
