@@ -155,7 +155,7 @@ export const StopCard = ({
         )}
 
         {/* Expand/Collapse */}
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={(e) => { e.stopPropagation(); onUpdate({ isExpanded: !stop.isExpanded }); >
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={(e) => { e.stopPropagation(); onUpdate({ isExpanded: !stop.isExpanded }); }}>
           {stop.isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
       </div>

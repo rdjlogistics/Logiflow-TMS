@@ -244,7 +244,7 @@ export const B2CSecuritySheet = ({ open, onOpenChange }: B2CSecuritySheetProps) 
                       />
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEnrolling2FA(false); setQrCode(null); setFactorId(null); >
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEnrolling2FA(false); setQrCode(null); setFactorId(null); }}>
                         Annuleren
                       </Button>
                       <Button size="sm" className="flex-1" onClick={handleVerify2FA} disabled={saving || verifyCode.length < 6}>

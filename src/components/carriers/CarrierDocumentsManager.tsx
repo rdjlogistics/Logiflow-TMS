@@ -239,7 +239,7 @@ export function CarrierDocumentsManager({ carrierId, tenantId }: Props) {
                           <Download className="h-3.5 w-3.5" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => { setDeleteId(doc.id); setDeleteOpen(true); >
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => { setDeleteId(doc.id); setDeleteOpen(true); }}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>

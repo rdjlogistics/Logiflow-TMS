@@ -232,8 +232,7 @@ const VehicleDocs = () => {
                       <Label className="text-xs uppercase text-muted-foreground tracking-wider">Type *</Label>
                       <Select value={form.doc_type} onValueChange={(val) => {
                         const docType = docTypes.find(d => d.value === val);
-                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name }));
-                      >
+                        setForm(prev => ({ ...prev, doc_type: val, doc_name: docType?.label || prev.doc_name })); }}>
                         <SelectTrigger className="h-11 bg-muted/30 border-border/50">
                           <SelectValue placeholder="Selecteer type..." />
                         </SelectTrigger>

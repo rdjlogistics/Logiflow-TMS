@@ -46,7 +46,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
-      <AlertDialog open={open} onOpenChange={v => { if (!v) handleResult(false); >
+      <AlertDialog open={open} onOpenChange={v => { if (!v) handleResult(false); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{opts.title}</AlertDialogTitle>

@@ -340,8 +340,7 @@ export default function PublicAPI() {
                   {newlyCreatedKey ? (
                     <Button onClick={() => {
                       setShowCreateDialog(false);
-                      setNewlyCreatedKey(null);
-                    >
+                      setNewlyCreatedKey(null); }}>
                       Sluiten
                     </Button>
                   ) : (

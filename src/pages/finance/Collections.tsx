@@ -425,8 +425,7 @@ export function CollectionsContent() {
                           setEditPaymentTerms(profile.payment_terms || 30);
                           setEditRiskLevel(profile.risk_level || 'low');
                           setEditProforma(profile.proforma || false);
-                          setEditStopShipping(profile.stop_shipping || false);
-                        >
+                          setEditStopShipping(profile.stop_shipping || false); }}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -532,8 +531,7 @@ export function CollectionsContent() {
                   const subject = encodeURIComponent(`Herinnering: Openstaande factuur ${selectedCase.invoice}`);
                   const body = encodeURIComponent(`Geachte heer/mevrouw,\n\nUit onze administratie blijkt dat de volgende factuur nog openstaat:\n\nFactuurnummer: ${selectedCase.invoice}\nBedrag: €${selectedCase.amount?.toLocaleString()}\nVervaldatum: ${selectedCase.due_date}\nDagen te laat: ${selectedCase.days_overdue}\n\nGraag ontvangen wij uw betaling zo spoedig mogelijk.\n\nMet vriendelijke groet`);
                   window.open(`mailto:${selectedCase.customer_email}?subject=${subject}&body=${body}`, '_blank');
-                  toast({ title: "E-mail geopend ✓", description: `Herinneringsmail voor ${selectedCase.invoice} is voorbereid.` });
-                ><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
+                  toast({ title: "E-mail geopend ✓", description: `Herinneringsmail voor ${selectedCase.invoice} is voorbereid.` }); }}><Mail className="h-4 w-4 mr-2" />E-mail sturen</Button>
                 <Button variant="outline" onClick={() => {
                   const promiseDate = new Date();
                   promiseDate.setDate(promiseDate.getDate() + 7);
@@ -543,8 +541,7 @@ export function CollectionsContent() {
                     promised_date: promiseDate.toISOString(),
                     promised_amount: selectedCase.amount || 0,
                     notes: `Betalingsbelofte geregistreerd voor ${promiseDate.toLocaleDateString('nl-NL')}`,
-                  });
-                ><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
+                  }); }}><Calendar className="h-4 w-4 mr-2" />Belofte registreren</Button>
               </div>
 
               <div className="space-y-2">
@@ -655,8 +652,7 @@ export function CollectionsContent() {
                     stop_shipping_on_overdue: editStopShipping,
                   }, {
                     onSuccess: () => setSelectedProfile(null),
-                  });
-                >Opslaan</Button>
+                  }); }}>Opslaan</Button>
               </DialogFooter>
             </div>
           )}

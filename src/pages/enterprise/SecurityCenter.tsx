@@ -54,7 +54,7 @@ const SecurityCenter = () => {
       <div className="space-y-6">
         <SecurityDashboardStats />
 
-        <Tabs defaultValue="rls" value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v === 'audit') resetNewEventCount(); >
+        <Tabs defaultValue="rls" value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v === 'audit') resetNewEventCount(); }}>
           <TabsList className="flex-wrap">
             <TabsTrigger value="rls" className="gap-2">
               <Database className="h-4 w-4" />

@@ -180,7 +180,7 @@ export const OrderSubstatusesTab = () => {
                     </div>
 
                     {editingId === sub.id ? (
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { updateSubstatus(sub.id, { name: sub.name }); setEditingId(null); >
+                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { updateSubstatus(sub.id, { name: sub.name }); setEditingId(null); }}>
                         <Check className="h-3.5 w-3.5 text-green-500" />
                       </Button>
                     ) : (

@@ -157,7 +157,7 @@ export default function EmailInbox() {
           </div>
 
           {/* Tabs */}
-          <Tabs value={tab} onValueChange={(v) => { setTab(v as "inbox" | "sent"); setSelected(null); >
+          <Tabs value={tab} onValueChange={(v) => { setTab(v as "inbox" | "sent"); setSelected(null); }}>
             <TabsList className="w-full rounded-none border-b border-border bg-transparent h-10">
               <TabsTrigger value="inbox" className="flex-1 gap-1.5">
                 <Inbox className="h-4 w-4" />

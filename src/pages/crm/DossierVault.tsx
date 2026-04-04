@@ -342,8 +342,7 @@ const DossierVault = () => {
                           <div className="flex items-center gap-1">
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {
                               const { data } = await supabase.storage.from('dossier-documents').createSignedUrl(doc.file_url, 3600);
-                              if (data?.signedUrl) window.open(data.signedUrl, '_blank');
-                            >
+                              if (data?.signedUrl) window.open(data.signedUrl, '_blank'); }}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => {

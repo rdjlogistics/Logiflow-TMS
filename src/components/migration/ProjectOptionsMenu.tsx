@@ -115,11 +115,11 @@ export function ProjectOptionsMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit?.(); setRenameDialogOpen(true); >
+          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit?.(); setRenameDialogOpen(true); }}>
             <Edit className="h-4 w-4 mr-2" />
             Hernoemen
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleArchive(); >
+          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleArchive(); }}>
             <Archive className="h-4 w-4 mr-2" />
             Archiveren
           </DropdownMenuItem>

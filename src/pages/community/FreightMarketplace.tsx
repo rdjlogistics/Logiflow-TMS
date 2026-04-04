@@ -496,7 +496,7 @@ function ListingCard({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button size="sm" variant="outline" className="flex-1 gap-1" onClick={(e) => { e.stopPropagation(); onView(); >
+          <Button size="sm" variant="outline" className="flex-1 gap-1" onClick={(e) => { e.stopPropagation(); onView(); }}>
             <Eye className="h-3 w-3" />
             Details
           </Button>

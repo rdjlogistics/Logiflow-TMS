@@ -1019,25 +1019,25 @@ const OrderOverview = () => {
               {/* Quick Status Badges */}
               <div className="hidden md:flex items-center gap-2">
                 {statusFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setStatusFilter('all'); setCurrentPage(1); >
+                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}>
                     Status: {statusFilter}
                     <XCircle className="h-3 w-3 ml-1" />
                   </Badge>
                 )}
                 {customerFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setCustomerFilter('all'); setCurrentPage(1); >
+                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setCustomerFilter('all'); setCurrentPage(1); }}>
                     Klant geselecteerd
                     <XCircle className="h-3 w-3 ml-1" />
                   </Badge>
                 )}
                 {carrierFilter !== 'all' && (
-                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setCarrierFilter('all'); setCurrentPage(1); >
+                  <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => { setCarrierFilter('all'); setCurrentPage(1); }}>
                     Charter geselecteerd
                     <XCircle className="h-3 w-3 ml-1" />
                   </Badge>
                 )}
                 {unassignedFilter && (
-                  <Badge variant="destructive" className="gap-1 cursor-pointer hover:opacity-80" onClick={() => { setUnassignedFilter(false); setCurrentPage(1); >
+                  <Badge variant="destructive" className="gap-1 cursor-pointer hover:opacity-80" onClick={() => { setUnassignedFilter(false); setCurrentPage(1); }}>
                     Onbemand
                     <XCircle className="h-3 w-3 ml-1" />
                   </Badge>
@@ -1515,7 +1515,7 @@ const OrderOverview = () => {
                 <span>
                   Toont {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalCount)} van {totalCount} orders
                 </span>
-                <Select value={String(itemsPerPage)} onValueChange={(v) => { setItemsPerPage(Number(v)); setCurrentPage(1); >
+                <Select value={String(itemsPerPage)} onValueChange={(v) => { setItemsPerPage(Number(v)); setCurrentPage(1); }}>
                   <SelectTrigger className="h-8 w-[80px] text-xs">
                     <SelectValue />
                   </SelectTrigger>

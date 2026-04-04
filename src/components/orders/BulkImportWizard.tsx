@@ -99,7 +99,7 @@ export const BulkImportWizard = ({ open, onOpenChange, entityType, companyId, on
               {file && (
                 <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/40">
                   <div className="flex items-center gap-3"><FileText className="h-5 w-5 text-primary" /><span className="font-medium text-sm">{file.name}</span></div>
-                  <Button variant="ghost" size="icon" onClick={() => { setFile(null); setPreview([]); setStep(1); ><X className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => { setFile(null); setPreview([]); setStep(1); }}><X className="h-4 w-4" /></Button>
                 </div>
               )}
               {preview.length > 0 && (
@@ -116,7 +116,7 @@ export const BulkImportWizard = ({ open, onOpenChange, entityType, companyId, on
                 </Card>
               )}
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => { setFile(null); setPreview([]); setStep(1); >Terug</Button>
+                <Button variant="outline" onClick={() => { setFile(null); setPreview([]); setStep(1); }}>Terug</Button>
                 <Button variant="premium" className="flex-1" onClick={handleImport} disabled={importing || !preview.length}>
                   {importing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ArrowRight className="h-4 w-4 mr-2" />}Importeren
                 </Button>

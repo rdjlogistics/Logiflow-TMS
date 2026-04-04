@@ -817,7 +817,7 @@ const Drivers = () => {
 
                 {/* Mobile cards */}
                 <div className="md:hidden space-y-3">
-                  <PullToRefresh onRefresh={async () => { queryClient.invalidateQueries({ queryKey: ["drivers"] }); >
+                  <PullToRefresh onRefresh={async () => { queryClient.invalidateQueries({ queryKey: ["drivers"] }); }}>
                     <div className="space-y-3 p-1">
                       {filteredDrivers.map((driver, i) => {
                         const sc = statusConfig[driver.status] || {

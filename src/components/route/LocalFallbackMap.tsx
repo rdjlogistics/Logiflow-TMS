@@ -93,8 +93,7 @@ const LocalFallbackMap: React.FC<LocalFallbackMapProps> = ({
           return (
             <g key={stop.id} className="cursor-pointer" onClick={() => {
               setActivePopup(activePopup === stop.id ? null : stop.id);
-              onStopClick?.(stop.id);
-            >
+              onStopClick?.(stop.id); }}>
               <circle cx={p.x} cy={p.y} r="14" fill={color} stroke="white" strokeWidth="2" />
               <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="central" fill="white" fontSize="10" fontWeight="bold">
                 {index + 1}

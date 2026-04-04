@@ -487,15 +487,13 @@ export default function WMSInbound() {
                   <>
                     <Button className="flex-1" onClick={() => {
                       handleUpdateStatus(selectedOrder.id, "received");
-                      setSelectedOrder(null);
-                    >
+                      setSelectedOrder(null); }}>
                       <CheckCircle2 className="h-4 w-4 mr-2" />
                       Volledig Ontvangen
                     </Button>
                     <Button variant="outline" onClick={() => {
                       handleUpdateStatus(selectedOrder.id, "partial");
-                      setSelectedOrder(null);
-                    >
+                      setSelectedOrder(null); }}>
                       Deels Ontvangen
                     </Button>
                   </>
@@ -503,8 +501,7 @@ export default function WMSInbound() {
                 {selectedOrder.status === "partial" && (
                   <Button className="flex-1" onClick={() => {
                     handleUpdateStatus(selectedOrder.id, "received");
-                    setSelectedOrder(null);
-                  >
+                    setSelectedOrder(null); }}>
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Volledig Ontvangen
                   </Button>

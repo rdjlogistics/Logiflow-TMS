@@ -152,8 +152,7 @@ const FreightSettlements = () => {
                       status: s.status === "concept" ? "pending" : s.status,
                       dueDate: "30 dagen na goedkeuring",
                     });
-                    setApprovalOpen(true);
-                  >
+                    setApprovalOpen(true); }}>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium">{s.carrierName}</span>

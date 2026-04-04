@@ -119,7 +119,7 @@ const Disputes = () => {
             ) : (
               <div className="space-y-3">
                 {filtered.map((c: any) => (
-                  <div key={c.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => { setDetailCase(c); setDetailOpen(true); >
+                  <div key={c.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => { setDetailCase(c); setDetailOpen(true); }}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium">{c.id.slice(0, 8).toUpperCase()}</span>
@@ -139,7 +139,7 @@ const Disputes = () => {
                         <p className="text-xs text-muted-foreground">{format(new Date(c.created_at), "d MMM yyyy", { locale: nl })}</p>
                       </div>
                       {!["settled", "rejected"].includes(c.status) && (
-                        <Button size="sm" onClick={(e) => { e.stopPropagation(); setSelectedCase(c); setRespondOpen(true); >Reageren</Button>
+                        <Button size="sm" onClick={(e) => { e.stopPropagation(); setSelectedCase(c); setRespondOpen(true); }}>Reageren</Button>
                       )}
                     </div>
                   </div>

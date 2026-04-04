@@ -285,18 +285,18 @@ const OrderMobileCard = ({
                       <DropdownMenuSeparator />
                     </>
                   )}
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/orders/edit/${trip.id}`); >
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/orders/edit/${trip.id}`); }}>
                     <Pencil className="h-4 w-4 mr-2" />
                     Bewerken
                   </DropdownMenuItem>
                   {onShowMap && (
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onShowMap(); >
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onShowMap(); }}>
                       <Map className="h-4 w-4 mr-2" />
                       Route bekijken
                     </DropdownMenuItem>
                   )}
                   {canEdit && (
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(); >
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(); }}>
                       <Copy className="h-4 w-4 mr-2" />
                       Dupliceren
                     </DropdownMenuItem>

@@ -385,8 +385,7 @@ const HoldsInbox = () => {
               <Button variant="outline" onClick={() => setShowDetailDialog(false)}>Sluiten</Button>
               <Button onClick={() => {
                 setShowDetailDialog(false);
-                setSelectedHold(detailHold);
-              >
+                setSelectedHold(detailHold); }}>
                 <CheckCircle2 className="h-4 w-4 mr-2" />
                 Oplossen
               </Button>
@@ -449,8 +448,7 @@ const HoldsInbox = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => {
                 setShowEscalateDialog(false);
-                setEscalateReason('');
-              >Annuleren</Button>
+                setEscalateReason(''); }}>Annuleren</Button>
               <Button 
                 onClick={async () => {
                   if (!escalateHold) return;

@@ -157,7 +157,7 @@ export function CarrierContactsManager({ carrierId, tenantId, contacts, onContac
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => { setDeleteId(c.id); setDeleteOpen(true); >
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => { setDeleteId(c.id); setDeleteOpen(true); }}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
