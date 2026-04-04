@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import PeriodSelector, { type PeriodKey } from "@/components/dashboard/PeriodSelector";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { motion } from "framer-motion";
