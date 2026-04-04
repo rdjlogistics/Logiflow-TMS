@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { 
   useVehicleInspection, 
   DEFAULT_INSPECTION_ITEMS, 
@@ -127,11 +126,8 @@ export function VehicleInspectionSheet({
         {/* Items list */}
         <div className="flex-1 overflow-y-auto py-4 space-y-3">
           {items.map((item, index) => (
-            <motion.div
+            <div
               key={item.name}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
               className="space-y-2"
             >
               <div className="flex items-center justify-between gap-3">
@@ -169,9 +165,7 @@ export function VehicleInspectionSheet({
 
               {/* Notes for NOK items */}
               {item.status === 'nok' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                <div
                   className="pl-2"
                 >
                   <Textarea
@@ -180,9 +174,9 @@ export function VehicleInspectionSheet({
                     onChange={(e) => setItemNotes(prev => ({ ...prev, [index]: e.target.value }))}
                     className="min-h-[60px] text-sm"
                   />
-                </motion.div>
+                </div>
               )}
-            </motion.div>
+            </div>
           ))}
 
           {/* Overall notes */}

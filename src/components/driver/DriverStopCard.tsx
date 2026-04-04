@@ -32,7 +32,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
 import { StopCheckoutFlow } from './StopCheckoutFlow';
 import { WaitingTimeControls } from './WaitingTimeControls';
 import { StopDocumentUpload } from './StopDocumentUpload';
@@ -533,11 +532,7 @@ export const DriverStopCard = ({
                 {steps.map((step, index) => (
                   <div key={step.label} className="flex items-center flex-1 last:flex-initial">
                     <div className="flex flex-col items-center gap-1">
-                      <motion.div
-                        initial={false}
-                        animate={{
-                          scale: step.status === 'current' ? 1.15 : step.status === 'completed' ? [1, 1.3, 1] : 1,
-                        }}
+                      <div
                         transition={step.status === 'completed' 
                           ? { duration: 0.5, times: [0, 0.4, 1], ease: 'easeOut' }
                           : { type: 'spring', stiffness: 400, damping: 25 }
@@ -549,45 +544,30 @@ export const DriverStopCard = ({
                           step.status === 'pending' && "border-muted-foreground/30 bg-muted/30 text-muted-foreground/50",
                         )}
                       >
-                        <AnimatePresence mode="wait">
                           {step.status === 'completed' ? (
-                            <motion.div
+                            <div
                               key="check"
-                              initial={{ scale: 0, rotate: -90 }}
-                              animate={{ scale: 1, rotate: 0 }}
-                              exit={{ scale: 0, opacity: 0 }}
-                              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                             >
                               <Check className="w-4 h-4" />
-                            </motion.div>
+                            </div>
                           ) : (
-                            <motion.div
+                            <div
                               key="icon"
-                              initial={{ scale: 0.8, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              exit={{ scale: 0, opacity: 0 }}
-                              transition={{ duration: 0.15 }}
                             >
                               <step.icon className="w-4 h-4" />
-                            </motion.div>
+                            </div>
                           )}
-                        </AnimatePresence>
                         {step.status === 'current' && (
-                          <motion.div
+                          <div
                             className="absolute inset-0 rounded-full border-2 border-primary"
-                            animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                           />
                         )}
                         {step.status === 'completed' && (
-                          <motion.div
+                          <div
                             className="absolute inset-0 rounded-full border-2 border-green-400"
-                            initial={{ scale: 1, opacity: 0.7 }}
-                            animate={{ scale: 1.6, opacity: 0 }}
-                            transition={{ duration: 0.6, ease: 'easeOut' }}
                           />
                         )}
-                      </motion.div>
+                      </div>
                       <span className={cn(
                         "text-2xs font-medium transition-colors duration-300",
                         step.status === 'completed' && "text-green-600 dark:text-green-400",
@@ -599,13 +579,8 @@ export const DriverStopCard = ({
                     </div>
                     {index < steps.length - 1 && (
                       <div className="flex-1 h-0.5 mx-2 mb-4 rounded-full bg-muted-foreground/20 overflow-hidden">
-                        <motion.div
+                        <div
                           className="h-full bg-green-500 rounded-full"
-                          initial={{ width: '0%' }}
-                          animate={{
-                            width: step.status === 'completed' ? '100%' : '0%',
-                          }}
-                          transition={{ duration: 0.5, ease: 'easeOut' }}
                         />
                       </div>
                     )}

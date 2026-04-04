@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -164,30 +163,24 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
   return (
     <Card className="border-border/40 overflow-hidden">
       <CardContent className="p-4">
-        <AnimatePresence mode="wait">
           {activeBreak ? (
-            <motion.div
+            <div
               key="active"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
               className="space-y-4"
             >
               {/* Active break display */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <motion.div
+                  <div
                     className={cn(
                       "w-12 h-12 rounded-xl flex items-center justify-center",
                       activeType?.value === 'pauze' && "bg-amber-500/10",
                       activeType?.value === 'rust' && "bg-blue-500/10",
                       activeType?.value === 'wachttijd' && "bg-purple-500/10"
                     )}
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
                   >
                     {activeType && <activeType.icon className={cn("h-6 w-6", activeType.color)} />}
-                  </motion.div>
+                  </div>
                   <div>
                     <p className="font-semibold">{activeType?.label} actief</p>
                     <p className="text-sm text-muted-foreground">Sinds {new Date(activeBreak.break_start).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}</p>
@@ -200,21 +193,19 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
 
               {/* Timer progress */}
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <motion.div
+                <div
                   className={cn(
                     "h-full rounded-full",
                     activeType?.value === 'pauze' && "bg-amber-500",
                     activeType?.value === 'rust' && "bg-blue-500",
                     activeType?.value === 'wachttijd' && "bg-purple-500"
                   )}
-                  initial={{ width: '0%' }}
                   animate={{ width: `${Math.min((elapsedSeconds / 1800) * 100, 100)}%` }}
-                  transition={{ duration: 0.5 }}
                 />
               </div>
 
               {/* Stop button */}
-              <motion.div whileTap={{ scale: 0.98 }}>
+              <div>
                 <Button
                   variant="destructive"
                   className="w-full h-12"
@@ -224,14 +215,11 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
                   <Square className="mr-2 h-5 w-5" />
                   Stop {activeType?.label?.toLowerCase()}
                 </Button>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           ) : (
-            <motion.div
+            <div
               key="idle"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
               className="space-y-4"
             >
               {/* Break type selection */}
@@ -242,10 +230,9 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
 
               <div className="grid grid-cols-3 gap-2">
                 {breakTypes.map((type) => (
-                  <motion.button
+                  <button
                     key={type.value}
                     type="button"
-                    whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedType(type.value)}
                     className={cn(
                       "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
@@ -256,12 +243,12 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
                   >
                     <type.icon className={cn("h-5 w-5", type.color)} />
                     <span className="text-xs font-medium">{type.label}</span>
-                  </motion.button>
+                  </button>
                 ))}
               </div>
 
               {/* Start button */}
-              <motion.div whileTap={{ scale: 0.98 }}>
+              <div>
                 <Button
                   className="w-full h-12"
                   onClick={startBreak}
@@ -270,10 +257,9 @@ export function BreakTimerCard({ tripId, tenantId }: BreakTimerCardProps) {
                   <Play className="mr-2 h-5 w-5" />
                   Start {breakTypes.find(t => t.value === selectedType)?.label?.toLowerCase()}
                 </Button>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           )}
-        </AnimatePresence>
       </CardContent>
     </Card>
   );

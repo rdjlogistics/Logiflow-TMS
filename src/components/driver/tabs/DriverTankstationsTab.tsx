@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import type mapboxgl from 'mapbox-gl';
 import { useMapboxToken } from '@/hooks/useMapboxToken';
 import { useFuelStationsDE, FuelStationDE } from '@/hooks/useFuelStationsDE';
@@ -100,14 +99,12 @@ export function DriverTankstationsTab() {
   if (tokenLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <motion.div 
+        <div 
           className="flex flex-col items-center gap-3"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
         >
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Kaart laden...</p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -141,14 +138,12 @@ export function DriverTankstationsTab() {
   if (stationsLoading && stations.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <motion.div 
+        <div 
           className="flex flex-col items-center gap-3"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
         >
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Tankstations laden...</p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -160,9 +155,8 @@ export function DriverTankstationsTab() {
         {/* Fuel Type Pills */}
         <div className="flex items-center gap-2">
           {fuelTypes.map(({ type, label }) => (
-            <motion.button
+            <button
               key={type}
-              whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedFuelType(type)}
               className={cn(
                 "px-4 py-2 rounded-full text-sm font-medium transition-all",
@@ -172,7 +166,7 @@ export function DriverTankstationsTab() {
               )}
             >
               {label}
-            </motion.button>
+            </button>
           ))}
         </div>
 
@@ -246,13 +240,9 @@ export function DriverTankstationsTab() {
           />
           
           {/* Selected Station Bottom Sheet */}
-          <AnimatePresence>
             {selectedStation && (
-              <motion.div 
+              <div 
                 className="absolute bottom-20 left-4 right-4 z-10"
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
               >
                 <Card className="border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl">
                   <CardContent className="p-4">
@@ -325,9 +315,8 @@ export function DriverTankstationsTab() {
                     </Button>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       ) : (
         <ScrollArea className="flex-1">
@@ -343,11 +332,8 @@ export function DriverTankstationsTab() {
               </div>
             ) : (
               nearbyStations.map((station, index) => (
-                <motion.div
+                <div
                   key={station.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }}
                 >
                   <Card 
                     className="border-border/40 hover:border-primary/30 transition-colors cursor-pointer"
@@ -394,7 +380,7 @@ export function DriverTankstationsTab() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))
             )}
           </div>

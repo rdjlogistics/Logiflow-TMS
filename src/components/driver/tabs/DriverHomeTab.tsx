@@ -1,5 +1,4 @@
 import { useMemo, memo } from 'react';
-import { motion } from 'framer-motion';
 import { useDriverTrips } from '@/hooks/useDriverTrips';
 import { useDriverPortalData } from '@/hooks/useDriverPortalData';
 import { Card, CardContent } from '@/components/ui/card';
@@ -185,35 +184,32 @@ export function DriverHomeTab({
 
         {/* Premium Primary Work Card */}
         <div>
-          <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <div>
             <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl">
               <CardContent className="p-5">
                 {primaryState.type === 'no_shift' ? (
                   <div className="flex flex-col items-center text-center py-4">
-                    <motion.div 
+                    <div 
                       className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mb-4"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     >
                       <Calendar className="h-7 w-7 text-muted-foreground/50" />
-                    </motion.div>
+                    </div>
                     <p className="font-semibold mb-1">{primaryState.title}</p>
                     <p className="text-sm text-muted-foreground mb-4">
                       {primaryState.subtitle}
                     </p>
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <div>
                       <Button onClick={primaryState.action}>
                         {primaryState.cta}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
-                    </motion.div>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <motion.div 
+                        <div 
                           className={cn(
                             "w-12 h-12 rounded-xl flex items-center justify-center",
                             primaryState.type === 'active_route' 
@@ -223,7 +219,6 @@ export function DriverHomeTab({
                                 : "bg-primary/10"
                           )}
                           animate={primaryState.type === 'active_route' ? { scale: [1, 1.05, 1] } : {}}
-                          transition={{ repeat: Infinity, duration: 2 }}
                         >
                           {primaryState.type === 'active_route' ? (
                             <Route className="h-6 w-6 text-blue-500" />
@@ -232,7 +227,7 @@ export function DriverHomeTab({
                           ) : (
                             <Calendar className="h-6 w-6 text-primary" />
                           )}
-                        </motion.div>
+                        </div>
                         <div>
                           <p className="font-semibold">{primaryState.title}</p>
                           <p className="text-sm text-muted-foreground">
@@ -248,11 +243,8 @@ export function DriverHomeTab({
                     </div>
 
                     {primaryState.type === 'next_shift' && (
-                      <motion.div 
+                      <div 
                         className="flex items-center gap-4 text-sm text-muted-foreground"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
                       >
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
@@ -264,10 +256,10 @@ export function DriverHomeTab({
                             <span>{primaryState.vehicleType}</span>
                           </div>
                         )}
-                      </motion.div>
+                      </div>
                     )}
 
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                    <div>
                       <Button 
                         className="w-full h-11" 
                         onClick={primaryState.action}
@@ -275,29 +267,28 @@ export function DriverHomeTab({
                         {primaryState.cta}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
-                    </motion.div>
+                    </div>
                   </div>
                 )}
               </CardContent>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* D) Next Route Card (only if exists and not active) */}
         {nextRoute && !activeRoute && (
-          <motion.div>
-            <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <div>
+            <div>
               <Card className="border-border/40 overflow-hidden">
                 <CardContent className="p-5">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <motion.div 
+                        <div 
                           className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
-                          whileHover={{ rotate: 10 }}
                         >
                           <Route className="h-6 w-6 text-primary" />
-                        </motion.div>
+                        </div>
                         <div>
                           <p className="font-semibold">Volgende rit</p>
                           <p className="text-sm text-muted-foreground font-mono">
@@ -323,7 +314,7 @@ export function DriverHomeTab({
                     </div>
 
                     <div className="space-y-2">
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <div>
                         <Button 
                           className="w-full h-11" 
                           onClick={handleStartRoute}
@@ -332,7 +323,7 @@ export function DriverHomeTab({
                           <Play className="h-4 w-4 mr-2" />
                           Start rit
                         </Button>
-                      </motion.div>
+                      </div>
                       {!gpsEnabled && (
                         <p className="text-xs text-center text-muted-foreground">
                           Activeer locatie om te starten
@@ -342,8 +333,8 @@ export function DriverHomeTab({
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
 
         {/* EU 561/2006 Rij- en rusttijden */}
@@ -351,7 +342,7 @@ export function DriverHomeTab({
 
         {/* Prestaties vandaag - Motivational card */}
         {(stats.completedStops > 0 || activeRoute) && (
-          <motion.div variants={itemVariants}>
+          <div>
             <Card className="border-border/40 overflow-hidden bg-gradient-to-br from-emerald-500/5 to-cyan-500/5">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3 mb-3">
@@ -379,41 +370,34 @@ export function DriverHomeTab({
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {/* Smart Tips */}
-        <motion.div variants={itemVariants}>
+        <div>
           <DriverSmartTipsCard />
-        </motion.div>
+        </div>
 
         {/* E) Mini Stats Row */}
-        <motion.div className="grid grid-cols-3 gap-3" variants={itemVariants}>
+        <div className="grid grid-cols-3 gap-3">
           {[
             { value: stats.todayRoutes, label: 'Ritten' },
             { value: stats.pendingStops, label: 'Stops' },
             { value: stats.completedStops, label: 'Voltooid', color: 'text-green-500' },
           ].map((stat, i) => (
-            <motion.div 
+            <div 
               key={stat.label}
               className="bg-card border border-border/40 rounded-[18px] p-3 text-center"
-              whileHover={{ scale: 1.03, y: -2 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + i * 0.1 }}
             >
-              <motion.p 
+              <p 
                 className={cn("text-2xl font-bold", stat.color)}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.5 + i * 0.1 }}
               >
                 {stat.value}
-              </motion.p>
+              </p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </ScrollArea>
   );

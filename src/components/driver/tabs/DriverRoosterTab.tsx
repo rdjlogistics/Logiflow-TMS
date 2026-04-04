@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useDriverAssignedShifts, useAvailableShifts } from '@/hooks/useProgramShifts';
 import { useDriverTrips } from '@/hooks/useDriverTrips';
@@ -305,15 +304,12 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <motion.div 
+        <div 
           className="flex flex-col items-center gap-3"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={springConfig}
         >
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground font-medium tracking-wide">Rooster laden...</p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -322,51 +318,39 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
     <>
       <div className="flex-1 flex flex-col overscroll-contain">
         {/* Header Section */}
-        <motion.div 
+        <div 
           className="px-4 pt-4 pb-2 space-y-4"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={springConfig}
         >
           {/* Month/Week Navigation */}
           <div className="flex items-center justify-between">
-            <motion.button
-              whileTap={{ scale: 0.85 }}
+            <button
               onClick={handlePrev}
               className="p-2 rounded-xl hover:bg-muted/50 transition-colors"
             >
               <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-            </motion.button>
+            </button>
             
             <div className="flex items-center gap-2">
-              <AnimatePresence mode="wait">
-                <motion.h2
+                <h2
                   key={headerTitle}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={springConfig}
                   className="font-bold text-xl capitalize tracking-tight"
                 >
                   {headerTitle}
-                </motion.h2>
-              </AnimatePresence>
+                </h2>
             </div>
             
-            <motion.button
-              whileTap={{ scale: 0.85 }}
+            <button
               onClick={handleNext}
               className="p-2 rounded-xl hover:bg-muted/50 transition-colors"
             >
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </motion.button>
+            </button>
           </div>
 
           {/* View Mode Toggle */}
           <div className="flex items-center justify-center gap-1">
             <div className="inline-flex items-center rounded-xl bg-muted/50 p-1 border border-border/30">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => setViewMode('month')}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
@@ -377,9 +361,8 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
                 Maand
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+              </button>
+              <button
                 onClick={() => setViewMode('week')}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
@@ -390,18 +373,15 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               >
                 <List className="h-3.5 w-3.5" />
                 Week
-              </motion.button>
+              </button>
             </div>
           </div>
 
           {/* Today Button */}
           {((viewMode === 'month' && !isSameMonth(currentDate, new Date())) ||
             (viewMode === 'week' && !isSameWeek(currentDate, new Date(), { weekStartsOn: 1 }))) && (
-            <motion.div 
+            <div 
               className="flex justify-center"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={springConfig}
             >
               <Button 
                 variant="outline" 
@@ -411,7 +391,7 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               >
                 Vandaag
               </Button>
-            </motion.div>
+            </div>
           )}
 
           {/* Filter Chips */}
@@ -420,12 +400,8 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               const isActive = filter === f.key;
               const count = filterCounts[f.key];
               return (
-                <motion.button
+                <button
                   key={f.key}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...springConfig, delay: idx * 0.04 }}
-                  whileTap={{ scale: 0.93 }}
                   onClick={() => setFilter(f.key)}
                   className={cn(
                     "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200",
@@ -445,11 +421,11 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                       {count}
                     </span>
                   )}
-                </motion.button>
+                </button>
               );
             })}
           </div>
-        </motion.div>
+        </div>
 
         {/* Calendar Grid with Swipe */}
         <ScrollArea className="flex-1 scroll-smooth-touch">
@@ -466,22 +442,13 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                 </div>
 
                 {/* Swipeable Month Calendar */}
-                <AnimatePresence mode="wait" custom={swipeDirection}>
-                  <motion.div
+                  <div
                     key={format(currentDate, 'yyyy-MM')}
-                    custom={swipeDirection}
                     variants={{
                       initial: (dir: string) => ({ x: dir === 'left' ? 200 : -200, opacity: 0 }),
                       animate: { x: 0, opacity: 1 },
                       exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
                     }}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={0.15}
                     onDragEnd={(_, info) => {
                       if (info.offset.x > 80) handlePrevMonth();
                       else if (info.offset.x < -80) handleNextMonth();
@@ -496,11 +463,8 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                         const hasShifts = dayShifts.length > 0;
 
                         return (
-                          <motion.button
+                          <button
                             key={i}
-                            initial={{ opacity: 0, scale: 0.85 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ ...springConfig, delay: i * 0.005 }}
                             onClick={() => handleDayClick(day)}
                             disabled={!isCurrentMonth}
                             whileTap={isCurrentMonth ? { scale: 0.92 } : undefined}
@@ -541,13 +505,11 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                                 </div>
                               </div>
                             )}
-                          </motion.button>
+                          </button>
                         );
                       })}
                     </div>
-                  </motion.div>
-                </AnimatePresence>
-
+                  </div>
                 {/* Legend */}
                 <div className="flex items-center justify-center gap-5 mt-6 pt-4 border-t border-border/20">
                   {[
@@ -564,22 +526,13 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               </>
             ) : (
               /* Week View */
-              <AnimatePresence mode="wait" custom={swipeDirection}>
-                <motion.div
+                <div
                   key={`week-${weekNumber}-${format(currentDate, 'yyyy')}`}
-                  custom={swipeDirection}
                   variants={{
                     initial: (dir: string) => ({ x: dir === 'left' ? 200 : -200, opacity: 0 }),
                     animate: { x: 0, opacity: 1 },
                     exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
                   }}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.15}
                   onDragEnd={(_, info) => {
                     if (info.offset.x > 80) handlePrevWeek();
                     else if (info.offset.x < -80) handleNextWeek();
@@ -593,12 +546,8 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                     const today = isToday(day);
 
                     return (
-                      <motion.button
+                      <button
                         key={i}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ ...springConfig, delay: i * 0.03 }}
-                        whileTap={{ scale: 0.98 }}
                         onClick={() => { setSelectedDay(day); }}
                         className={cn(
                           "w-full rounded-xl p-3 transition-all duration-200 text-left flex gap-3 items-start",
@@ -668,11 +617,10 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
 
                         {/* Chevron */}
                         <ChevronRight className="h-4 w-4 text-muted-foreground/30 mt-2 shrink-0" />
-                      </motion.button>
+                      </button>
                     );
                   })}
-                </motion.div>
-              </AnimatePresence>
+                </div>
             )}
           </div>
         </ScrollArea>
@@ -703,11 +651,8 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
 
                 {/* Gradient Stats Header */}
                 {dayShifts.length > 0 && (
-                  <motion.div
+                  <div
                     className="grid grid-cols-4 gap-2 pb-4"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={springConfig}
                   >
                     <div className="relative overflow-hidden rounded-xl p-3 text-center bg-gradient-to-br from-blue-500/15 via-blue-500/5 to-transparent border border-blue-500/20">
                       <Truck className="h-3.5 w-3.5 text-blue-500 mx-auto mb-1" />
@@ -729,32 +674,26 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                       <p className="text-lg font-bold text-foreground">{totalWeight > 0 ? totalWeight : '—'}</p>
                       <p className="text-[9px] font-medium text-orange-500/80 uppercase tracking-wider">kg</p>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 <ScrollArea className="flex-1 -mx-6 px-6">
                   {dayShifts.length === 0 ? (
-                    <motion.div
+                    <div
                       className="flex flex-col items-center justify-center py-16 text-center"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={springConfig}
                     >
                       <Calendar className="h-10 w-10 text-muted-foreground/30 mb-3" />
                       <p className="text-sm font-medium text-muted-foreground">Geen activiteiten</p>
                       <p className="text-xs text-muted-foreground/60 mt-1">Er zijn geen ritten of shifts gepland voor deze dag.</p>
-                    </motion.div>
+                    </div>
                   ) : (
                     <div className="relative pb-6">
                       {/* Timeline line */}
                       <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border/50" />
 
                       {sorted.map((shift, idx) => (
-                        <motion.div
+                        <div
                           key={shift.id}
-                          initial={{ opacity: 0, x: -12 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ ...springConfig, delay: idx * 0.05 }}
                           className="relative pl-10 pb-4 last:pb-0"
                         >
                           {/* Timeline dot */}
@@ -845,7 +784,7 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                               </div>
                             </CardContent>
                           </Card>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   )}
