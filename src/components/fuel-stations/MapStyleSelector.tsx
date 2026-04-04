@@ -214,11 +214,7 @@ export function MapStyleSelector({ currentStyle, onStyleChange, className }: Map
     setIsOpen(false);
   };
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 500) {
-      handleClose();
-    }
-  };
+  // handleDragEnd removed (was framer-motion specific)
 
   const currentStyleName = mapStyles.find(s => s.id === currentStyle)?.name || 'Auto';
 

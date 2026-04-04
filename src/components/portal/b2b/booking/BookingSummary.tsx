@@ -66,12 +66,9 @@ const shimmerVariants = {
   }
 };
 
-/* ──── Animated Number (useSpring like CapacityIndicator) ──── */
+/* ──── Animated Number ──── */
 const AnimatedNumber = ({ value, decimals = 0 }: { value: number; decimals?: number }) => {
-  const spring = useSpring(0, { stiffness: 80, damping: 20 });
-  const display = useTransform(spring, (v) => v.toFixed(decimals));
-  spring.set(value);
-  return <span>{display}</span>;
+  return <span>{value.toFixed(decimals)}</span>;
 };
 
 /* ──── Elite Capacity Bar (upgraded with card wrapper + glow + inner shine) ──── */
@@ -119,7 +116,7 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
       {/* Glassmorphism track */}
       <div className="relative h-3 rounded-full bg-muted/30 overflow-hidden border border-border/10">
         {/* Fill with glow shadow */}
-        <div}
+        <div
           className={cn(
             "h-full rounded-full relative bg-gradient-to-r",
             isOver ? "from-destructive/80 to-destructive" :

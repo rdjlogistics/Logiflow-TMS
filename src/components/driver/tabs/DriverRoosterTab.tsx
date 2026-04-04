@@ -443,14 +443,7 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
 
                 {/* Swipeable Month Calendar */}
                   <div
-                    key={format(currentDate, 'yyyy-MM')}),
-                      animate: { x: 0, opacity: 1 },
-                      exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
-                    }}
-                    onDragEnd={(_, info) => {
-                      if (info.offset.x > 80) handlePrevMonth();
-                      else if (info.offset.x < -80) handleNextMonth();
-                    }}
+                    key={format(currentDate, 'yyyy-MM')}
                     style={{ touchAction: 'pan-y' }}
                   >
                     <div className="grid grid-cols-7 gap-1">
@@ -524,14 +517,7 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
             ) : (
               /* Week View */
                 <div
-                  key={`week-${weekNumber}-${format(currentDate, 'yyyy')}`}),
-                    animate: { x: 0, opacity: 1 },
-                    exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
-                  }}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.x > 80) handlePrevWeek();
-                    else if (info.offset.x < -80) handleNextWeek();
-                  }}
+                  key={`week-${weekNumber}-${format(currentDate, 'yyyy')}`}
                   style={{ touchAction: 'pan-y' }}
                   className="space-y-2"
                 >

@@ -40,10 +40,7 @@ const shimmerVariants = {
 
 // --- Animated Number ---
 const AnimatedNumber = ({ value, decimals = 0 }: { value: number; decimals?: number }) => {
-  const spring = useSpring(0, { stiffness: 80, damping: 20 });
-  const display = useTransform(spring, (v) => v.toFixed(decimals));
-  spring.set(value);
-  return <span>{display}</span>;
+  return <span>{value.toFixed(decimals)}</span>;
 };
 
 // --- Capacity Bar (Premium) ---
