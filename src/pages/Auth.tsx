@@ -468,11 +468,8 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
         </div>
 
         {/* Right side - Auth form */}
-        <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 22, delay: 0.05 }}
-          className="w-full max-w-md mx-auto"
+         <div
+          className="w-full max-w-md mx-auto animate-fade-in-up"
         >
         <Card variant="glass" className="w-full">
           <CardHeader className="text-center space-y-4 pb-2">
