@@ -274,11 +274,11 @@ export const PurchaseInvoiceBulkActions = ({
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
         >
           <div
             className={cn(
-              "flex flex-wrap items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-2xl shadow-2xl",
+              "flex flex-wrap items-center gap-2 md:gap-4 px-3 md:px-6 py-3 md:py-4 rounded-2xl shadow-2xl overflow-x-auto scrollbar-none",
               "bg-background/95 backdrop-blur-xl border border-border/50",
             )}
           >

@@ -173,9 +173,9 @@ export function InvoiceBulkActionsBar({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         exit={{ opacity: 0, y: 20 }}
-        className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
+        className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
       >
-        <div className="flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-3 bg-card border border-border shadow-xl rounded-xl backdrop-blur-lg">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-3 bg-card border border-border shadow-xl rounded-xl backdrop-blur-lg overflow-x-auto scrollbar-none">
           {/* Selection Info */}
           <div className="flex items-center gap-2 pr-3 border-r border-border">
             <Badge variant="secondary" className="font-mono">
