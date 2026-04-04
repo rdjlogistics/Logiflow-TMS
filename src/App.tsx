@@ -561,7 +561,7 @@ const App = () => (
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
-    </LazyMotion>
+    
   </ErrorBoundary>
 );
 

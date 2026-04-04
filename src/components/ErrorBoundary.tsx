@@ -1,5 +1,4 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 
 interface Props {
@@ -27,7 +26,6 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo })
-    // Log to console in development
     if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught:', error, errorInfo)
     }
@@ -41,11 +39,7 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="min-h-[400px] flex items-center justify-center p-8"
-        >
+        <div className="min-h-[400px] flex items-center justify-center p-8 animate-fade-in-up">
           <div className="max-w-md w-full text-center space-y-6">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 backdrop-blur-xl border border-red-500/20">
               <AlertTriangle className="w-8 h-8 text-red-400" />
@@ -84,7 +78,7 @@ class ErrorBoundary extends Component<Props, State> {
               </a>
             </div>
           </div>
-        </motion.div>
+        </div>
       )
     }
 
