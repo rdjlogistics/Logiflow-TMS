@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X, Maximize2, Loader2 } from "lucide-react";
