@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
 import { Loader2, MapPin } from "lucide-react";
 
