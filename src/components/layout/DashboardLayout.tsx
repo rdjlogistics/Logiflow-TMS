@@ -10,7 +10,7 @@ import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { useOnboardingRequired } from "@/hooks/useOnboardingRequired";
 import { useCopilotContext } from "@/components/copilot";
 import { SessionWarningDialog } from "@/components/security/SessionWarningDialog";
-import { SessionRefreshIndicator } from "@/components/driver/SessionRefreshIndicator";
+
 import { Loader2, Menu, Bot, Sparkles, Command, Bell, RefreshCw } from "lucide-react";
 import { GlobalSearch } from "@/components/common/GlobalSearch";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
         onLogout={() => void signOut()}
         isExtending={isExtending}
       />
-      <SessionRefreshIndicator />
+      
       <div className="min-h-screen flex w-full bg-background pt-0 has-[.demo-banner]:pt-10">
         {/* Sidebar is isolated so it never disappears due to content errors */}
         <IsolatedErrorBoundary 
