@@ -1,34 +1,43 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+const LS_KEY = "mapbox_token_cache";
+
 // Singleton cache to prevent multiple API calls across components
 let cachedToken: string | null = null;
 let tokenPromise: Promise<string | null> | null = null;
 
 async function fetchMapboxToken(): Promise<string | null> {
-  // Return cached token if available
   if (cachedToken) return cachedToken;
-  
-  // If already fetching, return existing promise
   if (tokenPromise) return tokenPromise;
-  
+
   tokenPromise = (async () => {
     try {
       const { data, error } = await supabase.functions.invoke("get-mapbox-token");
-      
       if (error) throw error;
       if (data?.token) {
         cachedToken = data.token;
+        try { localStorage.setItem(LS_KEY, cachedToken); } catch {}
         return cachedToken;
       }
       throw new Error("No token received");
     } catch (err) {
       console.error("Error fetching Mapbox token:", err);
-      tokenPromise = null; // Reset so it can retry
+      tokenPromise = null;
+
+      // Fallback to localStorage cache
+      try {
+        const stored = localStorage.getItem(LS_KEY);
+        if (stored) {
+          cachedToken = stored;
+          return cachedToken;
+        }
+      } catch {}
+
       throw err;
     }
   })();
-  
+
   return tokenPromise;
 }
 
@@ -61,7 +70,6 @@ export const useMapboxToken = () => {
   useEffect(() => {
     mounted.current = true;
 
-    // If already cached, no need to fetch
     if (cachedToken) {
       setToken(cachedToken);
       setLoading(false);
@@ -79,14 +87,11 @@ export const useMapboxToken = () => {
           }
         })
         .catch(async (err: any) => {
-          // If auth isn't ready yet, the backend function may return 401.
-          // In that case: wait for auth session and retry once.
           const status = err?.status ?? err?.context?.status;
           if (!didRetryAfterAuth && status === 401) {
             didRetryAfterAuth = true;
             const { data } = await supabase.auth.getSession();
             if (data.session) {
-              // session is available already; retry immediately
               tryFetch();
               return;
             }
@@ -100,10 +105,8 @@ export const useMapboxToken = () => {
         });
     };
 
-    // Start fetch
     tryFetch();
 
-    // Retry once when auth becomes available (only needed if we got a 401 before)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -127,7 +130,6 @@ export const useMapboxToken = () => {
   return { token, loading, error, refetch };
 };
 
-// Export for manual cache clearing if needed
 export const clearMapboxTokenCache = () => {
   cachedToken = null;
   tokenPromise = null;

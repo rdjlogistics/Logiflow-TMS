@@ -5,8 +5,7 @@ let _loading: Promise<typeof mapboxgl> | null = null;
 
 /**
  * Dynamically load mapbox-gl and its CSS. Caches the module after first load.
- * Use this instead of static `import mapboxgl from 'mapbox-gl'` to keep
- * mapbox out of page chunks that don't show a map.
+ * Resets on failure so the next call can retry.
  */
 export async function loadMapboxGL(): Promise<typeof mapboxgl> {
   if (_mb) return _mb;
@@ -18,6 +17,9 @@ export async function loadMapboxGL(): Promise<typeof mapboxgl> {
     ]);
     _mb = m.default;
     return _mb;
+  }).catch((err) => {
+    _loading = null; // Reset so next call can retry
+    throw err;
   });
   return _loading;
 }
