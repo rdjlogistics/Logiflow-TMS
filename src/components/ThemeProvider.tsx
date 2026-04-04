@@ -3,7 +3,7 @@ import { useMouseParallax } from "@/hooks/useMouseParallax";
 import { useTenantSettings } from "@/hooks/useTenantSettings";
 
 type Theme = "dark" | "light" | "system" | "auto";
-export type ThemePreset = "imperial" | "vision-pro" | "horizon" | "carbon" | "aurora";
+export type ThemePreset = "imperial" | "vision-pro" | "horizon" | "carbon" | "aurora" | "ios";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -30,7 +30,7 @@ const initialState: ThemeProviderState = {
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 const PRESET_STORAGE_KEY = "nextgen-tms-theme-preset";
-const PRESET_CLASSES = ["theme-vision-pro", "theme-horizon", "theme-carbon", "theme-aurora"] as const;
+const PRESET_CLASSES = ["theme-vision-pro", "theme-horizon", "theme-carbon", "theme-aurora", "theme-ios"] as const;
 
 const isNightTime = (): boolean => {
   const hour = new Date().getHours();
@@ -38,7 +38,7 @@ const isNightTime = (): boolean => {
 };
 
 const isValidPreset = (v: string | null): v is ThemePreset =>
-  v === "imperial" || v === "vision-pro" || v === "horizon" || v === "carbon" || v === "aurora";
+  v === "imperial" || v === "vision-pro" || v === "horizon" || v === "carbon" || v === "aurora" || v === "ios";
 
 const isValidTheme = (v: string | null): v is Theme =>
   v === "dark" || v === "light" || v === "system" || v === "auto";
@@ -101,6 +101,7 @@ export function ThemeProvider({
         "horizon": () => import("@/styles/theme-horizon.css"),
         "carbon": () => import("@/styles/theme-carbon.css"),
         "aurora": () => import("@/styles/theme-aurora.css"),
+        "ios": () => import("@/styles/theme-ios.css"),
       };
       themeImports[themePreset]?.();
     }

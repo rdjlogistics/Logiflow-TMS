@@ -1,5 +1,5 @@
 import { useTheme, type ThemePreset } from '@/components/ThemeProvider';
-import { Check, Moon, Sun, Monitor, Sparkles, Building2 } from 'lucide-react';
+import { Check, Moon, Sun, Monitor, Sparkles, Building2, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -80,6 +80,17 @@ const presets: PresetConfig[] = [
       bg: '#0A1A1F', card: '#0F2229', primary: '#14B8A6', accent: '#10B981',
       sidebar: '#071318', border: '#1A3A42', text: '#E0F2F1',
       chart1: '#14B8A6', chart2: '#22D3EE', chart3: '#10B981',
+    },
+  },
+  {
+    id: 'ios',
+    name: 'iOS',
+    description: 'Apple Human Interface design. Puur zwart, systeem blauw, hairline borders en native vibrancy blur. Optimaal op iPhone, iPad & Mac.',
+    tag: 'Apple HIG',
+    colors: {
+      bg: '#000000', card: '#1C1C1E', primary: '#007AFF', accent: '#30B0C7',
+      sidebar: '#0D0D0D', border: '#2C2C2E', text: '#F5F5F7',
+      chart1: '#007AFF', chart2: '#34C759', chart3: '#FF9500',
     },
   },
 ];
