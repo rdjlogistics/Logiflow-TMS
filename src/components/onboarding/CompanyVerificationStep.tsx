@@ -29,6 +29,7 @@ interface FieldValidation {
 }
 
 const ValidationIcon = ({ status }: { status: ValidationStatus }) => (
+  <>
     {status === 'valid' && (
       <div
         key="valid"
@@ -45,6 +46,7 @@ const ValidationIcon = ({ status }: { status: ValidationStatus }) => (
         <X className="h-3 w-3 text-destructive" />
       </div>
     )}
+  </>
 );
 
 export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerificationStepProps) => {
@@ -176,9 +178,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
       </div>
 
       {/* Fields */}
-      <div
-        variants={{
-          hidden: { opacity: 0 },
+      <div,
           visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
         }}
         className="grid grid-cols-1 sm:grid-cols-2 gap-4"
@@ -190,9 +190,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
 
           return (
             <div
-              key={key}
-              variants={{
-                hidden: { opacity: 0, y: 10 },
+              key={key},
                 visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
               }}
               className={cn(span === 2 && 'sm:col-span-2')}

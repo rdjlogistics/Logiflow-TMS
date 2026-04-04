@@ -161,7 +161,6 @@ const GeographicHeatmapWidget = ({
         <motion.div 
           className="grid grid-cols-2 gap-3 mb-4"
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
         >
           <div className="p-3 rounded-xl bg-muted/20 border border-border/30">
             <div className="flex items-center gap-2 mb-1">
@@ -184,14 +183,12 @@ const GeographicHeatmapWidget = ({
         {/* Region grid */}
         <motion.div 
           className="grid grid-cols-2 sm:grid-cols-3 gap-2.5"
-          variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {data.slice(0, 6).map((region, index) => (
             <motion.div
               key={region.id}
-              variants={itemVariants}
               className="group cursor-pointer"
               onClick={() => handleRegionClick(region)}
             >
@@ -201,7 +198,6 @@ const GeographicHeatmapWidget = ({
                   "hover:border-primary/40 hover:shadow-lg"
                 )}
                 whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
                 {/* Intensity background */}
                 <div className={cn(

@@ -218,7 +218,6 @@ export function DriverHomeTab({
                                 ? "bg-primary/10"
                                 : "bg-primary/10"
                           )}
-                          animate={primaryState.type === 'active_route' ? { scale: [1, 1.05, 1] } : {}}
                         >
                           {primaryState.type === 'active_route' ? (
                             <Route className="h-6 w-6 text-blue-500" />

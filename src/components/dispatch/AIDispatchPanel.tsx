@@ -183,7 +183,7 @@ const AIDispatchPanel = () => {
 
         <AnimatePresence mode="wait">
           {selectedTrip && (
-            <motion.div key="recs" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-2">
+            <motion.div key="recs" initial={{ opacity: 0, height: 0 }} exit={{ opacity: 0, height: 0 }} className="space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase text-muted-foreground">AI Aanbevelingen</p>
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => refetch()}>
@@ -192,7 +192,7 @@ const AIDispatchPanel = () => {
               </div>
               <div className="space-y-2">
                 {recommendationsLoading ? [1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-lg" />) : recommendations?.slice(0, 3).map((driver, i) => (
-                  <motion.div key={driver.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                  <motion.div key={driver.id} initial={{ opacity: 0, y: 10 }}
                     className={cn("p-3 rounded-xl border", i === 0 ? "bg-primary/5 border-primary/30" : "border-border/40")}>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2.5">

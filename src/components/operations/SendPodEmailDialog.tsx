@@ -190,14 +190,11 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
             <motion.div
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
               transition={spring}
               className="py-10 text-center"
             >
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ ...spring, delay: 0.1 }}
                 className="inline-flex p-4 rounded-full bg-emerald-500/10 mb-4"
               >
                 <CheckCircle2 className="h-10 w-10 text-emerald-500" />
@@ -209,7 +206,6 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
             <motion.div
               key="form"
               initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
               transition={spring}
               className="space-y-4 py-2"
             >
@@ -258,8 +254,6 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                         <motion.div
                           key={doc.id}
                           initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05, ...spring }}
                           className={cn(
                             "flex items-center gap-3 p-2.5 rounded-xl border transition-colors cursor-pointer",
                             selectedDocIds.has(doc.id)

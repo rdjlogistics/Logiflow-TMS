@@ -54,8 +54,6 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
         {/* Company name with premium styling */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
         >
           <p className="font-bold text-xl text-foreground tracking-tight">{carrier.company_name}</p>
           {carrier.contact_name && (
@@ -68,8 +66,6 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
           <motion.div 
             className="flex items-start gap-3"
             initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
           >
             <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0 border border-border/50">
               <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -88,8 +84,6 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
               <motion.div
                 className="group"
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -120,8 +114,6 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
               <motion.div
                 className="group"
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.25 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">

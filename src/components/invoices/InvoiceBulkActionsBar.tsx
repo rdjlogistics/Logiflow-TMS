@@ -172,7 +172,6 @@ export function InvoiceBulkActionsBar({
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
       >

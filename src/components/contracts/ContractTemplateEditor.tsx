@@ -99,7 +99,7 @@ export function ContractTemplateEditor({
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const mergeTag = `{{${field.key}}}`;
+    const mergeTag = `{{${field.key}}`;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = formData.content_html;
@@ -337,7 +337,7 @@ export function ContractTemplateEditor({
                               }`}
                               onClick={() => insertMergeField(field as MergeField)}
                             >
-                              {`{{${field.key}}}`}
+                              {`{{${field.key}}`}
                             </Badge>
                           </div>
                         ))}
@@ -466,7 +466,7 @@ export function ContractTemplateEditor({
                                     }`} />
                                   </div>
                                   <code className="text-[11px] text-muted-foreground font-mono">
-                                    {`{{${field.key}}}`}
+                                    {`{{${field.key}}`}
                                   </code>
                                 </button>
                               ))}

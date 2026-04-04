@@ -234,8 +234,6 @@ ${company?.name || ""}`);
     return (
       <div className="flex items-center justify-center py-16">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
         >
           <Loader2 className="h-8 w-8 text-primary" />
         </motion.div>
@@ -255,7 +253,6 @@ ${company?.name || ""}`);
 
   return (
     <motion.div
-      variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="relative rounded-2xl overflow-hidden border border-border/30 shadow-xl"
@@ -272,7 +269,6 @@ ${company?.name || ""}`);
 
       {/* Animated shimmer */}
       <motion.div
-        variants={shimmerVariants}
         initial="initial"
         animate="animate"
         className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.03] to-transparent pointer-events-none"
@@ -283,7 +279,6 @@ ${company?.name || ""}`);
 
       {/* ── Header ── */}
       <motion.div
-        variants={itemVariants}
         className="relative px-6 py-5 border-b border-border/20"
       >
         <div className="flex items-center gap-4">
@@ -294,7 +289,6 @@ ${company?.name || ""}`);
               boxShadow: '0 0 24px -8px hsl(var(--primary) / 0.25)',
             }}
             whileHover={{ scale: 1.05, rotate: 3 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
             <Mail className="h-5 w-5 text-primary" />
             <div className="absolute inset-0 rounded-xl bg-primary/5 blur-xl animate-pulse" />
@@ -310,7 +304,7 @@ ${company?.name || ""}`);
 
       <div className="relative p-6 space-y-5">
         {/* ── Recipients ── */}
-        <motion.div variants={itemVariants} className="space-y-2.5">
+        <motion.div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aan</Label>
           <div
             className="flex flex-wrap items-center gap-2 p-3 min-h-[52px] rounded-xl border border-border/20 transition-all duration-200 focus-within:border-primary/30 focus-within:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.12)]"
@@ -326,11 +320,9 @@ ${company?.name || ""}`);
                 return (
                   <motion.div
                     key={email}
-                    variants={pillVariants}
                     initial="initial"
                     animate="animate"
                     exit="exit"
-                    layout
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border border-primary/20"
                     style={{
                       background: 'hsl(var(--primary) / 0.1)',
@@ -343,7 +335,6 @@ ${company?.name || ""}`);
                       onClick={() => removeRecipient(email)}
                       className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
                       whileHover={{ scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
                     >
                       <X className="h-3.5 w-3.5" />
                     </motion.button>
@@ -360,7 +351,6 @@ ${company?.name || ""}`);
                     onClick={() => toggleRecipient(contact.email)}
                     className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-border/40 rounded-full text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-200"
                     whileHover={{ scale: 1.03, y: -1 }}
-                    whileTap={{ scale: 0.97 }}
                   >
                     <Plus className="h-3.5 w-3.5" />
                     {contact.name}
@@ -370,7 +360,6 @@ ${company?.name || ""}`);
                   onClick={() => setShowCustomInput(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-border/40 rounded-full text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-200"
                   whileHover={{ scale: 1.03, y: -1 }}
-                  whileTap={{ scale: 0.97 }}
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ander adres
@@ -379,7 +368,6 @@ ${company?.name || ""}`);
             ) : (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
                 className="flex items-center gap-2 flex-1 min-w-[200px]"
               >
@@ -404,7 +392,7 @@ ${company?.name || ""}`);
         </motion.div>
 
         {/* ── Subject ── */}
-        <motion.div variants={itemVariants} className="space-y-2.5">
+        <motion.div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Onderwerp</Label>
           <Input
             value={emailSubject}
@@ -415,7 +403,7 @@ ${company?.name || ""}`);
         </motion.div>
 
         {/* ── Message ── */}
-        <motion.div variants={itemVariants} className="space-y-2.5">
+        <motion.div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Bericht</Label>
           <Textarea
             value={emailBody}
@@ -427,7 +415,7 @@ ${company?.name || ""}`);
         </motion.div>
 
         {/* ── Attachments ── */}
-        <motion.div variants={itemVariants} className="space-y-3">
+        <motion.div className="space-y-3">
           <div className="flex items-center gap-2">
             <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Bijlagen</Label>
@@ -444,7 +432,6 @@ ${company?.name || ""}`);
                   background: attachments[att.key] ? 'hsl(var(--primary) / 0.04)' : 'transparent',
                 }}
                 whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
                 <Checkbox
                   checked={attachments[att.key]}
@@ -461,7 +448,6 @@ ${company?.name || ""}`);
             {showDocAttachments && orderDocuments && orderDocuments.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-3 space-y-2 overflow-hidden"
               >
@@ -474,7 +460,6 @@ ${company?.name || ""}`);
                       background: selectedDocumentIds.has(doc.id) ? 'hsl(var(--primary) / 0.04)' : 'transparent',
                     }}
                     whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
                   >
                     <Checkbox
                       checked={selectedDocumentIds.has(doc.id)}
@@ -496,7 +481,6 @@ ${company?.name || ""}`);
 
       {/* ── Footer / Send ── */}
       <motion.div
-        variants={itemVariants}
         className="relative px-6 py-4 border-t border-border/20"
         style={{
           background: 'hsl(var(--card) / 0.4)',
@@ -515,22 +499,19 @@ ${company?.name || ""}`);
           onClick={() => sendEmailMutation.mutate()}
           disabled={sendEmailMutation.isPending || !hasRecipients}
           whileHover={hasRecipients ? { scale: 1.01, y: -1 } : undefined}
-          whileTap={hasRecipients ? { scale: 0.98 } : undefined}
         >
           {/* Button shimmer */}
           {hasRecipients && (
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
               initial={{ x: '-100%' }}
-              animate={{ x: '100%' }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: 'linear', repeatDelay: 3 }}
             />
           )}
 
           <span className="relative z-10 flex items-center justify-center gap-2">
             {sendEmailMutation.isPending ? (
               <>
-                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                <motion.div>
                   <Loader2 className="h-5 w-5" />
                 </motion.div>
                 Verzenden...
@@ -548,7 +529,6 @@ ${company?.name || ""}`);
           {!hasRecipients && (
             <motion.p
               initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               className="text-xs text-muted-foreground text-center mt-2.5"
             >

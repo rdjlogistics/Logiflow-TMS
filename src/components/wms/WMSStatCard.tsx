@@ -71,8 +71,6 @@ export function WMSStatCard({
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       className={cn(
         "relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6",

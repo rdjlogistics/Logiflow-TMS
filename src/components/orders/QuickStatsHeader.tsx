@@ -112,13 +112,12 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
   return (
     <TooltipProvider>
       <motion.div
-        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5"
       >
         {statCards.map((card) => (
-          <motion.div key={card.id} variants={itemVariants} className="h-full">
+          <motion.div key={card.id} className="h-full">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Card 
@@ -173,8 +172,6 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
       {/* Status distribution bar */}
       <motion.div 
         initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
         className="mt-3 sm:mt-4"
       >
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -188,8 +185,6 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                 <TooltipTrigger asChild>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(stats.plannedCount / stats.totalOrders) * 100}%` }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
                     className="bg-muted-foreground/40 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("gepland")}
                   />
@@ -205,8 +200,6 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                 <TooltipTrigger asChild>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(stats.enRouteCount / stats.totalOrders) * 100}%` }}
-                    transition={{ delay: 0.7, duration: 0.5 }}
                     className="bg-blue-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("onderweg")}
                   />
@@ -222,8 +215,6 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                 <TooltipTrigger asChild>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(stats.completedCount / stats.totalOrders) * 100}%` }}
-                    transition={{ delay: 0.8, duration: 0.5 }}
                     className="bg-green-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("afgerond")}
                   />
@@ -239,8 +230,6 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
                 <TooltipTrigger asChild>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(stats.unassignedCount / stats.totalOrders) * 100}%` }}
-                    transition={{ delay: 0.9, duration: 0.5 }}
                     className="bg-destructive cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("needs_driver")}
                   />

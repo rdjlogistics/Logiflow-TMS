@@ -169,8 +169,6 @@ export function SwipeableCard({
         onDragStart={() => setIsDragging(true)}
         onDragEnd={handleDragEnd}
         style={{ x }}
-        animate={{ scale: thresholdReached ? 0.97 : 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         className={cn(
           "relative bg-card touch-manipulation",
           isDragging && "cursor-grabbing"

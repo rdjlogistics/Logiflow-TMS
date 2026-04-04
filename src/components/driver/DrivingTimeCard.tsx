@@ -64,7 +64,6 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
                 "w-10 h-10 rounded-xl flex items-center justify-center",
                 isDriving ? "bg-emerald-500/10" : isOnBreak ? "bg-amber-500/10" : "bg-muted/50"
               )}
-              animate={isDriving ? { scale: [1, 1.05, 1] } : {}}
             >
               {isDriving ? (
                 <Timer className="h-5 w-5 text-emerald-500" />
@@ -114,7 +113,6 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className={cn("h-full rounded-full bg-gradient-to-r", progressColor)}
-              animate={{ width: `${progress * 100}%` }}
             />
           </div>
         </div>

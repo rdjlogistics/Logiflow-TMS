@@ -137,9 +137,7 @@ export const TripRateBreakdown = ({
             <motion.div
               key={type}
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
               <Badge 
                 variant="outline" 
@@ -180,8 +178,6 @@ export const TripRateBreakdown = ({
           {trips.length} {trips.length === 1 ? 'rit' : 'ritten'} — Tariefberekening bekijken
         </span>
         <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </motion.div>
@@ -190,7 +186,6 @@ export const TripRateBreakdown = ({
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            variants={expandVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -206,7 +201,6 @@ export const TripRateBreakdown = ({
                   <motion.div
                     key={trip.id}
                     custom={idx}
-                    variants={tripCardVariants}
                     initial="hidden"
                     animate="visible"
                     className="relative overflow-hidden rounded-xl bg-gradient-to-br from-card/80 to-muted/30 backdrop-blur-sm border border-border/50 hover:border-border/80 transition-all duration-300 group"
@@ -327,8 +321,6 @@ export const TripRateBreakdown = ({
               {/* Totals Section */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: trips.length * 0.04 + 0.1 }}
                 className="mt-4 space-y-2"
               >
                 {/* Subtotal */}
@@ -361,8 +353,6 @@ export const TripRateBreakdown = ({
                   <div className="flex items-center gap-3">
                     <motion.div 
                       className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/15"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
                     >
                       <Sparkles className="h-4 w-4 text-emerald-500" />
                     </motion.div>

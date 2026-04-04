@@ -392,8 +392,6 @@ export const SEPAExportModal = ({
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.02 }}
                       className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
                     >
                       <div>

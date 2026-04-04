@@ -83,21 +83,17 @@ export const Step1SelectionSection = ({
 }: Step1SelectionSectionProps) => {
   return (
     <motion.div
-      variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="space-y-4 sm:space-y-6"
     >
       {/* Section Header */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
       >
         {/* Shimmer */}
         <motion.div
           initial={{ x: '-100%' }}
-          animate={{ x: '200%' }}
-          transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
         />
         
@@ -107,7 +103,6 @@ export const Step1SelectionSection = ({
           <motion.div 
             className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
             whileHover={{ scale: 1.05, rotate: 3 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
             <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
             <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-primary/10 blur-xl animate-pulse" />
@@ -125,8 +120,7 @@ export const Step1SelectionSection = ({
       </motion.div>
 
       {/* Period Selection */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -143,7 +137,6 @@ export const Step1SelectionSection = ({
               <motion.button
                 key={preset.value}
                 onClick={() => onPeriodChange(preset.value)}
-                whileTap={{ scale: 0.97 }}
                 className={cn(
                   "relative flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 touch-manipulation min-h-[48px]",
                   periodPreset === preset.value
@@ -155,7 +148,6 @@ export const Step1SelectionSection = ({
                   <motion.div
                     layoutId="period-glow"
                     className="absolute inset-0 rounded-xl bg-primary/20 blur-xl"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 <preset.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 relative z-10 flex-shrink-0" />
@@ -168,7 +160,6 @@ export const Step1SelectionSection = ({
           <motion.div 
             key={periodPreset}
             initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
             className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm text-muted-foreground bg-muted/40 rounded-lg px-3 py-2.5"
           >
             <span className="font-medium text-foreground">Geselecteerd:</span>
@@ -181,8 +172,7 @@ export const Step1SelectionSection = ({
       </motion.div>
 
       {/* Carrier Selection */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -215,8 +205,7 @@ export const Step1SelectionSection = ({
       </motion.div>
 
       {/* Invoice Type Selection */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -231,7 +220,6 @@ export const Step1SelectionSection = ({
             {/* Standard Invoice Card */}
             <motion.button
               onClick={() => onInvoiceTypeChange("standaard")}
-              whileTap={{ scale: 0.98 }}
               className={cn(
                 "relative flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl text-left transition-all duration-300 touch-manipulation min-h-[72px]",
                 invoiceType === "standaard"
@@ -256,7 +244,6 @@ export const Step1SelectionSection = ({
               {invoiceType === "standaard" && (
                 <motion.div
                   initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
                   className="absolute top-3 right-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary shadow-lg shadow-primary/50"
                 />
               )}
@@ -265,7 +252,6 @@ export const Step1SelectionSection = ({
             {/* Self-billing Card */}
             <motion.button
               onClick={() => onInvoiceTypeChange("self_billing")}
-              whileTap={{ scale: 0.98 }}
               className={cn(
                 "relative flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl text-left transition-all duration-300 touch-manipulation min-h-[72px]",
                 invoiceType === "self_billing"
@@ -290,7 +276,6 @@ export const Step1SelectionSection = ({
               {invoiceType === "self_billing" && (
                 <motion.div
                   initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
                   className="absolute top-3 right-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary shadow-lg shadow-primary/50"
                 />
               )}
@@ -300,8 +285,7 @@ export const Step1SelectionSection = ({
       </motion.div>
 
       {/* Footnote */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -323,7 +307,7 @@ export const Step1SelectionSection = ({
       </motion.div>
 
       {/* Action Button - Fixed bottom on mobile for better UX */}
-      <motion.div variants={cardVariants} className="pb-safe">
+      <motion.div className="pb-safe">
         <Button
           onClick={onNext}
           disabled={isLoading}

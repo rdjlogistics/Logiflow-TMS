@@ -40,10 +40,7 @@ const shimmerVariants = {
 
 // --- Animated Number ---
 const AnimatedNumber = ({ value, decimals = 0 }: { value: number; decimals?: number }) => {
-  const spring = useSpring(0, { stiffness: 80, damping: 20 });
-  const display = useTransform(spring, (v) => v.toFixed(decimals));
-  spring.set(value);
-  return <span>{display}</span>;
+  return <span>{value.toFixed(decimals)}</span>;
 };
 
 // --- Capacity Bar (Premium) ---
@@ -92,8 +89,7 @@ const CapacityBar = ({
         </div>
       </div>
       <div className="h-3 rounded-full bg-muted/30 overflow-hidden relative border border-border/10">
-        <div
-          animate={{ width: `${Math.min(100, percent)}%` }}
+        <div}
           className={cn(
             "h-full rounded-full relative bg-gradient-to-r",
             getBarGradient(percent),
@@ -120,7 +116,6 @@ const VehicleCard = ({
   onSelect: () => void; index: number;
 }) => (
   <button
-    layout
     onClick={onSelect}
     className={cn(
       "p-3 rounded-xl border text-left transition-all duration-300 relative overflow-hidden backdrop-blur-sm touch-manipulation",

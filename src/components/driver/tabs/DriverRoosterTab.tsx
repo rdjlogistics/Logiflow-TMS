@@ -444,15 +444,6 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                 {/* Swipeable Month Calendar */}
                   <div
                     key={format(currentDate, 'yyyy-MM')}
-                    variants={{
-                      initial: (dir: string) => ({ x: dir === 'left' ? 200 : -200, opacity: 0 }),
-                      animate: { x: 0, opacity: 1 },
-                      exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
-                    }}
-                    onDragEnd={(_, info) => {
-                      if (info.offset.x > 80) handlePrevMonth();
-                      else if (info.offset.x < -80) handleNextMonth();
-                    }}
                     style={{ touchAction: 'pan-y' }}
                   >
                     <div className="grid grid-cols-7 gap-1">
@@ -467,7 +458,6 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
                             key={i}
                             onClick={() => handleDayClick(day)}
                             disabled={!isCurrentMonth}
-                            whileTap={isCurrentMonth ? { scale: 0.92 } : undefined}
                             className={cn(
                               "min-h-[68px] rounded-xl p-1.5 transition-all duration-200 text-left flex flex-col relative overflow-hidden",
                               isCurrentMonth
@@ -528,15 +518,6 @@ export function DriverRoosterTab({ onShiftClick, onNavigateToRoute }: DriverRoos
               /* Week View */
                 <div
                   key={`week-${weekNumber}-${format(currentDate, 'yyyy')}`}
-                  variants={{
-                    initial: (dir: string) => ({ x: dir === 'left' ? 200 : -200, opacity: 0 }),
-                    animate: { x: 0, opacity: 1 },
-                    exit: (dir: string) => ({ x: dir === 'left' ? -200 : 200, opacity: 0 }),
-                  }}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.x > 80) handlePrevWeek();
-                    else if (info.offset.x < -80) handleNextWeek();
-                  }}
                   style={{ touchAction: 'pan-y' }}
                   className="space-y-2"
                 >

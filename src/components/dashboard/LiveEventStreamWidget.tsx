@@ -126,9 +126,7 @@ const LiveEventStreamWidget = () => {
                 <motion.div
                   key={ev.id}
                   initial={{ opacity: 0, x: 12, height: 0 }}
-                  animate={{ opacity: 1, x: 0, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
                   className={cn(
                     "flex items-start gap-2.5 rounded-xl px-3 py-2.5",
                     "bg-card/60 border border-border/20 backdrop-blur-sm"

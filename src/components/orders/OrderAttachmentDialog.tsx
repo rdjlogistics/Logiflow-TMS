@@ -219,8 +219,6 @@ const OrderAttachmentDialog = ({ open, onOpenChange, orderId }: OrderAttachmentD
           {/* Public/Internal toggle */}
           <motion.div
             initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
             className={cn(
               "flex items-center justify-between p-3 rounded-xl border transition-colors",
               isPublic

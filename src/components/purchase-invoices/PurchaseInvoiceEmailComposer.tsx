@@ -271,8 +271,6 @@ ${company || "Uw transportbedrijf"}`
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <motion.div
-            animate={{ rotate: [0, -10, 10, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 5 }}
           >
             <Mail className="h-5 w-5 text-primary" />
           </motion.div>
@@ -290,11 +288,9 @@ ${company || "Uw transportbedrijf"}`
                 {recipients.map((email) => (
                   <motion.div
                     key={email}
-                    variants={pillVariants}
                     initial="initial"
                     animate="animate"
                     exit="exit"
-                    layout
                   >
                     <Badge 
                       variant="secondary" 
@@ -329,7 +325,6 @@ ${company || "Uw transportbedrijf"}`
                 {emailValid === true && (
                   <motion.div
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
                     className="flex-shrink-0"
                   >
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -343,9 +338,7 @@ ${company || "Uw transportbedrijf"}`
                   disabled={!emailValid}
                   className="h-8 w-8 flex-shrink-0 touch-manipulation active:scale-95"
                 >
-                  <motion.div
-                    animate={emailValid ? { rotate: 0 } : { rotate: 45 }}
-                    transition={{ duration: 0.2 }}
+                  <motion.div}
                   >
                     <Plus className="h-4 w-4" />
                   </motion.div>
@@ -431,7 +424,6 @@ ${company || "Uw transportbedrijf"}`
             {includePdf && (
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
               >
                 <CheckCircle2 className="h-4 w-4 text-primary" />
               </motion.div>
@@ -499,7 +491,6 @@ ${company || "Uw transportbedrijf"}`
                 <motion.div
                   key="loading"
                   initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                 >
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -508,7 +499,6 @@ ${company || "Uw transportbedrijf"}`
                 <motion.div
                   key="send"
                   initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                 >
                   <Send className="h-5 w-5" />

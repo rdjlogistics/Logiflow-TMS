@@ -171,6 +171,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
               <p className="text-sm text-white/40">Stuur een bericht naar de planning</p>
             </div>
           ) : (
+            <>
               {messages.map((msg) => {
                 const role = (msg.sender_role as 'planner' | 'chauffeur' | 'klant') || 'planner';
                 const isOwn = role === 'chauffeur';
@@ -212,6 +213,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                   </div>
                 );
               })}
+            </>
           )}
         </div>
       </ScrollArea>

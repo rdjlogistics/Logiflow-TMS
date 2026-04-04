@@ -475,7 +475,6 @@ export function ModuleOnboarding({ moduleKey, onComplete, forceShow = false }: M
                   <div className="flex-1 h-1 rounded-full bg-muted/30 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
-                      animate={{ width: `${progress}%` }}
                     />
                   </div>
                   <span className="text-[10px] text-muted-foreground font-medium tabular-nums">

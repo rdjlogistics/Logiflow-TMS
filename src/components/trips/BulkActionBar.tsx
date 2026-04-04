@@ -86,8 +86,9 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
 
   const count = selectedIds.size;
 
+  if (count <= 0) return null;
+
   return (
-      {count > 0 && (
         <div
           className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
         >
@@ -129,6 +130,5 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
             </Button>
           </div>
         </div>
-      )}
   );
 }

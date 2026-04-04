@@ -303,7 +303,6 @@ export function CompanySetupWizard({ onComplete }: CompanySetupWizardProps) {
             <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
               <div
                 className={`h-full rounded-full bg-gradient-to-r ${currentGradient}`}
-                animate={{ width: `${((stepIndex) / (totalSteps - 1)) * 100}%` }}
               />
             </div>
             <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">

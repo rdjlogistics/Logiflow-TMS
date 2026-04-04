@@ -43,8 +43,6 @@ const QuickLinksWidget = () => {
             <motion.div
               key={link.href}
               initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.03 }}
             >
               <Link to={link.href}>
                 <motion.div
@@ -54,7 +52,6 @@ const QuickLinksWidget = () => {
                     "transition-all duration-150 group cursor-pointer"
                   )}
                   whileHover={{ scale: 1.02, x: 2 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <div className={cn("p-1.5 rounded-lg bg-background/50", link.color)}>
                     <link.icon className="h-3.5 w-3.5" />

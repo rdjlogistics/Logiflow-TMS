@@ -126,7 +126,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
       {/* Zone Grid with Smooth Animations */}
       <TooltipProvider delayDuration={200}>
         <motion.div
-          variants={containerVariants}
           initial="hidden"
           animate="show"
           className="grid grid-cols-3 gap-3"
@@ -141,13 +140,11 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                 <Tooltip key={zone.id}>
                   <TooltipTrigger asChild>
                     <motion.button
-                      variants={zoneVariants}
                       whileHover={{ 
                         scale: 1.02, 
                         y: -2,
                         transition: { type: "tween", duration: 0.1 }
                       }}
-                      whileTap={{ scale: 0.98 }}
                       onMouseEnter={() => setHoveredZone(zone.id)}
                       onMouseLeave={() => setHoveredZone(null)}
                       onClick={() => onZoneClick?.(zone)}
@@ -162,7 +159,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                       {/* Animated gradient overlay */}
                       <motion.div 
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: isHovered ? 1 : 0.5 }}
                         className={cn("absolute inset-0 bg-gradient-to-br", config.gradient, "pointer-events-none")}
                       />
 
@@ -170,8 +166,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                       <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-background/40 overflow-hidden rounded-b-lg">
                         <motion.div
                           initial={{ width: 0 }}
-                          animate={{ width: `${zone.utilization}%` }}
-                          transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                           className={cn("h-full", utilStyle.bg)}
                         />
                       </div>
@@ -185,8 +179,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                         {zone.alerts && zone.alerts > 0 && (
                           <motion.div
                             initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.4 }}
                           >
                             <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center text-[10px] rounded-full">
                               {zone.alerts}
@@ -203,7 +195,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
                         <span className="text-muted-foreground">{zone.items.toLocaleString('nl-NL')} items</span>
                         <motion.span 
                           className={cn("font-bold tabular-nums", utilStyle.color)}
-                          animate={{ scale: isHovered ? 1.1 : 1 }}
                         >
                           {zone.utilization}%
                         </motion.span>
@@ -231,7 +222,6 @@ export function WMSWarehouseMap({ zones, className, onZoneClick }: WMSWarehouseM
       {zones.length === 0 && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           className="text-center py-12 text-muted-foreground"
         >
           <Box className="h-12 w-12 mx-auto mb-3 opacity-40" />

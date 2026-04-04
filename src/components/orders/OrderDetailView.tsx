@@ -621,9 +621,7 @@ const OrderDetailView = ({ tripId }: OrderDetailViewProps) => {
                           <motion.div
                             key="collapsed"
                             initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
                             onClick={() => toggleCollapsed(idx)}
                             className="cursor-pointer"
                           >
@@ -646,9 +644,7 @@ const OrderDetailView = ({ tripId }: OrderDetailViewProps) => {
                           <motion.div
                             key="expanded"
                             initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
                           >
                             {/* Swipe hint on first card */}
                             {idx === 0 && !swipeHintShown && (

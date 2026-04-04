@@ -16,24 +16,18 @@ export const OverdueBanner = ({ isOverdue, dueDate, onPaymentClick }: OverdueBan
       {isOverdue && (
         <motion.div
           initial={{ opacity: 0, y: -16, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -16, scale: 0.98 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
           <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent backdrop-blur-2xl shadow-xl shadow-red-500/10">
             {/* Animated gradient border effect */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/60 to-transparent" />
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/5 to-transparent"
-              animate={{ x: ['-100%', '100%'] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             />
             
             <div className="relative p-5 flex items-center gap-5">
               <motion.div 
                 className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-red-500/30 to-red-600/20 flex items-center justify-center shadow-lg shadow-red-500/20"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
               >
                 <CalendarClock className="h-7 w-7 text-red-500" />
               </motion.div>
@@ -51,7 +45,6 @@ export const OverdueBanner = ({ isOverdue, dueDate, onPaymentClick }: OverdueBan
               </div>
               <motion.div
                 whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
               >
                 <Button 
                   className="h-11 px-5 gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg shadow-red-500/25"
@@ -81,9 +74,7 @@ export const DifferenceBanner = ({ hasDifference, differenceAmount, formatCurren
       {hasDifference && (
         <motion.div
           initial={{ opacity: 0, y: -16, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -16, scale: 0.98 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
           <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent backdrop-blur-2xl shadow-xl shadow-amber-500/10">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
@@ -91,8 +82,6 @@ export const DifferenceBanner = ({ hasDifference, differenceAmount, formatCurren
             <div className="relative p-5 flex items-center gap-5">
               <motion.div 
                 className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/30 to-amber-600/20 flex items-center justify-center"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
               >
                 <AlertTriangle className="h-7 w-7 text-amber-500" />
               </motion.div>

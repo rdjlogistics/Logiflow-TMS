@@ -170,13 +170,6 @@ export const GPSStatusBarPremium = ({
               'relative w-12 h-12 rounded-xl flex items-center justify-center',
               'bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10'
             )}
-            animate={isTracking ? { 
-              boxShadow: [
-                '0 0 0 0 rgba(16, 185, 129, 0)',
-                '0 0 20px 0 rgba(16, 185, 129, 0.3)',
-                '0 0 0 0 rgba(16, 185, 129, 0)'
-              ]
-            } : {}}
           >
             <StatusIcon className={cn(
               'w-6 h-6',

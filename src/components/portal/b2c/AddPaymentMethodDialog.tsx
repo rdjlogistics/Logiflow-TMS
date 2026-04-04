@@ -246,7 +246,6 @@ export const AddPaymentMethodDialog = ({
             <motion.div
               key="select"
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className="space-y-3 py-4"
             >
@@ -290,7 +289,6 @@ export const AddPaymentMethodDialog = ({
             <motion.div
               key="ideal"
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="space-y-3 py-4"
             >
@@ -325,7 +323,6 @@ export const AddPaymentMethodDialog = ({
             <motion.div
               key="card"
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="space-y-4 py-4"
             >
@@ -385,7 +382,6 @@ export const AddPaymentMethodDialog = ({
             <motion.div
               key="sepa"
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="space-y-4 py-4"
             >
@@ -421,13 +417,10 @@ export const AddPaymentMethodDialog = ({
             <motion.div
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center py-8"
             >
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", damping: 10, stiffness: 200, delay: 0.1 }}
                 className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4"
               >
                 <CheckCircle2 className="h-8 w-8 text-green-500" />

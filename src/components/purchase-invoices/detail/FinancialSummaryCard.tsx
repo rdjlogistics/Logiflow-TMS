@@ -38,8 +38,6 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
           <motion.div 
             className="flex items-center justify-between py-3 px-4 -mx-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent"
             initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
           >
             <span className="text-base font-semibold flex items-center gap-2 text-foreground">
               <TrendingUp className="h-4 w-4 text-primary" />
@@ -48,8 +46,6 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
             <motion.span 
               className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-primary-glow bg-clip-text text-transparent"
               initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 300 }}
             >
               {formatCurrency(Number(invoice.total_amount))}
             </motion.span>
@@ -61,8 +57,6 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
           <motion.div 
             className="pt-4 mt-4 border-t border-border/50"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
           >
             <div className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
               <span className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2 font-medium">
@@ -81,8 +75,6 @@ export const FinancialSummaryCard = ({ invoice, formatCurrency }: FinancialSumma
           <motion.div 
             className={cn(!invoice.sent_at && "pt-4 mt-4 border-t border-border/50")}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
           >
             <div className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <span className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2 font-medium">

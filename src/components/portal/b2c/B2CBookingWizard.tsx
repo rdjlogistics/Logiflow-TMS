@@ -178,8 +178,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                   isCurrent ? "bg-primary text-primary-foreground" :
                   "bg-muted/50 text-muted-foreground"
                 )}
-                initial={false}
-                animate={isCompleted ? { scale: [1, 1.1, 1] } : {}}
+                initial={false}}
                 aria-label={`Stap ${index + 1}: ${step.label}${isCompleted ? ' (voltooid)' : isCurrent ? ' (huidige stap)' : ''}`}
               >
                 {isCompleted ? (
@@ -194,8 +193,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                     "w-8 sm:w-12 h-1 mx-1 rounded-full transition-colors",
                     index < currentStepIndex ? "bg-gold" : "bg-muted/50"
                   )}
-                  initial={false}
-                  animate={index < currentStepIndex ? { scaleX: 1 } : { scaleX: 1 }}
+                  initial={false}}
                 />
               )}
             </div>
@@ -462,7 +460,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
       {/* Actions - Touch Optimized */}
       <div className="flex gap-3">
         {currentStepIndex > 0 && (
-          <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+          <motion.div className="flex-1">
             <Button
               variant="outline"
               onClick={prevStep}
@@ -474,7 +472,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
             </Button>
           </motion.div>
         )}
-        <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+        <motion.div className="flex-1">
           <Button
             onClick={nextStep}
             disabled={!canProceed() || submitting}

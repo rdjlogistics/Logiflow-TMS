@@ -156,12 +156,11 @@ const PerformanceMetricsWidget = ({
       <CardContent className="p-3 sm:p-4 relative">
         <motion.div 
           className="space-y-3 sm:space-y-5"
-          variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* OTIF Rate - Hero Metric */}
-          <motion.div variants={itemVariants}>
+          <motion.div>
             <Link to="/enterprise/recommendations" className="block group touch-manipulation">
               <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-success/10 via-success/5 to-transparent border border-success/20 hover:border-success/40 transition-all active:scale-[0.98]">
                 <div className="flex items-center justify-between mb-2 sm:mb-3">
@@ -182,7 +181,6 @@ const PerformanceMetricsWidget = ({
                   <motion.span 
                     className="text-3xl sm:text-4xl font-bold text-success tabular-nums"
                     initial={{ scale: 0.8 }}
-                    animate={{ scale: 1 }}
                   >
                     {data.otifRate}%
                   </motion.span>
@@ -192,8 +190,6 @@ const PerformanceMetricsWidget = ({
                   <motion.div 
                     className="h-full rounded-full bg-gradient-to-r from-success to-success/70"
                     initial={{ width: 0 }}
-                    animate={{ width: `${data.otifRate}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
                   />
                 </div>
               </div>
@@ -201,7 +197,7 @@ const PerformanceMetricsWidget = ({
           </motion.div>
 
           {/* Utilization & Delivery Metrics Grid */}
-          <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2 sm:gap-3">
+          <motion.div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Utilization Rate */}
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
@@ -223,8 +219,6 @@ const PerformanceMetricsWidget = ({
                 <motion.div 
                   className={cn("h-full rounded-full", getProgressColor(data.utilizationRate, { good: 80, warn: 60 }))}
                   initial={{ width: 0 }}
-                  animate={{ width: `${data.utilizationRate}%` }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
                 />
               </div>
             </div>
@@ -250,7 +244,7 @@ const PerformanceMetricsWidget = ({
           </motion.div>
 
           {/* On-Time Metrics */}
-          <motion.div variants={itemVariants} className="space-y-2 sm:space-y-3">
+          <motion.div className="space-y-2 sm:space-y-3">
             {/* On-Time Pickup */}
             <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-muted/10 border border-border/30">
               <div className="flex items-center gap-2 sm:gap-2.5">
@@ -264,8 +258,6 @@ const PerformanceMetricsWidget = ({
                   <motion.div 
                     className="h-full rounded-full bg-success"
                     initial={{ width: 0 }}
-                    animate={{ width: `${data.onTimePickup}%` }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-success tabular-nums w-10 sm:w-12 text-right">
@@ -287,8 +279,6 @@ const PerformanceMetricsWidget = ({
                   <motion.div 
                     className="h-full rounded-full bg-primary"
                     initial={{ width: 0 }}
-                    animate={{ width: `${data.onTimeDelivery}%` }}
-                    transition={{ duration: 0.5, delay: 0.25 }}
                   />
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-primary tabular-nums w-10 sm:w-12 text-right">
@@ -299,8 +289,7 @@ const PerformanceMetricsWidget = ({
           </motion.div>
 
           {/* Bottom Stats */}
-          <motion.div 
-            variants={itemVariants}
+          <motion.div
             className="flex items-center justify-between pt-2 sm:pt-3 border-t border-border/30"
           >
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
