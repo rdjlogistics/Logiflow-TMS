@@ -293,7 +293,7 @@ const DriverPR = ({ children, redirectTo }: { children: ReactNode; redirectTo?: 
 
 const App = () => (
   <ErrorBoundary>
-    <LazyMotion features={loadFramerFeatures}>
+    
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="nextgen-tms-theme">
         <AuthProvider>
