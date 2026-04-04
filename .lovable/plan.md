@@ -1,89 +1,87 @@
 
 
-# Volledige Feature Audit — Scale Pakket (36 functies)
+# Concurrent-Audit Acties + Top 3 Features Bouwen
 
-## Audit Resultaten
+## Huidige Status
 
-### ✅ Volledig Werkend (26 functies)
+Na grondige audit van Erniesoft e-Lips versus ons systeem:
 
-| # | Feature | Status | Bewijs |
-|---|---------|--------|--------|
-| 1 | Orderbeheer | ✅ | OrderOverview + OrderForm, CRUD, realtime |
-| 2 | Digitale POD | ✅ | DigitalPOD pagina, storage, PDF download |
-| 3 | CMR / Vrachtbrief | ✅ | generate-document-pdf edge function, download flow |
-| 4 | Live Tracking | ✅ | GPSTracking pagina, Mapbox, driver_locations tabel |
-| 5 | Facturatie | ✅ | Invoices, batch-create, PDF, email verzending |
-| 6 | CRM | ✅ | Customers pagina, volledig CRUD |
-| 7 | KPI Dashboard | ✅ | KPIDashboard, get_dashboard_ops RPC |
-| 8 | Chauffeurs App | ✅ | DriverPortal, offline sync, GPS push |
-| 9 | Multi-stop Orders | ✅ | OrderForm multi-stop support |
-| 10 | AI Dispatch | ✅ | ai-dispatch-engine + intelligent-dispatch edge functions |
-| 11 | Route Optimalisatie | ✅ | RouteOptimization pagina, Mapbox layers |
-| 12 | Dienstplanning | ✅ | PlanningProgram, shifts CRUD, publish flow |
-| 13 | Proactieve Alerts | ✅ | proactive-alerts edge function, anomaly_events tabel |
-| 14 | SLA Monitoring | ✅ | SLAMonitoring pagina, useSLADefinitions hook (DB-connected) |
-| 15 | Debiteurenbeheer | ✅ | Receivables pagina, aging badges, reminders |
-| 16 | Inkoopfacturatie | ✅ | PurchaseInvoices, batch wizard, SEPA export |
-| 17 | Creditnota's | ✅ | Credit flow in invoice system |
-| 18 | Marge Analyse | ✅ | MarginIntelligence pagina |
-| 19 | Cashflow Dashboard | ✅ | CashflowCockpit pagina |
-| 20 | Klanten Portaal | ✅ | B2B Portal, login, tracking, cases |
-| 21 | Tariefcontracten | ✅ | RateManagement pagina, rate_contracts tabel |
-| 22 | Tendering / Charter | ✅ | TenderDashboard, rfq-parser edge function |
-| 23 | Smart OCR | ✅ | SmartDocumentOCR pagina, smart-document-ocr edge function |
-| 24 | WMS / Magazijn | ✅ | 8 WMS pagina's, allemaal DB-connected |
-| 25 | E-commerce | ✅ | EcommerceIntegrations, ecommerce-sync edge function |
-| 26 | Exception Management | ✅ | ExceptionsInbox + Playbooks, anomaly_events DB |
-| 27 | WhatsApp Chat | ✅ | Messenger, notification channels, WhatsApp API config |
-| 28 | Push Notificaties | ✅ | send-push-notification edge function, PushNotificationPrompt |
-| 29 | Fleet Management | ✅ | FleetManagement pagina, vehicles CRUD |
-| 30 | Bank Reconciliatie | ✅ | BankReconciliation pagina, bank-reconcile edge function |
-| 31 | Boekhouding Koppeling | ✅ | exact-oauth-start + exact-sync-invoices edge functions |
+**Wij winnen al op 20+ gebieden** — AI Dispatch, Smart OCR, iOS thema, B2B/Driver portals, Cashflow analytics, Route Optimalisatie, Exception Management, etc.
 
-### ⚠️ Problemen Gevonden (5 functies)
-
-| # | Feature | Probleem | Fix |
-|---|---------|----------|-----|
-| 32 | **UBL Export** | Frontend heeft UBL toggle in InvoiceEmailComposer, maar `send-invoice-email` edge function **negeert `include_ubl` parameter volledig** — er wordt geen UBL XML gegenereerd of bijgevoegd | Nieuwe edge function logica nodig om UBL 2.1 XML te genereren en als attachment mee te sturen |
-| 33 | **Multi-vestiging** | **Geen dedicated pagina of UI**. Feature key bestaat in subscription system maar er is geen multi-location management scherm | Nieuwe pagina nodig voor vestigingenbeheer (locaties, teams per vestiging) |
-| 34 | **Vervoerdersnetwerk** | Alle 4 community pagina's (JointOrders, Workspaces, Settlements, Ledger) zijn **lege placeholders** met alleen tekst "wordt beschikbaar zodra..." | Database-connected UI nodig |
-| 35 | **API Toegang** | PublicAPI pagina bestaat en is functioneel (key management, docs) ✅ | OK |
-| 36 | **White Label** | BrandingSettings pagina bestaat en is functioneel (logo, kleuren) ✅ | OK |
+**Erniesoft wint op 3 gebieden die we moeten toevoegen:**
 
 ---
 
-## Samenvatting: 3 Kritieke Fixes Nodig
+## Batch 1: Diesel Staffel Module (Prioriteit 1 — NL markt essentieel)
 
-### Fix 1: UBL Export — Edge function uitbreiden
-- `send-invoice-email` moet `include_ubl` parameter lezen
-- UBL 2.1 XML genereren op basis van factuurdata (standaard Nederlands belastingformaat)
-- XML als bijlage meesturen via Resend attachments API
-- **Geschatte omvang**: 1 edge function wijziging
+We hebben al een `FuelIndexUpdateDialog` en brandstoftoeslag in RateManagement, maar missen de **staffel-structuur** die Erniesoft wel heeft (automatische berekening op basis van prijsstaffels).
 
-### Fix 2: Multi-vestiging — Pagina bouwen
-- Nieuwe pagina `/admin/locations` of `/enterprise/locations`
-- CRUD voor vestigingen (naam, adres, contactpersoon)
-- Koppeling aan bestaande `companies` tabel of nieuwe `company_branches` tabel
-- FeatureGate op `multi_vestiging`
-- **Geschatte omvang**: 1 migratie + 1 pagina + 1 route
+**Wat te bouwen:**
+- **Nieuwe pagina** `/finance/diesel-module` — Diesel Staffel Beheer
+- **DB migratie**: `diesel_staffels` tabel (referentieprijs, staffelstappen met percentages, geldigheidsperiode)
+- **Staffel Calculator**: Automatische berekening brandstoftoeslag per klant op basis van actuele dieselprijs vs referentieprijs met staffelstappen (bv. elke €0.05 stijging = +0.5%)
+- **Maandelijkse auto-update**: Edge function die CBS/marktprijzen checkt en staffels herberekent
+- **Koppeling aan facturatie**: Brandstoftoeslag automatisch toepassen op factuurregels
+- **Overzichtsdashboard**: Huidige dieselprijs, historische grafiek, impact op omzet
 
-### Fix 3: Vervoerdersnetwerk — Community pagina's vullen
-- JointOrders: Toon gedeelde ritten tussen connected partners
-- CommunityWorkspaces: Workspace beheer (al deels in Network pagina)
-- Settlements & Ledger: Financiële afrekeningen tussen partners
-- Alle 4 pagina's moeten DB-connected worden met echte data
-- **Geschatte omvang**: 4 pagina's herschrijven
-
-### Bonus Fix: Console Warning
-- `ConfirmDialog` → AlertDialogContent geeft ref warning (uit console logs)
-- Fix: `forwardRef` wrapper toevoegen
+**Bestanden:**
+- 1 migratie (diesel_staffels tabel)
+- 1 pagina (`src/pages/finance/DieselModule.tsx`)
+- 1 edge function (`diesel-price-update`)
+- Update `BatchInvoiceWizard` voor automatische staffel-toepassing
+- Route toevoegen in `App.tsx`
 
 ---
 
-## Aanbeveling
+## Batch 2: Proforma + Offerte Flow (Prioriteit 2)
 
-**Fix 1 (UBL)** is kritiek voor Nederlandse markt — klanten verwachten UBL bij facturen.
-**Fix 2 (Multi-vestiging)** en **Fix 3 (Vervoerdersnetwerk)** zijn Scale-only features die actief verkocht worden.
+We hebben al `offerte` status in trips en `is_proforma` in facturatie, maar missen een **dedicated Offerte pagina** met volledige pipeline.
 
-Alle 3 moeten gefixt worden voor launch. Ik kan ze in 3 batches uitvoeren.
+**Wat te bouwen:**
+- **Nieuwe pagina** `/sales/quotes` — Offertes & Proforma Dashboard
+- Pipeline-view: Offerte → Akkoord → Order → Factuur
+- Offerte PDF genereren (edge function uitbreiding van `generate-document-pdf`)
+- Conversie-tracking: hoeveel offertes worden orders
+- Vervaldatum + automatische herinneringen
+- KPI cards: Open offertes, conversiepercentage, gemiddelde waarde
+
+**Bestanden:**
+- 1 pagina (`src/pages/sales/QuotesDashboard.tsx`)
+- Update `generate-document-pdf` edge function voor offerte template
+- Route toevoegen in `App.tsx`
+- Sidebar menu-item onder Sales/CRM
+
+---
+
+## Batch 3: CO2 Rapportage Upgraden naar GLEC Framework (Prioriteit 3)
+
+We hebben al een werkende CO2 pagina (`/co2`) met STREAM emissiefactoren. Upgrade naar **GLEC Framework** (EU regelgeving 2026):
+
+**Wat te verbeteren:**
+- **GLEC compliance badges** op het dashboard
+- **Well-to-Wheel (WTW)** emissiefactoren toevoegen naast Tank-to-Wheel
+- **Scope 1/2/3 uitsplitsing** volgens GHG Protocol
+- **PDF rapport export** naast CSV (professioneel ESG rapport)
+- **Doelstellingen panel**: CO2 reductiedoelen instellen en voortgang tracken
+- **Vergelijking met vorig jaar**: Trendlijn en delta
+
+**Bestanden:**
+- Update `src/hooks/useCO2Data.ts` (WTW factoren, scope-uitsplitsing)
+- Update `src/pages/CO2Reporting.tsx` (GLEC badges, doelen, PDF export)
+- Optioneel: edge function voor PDF rapport generatie
+
+---
+
+## Technische Details
+
+```text
+Batch 1 (Diesel):     1 migratie + 1 pagina + 1 edge function + 1 update
+Batch 2 (Offerte):    1 pagina + 1 edge function update + 2 updates
+Batch 3 (CO2 GLEC):   2 bestandsupdates + optioneel edge function
+
+Totaal: ~8-10 bestanden wijzigen/maken
+Volgorde: Batch 1 → 2 → 3 (prioriteit NL markt)
+```
+
+Alle 3 batches vullen exact de gaten die Erniesoft wel heeft en wij nog niet. Na implementatie: **0 concurrentievoordeel voor Erniesoft, 20+ voordelen voor ons**.
 
