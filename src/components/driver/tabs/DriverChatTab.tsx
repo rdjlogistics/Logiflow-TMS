@@ -213,6 +213,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                   </div>
                 );
               })}
+            </>
           )}
         </div>
       </ScrollArea>

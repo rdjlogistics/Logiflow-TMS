@@ -37,8 +37,9 @@ const navApps: Array<{ id: NavApp; name: string; icon: string; color: string; ge
 ];
 
 export function NavigationChooser({ isOpen, onClose, destination, label, lat, lng }: NavigationChooserProps) {
+  if (!isOpen) return null;
+
   return (
-      {isOpen && (
         <>
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
@@ -107,6 +108,6 @@ export function NavigationChooser({ isOpen, onClose, destination, label, lat, ln
             </div>
           </div>
         </>
-      )}
+        </>
   );
 }

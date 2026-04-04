@@ -59,8 +59,9 @@ export function DriverBulkActions({
   onDelete,
   onClearSelection,
 }: DriverBulkActionsProps) {
+  if (selectedCount <= 0) return null;
+
   return (
-      {selectedCount > 0 && (
         <div
           className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit"
         >
@@ -139,6 +140,6 @@ export function DriverBulkActions({
             </Tooltip>
           </div>
         </div>
-      )}
+        </div>
   );
 }

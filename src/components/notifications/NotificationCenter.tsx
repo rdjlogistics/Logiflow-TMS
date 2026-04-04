@@ -258,6 +258,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
           </div>
         </>
       )}
+    </>
   );
 }
 
