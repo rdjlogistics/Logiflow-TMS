@@ -161,7 +161,7 @@ export const B2BDashboard = ({
       >
         <div className="flex items-center gap-4">
           {/* Time Icon */}
-          <div}
+          <div
             className={`p-3 rounded-xl bg-background/60 ${getTimeIcon().glow}`}
           >
             {(() => { const { Icon, color } = getTimeIcon(); return <Icon className={`h-6 w-6 ${color}`} />; })()}
@@ -224,7 +224,7 @@ export const B2BDashboard = ({
         ) : (
           kpis.map((kpi, index) => (
             <div key={kpi.label}>
-              <div}>
+              <div>
                 <Card className={`relative overflow-hidden cursor-pointer border-border/30 bg-card/60 backdrop-blur-sm ${kpi.urgent ? 'border-red-500/50' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -295,7 +295,7 @@ export const B2BDashboard = ({
                     const status = statusConfig[shipment.status];
                     return (
                       <div
-                        key={shipment.id}}
+                        key={shipment.id}
                       >
                         <Link to={`/portal/b2b/shipments/${shipment.id}`} className="flex items-center gap-4 p-4 md:py-3 py-4 transition-colors touch-manipulation">
                           <div className="flex-1 min-w-0">
@@ -323,12 +323,12 @@ export const B2BDashboard = ({
         {/* Sidebar Widgets */}
         <div className="space-y-4">
           {/* Widget 1: Openstaande Facturen */}
-          <div}>
+          <div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <div}><Euro className="h-4 w-4 text-gold" /></div>
+                    <div><Euro className="h-4 w-4 text-gold" /></div>
                     Openstaande Facturen
                   </span>
                   {overdueInvoices.length > 0 && (
@@ -411,7 +411,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <div} className="pt-1">
+                <div className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/invoices" className="gap-1">
                       Bekijk alle facturen <ArrowUpRight className="h-3 w-3" />
@@ -423,12 +423,12 @@ export const B2BDashboard = ({
           </div>
 
           {/* Widget 2: Aankomende Leveringen */}
-          <div}>
+          <div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <div}><CalendarClock className="h-4 w-4 text-primary" /></div>
+                    <div><CalendarClock className="h-4 w-4 text-primary" /></div>
                     Aankomende Leveringen
                   </span>
                   {openCasesCount > 0 && (
@@ -496,7 +496,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <div} className="pt-1">
+                <div className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/shipments" className="gap-1">
                       Bekijk alle zendingen <ArrowUpRight className="h-3 w-3" />
@@ -508,11 +508,11 @@ export const B2BDashboard = ({
           </div>
 
           {/* Widget 3: Recente Statusupdates */}
-          <div}>
+          <div>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <div}><Activity className="h-4 w-4 text-emerald-400" /></div>
+                  <div><Activity className="h-4 w-4 text-emerald-400" /></div>
                   Recente Statusupdates
                 </CardTitle>
               </CardHeader>
@@ -535,7 +535,7 @@ export const B2BDashboard = ({
                       const timeAgo = getRelativeTime(s.createdAt);
                       return (
                         <div
-                          key={s.id}}
+                          key={s.id}
                           className="rounded-md transition-colors"
                         >
                           <Link to={`/portal/b2b/shipments/${s.id}`} className="block py-2.5 px-1 touch-manipulation">

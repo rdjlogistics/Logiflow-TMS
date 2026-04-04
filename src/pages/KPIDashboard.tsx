@@ -218,7 +218,7 @@ ${driverPerformance.map(d =>
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           {kpiSummary.map((kpi, i) => (
             <div
-              key={kpi.name}}}}
+              key={kpi.name}
             >
             <Card className="relative overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -377,7 +377,7 @@ ${driverPerformance.map(d =>
                 <div className="space-y-4">
                   {driverPerformance.map((driver, index) => (
                     <div
-                      key={driver.name}}}}
+                      key={driver.name}
                       className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-muted/50 rounded-lg"
                     >
                       <div className="flex items-center gap-4">

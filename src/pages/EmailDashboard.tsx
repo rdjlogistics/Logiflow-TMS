@@ -175,7 +175,7 @@ export default function EmailDashboard() {
 
   return (
     <DashboardLayout title="E-mail Dashboard" description="Overzicht van alle verzonden e-mails">
-      <div}}}
+      <div
         className="space-y-6"
       >
         {/* Stats Cards */}

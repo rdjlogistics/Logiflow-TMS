@@ -67,7 +67,7 @@ export function WMSStatCard({
   const styles = variantStyles[variant];
 
   return (
-    <div} }}
+    <div }}
       className={cn(
         "relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6",
         "transition-all duration-300",

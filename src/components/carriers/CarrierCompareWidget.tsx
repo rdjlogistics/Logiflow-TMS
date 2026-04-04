@@ -107,7 +107,7 @@ const CarrierCompareWidget: React.FC<CarrierCompareWidgetProps> = ({
       <CardContent className="space-y-3">
         {displayQuotes.map((quote, idx) => (
           <div
-            key={quote.carrier_id}}}}
+            key={quote.carrier_id}
             className="flex items-center justify-between rounded-xl border border-border/60 bg-card/60 p-3 gap-3"
           >
             <div className="flex-1 min-w-0">

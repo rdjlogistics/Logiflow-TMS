@@ -422,7 +422,7 @@ const PricingPage = () => {
       <section className="mt-24 mb-16">
         <AIPlanSelector
           selectedPlanId={null}
-          onSelect={() => {}}
+          onSelect={() => {}
           showSkip={false}
         />
       </section>

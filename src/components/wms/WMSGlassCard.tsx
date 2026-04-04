@@ -18,7 +18,7 @@ export function WMSGlassCard({
   noPadding = false,
 }: WMSGlassCardProps) {
   return (
-    <div}
+    <div
       className={cn(
         "relative overflow-hidden rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm",
         variant === "elevated" && "shadow-lg shadow-black/5",

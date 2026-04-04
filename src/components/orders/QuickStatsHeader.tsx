@@ -167,7 +167,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
       </div>
 
       {/* Status distribution bar */}
-      <div}
+      <div
         className="mt-3 sm:mt-4"
       >
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -179,7 +179,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div}
+                  <div
                     className="bg-muted-foreground/40 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("gepland")}
                   />
@@ -193,7 +193,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div}
+                  <div
                     className="bg-blue-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("onderweg")}
                   />
@@ -207,7 +207,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div}
+                  <div
                     className="bg-green-500 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("afgerond")}
                   />
@@ -221,7 +221,7 @@ export const QuickStatsHeader = ({ stats, onStatClick }: QuickStatsHeaderProps) 
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div}
+                  <div
                     className="bg-destructive cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => onStatClick?.("needs_driver")}
                   />

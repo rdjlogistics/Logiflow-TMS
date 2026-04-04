@@ -144,7 +144,7 @@ export default function WMSInbound() {
   return (
     <DashboardLayout title="Ontvangst (Inbound)">
       {/* Header */}
-      <div}}
+      <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -315,7 +315,7 @@ export default function WMSInbound() {
                       const status = statusConfig[order.status] || statusConfig.pending;
                       return (
                         <tr
-                          key={order.id}}}}
+                          key={order.id}
                           className="border-b border-border/50 hover:bg-muted/30"
                         >
                           <TableCell>

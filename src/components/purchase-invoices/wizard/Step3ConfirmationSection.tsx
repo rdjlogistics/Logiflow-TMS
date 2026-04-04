@@ -77,7 +77,7 @@ export const Step3ConfirmationSection = ({
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/10 to-transparent backdrop-blur-2xl border border-emerald-500/30 p-6 sm:p-8 text-center"
       >
         {/* Shimmer */}
-        <div}
+        <div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
         />
         
@@ -86,7 +86,7 @@ export const Step3ConfirmationSection = ({
         
         <div className="relative space-y-3 sm:space-y-4">
           {/* Animated Success Icon */}
-          <div}
+          <div
             className="mx-auto relative"
           >
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto">
@@ -106,7 +106,7 @@ export const Step3ConfirmationSection = ({
           </div>
 
           {/* Success Title */}
-          <div}
+          <div
             className="space-y-1.5 sm:space-y-2"
           >
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
@@ -176,7 +176,7 @@ export const Step3ConfirmationSection = ({
               </div>
             </div>
             
-            <div}
+            <div
               className="text-xl sm:text-3xl font-black tracking-tight bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400 dark:from-emerald-400 dark:via-emerald-300 dark:to-emerald-200 bg-clip-text text-transparent flex-shrink-0"
             >
               {formatCurrency(totalAmount)}

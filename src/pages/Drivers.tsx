@@ -831,7 +831,7 @@ const Drivers = () => {
                             leftActions={canManageDrivers ? [swipeActions.more(() => handleEdit(driver))] : []}
                             rightActions={canDelete ? [swipeActions.delete(() => handleDeleteClick(driver.id))] : []}
                           >
-                            <div}}}
+                            <div
                               className="bg-card border border-border rounded-xl p-4"
                             >
                               <div className="flex items-center justify-between mb-3">

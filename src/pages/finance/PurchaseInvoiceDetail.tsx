@@ -69,11 +69,11 @@ const LoadingSkeleton = () => (
 
 // Not Found State
 const NotFoundState = () => (
-  <div}}
+  <div
     className="flex flex-col items-center justify-center py-32"
   >
     <div 
-      className="relative mb-8"}}}
+      className="relative mb-8"
     >
       <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-xl">
         <FileText className="h-12 w-12 text-muted-foreground" />
@@ -189,10 +189,10 @@ const PurchaseInvoiceDetail = () => {
       {/* Premium animated background mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div
-          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"}}
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"
         />
         <div
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"}}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"
         />
       </div>
 
@@ -301,7 +301,7 @@ const PurchaseInvoiceDetail = () => {
                   onClick={() => updateStatusMutation.mutate("definitief")}
                   disabled={updateStatusMutation.isPending}
                 >
-                  <div}}
+                  <div
                   >
                     <Sparkles className="h-5 w-5" />
                   </div>

@@ -147,7 +147,7 @@ const PurchaseInvoicesWidget = () => {
                 ) : (
                   stats?.recentInvoices?.map((invoice, index) => (
                     <div
-                      key={invoice.id}}
+                      key={invoice.id}
                     >
                       <Link
                         to={`/purchase-invoices/${invoice.id}`}

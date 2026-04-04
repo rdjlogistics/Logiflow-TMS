@@ -40,7 +40,7 @@ const QuickLinksWidget = () => {
         <div className="grid grid-cols-2 gap-2">
           {quickLinks.map((link, index) => (
             <div
-              key={link.href}}
+              key={link.href}
             >
               <Link to={link.href}>
                 <div

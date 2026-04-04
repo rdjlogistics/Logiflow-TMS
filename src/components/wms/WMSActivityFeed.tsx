@@ -60,7 +60,7 @@ export function WMSActivityFeed({
     <div className={cn("space-y-1", className)}>
       {displayedActivities.map((activity, index) => (
         <div
-          key={activity.id}}
+          key={activity.id}
           className="group relative flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
         >
           {/* Timeline connector */}

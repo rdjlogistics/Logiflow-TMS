@@ -103,7 +103,7 @@ export default function WMSTransfers() {
 
   return (
     <DashboardLayout title="Inter-Warehouse Transfers">
-      <div}} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <p className="text-muted-foreground">Beheer voorraadtransfers tussen magazijnen</p>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild><Button className="gap-2"><Plus className="h-4 w-4" />Nieuwe Transfer</Button></DialogTrigger>
@@ -157,7 +157,7 @@ export default function WMSTransfers() {
                 <div className="space-y-3">{filteredTransfers?.map((transfer, i) => {
                   const status = statusConfig[transfer.status] || statusConfig.draft;
                   return (
-                    <div key={transfer.id}}}} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+                    <div key={transfer.id} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div><p className="font-mono font-medium">{transfer.transfer_number}</p>{transfer.shipped_date && <p className="text-xs text-muted-foreground">Verzonden: {format(new Date(transfer.shipped_date), "dd MMM yyyy", { locale: nl })}</p>}</div>
                         <div className="flex items-center gap-2">

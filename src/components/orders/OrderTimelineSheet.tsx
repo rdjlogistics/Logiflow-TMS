@@ -496,7 +496,7 @@ const OrderTimelineSheet = ({ open, onOpenChange, orderId }: OrderTimelineSheetP
                   const styles = variantStyles[entry.variant];
                   return (
                     <div
-                      key={entry.id}}
+                      key={entry.id}
                       className="relative flex gap-3 group"
                     >
                       {/* Dot */}

@@ -180,7 +180,7 @@ const PricingPanel = ({
   const TARIFF_GRID = isFullwidth ? TARIFF_GRID_FW : TARIFF_GRID_SB;
 
   return (
-    <div}
+    <div
     >
     <Card 
       className={cn(

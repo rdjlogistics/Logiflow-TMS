@@ -87,7 +87,7 @@ function MetricCard({
   const styles = colorStyles[color];
 
   const content = (
-    <div}}
+    <div
       className={cn(
         "relative h-full overflow-hidden rounded-xl border bg-card/60 backdrop-blur-md p-5",
         "transition-all duration-300 group cursor-pointer",
@@ -114,7 +114,7 @@ function MetricCard({
         </div>
         
         {/* Right side: Icon */}
-        <div}
+        <div
           className={cn(
             "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ml-3",
             styles.bg, "border", styles.border
@@ -214,7 +214,7 @@ export default function WMSDashboard() {
   return (
     <DashboardLayout title="WMS Control Tower">
       {/* Imperial Header */}
-      <div}}
+      <div
         className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6"
       >
         <div className="flex items-center gap-4">
@@ -275,7 +275,7 @@ export default function WMSDashboard() {
       </div>
 
       {/* Quick Actions - Compact */}
-      <div}}}
+      <div
         className="mb-6"
       >
         <WMSQuickActions />
@@ -495,7 +495,7 @@ export default function WMSDashboard() {
                     {pendingOutbound?.slice(0, 6).map((order, index) => (
                       <tr 
                         key={order.id} 
-                        className="hover:bg-muted/20 transition-colors"}}}
+                        className="hover:bg-muted/20 transition-colors"
                       >
                         <td className="py-3 px-4">
                           <span className="font-mono text-xs font-medium text-primary">{order.order_number}</span>
@@ -571,7 +571,7 @@ export default function WMSDashboard() {
               <div className="space-y-2">
                 {warehouses?.slice(0, 4).map((wh, i) => (
                   <div
-                    key={wh.id}}}}
+                    key={wh.id}
                     className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors"
                   >
                     <div className={cn(
@@ -618,7 +618,7 @@ export default function WMSDashboard() {
               <div className="space-y-2">
                 {lowStock?.slice(0, 5).map((inv, i) => (
                   <div
-                    key={inv.id}}}}
+                    key={inv.id}
                     className="flex items-center gap-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/5"
                   >
                     <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />

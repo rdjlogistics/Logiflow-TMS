@@ -146,7 +146,7 @@ const B2BShipments = () => {
             const status = statusConfig[shipment.status];
             return (
               <div
-                key={shipment.id}}
+                key={shipment.id}
                 className="touch-manipulation"
                 onClick={() => navigate(`/portal/b2b/shipments/${shipment.id}`)}
               >
@@ -206,7 +206,7 @@ const B2BShipments = () => {
                   const status = statusConfig[shipment.status];
                   return (
                     <tr
-                      key={shipment.id}}
+                      key={shipment.id}
                       className="transition-colors cursor-pointer"
                       onClick={() => navigate(`/portal/b2b/shipments/${shipment.id}`)}
                     >
@@ -265,9 +265,9 @@ const B2BShipments = () => {
           
         {filteredShipments.length === 0 && (
           <div 
-            className="text-center py-16"}}}
+            className="text-center py-16"
           >
-            <div}}}
+            <div
             >
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                 <Package className="h-8 w-8 text-muted-foreground" />

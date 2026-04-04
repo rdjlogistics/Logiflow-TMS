@@ -256,7 +256,7 @@ export function CollectionsContent() {
                   </div>
                 ) : filteredCollections.map((coll: any) => (
                   <div
-                    key={coll.id}}}}
+                    key={coll.id}
                     onClick={() => setSelectedCase(coll)}
                     className="p-4 cursor-pointer active:bg-muted/30 transition-colors touch-manipulation"
                   >
@@ -347,7 +347,7 @@ export function CollectionsContent() {
                   const isOverLimit = usagePercent > 100;
                   return (
                     <div
-                      key={profile.id}}}}
+                      key={profile.id}
                       onClick={() => {
                         setSelectedProfile(profile);
                         setEditCreditLimit(profile.credit_limit || 0);

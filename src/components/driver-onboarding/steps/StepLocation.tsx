@@ -50,15 +50,15 @@ export const StepLocation = () => {
         <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Locatie Delen
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           We hebben je locatie nodig voor de beste route-planning.
         </p>
       </div>
 
-      <div className="relative mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="relative mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <div className="w-48 h-48 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl border border-white/20 flex items-center justify-center">
           <div className={permissionGranted ? "animate-pulse" : "animate-bounce"}>
             {permissionGranted ? (
@@ -76,7 +76,7 @@ export const StepLocation = () => {
         )}
       </div>
 
-      <div className="space-y-3 mb-auto animate-fade-in-up" style={{ animationDelay: '0.4s' >
+      <div className="space-y-3 mb-auto animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
         {features.map((feature, index) => (
           <div
             key={index}

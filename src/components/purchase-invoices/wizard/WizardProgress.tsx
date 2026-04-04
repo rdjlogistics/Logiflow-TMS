@@ -8,14 +8,14 @@ interface WizardProgressProps {
 
 export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
   return (
-    <div}
+    <div
       className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-card/90 via-card/80 to-muted/50 backdrop-blur-xl border border-border/40 p-4 sm:p-6"
     >
       {/* Mesh gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.06),transparent)] pointer-events-none" />
       
       {/* Shimmer effect */}
-      <div}
+      <div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none"
       />
 
@@ -30,7 +30,7 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
             <div key={idx} className="flex items-center flex-1 sm:flex-none last:flex-none">
               {/* Step Circle */}
               <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                <div}
+                <div
                   className="relative"
                 >
                   {/* Glow ring for active */}
@@ -49,7 +49,7 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                     )}
                   >
                     {isCompleted ? (
-                      <div}
+                      <div
                       >
                         <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
@@ -60,7 +60,7 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                 </div>
                 
                 {/* Label */}
-                <span}
+                <span
                   className={cn(
                     "text-[10px] sm:text-xs font-medium transition-colors text-center",
                     isActive && "text-primary",
@@ -79,7 +79,7 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                   <div className="absolute inset-0 bg-border/60 rounded-full" />
                   
                   {/* Animated fill */}
-                  <div}
+                  <div
                     className={cn(
                       "absolute inset-0 origin-left rounded-full",
                       isCompleted ? "bg-gradient-to-r from-emerald-500 to-emerald-400" : "bg-gradient-to-r from-primary to-primary/60"

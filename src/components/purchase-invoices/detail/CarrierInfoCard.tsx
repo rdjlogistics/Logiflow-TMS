@@ -51,7 +51,7 @@ export const CarrierInfoCard = ({ carrier }: CarrierInfoCardProps) => {
       
       <div className="p-6 pt-2 space-y-5">
         {/* Company name with premium styling */}
-        <div}
+        <div
         >
           <p className="font-bold text-xl text-foreground tracking-tight">{carrier.company_name}</p>
           {carrier.contact_name && (

@@ -397,7 +397,7 @@ const Invoices = () => {
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 {/* Shimmer sweep */}
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"}}}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
                 />
                 <CardContent className="relative p-3 sm:p-5 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-1.5 sm:mb-3">
@@ -649,7 +649,7 @@ const Invoices = () => {
               const overdue = isOverdue(invoice);
               return (
                 <div
-                  key={invoice.id}}
+                  key={invoice.id}
                   className="touch-manipulation"
                 >
                   <Card 

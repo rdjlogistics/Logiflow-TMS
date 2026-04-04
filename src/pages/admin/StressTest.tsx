@@ -433,7 +433,7 @@ const StressTest = () => {
 
   return (
     <DashboardLayout title="Stress Test" description="Performance benchmarks en belastingstest">
-      <div}}
+      <div
         className="space-y-6"
       >
         {/* Header */}

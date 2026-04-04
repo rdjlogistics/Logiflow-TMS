@@ -148,7 +148,7 @@ export default function WMSOutbound() {
   return (
     <DashboardLayout title="Verzending (Outbound)">
       {/* Header */}
-      <div}}
+      <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -329,7 +329,7 @@ export default function WMSOutbound() {
 
                         return (
                           <tr
-                            key={order.id}}}}
+                            key={order.id}
                             className="border-b border-border/50 hover:bg-muted/30"
                           >
                             <TableCell>

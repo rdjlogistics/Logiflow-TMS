@@ -38,15 +38,15 @@ export const StepVehiclePreference = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Voertuigvoorkeur
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Met welk type voertuig heb je ervaring? Selecteer alles dat van toepassing is.
         </p>
       </div>
 
-      <div className="flex-1 space-y-3 mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex-1 space-y-3 mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {VEHICLE_TYPES.map((vehicle, index) => {
           const isSelected = selectedTypes.includes(vehicle.id);
           const Icon = vehicle.icon;

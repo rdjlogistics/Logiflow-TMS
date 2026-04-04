@@ -83,7 +83,7 @@ export const Step2PreviewSection = ({
 
   if (carrierGroups.length === 0) {
     return (
-      <div}
+      <div
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-card/90 via-card/80 to-muted/50 backdrop-blur-2xl border border-border/40 p-8 sm:p-12"
       >
         {/* Ambient glow */}
@@ -121,7 +121,7 @@ export const Step2PreviewSection = ({
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
       >
         {/* Shimmer effect */}
-        <div}
+        <div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
         />
         

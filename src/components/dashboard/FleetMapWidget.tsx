@@ -253,7 +253,7 @@ const FleetMapWidget = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            <div}>
+            <div>
               <Button 
                 variant="ghost" 
                 size="sm" 

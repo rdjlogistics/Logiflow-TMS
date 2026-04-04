@@ -192,7 +192,7 @@ export const B2BLiveTrackingCard = ({ tripId, deliveryCity, deliveryAddress, cus
 
           {/* Stats bar */}
           {location && (
-            <div}
+            <div
               className={cn("grid gap-px bg-border/20", etaMinutes != null ? "grid-cols-4" : "grid-cols-3")}
             >
               <div className="bg-card/80 px-3 py-2.5 flex items-center gap-2">

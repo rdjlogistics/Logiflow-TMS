@@ -63,7 +63,7 @@ export const InvoiceHeader = ({
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           {/* Left: Back + Info */}
           <div className="flex items-start gap-5">
-            <div}
+            <div
             >
               <Button 
                 variant="ghost" 
@@ -119,7 +119,7 @@ export const InvoiceHeader = ({
                 <span className="sm:hidden">Versturen</span>
               </Link>
             </Button>
-            <div}>
+            <div>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -135,7 +135,7 @@ export const InvoiceHeader = ({
                 <span className="sm:hidden">PDF</span>
               </Button>
             </div>
-            <div}>
+            <div>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -147,7 +147,7 @@ export const InvoiceHeader = ({
               </Button>
             </div>
             {invoice.status !== "betaald" && (
-              <div}>
+              <div>
                 <Button 
                   variant="outline" 
                   className="gap-2.5 h-11 px-5 border-border/60 hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-600 transition-all duration-300"

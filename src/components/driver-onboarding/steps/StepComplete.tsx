@@ -107,10 +107,10 @@ export const StepComplete = () => {
       </div>
 
       <div className="mb-4 relative z-10">
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Welkom aan boord,<br /><span className="text-primary">{data.name}!</span>
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.3s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           {isSaving ? 'Even geduld, we slaan je gegevens op...' : 'Je bent klaar om te beginnen. Bekijk je rooster en accepteer je eerste ritten.'}
         </p>
       </div>
@@ -124,7 +124,7 @@ export const StepComplete = () => {
         ) : (
           <>
             <FloatingTruck3D />
-            <div className="absolute top-0 right-8 p-3 rounded-full bg-emerald-500/20 border border-emerald-500/30 animate-scale-fade-in" style={{ animationDelay: '0.5s' >
+            <div className="absolute top-0 right-8 p-3 rounded-full bg-emerald-500/20 border border-emerald-500/30 animate-scale-fade-in" style={{ animationDelay: '0.5s' }}>
               <CheckCircle2 className="w-8 h-8 text-emerald-400" />
             </div>
           </>
@@ -140,7 +140,7 @@ export const StepComplete = () => {
         </div>
       )}
 
-      <div className="mb-8 p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 animate-fade-in-up" style={{ animationDelay: '0.6s' >
+      <div className="mb-8 p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
         <p className="text-sm text-muted-foreground mb-3">Profiel aangemaakt met:</p>
         <div className="space-y-2">
           {[

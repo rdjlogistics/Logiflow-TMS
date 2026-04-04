@@ -103,7 +103,7 @@ const B2BInvoices = () => {
               <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div}
+                    <div
                       className={cn("p-1.5 rounded-lg flex-shrink-0", card.key === 'overdue' ? 'bg-red-500/10' : card.key === 'paid' ? 'bg-emerald-500/10' : card.key === 'open' ? 'bg-amber-500/10' : 'bg-muted/50')}
                     >
                       <card.icon className={cn("h-4 w-4", card.colorClass)} />
@@ -157,7 +157,7 @@ const B2BInvoices = () => {
             
             return (
               <div
-                key={invoice.id}}
+                key={invoice.id}
                 className="touch-manipulation"
               >
                 <div className={cn(
@@ -178,7 +178,7 @@ const B2BInvoices = () => {
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span
-                        className={cn("text-xl font-bold tabular-nums", isOverdue && "text-red-400")} : {}} : {}}
+                        className={cn("text-xl font-bold tabular-nums", isOverdue && "text-red-400")} : {} : {}
                       >
                         €{invoice.amount.toFixed(2)}
                       </span>
@@ -247,7 +247,7 @@ const B2BInvoices = () => {
                   
                   return (
                     <tr
-                      key={invoice.id}}
+                      key={invoice.id}
                       className="transition-colors"
                     >
                       <td className="px-4 py-3"><span className="font-medium text-sm">{invoice.number}</span></td>
@@ -261,7 +261,7 @@ const B2BInvoices = () => {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span
-                          className={cn("text-sm font-semibold", isOverdue && "text-red-400")} : {}} : {}}
+                          className={cn("text-sm font-semibold", isOverdue && "text-red-400")} : {} : {}
                         >
                           €{invoice.amount.toFixed(2)}
                         </span>
@@ -312,7 +312,7 @@ const B2BInvoices = () => {
 
         {filteredInvoices.length === 0 && (
           <div 
-            className="text-center py-16"}}
+            className="text-center py-16"
           >
             <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <FileText className="h-8 w-8 text-muted-foreground" />

@@ -671,7 +671,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
             toast({ title: 'CSV gedownload' });
           });
         }}
-        onScheduleMaintenance={() => {}}
+        onScheduleMaintenance={() => {}
         onUpdateMileage={() => setMileageDialogOpen(true)}
         onClearSelection={() => setSelectedIds(new Set())}
       />

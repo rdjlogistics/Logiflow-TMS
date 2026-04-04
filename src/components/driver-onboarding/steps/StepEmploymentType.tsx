@@ -47,15 +47,15 @@ export const StepEmploymentType = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Dienstverband
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Werk je in loondienst of als zelfstandige? Dit bepaalt welke documenten we nodig hebben.
         </p>
       </div>
 
-      <div className="flex-1 space-y-4 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex-1 space-y-4 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {OPTIONS.map((option, index) => {
           const isSelected = selected === option.id;
           const Icon = option.icon;

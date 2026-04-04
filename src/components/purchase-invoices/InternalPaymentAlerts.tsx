@@ -128,7 +128,7 @@ export const PaymentAlertBanner = () => {
       {/* Overdue Alert */}
       {hasOverdue && (
         <Link to="/purchase-invoices?status=verlopen">
-          <div}
+          <div
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-red-500/10 border-red-500/30 hover:bg-red-500/15"
@@ -155,7 +155,7 @@ export const PaymentAlertBanner = () => {
       {/* Soon Due Alert */}
       {hasSoonDue && (
         <Link to="/purchase-invoices">
-          <div}
+          <div
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/15"

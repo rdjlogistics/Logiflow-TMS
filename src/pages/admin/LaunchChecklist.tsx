@@ -243,7 +243,7 @@ const LaunchChecklist = () => {
 
   return (
     <DashboardLayout title="Launch Checklist">
-      <div}}}
+      <div
         className="space-y-6"
       >
         {/* Header */}

@@ -1121,7 +1121,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                           '0 0 0 6px hsl(var(--primary) / 0.15)',
                           '0 0 0 0 hsl(var(--primary) / 0)',
                         ],
-                      } : {}}
+                      } : {}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
                       {isCompleted ? (

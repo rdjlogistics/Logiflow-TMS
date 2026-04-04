@@ -72,7 +72,7 @@ export function InvoiceReminderHistory({ invoiceId }: InvoiceReminderHistoryProp
 
         return (
           <div
-            key={r.id}}
+            key={r.id}
             className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-muted/20 transition-colors duration-200 group"
           >
             <div className={cn(

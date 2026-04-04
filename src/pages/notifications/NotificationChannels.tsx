@@ -638,7 +638,7 @@ export default function NotificationChannels() {
                   value={editingTemplate.messageTemplate}
                   onChange={(e) => setEditingTemplate({ ...editingTemplate, messageTemplate: e.target.value })}
                   rows={4}
-                  placeholder="Gebruik {{variabele}} voor dynamische waarden"
+                  placeholder="Gebruik {{variabele} voor dynamische waarden"
                 />
                 <p className="text-xs text-muted-foreground">
                   Beschikbare variabelen: {'{{order_id}}'}, {'{{customer_name}}'}, {'{{driver_name}}'}, {'{{tracking_url}}'}, {'{{delivery_date}}'}

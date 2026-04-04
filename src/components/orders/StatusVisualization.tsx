@@ -174,7 +174,7 @@ export const StatusVisualization = ({
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div}}
+              <div
                 className="cursor-default"
               >
                 <Badge
@@ -265,7 +265,7 @@ export const StatusVisualization = ({
 
         {/* Progress bar */}
         {showProgress && (
-          <div}
+          <div
           >
             <Progress 
               value={config.progressValue} 
@@ -296,7 +296,7 @@ export const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => 
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center">
-                  <div}
+                  <div
                     className={cn(
                       "w-6 h-6 rounded-full flex items-center justify-center transition-all",
                       isActive && cn(config.bgColor, "ring-2 ring-offset-2 ring-offset-background", config.borderColor.replace("border-", "ring-")),

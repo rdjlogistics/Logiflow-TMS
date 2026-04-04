@@ -91,13 +91,13 @@ export const StepDriversLicense = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >Rijbewijs</h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>Rijbewijs</h1>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Upload zowel de voor- als achterkant van je rijbewijs.
         </p>
       </div>
       
-      <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.25s' >
+      <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
         <div className="flex items-start gap-2">
           <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-xs text-primary">
@@ -106,7 +106,7 @@ export const StepDriversLicense = () => {
         </div>
       </div>
 
-      <div className="flex gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {(['front', 'back'] as Side[]).map((side) => {
           const isActive = activeSide === side;
           const sideUploaded = side === 'front' ? frontUploaded : backUploaded;
@@ -134,7 +134,7 @@ export const StepDriversLicense = () => {
         })}
       </div>
 
-      <div className="flex-1 mb-6 animate-fade-in-up" style={{ animationDelay: '0.35s' >
+      <div className="flex-1 mb-6 animate-fade-in-up" style={{ animationDelay: '0.35s' }}>
         {currentUpload.url ? (
           <div className="relative">
             <img
@@ -192,11 +192,11 @@ export const StepDriversLicense = () => {
         )}
       </div>
 
-      <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.4s' >
+      <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
         <OnboardingInput value={data.driversLicenseNumber} onChange={(value) => updateData({ driversLicenseNumber: value })} placeholder="Rijbewijsnummer" />
       </div>
 
-      <div className="flex gap-4 mb-6 text-sm animate-fade-in-up" style={{ animationDelay: '0.5s' >
+      <div className="flex gap-4 mb-6 text-sm animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
         <div className={cn("flex items-center gap-2", frontVerified ? "text-emerald-400" : frontUploaded ? "text-primary" : "text-muted-foreground")}>
           {uploadingSide === 'front' ? <Loader2 className="w-4 h-4 animate-spin" /> : (frontVerified || frontUploaded) ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border-2 border-current" />}
           <span>Voorkant</span>

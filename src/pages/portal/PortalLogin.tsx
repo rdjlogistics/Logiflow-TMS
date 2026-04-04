@@ -134,7 +134,7 @@ const PortalLogin = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <div}}}
+      <div
         className="relative w-full max-w-md"
       >
         <div className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-8 shadow-2xl">
@@ -151,7 +151,7 @@ const PortalLogin = () => {
 
           {/* Error */}
           {error && (
-            <div}}
+            <div
               className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm"
             >
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />

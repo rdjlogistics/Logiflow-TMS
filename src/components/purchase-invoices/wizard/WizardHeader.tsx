@@ -7,13 +7,13 @@ interface WizardHeaderProps {
 
 export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
   return (
-    <div}
+    <div
       className="relative text-center space-y-2 px-4"
     >
       {/* Ambient glow behind */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,hsl(var(--primary)/0.15),transparent)] blur-2xl" />
       
-      <div}
+      <div
         className="flex items-center justify-center gap-2 sm:gap-3"
       >
         <div
@@ -33,7 +33,7 @@ export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
         </div>
       </div>
       
-      <p}
+      <p
         className="text-muted-foreground text-sm sm:text-base px-2"
       >
         {subtitle}

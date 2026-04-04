@@ -453,7 +453,7 @@ const PurchaseInvoices = () => {
             
             return (
               <div
-                key={invoice.id}}
+                key={invoice.id}
                 className="touch-manipulation"
               >
                 <Card 

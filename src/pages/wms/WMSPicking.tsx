@@ -163,7 +163,7 @@ export default function WMSPicking() {
   return (
     <DashboardLayout title="Picking">
       {/* Header */}
-      <div}}
+      <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -339,7 +339,7 @@ export default function WMSPicking() {
 
                     return (
                       <div
-                        key={wave.id}}}}
+                        key={wave.id}
                         onClick={() => setSelectedWaveId(wave.id)}
                         className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                           selectedWaveId === wave.id
@@ -441,7 +441,7 @@ export default function WMSPicking() {
 
                 return (
                   <div
-                    key={task.id}}}}
+                    key={task.id}
                     className="p-3 rounded-lg border bg-muted/30 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">

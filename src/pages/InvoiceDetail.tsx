@@ -77,7 +77,7 @@ const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => {
                 isActive
                   ? "bg-primary/10 border-primary/30 text-primary shadow-lg shadow-primary/10"
                   : "bg-muted/30 border-border/30 text-muted-foreground"
-              )} : {}}}
+              )} : {}
             >
               <StepIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">{step.label}</span>
@@ -134,11 +134,11 @@ const LoadingSkeleton = () => (
 
 // Not Found State
 const NotFoundState = () => (
-  <div}}
+  <div
     className="flex flex-col items-center justify-center py-32"
   >
     <div 
-      className="relative mb-8"}}}
+      className="relative mb-8"
     >
       <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-xl">
         <FileText className="h-12 w-12 text-muted-foreground" />
@@ -264,10 +264,10 @@ const InvoiceDetail = () => {
       {/* Premium animated background mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 print:hidden">
         <div
-          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"}}
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/8 via-primary/4 to-transparent blur-3xl"
         />
         <div
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"}}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-accent/6 via-accent/3 to-transparent blur-3xl"
         />
       </div>
 
@@ -282,7 +282,7 @@ const InvoiceDetail = () => {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/30 via-transparent to-transparent" />
           <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"}}}
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
           />
 
           <div className="relative p-6 lg:p-8">
@@ -300,7 +300,7 @@ const InvoiceDetail = () => {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-3 mb-2">
                     <h1 
-                      className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"}}}
+                      className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"
                     >
                       {invoice.invoice_number}
                     </h1>
@@ -313,7 +313,7 @@ const InvoiceDetail = () => {
                     <InvoiceAgingBadge dueDate={invoice.due_date} status={invoice.status} />
                   </div>
                   <p 
-                    className="text-muted-foreground text-base sm:text-lg"}}}
+                    className="text-muted-foreground text-base sm:text-lg"
                   >
                     Factuur voor <span className="font-semibold text-foreground">{customer?.company_name || "–"}</span>
                   </p>
@@ -322,7 +322,7 @@ const InvoiceDetail = () => {
 
               {/* Actions */}
               <div 
-                className="flex flex-col sm:flex-row sm:flex-wrap gap-3 w-full lg:w-auto"}}}
+                className="flex flex-col sm:flex-row sm:flex-wrap gap-3 w-full lg:w-auto"
               >
                 {/* Primary actions group */}
                 <div className="flex flex-wrap gap-2">

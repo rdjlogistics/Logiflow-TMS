@@ -254,7 +254,7 @@ export const PurchaseInvoiceContentPreview = ({
             
             <div className="flex justify-between items-center pt-2">
               <span className="text-lg font-bold">Totaal</span>
-              <span}
+              <span
                 className="text-2xl font-bold text-primary"
               >
                 {formatCurrency(Number(invoice.total_amount))}

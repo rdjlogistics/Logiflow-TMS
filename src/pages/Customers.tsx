@@ -797,7 +797,7 @@ const Customers = () => {
 
         {/* Bulk Actions Toolbar */}
         {someSelected && (
-          <div}}
+          <div
             className="flex items-center gap-3 p-3 backdrop-blur-xl bg-card/60 rounded-2xl border border-border/20 shadow-xl"
           >
             <CheckSquare className="h-4 w-4 text-primary" />
@@ -838,7 +838,7 @@ const Customers = () => {
                           leftActions={[swipeActions.more(() => handleEdit(customer))]}
                           rightActions={isAdmin ? [swipeActions.delete(() => handleDeleteRequest(customer))] : []}
                         >
-                          <div}}}
+                          <div
                           >
                           <div className="relative rounded-2xl backdrop-blur-xl bg-card/50 border border-border/20 shadow-lg overflow-hidden">
                             {/* Premium top highlight */}

@@ -137,16 +137,16 @@ export const StepDocuments = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Documenten
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Upload je overige documenten voor verificatie.
         </p>
       </div>
 
       {!requiresCPC && !isZZP && (
-        <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 animate-fade-in-up" style={{ animationDelay: '0.25s' >
+        <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
           <div className="flex items-start gap-2">
             <Info className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-emerald-400">
@@ -157,7 +157,7 @@ export const StepDocuments = () => {
       )}
       
       {isZZP && (
-        <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in-up" style={{ animationDelay: '0.25s' >
+        <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
           <div className="flex items-start gap-2">
             <Shield className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-amber-400">
@@ -167,7 +167,7 @@ export const StepDocuments = () => {
         </div>
       )}
       
-      <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.28s' >
+      <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
         <div className="flex items-start gap-2">
           <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-xs text-primary">
@@ -176,7 +176,7 @@ export const StepDocuments = () => {
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 mb-6 overflow-y-auto animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex-1 space-y-3 mb-6 overflow-y-auto animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {DOCUMENTS.map((doc, index) => {
           const upload = getUploadStatus(doc.key);
           const isExpanded = expandedDoc === doc.key;
@@ -278,7 +278,7 @@ export const StepDocuments = () => {
         })}
       </div>
 
-      <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10 animate-fade-in-up" style={{ animationDelay: '0.6s' >
+      <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
         <div className="flex items-center gap-3">
           {canProceed ? (
             <><CheckCircle2 className="w-5 h-5 text-emerald-400" /><span className="text-sm text-emerald-400">Alle verplichte documenten geüpload</span></>

@@ -175,7 +175,7 @@ const SuperAdminDashboard = () => {
 
   return (
     <DashboardLayout title="Super-Admin Dashboard">
-      <div}}}
+      <div
         className="space-y-6"
       >
         {/* Header */}

@@ -227,7 +227,7 @@ export default function WMSProducts() {
   return (
     <DashboardLayout title="Producten / SKU's">
       {/* Header */}
-      <div}}
+      <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -519,7 +519,7 @@ export default function WMSProducts() {
                 <TableBody>
                   {filteredProducts?.map((product, index) => (
                     <tr
-                      key={product.id}}}}
+                      key={product.id}
                       className="border-b border-border/50 hover:bg-muted/30"
                     >
                       <TableCell>

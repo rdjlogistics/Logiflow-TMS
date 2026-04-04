@@ -76,7 +76,7 @@ function KPICard({ icon: Icon, label, value, sub, color }: {
   icon: any; label: string; value: string; sub?: string; color: string;
 }) {
   return (
-    <div}}}
+    <div
     >
       <Card className="relative overflow-hidden rounded-2xl border border-border/25 bg-card/50 backdrop-blur-2xl shadow-xl group hover:ring-2 hover:ring-primary/30 transition-all">
         <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.04] pointer-events-none" style={{
@@ -350,7 +350,7 @@ function CustomerAccordion({ group, index, onNavigate, onReminder }: {
   );
 
   return (
-    <div}}}
+    <div
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <Card className={cn(

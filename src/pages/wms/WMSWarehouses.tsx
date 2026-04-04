@@ -215,7 +215,7 @@ export default function WMSWarehouses() {
   return (
     <DashboardLayout title="Magazijnen">
       {/* Header */}
-      <div}}
+      <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
@@ -410,7 +410,7 @@ export default function WMSWarehouses() {
               <div className="space-y-2">
                 {warehouses?.map((wh, index) => (
                   <div
-                    key={wh.id}}}}
+                    key={wh.id}
                     onClick={() => setSelectedWarehouse(wh.id)}
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                       selectedWarehouse === wh.id
@@ -572,7 +572,7 @@ export default function WMSWarehouses() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {zones?.map((zone, i) => (
                       <div
-                        key={zone.id}}}}
+                        key={zone.id}
                         className="p-3 rounded-lg border bg-muted/30"
                       >
                         <p className="font-medium text-sm">{zone.name}</p>
@@ -661,7 +661,7 @@ export default function WMSWarehouses() {
                   <div className="grid grid-cols-4 md:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto">
                     {locations?.map((loc, i) => (
                       <div
-                        key={loc.id}}}}
+                        key={loc.id}
                         className={`p-2 rounded border text-center ${
                           loc.is_pickable
                             ? "bg-emerald-500/10 border-emerald-500/30"

@@ -62,13 +62,13 @@ export const StepProfilePhoto = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >Profielfoto</h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>Profielfoto</h1>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Upload een duidelijke foto van jezelf. Dit helpt bij identificatie.
         </p>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex-1 flex flex-col items-center justify-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <input ref={fileInputRef} type="file" accept="image/*" capture="user" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} className="hidden" />
 
         {previewUrl ? (
@@ -141,7 +141,7 @@ export const StepProfilePhoto = () => {
         )}
 
         {!previewUrl && (
-          <p className="mt-6 text-sm text-muted-foreground text-center animate-fade-in" style={{ animationDelay: '0.4s' >
+          <p className="mt-6 text-sm text-muted-foreground text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
             Of sleep een foto hierheen
           </p>
         )}

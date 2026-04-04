@@ -243,7 +243,7 @@ const Procurement = () => {
             { label: "Gesloten", value: rfqRequests.filter(r => r.status === "gesloten").length, icon: XCircle, color: "text-gray-500" },
           ].map((kpi) => (
             <div
-              key={kpi.label}}}
+              key={kpi.label}
               className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-xl p-4 space-y-1"
             >
               <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ const Procurement = () => {
                           <TableBody>
                             {offertes.map((offerte, idx) => (
                               <tr
-                                key={offerte.id}}}}
+                                key={offerte.id}
                                 className={`border-b ${idx === 0 ? 'bg-emerald-500/5' : ''}`}
                               >
                                 <TableCell className="font-medium">

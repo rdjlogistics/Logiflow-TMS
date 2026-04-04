@@ -50,15 +50,15 @@ export const StepDriverCategory = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 animate-fade-in-up">
           <span>Stap {currentStep + 1} van 15</span>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' >
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Type chauffeur
         </h1>
-        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' >
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Welk type voertuig ga je besturen? Dit bepaalt welke documenten je nodig hebt.
         </p>
       </div>
 
-      <div className="flex-1 space-y-4 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' >
+      <div className="flex-1 space-y-4 mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         {CATEGORIES.map((category, index) => {
           const isSelected = selected === category.id;
           const Icon = category.icon;
@@ -108,7 +108,7 @@ export const StepDriverCategory = () => {
         })}
       </div>
 
-      <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 animate-fade-in-up" style={{ animationDelay: '0.5s' >
+      <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
           <div>
