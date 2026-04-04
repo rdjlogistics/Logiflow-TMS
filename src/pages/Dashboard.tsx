@@ -277,7 +277,10 @@ const Dashboard = () => {
                 </Badge>
               </div>
               
-              {/* Mobile Quick Actions - Fixed at bottom, prominent */}
+              {/* Period selector - mobile */}
+              <PeriodSelector value={period} onChange={setPeriod} />
+
+              {/* Mobile Quick Actions */}
               <div className="flex gap-2">
                 <Button asChild variant="premium" size="sm" className="flex-1 h-10 shadow-lg shadow-primary/20">
                   <Link to="/orders">
