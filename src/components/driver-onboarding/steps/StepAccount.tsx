@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { OnboardingButton } from '../OnboardingButton';
 import { OnboardingInput } from '../OnboardingInput';
 import { useOnboarding } from '../OnboardingContext';
@@ -15,7 +14,6 @@ export const StepAccount = () => {
   const [error, setError] = useState('');
   const [attempted, setAttempted] = useState(false);
 
-  // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isEmailValid = emailRegex.test(data.email);
   const isPasswordValid = data.password.length >= 6;
@@ -50,14 +48,11 @@ export const StepAccount = () => {
         } else {
           setError(signUpError.message);
         }
-        toast.error('Account aanmaken mislukt', {
-          description: signUpError.message,
-        });
+        toast.error('Account aanmaken mislukt', { description: signUpError.message });
         return;
       }
 
       if (authData.user) {
-        // Ensure profile exists (fallback for missing DB trigger)
         try {
           const { ensureProfileAfterSignup } = await import('@/lib/ensureProfileAfterSignup');
           await ensureProfileAfterSignup(authData.user.id, data.email, data.name, { skipAdminRole: true });
@@ -65,7 +60,6 @@ export const StepAccount = () => {
           logger.error('[StepAccount] ensureProfileAfterSignup failed:', e);
         }
 
-        // Create driver record linked to the auth user
         const { error: driverError } = await supabase
           .from('drivers')
           .insert({
@@ -84,14 +78,11 @@ export const StepAccount = () => {
           logger.error('Driver record creation error:', driverError);
         }
 
-        // Assign chauffeur role, company link, and tenant_id via edge function
         try {
           const { data: session } = await supabase.auth.getSession();
           if (session?.session?.access_token) {
             const response = await supabase.functions.invoke('assign-driver-role', {
-              headers: {
-                Authorization: `Bearer ${session.session.access_token}`,
-              },
+              headers: { Authorization: `Bearer ${session.session.access_token}` },
             });
             if (response.error) {
               logger.error('assign-driver-role error:', response.error);
@@ -103,13 +94,8 @@ export const StepAccount = () => {
           logger.error('Role assignment failed:', roleErr);
         }
 
-        toast.success('Account aangemaakt!', {
-          description: 'Je account is succesvol aangemaakt.',
-        });
-        // Move to next step after account creation
-        setTimeout(() => {
-          setCurrentStep(currentStep + 1);
-        }, 100);
+        toast.success('Account aangemaakt!', { description: 'Je account is succesvol aangemaakt.' });
+        setTimeout(() => setCurrentStep(currentStep + 1), 100);
       }
     } catch (err) {
       logger.error('Account creation error:', err);
@@ -120,48 +106,22 @@ export const StepAccount = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      className="flex flex-col min-h-screen px-6 pt-12 pb-8"
-    >
+    <div className="flex flex-col min-h-screen px-6 pt-12 pb-8 animate-fade-in-up">
       <OfflineBanner isOnline={isOnline} pendingUploads={pendingUploads} />
 
-      {/* Header */}
       <div className="mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-muted-foreground mb-2"
-        >
+        <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl font-bold text-foreground mb-2"
-        >
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Maak je account aan
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-muted-foreground"
-        >
+        </h1>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Zo kun je altijd bij je ritten en rooster.
-        </motion.p>
+        </p>
       </div>
 
-      {/* Inputs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="space-y-8 mb-auto"
-      >
+      <div className="space-y-8 mb-auto animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <OnboardingInput
           value={data.email}
           onChange={(value) => updateData({ email: value })}
@@ -179,45 +139,27 @@ export const StepAccount = () => {
         />
 
         {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-destructive text-sm"
-          >
-            {error}
-          </motion.p>
+          <p className="text-destructive text-sm animate-fade-in-up">{error}</p>
         )}
 
         {!isOnline && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20"
-          >
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in-up">
             <WifiOff className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <p className="text-xs text-amber-400">
               Je hebt internet nodig om je account aan te maken. Je gegevens zijn opgeslagen.
             </p>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
-      {/* Buttons */}
       <div className="space-y-3">
-        <OnboardingButton
-          onClick={handleCreateAccount}
-          disabled={!canProceed || !isOnline}
-          loading={loading}
-        >
+        <OnboardingButton onClick={handleCreateAccount} disabled={!canProceed || !isOnline} loading={loading}>
           {loading ? 'Bezig...' : 'Account aanmaken'}
         </OnboardingButton>
-        <OnboardingButton
-          onClick={() => setCurrentStep(currentStep - 1)}
-          variant="ghost"
-        >
+        <OnboardingButton onClick={() => setCurrentStep(currentStep - 1)} variant="ghost">
           Terug
         </OnboardingButton>
       </div>
-    </motion.div>
+    </div>
   );
 };

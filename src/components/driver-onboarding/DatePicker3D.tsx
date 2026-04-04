@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface DatePicker3DProps {
@@ -28,7 +27,6 @@ const WheelColumn = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemHeight = 48;
-  const visibleItems = 5;
 
   useEffect(() => {
     if (containerRef.current) {
@@ -48,10 +46,7 @@ const WheelColumn = ({
 
   return (
     <div className="relative h-[240px] flex-1 overflow-hidden">
-      {/* Selection highlight */}
       <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-12 bg-muted/50 rounded-lg pointer-events-none z-10" />
-      
-      {/* Fade gradients */}
       <div className="absolute left-0 right-0 top-0 h-20 bg-gradient-to-b from-background to-transparent pointer-events-none z-20" />
       <div className="absolute left-0 right-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent pointer-events-none z-20" />
       
@@ -64,7 +59,6 @@ const WheelColumn = ({
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {/* Padding items */}
         <div style={{ height: itemHeight * 2 }} />
         
         {items.map((item, index) => {
@@ -73,24 +67,20 @@ const WheelColumn = ({
           const scale = distance === 0 ? 1 : distance === 1 ? 0.9 : 0.8;
           
           return (
-            <motion.div
+            <div
               key={index}
               className={cn(
-                'h-12 flex items-center justify-center font-semibold text-lg snap-center cursor-pointer',
+                'h-12 flex items-center justify-center font-semibold text-lg snap-center cursor-pointer transition-all duration-200',
                 index === selectedIndex ? 'text-foreground' : 'text-muted-foreground'
               )}
-              style={{
-                opacity,
-                transform: `scale(${scale})`,
-              }}
+              style={{ opacity, transform: `scale(${scale})` }}
               onClick={() => onSelect(index)}
             >
               {renderItem(item)}
-            </motion.div>
+            </div>
           );
         })}
         
-        {/* Padding items */}
         <div style={{ height: itemHeight * 2 }} />
       </div>
     </div>
@@ -120,24 +110,9 @@ export const DatePicker3D = ({ value, onChange }: DatePicker3DProps) => {
   return (
     <div className="w-full">
       <div className="flex gap-2">
-        <WheelColumn
-          items={DAYS}
-          selectedIndex={selectedDay}
-          onSelect={setSelectedDay}
-          renderItem={(item) => String(item)}
-        />
-        <WheelColumn
-          items={MONTHS}
-          selectedIndex={selectedMonth}
-          onSelect={setSelectedMonth}
-          renderItem={(item) => String(item)}
-        />
-        <WheelColumn
-          items={YEARS}
-          selectedIndex={selectedYear}
-          onSelect={setSelectedYear}
-          renderItem={(item) => String(item)}
-        />
+        <WheelColumn items={DAYS} selectedIndex={selectedDay} onSelect={setSelectedDay} renderItem={(item) => String(item)} />
+        <WheelColumn items={MONTHS} selectedIndex={selectedMonth} onSelect={setSelectedMonth} renderItem={(item) => String(item)} />
+        <WheelColumn items={YEARS} selectedIndex={selectedYear} onSelect={setSelectedYear} renderItem={(item) => String(item)} />
       </div>
     </div>
   );

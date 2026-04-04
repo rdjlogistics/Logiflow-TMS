@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { OnboardingButton } from '../OnboardingButton';
 import { useOnboarding } from '../OnboardingContext';
 import { Bell, BellRing, MessageSquare, Calendar, CheckCircle2 } from 'lucide-react';
@@ -13,7 +12,6 @@ export const StepNotifications = () => {
   const nextStep = currentStep + 1;
 
   useEffect(() => {
-    // Check if notifications are already granted
     if ('Notification' in window && Notification.permission === 'granted') {
       setPermissionGranted(true);
       updateData({ notificationsEnabled: true });
@@ -21,27 +19,15 @@ export const StepNotifications = () => {
   }, []);
 
   const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      // Browser doesn't support notifications
-      setCurrentStep(nextStep);
-      return;
-    }
+    if (!('Notification' in window)) { setCurrentStep(nextStep); return; }
 
     setIsRequesting(true);
-
     try {
       const permission = await Notification.requestPermission();
-      
       if (permission === 'granted') {
         setPermissionGranted(true);
         updateData({ notificationsEnabled: true });
-        
-        // Show a test notification
-        new Notification('Welkom! 🚚', {
-          body: 'Je ontvangt nu meldingen over je ritten.',
-          icon: '/favicon.ico',
-        });
-        
+        new Notification('Welkom! 🚚', { body: 'Je ontvangt nu meldingen over je ritten.', icon: '/favicon.ico' });
         setTimeout(() => setCurrentStep(nextStep), 500);
       } else {
         updateData({ notificationsEnabled: false });
@@ -62,56 +48,23 @@ export const StepNotifications = () => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      className="flex flex-col min-h-screen px-6 pt-12 pb-8"
-    >
-      {/* Header */}
+    <div className="flex flex-col min-h-screen px-6 pt-12 pb-8 animate-fade-in-up">
       <div className="mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-muted-foreground mb-2"
-        >
+        <div className="text-sm text-muted-foreground mb-2 animate-fade-in-up">
           Stap {currentStep + 1} van 15
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl font-bold text-foreground mb-2"
-        >
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Blijf Op de Hoogte
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-muted-foreground"
-        >
+        </h1>
+        <p className="text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Ontvang meldingen over belangrijke updates. We spammen je niet.
-        </motion.p>
+        </p>
       </div>
 
-      {/* Visual - Phone mockup */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
-        className="relative mx-auto mb-8"
-      >
+      <div className="relative mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <div className="w-56 h-80 rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 border-4 border-slate-700 p-4 overflow-hidden shadow-2xl">
-          {/* Phone screen content */}
           <div className="w-full h-full rounded-2xl bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-xl p-4 space-y-3">
-            {/* Notification preview */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20"
-            >
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-primary/20">
                   <Bell className="w-4 h-4 text-primary" />
@@ -121,75 +74,46 @@ export const StepNotifications = () => {
                   <p className="text-xs text-muted-foreground">Amsterdam → Rotterdam</p>
                 </div>
               </div>
-            </motion.div>
-
-            {/* App icons placeholder */}
+            </div>
             <div className="grid grid-cols-4 gap-2 mt-6">
               {[...Array(8)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="aspect-square rounded-xl bg-white/5"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 + i * 0.05 }}
-                />
+                <div key={i} className="aspect-square rounded-xl bg-white/5 animate-fade-in" style={{ animationDelay: `${0.7 + i * 0.05}s` }} />
               ))}
             </div>
           </div>
         </div>
 
-        {/* Success checkmark */}
         {permissionGranted && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute -bottom-3 -right-3 p-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/30"
-          >
+          <div className="absolute -bottom-3 -right-3 p-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/30 animate-scale-fade-in">
             <CheckCircle2 className="w-6 h-6 text-white" />
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
-      {/* Features */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-3 mb-auto"
-      >
+      <div className="space-y-3 mb-auto animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
         {features.map((feature, index) => (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 + index * 0.1 }}
             className={cn(
-              'flex items-center gap-3 p-3 rounded-xl',
+              'flex items-center gap-3 p-3 rounded-xl animate-fade-in-up',
               'bg-white/5 backdrop-blur-sm border border-white/10'
             )}
+            style={{ animationDelay: `${0.5 + index * 0.1}s` }}
           >
             <feature.icon className="w-5 h-5 text-primary" />
             <span className="text-sm text-foreground">{feature.text}</span>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Buttons */}
       <div className="space-y-3 mt-8">
-        <OnboardingButton
-          onClick={requestNotificationPermission}
-          loading={isRequesting}
-          variant="primary"
-        >
+        <OnboardingButton onClick={requestNotificationPermission} loading={isRequesting} variant="primary">
           Meldingen Toestaan
         </OnboardingButton>
-        <OnboardingButton
-          onClick={() => setCurrentStep(nextStep)}
-          variant="ghost"
-        >
+        <OnboardingButton onClick={() => setCurrentStep(nextStep)} variant="ghost">
           Overslaan
         </OnboardingButton>
       </div>
-    </motion.div>
+    </div>
   );
 };
