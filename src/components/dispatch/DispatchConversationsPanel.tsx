@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -325,7 +324,7 @@ interface ConversationItemProps {
 
 function ConversationItem({ conversation, isSelected, onSelect, getStatusBadge, isHistory }: ConversationItemProps) {
   return (
-    <motion.button
+    <button
       onClick={onSelect}
       className={cn(
         "w-full p-3 rounded-lg border text-left transition-all",
@@ -334,8 +333,6 @@ function ConversationItem({ conversation, isSelected, onSelect, getStatusBadge, 
           : "bg-card/50 border-border/50 hover:border-primary/30 hover:bg-accent/50",
         isHistory && "opacity-70"
       )}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
@@ -360,7 +357,7 @@ function ConversationItem({ conversation, isSelected, onSelect, getStatusBadge, 
           })}
         </span>
       </div>
-    </motion.button>
+    </button>
   );
 }
 

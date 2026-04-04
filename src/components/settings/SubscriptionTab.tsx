@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Crown, Users, Truck, Package, Clock, ArrowUpRight, CheckCircle2, AlertTriangle, Receipt, Loader2, CalendarDays, RefreshCw, XCircle, Check, X, Sparkles, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -193,7 +192,7 @@ export const SubscriptionTab = () => {
   // ─── No subscription: attractive empty state ───
   if (!plan || !subscription) {
     return (
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass" className="overflow-hidden">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10" />
@@ -234,7 +233,7 @@ export const SubscriptionTab = () => {
             </CardContent>
           </div>
         </Card>
-      </motion.div>
+      </div>
     );
   }
 
@@ -280,17 +279,16 @@ export const SubscriptionTab = () => {
   return (
     <>
       {/* Plan Overview Card — enriched */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <motion.div
+                <div
                   className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20"
-                  whileHover={{ rotate: 10, scale: 1.1 }}
                 >
                   <Crown className="h-5 w-5 text-primary-foreground" />
-                </motion.div>
+                </div>
                 <div>
                   <CardTitle className="text-base md:text-lg">{plan.name}</CardTitle>
                   <CardDescription>{plan.description || 'Je huidige abonnement'}</CardDescription>
@@ -427,10 +425,10 @@ export const SubscriptionTab = () => {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Included Features Card */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
@@ -474,11 +472,11 @@ export const SubscriptionTab = () => {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Limits & Usage */}
       {limitItems.length > 0 && (
-        <motion.div variants={staggerItem}>
+        <div>
           <Card variant="glass">
             <CardHeader className="pb-4">
               <CardTitle className="text-base md:text-lg">Limieten & Verbruik</CardTitle>
@@ -512,11 +510,11 @@ export const SubscriptionTab = () => {
               })}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       )}
 
       {/* Subscription Management */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <CardTitle className="text-base md:text-lg">Abonnement beheren</CardTitle>
@@ -565,10 +563,10 @@ export const SubscriptionTab = () => {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Billing History */}
-      <motion.div variants={staggerItem}>
+      <div>
         <Card variant="glass">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
@@ -625,7 +623,7 @@ export const SubscriptionTab = () => {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Cancel Confirmation Dialog */}
       <ConfirmDialog

@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -81,10 +80,8 @@ export const BulkImportWizard = ({ open, onOpenChange, entityType, companyId, on
             </div>
           ))}
         </div>
-
-        <AnimatePresence mode="wait">
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+            <div key="step1" className="space-y-4">
               <div {...getRootProps()} className={cn("border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer", isDragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
                 <input {...getInputProps()} />
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-muted flex items-center justify-center mb-4"><FileSpreadsheet className="h-8 w-8 text-muted-foreground" /></div>
@@ -94,11 +91,11 @@ export const BulkImportWizard = ({ open, onOpenChange, entityType, companyId, on
               <div className="flex items-center justify-center">
                 <Button variant="outline" size="sm" onClick={() => downloadTemplate(entityType)}><Download className="h-4 w-4 mr-2" />Download template</Button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+            <div key="step2" className="space-y-4">
               {file && (
                 <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/40">
                   <div className="flex items-center gap-3"><FileText className="h-5 w-5 text-primary" /><span className="font-medium text-sm">{file.name}</span></div>
@@ -124,20 +121,19 @@ export const BulkImportWizard = ({ open, onOpenChange, entityType, companyId, on
                   {importing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ArrowRight className="h-4 w-4 mr-2" />}Importeren
                 </Button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === 3 && result && (
-            <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8">
+            <div key="step3" className="text-center py-8">
               <div className={cn("w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4", result.success ? "bg-success/20" : "bg-destructive/20")}>
                 {result.success ? <CheckCircle2 className="h-10 w-10 text-success" /> : <AlertCircle className="h-10 w-10 text-destructive" />}
               </div>
               <h3 className="text-xl font-bold mb-2">{result.success ? 'Import geslaagd!' : 'Import mislukt'}</h3>
               <p className="text-muted-foreground mb-6">{result.imported} geïmporteerd</p>
               <Button onClick={handleClose} variant="premium">Sluiten</Button>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </DialogContent>
     </Dialog>
   );

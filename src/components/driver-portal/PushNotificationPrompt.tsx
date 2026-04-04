@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, BellOff, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -57,11 +56,7 @@ export const PushNotificationPrompt = () => {
   }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 100, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 100, scale: 0.9 }}
+      <div
         className="fixed bottom-20 left-4 right-4 z-50 md:left-auto md:right-6 md:max-w-sm"
       >
         <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl p-4 shadow-2xl">
@@ -76,20 +71,11 @@ export const PushNotificationPrompt = () => {
           {/* Icon and content */}
           <div className="flex gap-4">
             <div className="flex-shrink-0">
-              <motion.div
-                animate={{ 
-                  rotate: [0, -10, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  duration: 0.5,
-                  repeat: Infinity,
-                  repeatDelay: 2
-                }}
+              <div
                 className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
               >
                 <Bell className="w-6 h-6 text-primary" />
-              </motion.div>
+              </div>
             </div>
 
             <div className="flex-1 min-w-0 pr-4">
@@ -122,7 +108,6 @@ export const PushNotificationPrompt = () => {
             </div>
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };

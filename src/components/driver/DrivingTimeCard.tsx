@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useDrivingTime } from '@/hooks/useDrivingTime';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,13 +59,12 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <motion.div
+            <div
               className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center",
                 isDriving ? "bg-emerald-500/10" : isOnBreak ? "bg-amber-500/10" : "bg-muted/50"
               )}
               animate={isDriving ? { scale: [1, 1.05, 1] } : {}}
-              transition={{ repeat: Infinity, duration: 2 }}
             >
               {isDriving ? (
                 <Timer className="h-5 w-5 text-emerald-500" />
@@ -75,7 +73,7 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
               ) : (
                 <Clock className="h-5 w-5 text-muted-foreground" />
               )}
-            </motion.div>
+            </div>
             <div>
               <p className="font-semibold text-sm">
                 {isDriving ? 'Rijden' : isOnBreak ? 'Pauze actief' : 'Rij- & rusttijden'}
@@ -99,20 +97,14 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
         </div>
 
         {/* Critical warning */}
-        <AnimatePresence>
           {criticalWarning && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+            <div
               className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20"
             >
               <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
               <p className="text-xs font-medium text-red-500">{criticalWarning.message}</p>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-
         {/* Progress bar - continuous driving */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-muted-foreground">
@@ -120,11 +112,9 @@ export const DrivingTimeCard = memo(function DrivingTimeCard() {
             <span>{formatMinutes(continuousDrivingMinutes)} / 4u30</span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <motion.div
+            <div
               className={cn("h-full rounded-full bg-gradient-to-r", progressColor)}
-              initial={{ width: 0 }}
               animate={{ width: `${progress * 100}%` }}
-              transition={{ duration: 0.5 }}
             />
           </div>
         </div>

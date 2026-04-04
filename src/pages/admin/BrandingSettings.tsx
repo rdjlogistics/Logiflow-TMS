@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -166,14 +165,13 @@ const BrandingSettings = () => {
                       </Button>
                     </div>
                   ) : (
-                    <motion.div 
+                    <div 
                       className="h-32 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 cursor-pointer"
-                      whileHover={{ borderColor: "hsl(var(--primary))" }}
                       onClick={() => document.getElementById('logo-upload')?.click()}
                     >
                       <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                       <span className="text-sm text-muted-foreground">Klik om logo te uploaden</span>
-                    </motion.div>
+                    </div>
                   )}
                   <input
                     id="logo-upload"
@@ -219,13 +217,12 @@ const BrandingSettings = () => {
                       </Button>
                     </div>
                   ) : (
-                    <motion.div 
+                    <div 
                       className="h-16 w-16 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center bg-muted/30 cursor-pointer"
-                      whileHover={{ borderColor: "hsl(var(--primary))" }}
                       onClick={() => document.getElementById('favicon-upload')?.click()}
                     >
                       <Upload className="h-5 w-5 text-muted-foreground" />
-                    </motion.div>
+                    </div>
                   )}
                   <input
                     id="favicon-upload"

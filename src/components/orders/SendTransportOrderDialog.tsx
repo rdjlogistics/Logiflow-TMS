@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -207,33 +206,22 @@ export const SendTransportOrderDialog: React.FC<SendTransportOrderDialogProps> =
             Order {orderNumber}{carrierName && ` — ${carrierName}`}
           </DialogDescription>
         </DialogHeader>
-
-        <AnimatePresence mode="wait">
           {sent ? (
-            <motion.div
+            <div
               key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={spring}
               className="py-10 text-center"
             >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ ...spring, delay: 0.1 }}
+              <div
                 className="inline-flex p-4 rounded-full bg-emerald-500/10 mb-4"
               >
                 <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-              </motion.div>
+              </div>
               <p className="font-semibold text-lg">Verstuurd!</p>
               <p className="text-sm text-muted-foreground mt-1">Transportopdracht verzonden naar {email}</p>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
+            <div
               key="form"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={spring}
               className="space-y-4 py-2"
             >
               {/* Email */}
@@ -282,11 +270,8 @@ export const SendTransportOrderDialog: React.FC<SendTransportOrderDialogProps> =
                     {publicDocs.map((doc, i) => {
                       const Icon = getDocIcon(doc.mime_type);
                       return (
-                        <motion.div
+                        <div
                           key={doc.id}
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05, ...spring }}
                           className={cn(
                             "flex items-center gap-3 p-2.5 rounded-xl border transition-colors cursor-pointer",
                             selectedDocIds.has(doc.id)
@@ -306,7 +291,7 @@ export const SendTransportOrderDialog: React.FC<SendTransportOrderDialogProps> =
                               {doc.document_type}{doc.file_size ? ` · ${formatSize(doc.file_size)}` : ''}
                             </p>
                           </div>
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
@@ -327,10 +312,8 @@ export const SendTransportOrderDialog: React.FC<SendTransportOrderDialogProps> =
                   className="rounded-xl border-border/50 bg-muted/20 focus:bg-background transition-colors resize-none"
                 />
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-
         {!sent && (
           <DialogFooter className="gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isSending} className="rounded-xl">

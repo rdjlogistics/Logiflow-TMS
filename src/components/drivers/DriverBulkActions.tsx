@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -61,13 +60,8 @@ export function DriverBulkActions({
   onClearSelection,
 }: DriverBulkActionsProps) {
   return (
-    <AnimatePresence>
       {selectedCount > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-          transition={{ type: 'spring', stiffness: 200, damping: 24 }}
+        <div
           className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-fit"
         >
           <div className={cn(
@@ -144,8 +138,7 @@ export function DriverBulkActions({
               </TooltipContent>
             </Tooltip>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
   );
 }

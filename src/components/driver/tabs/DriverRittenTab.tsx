@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { motion, AnimatePresence } from 'framer-motion';
 import { DocumentsSheet } from '@/components/driver/DocumentsSheet';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { 
@@ -315,10 +314,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
     const isActive = ['onderweg', 'geladen'].includes(trip.status);
 
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      <div
       >
         <Card 
           className={cn(
@@ -370,7 +366,7 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     );
   };
 
@@ -493,10 +489,9 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
             {/* Completed Stops - Elite animated section */}
             {completedStops.length > 0 && (
               <div className="space-y-2">
-                <motion.button
+                <button
                   className="w-full flex items-center justify-between px-4 py-2.5 bg-emerald-500/5 rounded-2xl border border-emerald-500/10 hover:bg-emerald-500/10 transition-colors"
                   onClick={() => setExpandedCompleted(!expandedCompleted)}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -504,29 +499,18 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
                     </div>
                     <span className="text-sm font-medium text-emerald-400/80">Voltooid</span>
                   </div>
-                  <motion.div
-                    animate={{ rotate: expandedCompleted ? 180 : 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  <div
                   >
                     <ChevronDown className="h-4 w-4 text-emerald-400/60" />
-                  </motion.div>
-                </motion.button>
-
-                <AnimatePresence initial={false}>
+                  </div>
+                </button>
                   {expandedCompleted && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    <div
                       className="overflow-hidden space-y-2"
                     >
                       {completedStops.map((stop, i) => (
-                        <motion.div
+                        <div
                           key={stop.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05 }}
                         >
                           <DriverStopCard
                             stop={stop}
@@ -538,11 +522,10 @@ export function DriverRittenTab({ onStartRoute, gpsPermissionStatus, onRequestGP
                             purchaseTotal={selectedTrip.purchase_total}
                             tripStatus={selectedTrip.status}
                           />
-                        </motion.div>
+                        </div>
                       ))}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
               </div>
             )}
           </div>

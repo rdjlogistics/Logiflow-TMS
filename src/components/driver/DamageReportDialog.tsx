@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -156,10 +155,9 @@ export function DamageReportDialog({
             <Label className="text-sm font-medium">Type schade</Label>
             <div className="grid grid-cols-2 gap-3">
               {damageTypes.map((type) => (
-                <motion.button
+                <button
                   key={type.value}
                   type="button"
-                  whileTap={{ scale: 0.97 }}
                   onClick={() => setFormData({ ...formData, damage_type: type.value })}
                   className={cn(
                     "flex items-center gap-3 p-4 rounded-xl border-2 transition-all",
@@ -170,7 +168,7 @@ export function DamageReportDialog({
                 >
                   <type.icon className={cn("h-5 w-5", type.color)} />
                   <span className="font-medium text-sm">{type.label}</span>
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
@@ -243,9 +241,7 @@ export function DamageReportDialog({
             </label>
 
             {formData.third_party_involved && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+              <div
                 className="space-y-3 pl-8"
               >
                 <Input
@@ -258,7 +254,7 @@ export function DamageReportDialog({
                   value={formData.police_report_number}
                   onChange={(e) => setFormData({ ...formData, police_report_number: e.target.value })}
                 />
-              </motion.div>
+              </div>
             )}
           </div>
 

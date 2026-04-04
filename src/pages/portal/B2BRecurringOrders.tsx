@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Repeat, Plus, Play, Pause, Trash2, Loader2, Calendar, MapPin, Package, Edit2 } from 'lucide-react';
 import B2BLayout from '@/components/portal/b2b/B2BLayout';
 import { Button } from '@/components/ui/button';
@@ -113,9 +112,7 @@ const B2BRecurringOrders = () => {
 
         {/* Empty */}
         {!loading && templates.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="text-center py-16 rounded-xl border border-dashed border-border/50 bg-card/40 backdrop-blur-sm"
           >
             <Repeat className="h-12 w-12 mx-auto mb-4 text-muted-foreground/40" />
@@ -125,21 +122,16 @@ const B2BRecurringOrders = () => {
               <Plus className="h-4 w-4 mr-2" />
               Eerste Herhaalorder
             </Button>
-          </motion.div>
+          </div>
         )}
 
         {/* Templates List */}
         {!loading && templates.length > 0 && (
           <div className="space-y-3">
-            <AnimatePresence>
               {templates.map((template, i) => (
-                <motion.div
+                <div
                   key={template.id}
                   layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.05 }}
                   className={cn(
                     "group rounded-xl border bg-card/80 backdrop-blur-sm p-4 transition-all",
                     template.is_active ? "border-primary/30" : "border-border/50 opacity-70"
@@ -225,9 +217,8 @@ const B2BRecurringOrders = () => {
                       </Button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
           </div>
         )}
 

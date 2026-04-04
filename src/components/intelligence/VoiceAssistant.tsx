@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -234,11 +233,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      <div
         className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]"
       >
         <Card className="shadow-2xl border-2">
@@ -280,10 +275,8 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
             <ScrollArea className="h-80 p-4">
               <div className="space-y-4">
                 {messages.map((message) => (
-                  <motion.div
+                  <div
                     key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
                     className={cn(
                       'flex gap-2',
                       message.role === 'user' ? 'justify-end' : 'justify-start'
@@ -309,12 +302,10 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
                         <User className="w-3.5 h-3.5 text-primary-foreground" />
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
                 {isProcessing && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <div
                     className="flex gap-2"
                   >
                     <div className="p-1.5 rounded-full bg-primary/10 h-fit">
@@ -323,7 +314,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
                     <div className="p-3 rounded-lg bg-muted">
                       <Loader2 className="w-4 h-4 animate-spin" />
                     </div>
-                  </motion.div>
+                  </div>
                 )}
                 <div ref={scrollRef} />
               </div>
@@ -381,8 +372,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose 
             </div>
           </CardContent>
         </Card>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };
 

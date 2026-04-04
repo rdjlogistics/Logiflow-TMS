@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { RouteplanningTab } from '@/components/settings/RouteplanningTab';
 import { PlanningSettingsTab } from '@/components/settings/PlanningSettingsTab';
 import { ThemePresetsTab } from '@/components/settings/ThemePresetsTab';
@@ -503,7 +502,7 @@ const AdminSettings = () => {
   const GlassToggleRow = ({ icon: Icon, label, description, checked, onCheckedChange, disabled = false }: {
     icon: React.ElementType; label: string; description: string; checked: boolean; onCheckedChange: (v: boolean) => void; disabled?: boolean;
   }) => (
-    <motion.div
+    <div
       className={cn(
         "flex items-center justify-between p-4 rounded-xl",
         "bg-card/40 backdrop-blur-sm border border-border/30",
@@ -520,7 +519,7 @@ const AdminSettings = () => {
         <p className="text-xs md:text-sm text-muted-foreground">{description}</p>
       </div>
       <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} className="shrink-0" />
-    </motion.div>
+    </div>
   );
 
   return (
@@ -530,12 +529,11 @@ const AdminSettings = () => {
         <div className="flex items-center justify-between mb-4 md:mb-6">
           <div className="min-w-0">
             <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2.5">
-              <motion.div 
+              <div 
                 className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20"
-                whileHover={{ rotate: 10, scale: 1.1 }}
               >
                 <Settings className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
-              </motion.div>
+              </div>
               <span>Instellingen</span>
             </h1>
             <p className="text-muted-foreground mt-1 text-xs md:text-sm hidden sm:block">
@@ -557,7 +555,7 @@ const AdminSettings = () => {
                   const isActive = activeTab === tab.value;
                   const TabIcon = tab.icon;
                   return (
-                    <motion.button
+                    <button
                       key={tab.value}
                       onClick={() => setActiveTab(tab.value)}
                       className={cn(
@@ -566,13 +564,10 @@ const AdminSettings = () => {
                           ? "text-primary-foreground"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
-                      whileTap={{ scale: 0.98 }}
                     >
                       {isActive && (
-                        <motion.div
+                        <div
                           className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-primary/80 shadow-md shadow-primary/25"
-                          layoutId="sidebarActive"
-                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                         />
                       )}
                       <span className="relative flex items-center gap-3">
@@ -584,7 +579,7 @@ const AdminSettings = () => {
                           </span>
                         </div>
                       </span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
@@ -597,7 +592,7 @@ const AdminSettings = () => {
                   const isActive = activeTab === tab.value;
                   const TabIcon = tab.icon;
                   return (
-                    <motion.button
+                    <button
                       key={tab.value}
                       onClick={() => setActiveTab(tab.value)}
                       className={cn(
@@ -606,20 +601,17 @@ const AdminSettings = () => {
                           ? "text-primary-foreground"
                           : "text-muted-foreground bg-muted/40"
                       )}
-                      whileTap={{ scale: 0.95 }}
                     >
                       {isActive && (
-                        <motion.div
+                        <div
                           className="absolute inset-0 rounded-full bg-primary shadow-md shadow-primary/25"
-                          layoutId="mobileActiveTab"
-                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                         />
                       )}
                       <span className="relative flex items-center gap-1.5">
                         <TabIcon className="h-3.5 w-3.5" />
                         <span>{tab.label}</span>
                       </span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
@@ -627,12 +619,8 @@ const AdminSettings = () => {
 
             {/* === CONTENT AREA === */}
             <div className="flex-1 min-w-0">
-              <AnimatePresence mode="wait">
-                <motion.div
+                <div
                   key={activeTab}
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
                   exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
                   className="space-y-4 md:space-y-6"
                 >
@@ -648,13 +636,13 @@ const AdminSettings = () => {
                   {/* === BEDRIJF === */}
                   {activeTab === 'bedrijf' && (
                     <>
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <Palette className="h-5 w-5 text-primary" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Huisstijl & Branding</CardTitle>
                                 <CardDescription>Logo en visuele identiteit voor documenten</CardDescription>
@@ -673,10 +661,10 @@ const AdminSettings = () => {
                                   </Button>
                                 </div>
                               ) : (
-                                <motion.div className="h-20 w-40 md:h-24 md:w-48 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 text-muted-foreground" whileHover={{ borderColor: "hsl(var(--primary))", scale: 1.02 }}>
+                                <div className="h-20 w-40 md:h-24 md:w-48 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 text-muted-foreground">
                                   <Image className="h-8 w-8 mb-1" />
                                   <span className="text-xs">Geen logo</span>
-                                </motion.div>
+                                </div>
                               )}
                               <div className="flex flex-col gap-2">
                                 <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" id="logo-upload" />
@@ -689,15 +677,15 @@ const AdminSettings = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <Building2 className="h-5 w-5 text-primary" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Bedrijfsgegevens</CardTitle>
                                 <CardDescription>Contactinformatie en adresgegevens</CardDescription>
@@ -741,15 +729,15 @@ const AdminSettings = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <CreditCard className="h-5 w-5 text-primary" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Juridisch & Bankgegevens</CardTitle>
                                 <CardDescription>KvK, BTW en IBAN informatie voor facturen</CardDescription>
@@ -780,27 +768,27 @@ const AdminSettings = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     </>
                   )}
 
                   {/* === THEMA === */}
                   {activeTab === 'thema' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <ThemePresetsTab />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* === CHAUFFEURS === */}
                   {activeTab === 'chauffeurs' && (
                     <>
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <Truck className="h-5 w-5 text-primary" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Chauffeur Portal</CardTitle>
                                 <CardDescription>Configureer wat chauffeurs kunnen zien en doen</CardDescription>
@@ -817,15 +805,15 @@ const AdminSettings = () => {
                             />
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center">
                                 <FileText className="h-5 w-5 text-accent" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Documentopslag</CardTitle>
                                 <CardDescription>Bepaal hoe documenten worden gedeeld en bijgevoegd</CardDescription>
@@ -838,15 +826,15 @@ const AdminSettings = () => {
                             <GlassToggleRow icon={FileText} label="Documenten bijvoegen bij inkoopfacturen" description="Voeg openbare documenten automatisch bij als bijlage bij inkoopfacturen" checked={settings.attach_documents_to_purchase_invoice} onCheckedChange={(checked) => setSettings({ ...settings, attach_documents_to_purchase_invoice: checked })} />
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center">
                                 <Euro className="h-5 w-5 text-accent" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Tarieven & Producten</CardTitle>
                                 <CardDescription>Beheer standaard tarieven en prijsmodellen</CardDescription>
@@ -860,13 +848,13 @@ const AdminSettings = () => {
                             </Button>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     </>
                   )}
 
                   {/* === CHAUFFEURS APP === */}
                   {activeTab === 'chauffeurs-app' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <DriverAppSettingsTab
                         settings={{
                           driver_app_use_arrival_departure_times: (settings as any).driver_app_use_arrival_departure_times ?? false,
@@ -880,26 +868,26 @@ const AdminSettings = () => {
                         }}
                         onSettingsChange={(updates) => setSettings({ ...settings, ...updates } as TenantSettings)}
                       />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* === SUBSTATUSSEN === */}
                   {activeTab === 'substatussen' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <OrderSubstatusesTab />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* === NOTIFICATIES === */}
                   {activeTab === 'notificaties' && (
                     <>
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <Mail className="h-5 w-5 text-primary" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">POD E-mail Notificaties</CardTitle>
                                 <CardDescription>Automatische Proof of Delivery e-mails na afmelding</CardDescription>
@@ -943,15 +931,15 @@ const AdminSettings = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
-                              <motion.div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+                              <div className="h-9 w-9 rounded-xl bg-accent/10 flex items-center justify-center">
                                 <Send className="h-5 w-5 text-accent" />
-                              </motion.div>
+                              </div>
                               <div>
                                 <CardTitle className="text-base md:text-lg">Afleverbevestiging Defaults</CardTitle>
                                 <CardDescription>Standaard instellingen voor afleverbevestigingen naar klanten</CardDescription>
@@ -963,21 +951,21 @@ const AdminSettings = () => {
                             <GlassToggleRow icon={Users} label="Standaard per bestemming" description="E-mail per afzonderlijke bestemming i.p.v. één e-mail per order" checked={(settings as any).default_delivery_confirmation_per_stop ?? false} onCheckedChange={(checked) => setSettings({ ...settings, default_delivery_confirmation_per_stop: checked } as any)} />
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     </>
                   )}
 
                   {/* === INTEGRATIES === */}
                   {activeTab === 'integraties' && (
                     <>
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass">
                           <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <motion.div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20" whileHover={{ rotate: 10, scale: 1.1 }}>
+                                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
                                   <Bot className="h-5 w-5 text-primary-foreground" />
-                                </motion.div>
+                                </div>
                                 <div>
                                   <CardTitle className="text-base md:text-lg">AI Assistent (ChatGPT)</CardTitle>
                                   <CardDescription>Budget, limieten en toegangsbeheer</CardDescription>
@@ -1032,9 +1020,9 @@ const AdminSettings = () => {
                             )}
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
 
-                      <motion.div variants={staggerItem}>
+                      <div>
                         <Card variant="glass" className="border-dashed">
                           <CardContent className="py-8">
                             <div className="flex flex-col items-center justify-center text-center">
@@ -1048,20 +1036,20 @@ const AdminSettings = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     </>
                   )}
 
                   {/* === PLANNING === */}
                   {activeTab === 'planning' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <PlanningSettingsTab />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* === ROUTEPLANNING === */}
                   {activeTab === 'routeplanning' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <RouteplanningTab
                         settings={{
                           route_service_time_minutes: settings.route_service_time_minutes ?? 15,
@@ -1076,27 +1064,23 @@ const AdminSettings = () => {
                         }}
                         onSettingsChange={(updates) => setSettings({ ...settings, ...updates } as TenantSettings)}
                       />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* === EMAIL === */}
                   {activeTab === 'email' && (
-                    <motion.div variants={staggerItem}>
+                    <div>
                       <EmailDomainTab />
-                    </motion.div>
+                    </div>
                   )}
-                </motion.div>
-              </AnimatePresence>
+                </div>
             </div>
           </div>
         )}
 
         {/* === FLOATING SAVE BUTTON (Mobile) === */}
         <div className="md:hidden fixed bottom-6 left-4 right-4 z-30">
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.3 }}
+          <div
           >
             <Button
               onClick={handleSave}
@@ -1106,7 +1090,7 @@ const AdminSettings = () => {
               {saving ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Save className="h-5 w-5 mr-2" />}
               Opslaan
             </Button>
-          </motion.div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

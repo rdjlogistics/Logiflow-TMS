@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -127,17 +126,14 @@ export default function VehicleValuation() {
           { label: 'Gem. leeftijd', value: `${summary.avgAge} jr`, sub: `${summary.count} voertuigen`, color: 'text-amber-500' },
           { label: 'Totaal aanschaf', value: formatEuro(summary.totalPurchase), sub: 'investering', color: 'text-purple-500' },
         ].map((card, i) => (
-          <motion.div
+          <div
             key={card.label}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06, type: 'spring', stiffness: 260, damping: 24 }}
             className="rounded-2xl border border-border/20 bg-card/40 backdrop-blur-xl p-4"
           >
             <p className={cn('text-xl md:text-2xl font-bold tabular-nums', card.color)}>{card.value}</p>
             <p className="text-xs text-muted-foreground mt-1">{card.label}</p>
             <p className="text-[10px] text-muted-foreground/60">{card.sub}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -177,11 +173,8 @@ export default function VehicleValuation() {
           const isEditing = editingId === v.id;
 
           return (
-            <motion.div
+            <div
               key={v.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04, type: 'spring', stiffness: 260, damping: 24 }}
               className="rounded-2xl border border-border/20 bg-card/40 backdrop-blur-xl overflow-hidden"
             >
               {/* Header */}
@@ -246,10 +239,8 @@ export default function VehicleValuation() {
                       <span>Afschrijving {formatEuro(dep.depreciationTotal)}</span>
                     </div>
                     <div className="h-2.5 rounded-full bg-muted/50 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
+                      <div
                         animate={{ width: `${Math.round(dep.residualPct * 100)}%` }}
-                        transition={{ delay: i * 0.04 + 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                         className={cn(
                           'h-full rounded-full',
                           dep.residualPct > 0.5
@@ -291,7 +282,7 @@ export default function VehicleValuation() {
                   )}
                 </div>
               )}
-            </motion.div>
+            </div>
           );
         })}
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -141,9 +141,8 @@ const PortalBrandingTab = ({ settings, onUpdate, onUploadPortalLogo }: PortalBra
                           </Button>
                         </div>
                       ) : (
-                        <motion.div 
-                          className="h-20 w-48 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 cursor-pointer"
-                          whileHover={{ borderColor: "hsl(var(--primary))" }}
+                        <div 
+                          className="h-20 w-48 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 cursor-pointer hover:border-primary transition-colors"
                           onClick={() => document.getElementById(`portal-logo-${portal.key}`)?.click()}
                         >
                           {uploadingPortal === portal.key ? (
@@ -154,7 +153,7 @@ const PortalBrandingTab = ({ settings, onUpdate, onUploadPortalLogo }: PortalBra
                               <span className="text-xs text-muted-foreground">Upload logo</span>
                             </>
                           )}
-                        </motion.div>
+                        </div>
                       )}
                       <input
                         id={`portal-logo-${portal.key}`}

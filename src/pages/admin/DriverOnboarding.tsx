@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -199,7 +198,6 @@ const DriverOnboarding = () => {
 
         {/* Onboarding List */}
         <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
             {filteredOnboardings.map((onboarding) => {
               const progress = getProgress(onboarding);
               const statusConfig = STATUS_CONFIG[onboarding.status];
@@ -208,12 +206,9 @@ const DriverOnboarding = () => {
               const driverInitials = driverName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
               
               return (
-                <motion.div
+                <div
                   key={onboarding.id}
                   layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
                 >
                   <Card className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
@@ -314,11 +309,9 @@ const DriverOnboarding = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
-          </AnimatePresence>
-
           {filteredOnboardings.length === 0 && (
             <Card>
               <CardContent className="py-12 text-center">
@@ -361,14 +354,12 @@ const DriverOnboarding = () => {
                           {ONBOARDING_STEPS.map((step) => {
                             const completed = selectedOnboarding[step.key as keyof DriverOnboardingType] as boolean;
                             return (
-                              <motion.div
+                              <div
                                 key={step.key}
                                 className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                                   completed ? 'bg-green-50 border-green-200' : 'bg-muted/30 border-border hover:bg-muted/50'
                                 }`}
                                 onClick={() => handleStepToggle(selectedOnboarding, step.key)}
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.99 }}
                               >
                                 <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
                                   completed ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'
@@ -383,7 +374,7 @@ const DriverOnboarding = () => {
                                     Voltooid
                                   </Badge>
                                 )}
-                              </motion.div>
+                              </div>
                             );
                           })}
                         </div>

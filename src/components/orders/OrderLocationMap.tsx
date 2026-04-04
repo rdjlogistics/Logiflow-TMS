@@ -3,7 +3,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { BaseMap, BaseMapRef } from '@/components/map/BaseMap';
 import type mapboxgl from 'mapbox-gl';
 import { loadMapboxGL } from '@/utils/mapbox-loader';
-import { motion } from 'framer-motion';
 import { OrderStatus } from '@/types/orderStatus';
 import { cn } from '@/lib/utils';
 import { useAllDriverLocations } from '@/hooks/useAllDriverLocations';
@@ -369,22 +368,18 @@ const OrderLocationMap: React.FC<OrderLocationMapProps> = ({
 
   if (ordersWithCoords.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-        exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}
+      <div
         className={`rounded-xl border border-border/30 bg-muted/20 p-6 text-center ${className || ''}`}
       >
         <p className="text-sm text-muted-foreground">
           Geen orders met coördinaten gevonden. Voeg adressen toe om de kaart te gebruiken.
         </p>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: isMobile ? 220 : 340 }}
-      exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3, ease: 'easeInOut' }}
+    <div
       className={`relative rounded-xl overflow-hidden border border-border/30 shadow-lg ${className || ''}`}
     >
       <BaseMap
@@ -393,7 +388,7 @@ const OrderLocationMap: React.FC<OrderLocationMapProps> = ({
         onLoad={handleMapLoad} className="w-full h-full"
       />
       <MapLegend isMobile={isMobile} hasDrivers={driverLocations.length > 0} />
-    </motion.div>
+    </div>
   );
 };
 

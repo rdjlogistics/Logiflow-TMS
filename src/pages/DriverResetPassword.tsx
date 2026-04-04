@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { FloatingTruckMini } from '@/components/driver/FloatingTruckMini';
 import { Button } from '@/components/ui/button';
@@ -94,64 +93,53 @@ const DriverResetPassword = () => {
   return (
     <div className="min-h-screen-safe bg-gradient-to-b from-[#0a0a0f] via-[#0f0f18] to-[#0a0a12] flex flex-col items-center justify-center overscroll-contain relative overflow-hidden">
       {/* Animated background orbs */}
-      <motion.div
+      <div
         className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 via-pink-500/10 to-transparent blur-3xl pointer-events-none"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <motion.div
+      <div
         className="absolute -bottom-60 -left-40 w-96 h-96 rounded-full bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="relative z-10 w-full max-w-sm mx-auto px-6"
       >
-        <motion.div variants={itemVariants} className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-8">
           <FloatingTruckMini size="lg" />
-          <motion.h1 className="mt-4 text-2xl font-bold text-white/95 tracking-tight" variants={itemVariants}>
+          <h1 className="mt-4 text-2xl font-bold text-white/95 tracking-tight">
             Nieuw wachtwoord
-          </motion.h1>
-          <motion.p className="text-sm text-white/40 mt-1" variants={itemVariants}>
+          </h1>
+          <p className="text-sm text-white/40 mt-1">
             Stel een nieuw wachtwoord in
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
         {success ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+          <div
             className="flex flex-col items-center gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-6 text-center"
           >
             <CheckCircle className="h-8 w-8 text-emerald-400" />
             <p className="text-emerald-300 text-sm font-medium">
               Wachtwoord succesvol gewijzigd! Je wordt doorgestuurd naar de login pagina…
             </p>
-          </motion.div>
+          </div>
         ) : !sessionReady ? (
-          <motion.div variants={itemVariants} className="flex flex-col items-center gap-3 rounded-xl bg-white/5 border border-white/10 p-6 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-xl bg-white/5 border border-white/10 p-6 text-center">
             <Loader2 className="h-6 w-6 text-white/40 animate-spin" />
             <p className="text-white/40 text-sm">Sessie laden… Klik op de link in je e-mail om door te gaan.</p>
-          </motion.div>
+          </div>
         ) : (
           <>
             {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+              <div
                 className="mb-4 flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-red-300 text-sm"
               >
                 <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
-              </motion.div>
+              </div>
             )}
 
-            <motion.form onSubmit={handleReset} className="space-y-4">
-              <motion.div variants={itemVariants} className="space-y-2">
+            <form onSubmit={handleReset} className="space-y-4">
+              <div className="space-y-2">
                 <Label htmlFor="new-password" className="text-white/60 text-sm">Nieuw wachtwoord</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -174,9 +162,9 @@ const DriverResetPassword = () => {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div variants={itemVariants} className="space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="confirm-password" className="text-white/60 text-sm">Bevestig wachtwoord</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -199,9 +187,9 @@ const DriverResetPassword = () => {
                     {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div variants={itemVariants}>
+              <div>
                 <Button
                   type="submit"
                   disabled={loading}
@@ -209,20 +197,20 @@ const DriverResetPassword = () => {
                 >
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Wachtwoord opslaan'}
                 </Button>
-              </motion.div>
-            </motion.form>
+              </div>
+            </form>
           </>
         )}
 
-        <motion.div variants={itemVariants} className="mt-6 text-center">
+        <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/driver/login')}
             className="text-xs text-white/25 hover:text-white/50 transition-colors"
           >
             ← Terug naar inloggen
           </button>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

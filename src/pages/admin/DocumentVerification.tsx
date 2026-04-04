@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/hooks/useCompany';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -239,22 +238,17 @@ export default function DocumentVerification() {
   return (
     <div className="space-y-5 md:space-y-6 pb-20">
       {/* Elite Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="relative rounded-2xl border border-border/20 overflow-hidden p-5 md:p-6"
         style={{ background: 'var(--gradient-mesh)' }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+            <div
               className="w-12 h-12 rounded-xl flex items-center justify-center bg-primary/15 shadow-[var(--shadow-glow)]"
             >
               <Shield className="h-6 w-6 text-primary" />
-            </motion.div>
+            </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-foreground">Document Verificatie</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
@@ -267,7 +261,7 @@ export default function DocumentVerification() {
             Vernieuwen
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Stats */}
       <StatsCards
@@ -323,16 +317,13 @@ export default function DocumentVerification() {
             ))}
           </div>
         ) : filteredDocs.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+          <div
             className="flex flex-col items-center justify-center py-16 text-muted-foreground"
           >
             <FileCheck className="h-12 w-12 mb-3 opacity-30" />
             <p className="text-sm">Geen documenten gevonden</p>
-          </motion.div>
+          </div>
         ) : (
-          <AnimatePresence mode="popLayout">
             <div className="space-y-2">
               {filteredDocs.map((doc, i) => (
                 <DocumentCard
@@ -345,7 +336,6 @@ export default function DocumentVerification() {
                 />
               ))}
             </div>
-          </AnimatePresence>
         )}
       </div>
 

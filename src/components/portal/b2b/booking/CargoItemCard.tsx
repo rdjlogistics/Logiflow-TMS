@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { 
   Trash2, 
   Package, 
@@ -29,10 +28,7 @@ export const CargoItemCard = ({ item, index, onUpdate, onRemove }: CargoItemCard
   const totalVolume = volumeM3 * item.quantity;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
+    <div
       className="p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3 sm:space-y-4"
     >
       {/* Header */}
@@ -208,6 +204,6 @@ export const CargoItemCard = ({ item, index, onUpdate, onRemove }: CargoItemCard
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };

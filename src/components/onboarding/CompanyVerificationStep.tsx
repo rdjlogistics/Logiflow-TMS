@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Check, X, AlertCircle, Loader2, CreditCard, FileText, MapPin, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,32 +29,22 @@ interface FieldValidation {
 }
 
 const ValidationIcon = ({ status }: { status: ValidationStatus }) => (
-  <AnimatePresence mode="wait">
     {status === 'valid' && (
-      <motion.div
+      <div
         key="valid"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
         className="h-5 w-5 rounded-full bg-emerald-500/15 flex items-center justify-center"
       >
         <Check className="h-3 w-3 text-emerald-500" />
-      </motion.div>
+      </div>
     )}
     {status === 'invalid' && (
-      <motion.div
+      <div
         key="invalid"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
         className="h-5 w-5 rounded-full bg-destructive/15 flex items-center justify-center"
       >
         <X className="h-3 w-3 text-destructive" />
-      </motion.div>
+      </div>
     )}
-  </AnimatePresence>
 );
 
 export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerificationStepProps) => {
@@ -155,26 +144,20 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
           {/* Progress ring SVG */}
           <svg className="absolute -inset-2 w-[76px] h-[76px]" viewBox="0 0 76 76">
             <circle cx="38" cy="38" r="34" fill="none" stroke="hsl(var(--muted) / 0.2)" strokeWidth="2.5" />
-            <motion.circle
+            <circle
               cx="38" cy="38" r="34" fill="none"
               stroke="hsl(var(--primary))"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 34}`}
-              initial={{ strokeDashoffset: 2 * Math.PI * 34 }}
-              animate={{ strokeDashoffset: 2 * Math.PI * 34 * (1 - progressPercent / 100) }}
-              transition={{ type: 'spring', stiffness: 60, damping: 15 }}
               style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
             />
           </svg>
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          <div
             className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/20"
           >
             <Building2 className="h-7 w-7 text-white" />
-          </motion.div>
+          </div>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-display font-light tracking-tight">
@@ -184,20 +167,16 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
           Vul je gegevens in — ze verschijnen op facturen en documenten
         </p>
         {validCount > 0 && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+          <p
             className="text-xs text-primary/70 font-medium"
           >
             {validCount} van {totalFields} velden geverifieerd
-          </motion.p>
+          </p>
         )}
       </div>
 
       {/* Fields */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
+      <div
         variants={{
           hidden: { opacity: 0 },
           visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
@@ -210,7 +189,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
           const isInvalid = val?.status === 'invalid';
 
           return (
-            <motion.div
+            <div
               key={key}
               variants={{
                 hidden: { opacity: 0, y: 10 },
@@ -238,39 +217,28 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
                   isInvalid && 'border-destructive/30',
                 )}
               />
-              <AnimatePresence>
                 {isInvalid && val?.message && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0, y: -4 }}
-                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                    exit={{ opacity: 0, height: 0, y: -4 }}
+                  <p
                     className="text-[11px] text-destructive/80 mt-1 flex items-center gap-1"
                   >
                     <AlertCircle className="h-3 w-3 shrink-0" />
                     {val.message}
-                  </motion.p>
+                  </p>
                 )}
                 {!isInvalid && hint && touchedFields.has(key) && val?.status !== 'valid' && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                  <p
                     className="text-[11px] text-muted-foreground/40 mt-1"
                   >
                     {hint}
-                  </motion.p>
+                  </p>
                 )}
-              </AnimatePresence>
-            </motion.div>
+            </div>
           );
         })}
-      </motion.div>
+      </div>
 
       {/* Skip hint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
+      <div
         className="text-center space-y-1"
       >
         <p className="text-xs text-muted-foreground/40">
@@ -282,7 +250,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
             Zonder bedrijfsgegevens kun je nog geen facturen versturen
           </p>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 };

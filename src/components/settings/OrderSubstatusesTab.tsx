@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,18 +95,15 @@ export const OrderSubstatusesTab = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+    <div
       className="space-y-4 md:space-y-6"
     >
       <Card variant="glass">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <motion.div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center" whileHover={{ rotate: 10, scale: 1.1 }}>
+            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
               <Tag className="h-5 w-5 text-primary" />
-            </motion.div>
+            </div>
             <div>
               <CardTitle className="text-base md:text-lg">Order Substatussen</CardTitle>
               <CardDescription>
@@ -152,13 +148,9 @@ export const OrderSubstatusesTab = () => {
 
           {/* List */}
           <div className="space-y-2">
-            <AnimatePresence>
               {substatuses.map((sub) => (
-                <motion.div
+                <div
                   key={sub.id}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
                   className="flex items-center gap-2 md:gap-3 p-3 rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm"
                 >
                   <GripVertical className="h-4 w-4 text-muted-foreground/50 shrink-0 hidden sm:block" />
@@ -200,10 +192,8 @@ export const OrderSubstatusesTab = () => {
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
-
             {substatuses.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <Tag className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -214,6 +204,6 @@ export const OrderSubstatusesTab = () => {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 };

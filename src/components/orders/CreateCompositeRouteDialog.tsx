@@ -24,7 +24,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Route,
   Loader2,
@@ -373,13 +372,9 @@ const CreateCompositeRouteDialog: React.FC<CreateCompositeRouteDialogProps> = ({
           {/* Order List */}
           <ScrollArea className="h-[160px]">
             <div className="space-y-1.5 pr-4">
-              <AnimatePresence>
                 {selectedOrders.map((order, idx) => (
-                  <motion.div
+                  <div
                     key={order.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
                     className="flex items-center justify-between p-2.5 rounded-lg bg-muted/20 border border-border/15 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center gap-3">
@@ -397,9 +392,8 @@ const CreateCompositeRouteDialog: React.FC<CreateCompositeRouteDialogProps> = ({
                     <div className="text-xs text-muted-foreground">
                       {order.pickup_city || '-'} → {order.delivery_city || '-'}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </AnimatePresence>
             </div>
           </ScrollArea>
 
@@ -450,14 +444,12 @@ const CreateCompositeRouteDialog: React.FC<CreateCompositeRouteDialogProps> = ({
             className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20 gap-2 min-w-[180px]"
           >
             {isSuccess ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+              <div
                 className="flex items-center gap-2"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {optimizationResult ? `Geoptimaliseerd!` : 'Aangemaakt!'}
-              </motion.div>
+              </div>
             ) : isOptimizing ? (
               <>
                 <Brain className="h-4 w-4 animate-pulse" />

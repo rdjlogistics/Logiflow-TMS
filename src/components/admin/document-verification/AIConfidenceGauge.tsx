@@ -1,5 +1,4 @@
-import { motion, useSpring, useTransform } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AIConfidenceGaugeProps {
@@ -12,13 +11,13 @@ interface AIConfidenceGaugeProps {
 export function AIConfidenceGauge({ score, size = 80, label, className }: AIConfidenceGaugeProps) {
   const radius = (size - 8) / 2;
   const circumference = 2 * Math.PI * radius;
-  
-  const springValue = useSpring(0, { stiffness: 60, damping: 15 });
-  const strokeDashoffset = useTransform(springValue, [0, 100], [circumference, 0]);
-  
+  const circleRef = useRef<SVGCircleElement>(null);
+
   useEffect(() => {
-    springValue.set(score);
-  }, [score, springValue]);
+    if (circleRef.current) {
+      circleRef.current.style.strokeDashoffset = String(circumference - (score / 100) * circumference);
+    }
+  }, [score, circumference]);
 
   const getColor = () => {
     if (score >= 90) return 'hsl(var(--success))';
@@ -35,7 +34,6 @@ export function AIConfidenceGauge({ score, size = 80, label, className }: AIConf
   return (
     <div className={cn('relative inline-flex items-center justify-center', className)}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        {/* Background ring */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -45,8 +43,8 @@ export function AIConfidenceGauge({ score, size = 80, label, className }: AIConf
           strokeWidth="4"
           opacity={0.3}
         />
-        {/* Animated ring */}
-        <motion.circle
+        <circle
+          ref={circleRef}
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -55,18 +53,17 @@ export function AIConfidenceGauge({ score, size = 80, label, className }: AIConf
           strokeWidth="4"
           strokeLinecap="round"
           strokeDasharray={circumference}
-          style={{ strokeDashoffset, filter: `drop-shadow(0 0 6px ${getGlowColor()})` }}
+          strokeDashoffset={circumference}
+          style={{
+            transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            filter: `drop-shadow(0 0 6px ${getGlowColor()})`,
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <motion.span
-          className="text-sm font-bold text-foreground"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+        <span className="text-sm font-bold text-foreground animate-fade-in">
           {score}%
-        </motion.span>
+        </span>
         {label && (
           <span className="text-[9px] text-muted-foreground mt-0.5 leading-none">{label}</span>
         )}

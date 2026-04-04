@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   useDriverExpenses, 
   EXPENSE_CATEGORY_LABELS, 
@@ -116,14 +115,9 @@ export function ExpensesSheet({ open, onOpenChange, activeTripId }: ExpensesShee
             {showForm ? 'Voeg een nieuw onkostenbewijs toe' : 'Beheer je declaraties'}
           </SheetDescription>
         </SheetHeader>
-
-        <AnimatePresence mode="wait">
           {showForm ? (
-            <motion.div
+            <div
               key="form"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
               className="flex-1 overflow-y-auto py-4 space-y-5"
             >
               {/* Category picker */}
@@ -223,13 +217,10 @@ export function ExpensesSheet({ open, onOpenChange, activeTripId }: ExpensesShee
                 )}
                 Indienen
               </Button>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
+            <div
               key="list"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
               className="flex-1 flex flex-col overflow-hidden"
             >
               {/* Total pending */}
@@ -294,9 +285,8 @@ export function ExpensesSheet({ open, onOpenChange, activeTripId }: ExpensesShee
                   Nieuwe onkosten
                 </Button>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </SheetContent>
     </Sheet>
   );

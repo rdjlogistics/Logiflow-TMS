@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -196,8 +195,7 @@ function StatsCard({ title, value, icon: Icon, trend, description, isText }: Sta
   };
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
+    <div
       className="relative"
     >
       <Card className="bg-card/50 backdrop-blur border-border/50 hover:border-primary/30 transition-all">
@@ -219,6 +217,6 @@ function StatsCard({ title, value, icon: Icon, trend, description, isText }: Sta
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

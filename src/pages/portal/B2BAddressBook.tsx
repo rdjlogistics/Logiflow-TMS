@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Plus, Search, Star, Building2, Phone, Trash2, Edit2, Loader2 } from 'lucide-react';
 import B2BLayout from '@/components/portal/b2b/B2BLayout';
 import { Button } from '@/components/ui/button';
@@ -110,9 +109,7 @@ const B2BAddressBook = () => {
 
         {/* Empty State */}
         {!loading && locations.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="text-center py-16 rounded-xl border border-dashed border-border/50 bg-card/40 backdrop-blur-sm"
           >
             <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground/40" />
@@ -122,7 +119,7 @@ const B2BAddressBook = () => {
               <Plus className="h-4 w-4 mr-2" />
               Eerste Adres Toevoegen
             </Button>
-          </motion.div>
+          </div>
         )}
 
         {/* Address Cards */}
@@ -136,7 +133,6 @@ const B2BAddressBook = () => {
                   Favorieten ({favorites.length})
                 </h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <AnimatePresence>
                     {favorites.map((loc, i) => (
                       <AddressCard
                         key={loc.id}
@@ -147,7 +143,6 @@ const B2BAddressBook = () => {
                         onToggleFavorite={() => toggleFavorite(loc.id)}
                       />
                     ))}
-                  </AnimatePresence>
                 </div>
               </div>
             )}
@@ -161,7 +156,6 @@ const B2BAddressBook = () => {
                   </h2>
                 )}
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <AnimatePresence>
                     {others.map((loc, i) => (
                       <AddressCard
                         key={loc.id}
@@ -172,7 +166,6 @@ const B2BAddressBook = () => {
                         onToggleFavorite={() => toggleFavorite(loc.id)}
                       />
                     ))}
-                  </AnimatePresence>
                 </div>
               </div>
             )}
@@ -233,12 +226,8 @@ const AddressCard = ({
   onDelete: () => void;
   onToggleFavorite: () => void;
 }) => (
-  <motion.div
+  <div
     layout
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ delay: index * 0.05 }}
     className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-4 hover:border-border transition-all"
   >
     <div className="flex items-start justify-between mb-2">
@@ -277,7 +266,7 @@ const AddressCard = ({
         <Phone className="h-3 w-3" /> {location.contact_name} {location.contact_phone && `· ${location.contact_phone}`}
       </p>
     )}
-  </motion.div>
+  </div>
 );
 
 export default B2BAddressBook;

@@ -1,6 +1,5 @@
 import { CheckCircle, Circle, Truck, Package, MapPin, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface TrackingStep {
   id: string;
@@ -43,24 +42,20 @@ const checkVariants = {
 
 export const TrackingTimeline = ({ steps, className }: TrackingTimelineProps) => {
   return (
-    <motion.div
+    <div
       className={cn('space-y-0', className)}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
     >
       {steps.map((step, index) => {
         const IconComponent = stepIcons[step.id] || Circle;
         
         return (
-          <motion.div
+          <div
             key={step.id}
-            variants={itemVariants}
             className="flex gap-3"
           >
             {/* Timeline line and dot */}
             <div className="flex flex-col items-center">
-              <motion.div
+              <div
                 layout
                 className={cn(
                   'w-10 h-10 rounded-full flex items-center justify-center relative',
@@ -70,74 +65,47 @@ export const TrackingTimeline = ({ steps, className }: TrackingTimelineProps) =>
                     ? 'bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg shadow-primary/30'
                     : 'bg-muted/50 text-muted-foreground border-2 border-muted'
                 )}
-                animate={{
-                  scale: step.current ? 1.1 : 1,
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 {/* Pulse ring for current step */}
                 {step.current && (
                   <>
-                    <motion.span
+                    <span
                       className="absolute inset-0 rounded-full bg-primary/30"
-                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                     />
-                    <motion.span
+                    <span
                       className="absolute inset-0 rounded-full bg-primary/20"
-                      animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
                     />
                   </>
                 )}
-                
-                <AnimatePresence mode="wait">
                   {step.completed ? (
-                    <motion.span
+                    <span
                       key="check"
-                      variants={checkVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="flex items-center justify-center"
                     >
                       <CheckCircle className="w-5 h-5" />
-                    </motion.span>
+                    </span>
                   ) : step.current ? (
-                    <motion.span
+                    <span
                       key="truck"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="flex items-center justify-center"
                     >
                       <Truck className="w-5 h-5 animate-bounce-subtle" />
-                    </motion.span>
+                    </span>
                   ) : (
-                    <motion.span
+                    <span
                       key="icon"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="flex items-center justify-center"
                     >
                       <IconComponent className="w-4 h-4" />
-                    </motion.span>
+                    </span>
                   )}
-                </AnimatePresence>
-              </motion.div>
+              </div>
               
               {/* Connecting line */}
               {index < steps.length - 1 && (
                 <div className="relative w-0.5 h-14 bg-muted/30 overflow-hidden">
-                  <motion.div
+                  <div
                     className="absolute top-0 left-0 w-full bg-gradient-to-b from-green-500 to-green-400 origin-top"
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: step.completed ? 1 : 0 }}
-                    transition={{ type: "spring", stiffness: 80, damping: 20, delay: index * 0.15 }}
                     style={{ height: '100%' }}
                   />
                   
@@ -179,7 +147,7 @@ export const TrackingTimeline = ({ steps, className }: TrackingTimelineProps) =>
                 </p>
               )}
             </div>
-          </motion.div>
+          </div>
         );
       })}
       
@@ -190,7 +158,7 @@ export const TrackingTimeline = ({ steps, className }: TrackingTimelineProps) =>
           50% { top: calc(100% - 8px); opacity: 0.5; }
         }
       `}</style>
-    </motion.div>
+    </div>
   );
 };
 

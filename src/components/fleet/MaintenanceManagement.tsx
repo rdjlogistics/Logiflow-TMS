@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -408,11 +407,8 @@ const MaintenanceManagement = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredRecords.map((record, index) => (
-                    <motion.tr
+                    <tr
                       key={record.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
                       className="group hover:bg-muted/30 transition-colors cursor-pointer"
                     >
                       <TableCell>
@@ -448,7 +444,7 @@ const MaintenanceManagement = () => {
                       <TableCell className="text-muted-foreground">
                         {record.vendor_name || '–'}
                       </TableCell>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </TableBody>
               </Table>

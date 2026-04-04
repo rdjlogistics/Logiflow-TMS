@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -86,9 +85,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
           <h1 className="text-xl font-bold text-white/95">Chat</h1>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+          <div
             className="flex flex-col items-center text-center"
           >
             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4">
@@ -98,7 +95,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
             <p className="text-sm text-white/40 mb-6 max-w-xs">
               Selecteer een rit hieronder om een chat te starten met de planning.
             </p>
-          </motion.div>
+          </div>
 
           {availableTrips.length > 0 && (
             <div className="w-full space-y-2 mt-4">
@@ -106,11 +103,8 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                 Beschikbare ritten
               </p>
               {availableTrips.map((trip, i) => (
-                <motion.button
+                <button
                   key={trip.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
                   onClick={() => setSelectedTripId(trip.id)}
                   className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 transition-all text-left"
                 >
@@ -125,7 +119,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                       <p className="text-xs text-white/40">{trip.pickup_city} → {trip.delivery_city}</p>
                     </div>
                   </div>
-                </motion.button>
+                </button>
               ))}
             </div>
           )}
@@ -167,9 +161,7 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : messages.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <div
               className="flex flex-col items-center justify-center py-16 text-center"
             >
               <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
@@ -177,9 +169,8 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
               </div>
               <p className="font-semibold text-white/70 mb-1">Nog geen berichten</p>
               <p className="text-sm text-white/40">Stuur een bericht naar de planning</p>
-            </motion.div>
+            </div>
           ) : (
-            <AnimatePresence initial={false}>
               {messages.map((msg) => {
                 const role = (msg.sender_role as 'planner' | 'chauffeur' | 'klant') || 'planner';
                 const isOwn = role === 'chauffeur';
@@ -187,10 +178,8 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                 const Icon = config.icon;
 
                 return (
-                  <motion.div
+                  <div
                     key={msg.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
                     className={cn('flex gap-2.5 max-w-[85%]', isOwn ? 'ml-auto flex-row-reverse' : '')}
                   >
                     <div className={cn('w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center', config.bg)}>
@@ -220,10 +209,9 @@ export function DriverChatTab({ trips = [], activeTrip, onStartChat }: DriverCha
                         {isOwn && <CheckCheck className="w-3 h-3 text-primary/60" />}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </AnimatePresence>
           )}
         </div>
       </ScrollArea>

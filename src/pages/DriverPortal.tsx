@@ -1,7 +1,6 @@
 import { useState, useEffect, Suspense, memo, useCallback } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useDriverTrips } from '@/hooks/useDriverTrips';
@@ -155,29 +154,11 @@ const DriverPortal = () => {
       <div className="w-full md:max-w-[430px] md:mx-auto md:my-8 md:rounded-3xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:border md:border-white/10 md:relative md:h-[calc(100vh-4rem)] flex flex-col min-h-screen-safe md:min-h-0">
       {/* Premium animated background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <motion.div
+        <div
           className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 via-pink-500/10 to-transparent blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
         />
-        <motion.div
+        <div
           className="absolute -bottom-60 -left-40 w-96 h-96 rounded-full bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-transparent blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
         />
       </div>
 
@@ -190,31 +171,26 @@ const DriverPortal = () => {
               <div className="relative">
                 <FloatingTruckMini size="sm" />
                 {activeTripsCount > 0 && (
-                  <motion.div 
+                  <div 
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-[#0a0a0f] flex items-center justify-center shadow-lg shadow-emerald-500/30"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
                   >
                     <span className="text-[10px] font-bold text-white">{activeTripsCount}</span>
-                  </motion.div>
+                  </div>
                 )}
               </div>
               <div>
-                <motion.h1 
+                <h1 
                   className="font-bold text-lg text-white/95"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
                 >
                   {getGreeting()} 👋
-                </motion.h1>
+                </h1>
                 <div className="flex items-center gap-2 text-xs text-white/40">
                   <Calendar className="h-3 w-3" />
                   {format(new Date(), 'EEEE d MMMM • HH:mm', { locale: nl })}
                 </div>
               </div>
             </div>
-            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }}>
+            <div>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -224,7 +200,7 @@ const DriverPortal = () => {
               >
                 <RefreshCw className={cn("h-5 w-5", loading && 'animate-spin')} />
               </Button>
-            </motion.div>
+            </div>
           </div>
         </div>
 
@@ -280,10 +256,9 @@ const DriverPortal = () => {
             { id: 'ritten' as DriverTab, icon: Route, label: 'Ritten', badge: 0 },
             { id: 'profiel' as DriverTab, icon: User, label: 'Profiel', badge: 0 },
           ].map((item) => (
-            <motion.button
+            <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              whileTap={{ scale: 0.92 }}
               className={cn(
                 "flex flex-col items-center justify-center py-2 rounded-2xl transition-all duration-300 relative min-h-[48px]",
                 activeTab === item.id 
@@ -292,38 +267,33 @@ const DriverPortal = () => {
               )}
             >
               {activeTab === item.id && (
-                <motion.span 
+                <span 
                   className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-gradient-to-r from-primary to-pink-500"
-                  layoutId="activeTab"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <motion.div
+              <div
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center mb-0.5",
                   activeTab === item.id && "bg-white/10"
                 )}
                 animate={activeTab === item.id ? { scale: 1.1, y: -2 } : { scale: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               >
                 <item.icon className="h-5 w-5" />
                 {item.badge > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                  <span
                     className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 border-2 border-[#0a0a0f] flex items-center justify-center"
                   >
                     <span className="text-[9px] font-bold text-white">{item.badge > 9 ? '9+' : item.badge}</span>
-                  </motion.span>
+                  </span>
                 )}
-              </motion.div>
+              </div>
               <span className={cn(
                 "text-[10px] transition-all", 
                 activeTab === item.id ? "font-bold" : "font-medium"
               )}>
                 {item.label}
               </span>
-            </motion.button>
+            </button>
           ))}
         </div>
       </nav>

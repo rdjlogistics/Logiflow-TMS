@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { AlertTriangle, Clock, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,15 +20,11 @@ export function SessionWarningDialog({
 
   return (
     <div className="fixed inset-0 z-[100]">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <div
         className="fixed inset-0 bg-black/50"
       />
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+      <div
         className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm p-6 bg-card border border-border rounded-2xl shadow-2xl"
       >
         <div className="text-center">
@@ -60,7 +55,7 @@ export function SessionWarningDialog({
             </Button>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -185,11 +184,8 @@ export default function BankReconciliation() {
                   </div>
                 ) : (
                   filtered.map(tx => (
-                    <motion.div
+                    <div
                       key={tx.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedTx(tx)}
                       className="p-4 cursor-pointer active:bg-muted/30 transition-colors touch-manipulation"
                     >
@@ -235,7 +231,7 @@ export default function BankReconciliation() {
                           )}
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   ))
                 )}
               </div>

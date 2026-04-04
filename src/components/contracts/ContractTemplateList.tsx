@@ -37,7 +37,7 @@ import {
 import { ContractTemplate, TEMPLATE_TYPES } from '@/hooks/useContractTemplates';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 interface ContractTemplateListProps {
   templates: ContractTemplate[];
@@ -103,10 +103,8 @@ export function ContractTemplateList({
   return (
     <div className="space-y-4">
       {/* Search and Actions */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row gap-3"
+      <div 
+        className="flex flex-col sm:flex-row gap-3 animate-fade-in-up"
       >
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -141,7 +139,7 @@ export function ContractTemplateList({
           ))}
         </div>
 
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <div>
           <Button 
             onClick={onCreate} 
             className="h-11 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 transition-all duration-200"
@@ -149,30 +147,25 @@ export function ContractTemplateList({
             <Plus className="h-4 w-4 mr-2" />
             Nieuw sjabloon
           </Button>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Templates Grid */}
-      <AnimatePresence mode="popLayout">
+      <div>
         {filteredTemplates.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+          <div
+            className="animate-scale-fade-in"
           >
             <Card className="border-dashed border-2 bg-gradient-to-br from-background to-muted/20">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", bounce: 0.5 }}
+                <div
                   className="relative mb-6"
                 >
                   <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
                   <div className="relative p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                     <FileText className="h-12 w-12 text-primary" />
                   </div>
-                </motion.div>
+                </div>
                 <h3 className="text-xl font-semibold mb-2">Geen sjablonen gevonden</h3>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   {searchQuery
@@ -180,29 +173,25 @@ export function ContractTemplateList({
                     : 'Maak uw eerste contractsjabloon aan om te beginnen met professionele documentatie.'}
                 </p>
                 {!searchQuery && (
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <div>
                     <Button onClick={onCreate} className="gap-2">
                       <Sparkles className="h-4 w-4" />
                       Eerste sjabloon maken
                     </Button>
-                  </motion.div>
+                  </div>
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div 
-            layout
+          <div 
             className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
           >
             {filteredTemplates.map((template, index) => (
-              <motion.div
+              <div
                 key={template.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.03 }}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 30}ms` }}
               >
                 <Card 
                   className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 active:scale-[0.98] bg-gradient-to-br ${getTypeColor(template.type)}`}
@@ -223,15 +212,14 @@ export function ContractTemplateList({
                   <CardHeader className="pb-3 relative">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0">
-                        <motion.div 
-                          whileHover={{ scale: 1.1, rotate: 5 }}
+                        <div 
                           className="relative shrink-0"
                         >
                           <div className="absolute inset-0 bg-primary/30 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="relative p-2.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:border-primary/40 transition-colors">
                             <FileText className="h-5 w-5 text-primary" />
                           </div>
-                        </motion.div>
+                        </div>
                         <div className="min-w-0">
                           <CardTitle className="text-base font-semibold truncate group-hover:text-primary transition-colors">
                             {template.name}
@@ -280,7 +268,7 @@ export function ContractTemplateList({
                       </p>
                     )}
                     <div className="flex items-center justify-between">
-                      <motion.div whileHover={{ scale: 1.05 }}>
+                      <div>
                         <Badge 
                           variant={template.is_active ? 'default' : 'secondary'} 
                           className={`text-xs ${
@@ -301,7 +289,7 @@ export function ContractTemplateList({
                             </>
                           )}
                         </Badge>
-                      </motion.div>
+                      </div>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         <span className="font-medium">v{template.version}</span>
@@ -311,21 +299,19 @@ export function ContractTemplateList({
                       <p className="text-xs text-muted-foreground">
                         Bijgewerkt {format(new Date(template.updated_at), 'd MMM yyyy', { locale: nl })}
                       </p>
-                      <motion.div 
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
+                      <div 
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <span className="text-xs text-primary font-medium">Bewerken →</span>
-                      </motion.div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

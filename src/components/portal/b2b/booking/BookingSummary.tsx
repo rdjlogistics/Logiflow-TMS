@@ -1,4 +1,3 @@
-import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import { 
   MapPin, 
   Package, 
@@ -72,7 +71,7 @@ const AnimatedNumber = ({ value, decimals = 0 }: { value: number; decimals?: num
   const spring = useSpring(0, { stiffness: 80, damping: 20 });
   const display = useTransform(spring, (v) => v.toFixed(decimals));
   spring.set(value);
-  return <motion.span>{display}</motion.span>;
+  return <span>{display}</span>;
 };
 
 /* ──── Elite Capacity Bar (upgraded with card wrapper + glow + inner shine) ──── */
@@ -88,11 +87,8 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
   };
 
   return (
-    <motion.div
+    <div
       className="space-y-1.5 p-2.5 rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 relative overflow-hidden"
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* Subtle top highlight */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
@@ -106,7 +102,7 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
           <span className="text-muted-foreground">
             <AnimatedNumber value={value} decimals={1} /> / {max} {unit}
           </span>
-          <motion.span
+          <span
             className={cn(
               "font-bold tabular-nums min-w-[36px] text-right",
               isOver && "text-destructive",
@@ -114,22 +110,17 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
               !isOver && !isWarn && "text-emerald-500"
             )}
             key={Math.round(pct)}
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             {Math.round(pct)}%
-          </motion.span>
+          </span>
         </div>
       </div>
 
       {/* Glassmorphism track */}
       <div className="relative h-3 rounded-full bg-muted/30 overflow-hidden border border-border/10">
         {/* Fill with glow shadow */}
-        <motion.div
-          initial={{ width: 0 }}
+        <div
           animate={{ width: `${Math.min(pct, 100)}%` }}
-          transition={{ type: 'spring', stiffness: 60, damping: 15 }}
           className={cn(
             "h-full rounded-full relative bg-gradient-to-r",
             isOver ? "from-destructive/80 to-destructive" :
@@ -141,22 +132,18 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
           {/* Inner shine overlay */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/25 via-white/10 to-transparent" />
           {/* Animated shimmer on bar */}
-          <motion.div
-            variants={shimmerVariants}
-            initial="initial"
-            animate="animate"
+          <div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
           />
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 /* ──── Elite Glass Section ──── */
 const GlassSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
-  <motion.div
-    variants={sectionVariants}
+  <div
     className="relative rounded-2xl border border-border/40 bg-card/60 backdrop-blur-2xl overflow-hidden group/section transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_40px_-15px_hsl(var(--primary)/0.2)]"
   >
     {/* Double border highlights */}
@@ -164,10 +151,7 @@ const GlassSection = ({ title, icon, children }: { title: string; icon: React.Re
     <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/20 via-transparent to-transparent" />
     
     {/* Animated shimmer */}
-    <motion.div
-      variants={shimmerVariants}
-      initial="initial"
-      animate="animate"
+    <div
       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none"
     />
     
@@ -177,19 +161,17 @@ const GlassSection = ({ title, icon, children }: { title: string; icon: React.Re
     <div className="relative p-3 sm:p-4 border-b border-border/30 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
       <h3 className="text-sm font-semibold flex items-center gap-3">
         {/* Icon with glow background */}
-        <motion.div 
+        <div 
           className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg shadow-primary/15"
-          whileHover={{ scale: 1.1, rotate: 3 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
           {icon}
           <div className="absolute inset-0 rounded-lg bg-primary/10 blur-lg animate-pulse opacity-50" />
-        </motion.div>
+        </div>
         <span className="tracking-tight">{title}</span>
       </h3>
     </div>
     <div className="relative p-3 sm:p-4">{children}</div>
-  </motion.div>
+  </div>
 );
 
 export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle }: BookingSummaryProps) => {
@@ -204,11 +186,8 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
   };
 
   return (
-    <motion.div 
+    <div 
       className="rounded-2xl border border-border/25 bg-card/50 backdrop-blur-2xl overflow-hidden relative shadow-xl"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* Premium multi-layer effects (matching CapacityIndicator) */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -216,10 +195,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,hsl(var(--primary)/0.08),transparent_70%)] pointer-events-none" />
       
       {/* Animated shimmer */}
-      <motion.div
-        variants={shimmerVariants}
-        initial="initial"
-        animate="animate"
+      <div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.015] to-transparent pointer-events-none"
       />
 
@@ -227,32 +203,23 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
       <div className="p-3 sm:p-4 border-b border-border/25 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.1),transparent)] pointer-events-none" />
         <div className="flex items-center gap-3 relative">
-          <motion.div 
+          <div 
             className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary/25 to-primary/10 text-primary shadow-lg shadow-primary/15"
-            whileHover={{ scale: 1.05, rotate: 3 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             <ClipboardCheck className="h-4 w-4" />
             <div className="absolute inset-0 rounded-xl bg-primary/10 blur-xl animate-pulse" />
-          </motion.div>
+          </div>
           <h3 className="text-sm font-bold tracking-tight">Boekingsoverzicht</h3>
         </div>
       </div>
 
       {/* ── Content ── */}
-      <motion.div 
+      <div 
         className="relative p-3 sm:p-4 space-y-4 sm:space-y-5"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
       >
         {/* ── Validation Alerts ── */}
-        <AnimatePresence>
           {!validation.isValid && (
-            <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
+            <div
               className="relative p-4 rounded-2xl bg-destructive/10 border border-destructive/30 backdrop-blur-2xl overflow-hidden"
             >
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-destructive/40 to-transparent" />
@@ -267,14 +234,11 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                   </ul>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {validation.warnings.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
+            <div
               className="relative p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-2xl overflow-hidden"
             >
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
@@ -289,14 +253,11 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                   </ul>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-
         {/* ── Selected Vehicle Hero — Elite ── */}
         {activeVehicle && (
-          <motion.div
-            variants={sectionVariants}
+          <div
             className="relative rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/8 via-card/70 to-primary/4 backdrop-blur-2xl overflow-hidden group"
           >
             {/* Premium border highlights */}
@@ -304,10 +265,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
             <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/30 via-transparent to-transparent" />
             
             {/* Animated shimmer */}
-            <motion.div
-              variants={shimmerVariants}
-              initial="initial"
-              animate="animate"
+            <div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
             />
             
@@ -315,14 +273,10 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_20%,hsl(var(--primary)/0.1),transparent)] pointer-events-none" />
             
             {/* Floating particles */}
-            <motion.div
-              animate={{ y: [-5, 5, -5], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+            <div
               className="absolute top-4 right-8 w-2 h-2 rounded-full bg-primary/30 blur-[2px]"
             />
-            <motion.div
-              animate={{ y: [3, -3, 3], opacity: [0.2, 0.5, 0.2] }}
-              transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 0.5 }}
+            <div
               className="absolute top-8 right-16 w-1.5 h-1.5 rounded-full bg-primary/20 blur-[1px]"
             />
 
@@ -330,9 +284,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
               <div className="flex items-center gap-3 mb-3">
                 {/* Pulsating ring around vehicle icon */}
                 <div className="relative">
-                  <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
-                    transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+                  <div
                     className="absolute inset-0 rounded-xl bg-primary/20 blur-md"
                   />
                   <div className="relative w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 shadow-lg shadow-primary/15 overflow-hidden">
@@ -343,13 +295,11 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                   <p className="font-bold text-sm tracking-tight">{activeVehicle.label}</p>
                   <p className="text-xs text-muted-foreground">{category?.label} — {activeVehicle.description}</p>
                 </div>
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1], rotate: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2.5 }}
+                <div
                   className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/15 flex items-center justify-center shadow-lg shadow-primary/10"
                 >
                   <Truck className="h-4 w-4 text-primary" />
-                </motion.div>
+                </div>
               </div>
 
               {/* Specs badges with glassmorphism + glow */}
@@ -371,7 +321,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ── Route Overview ── */}
@@ -380,11 +330,8 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
             {formData.stops.map((stop, index) => {
               const conf = stopTypeConfig[stop.type];
               return (
-                <motion.div
+                <div
                   key={stop.id}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.06 }}
                   className="relative"
                 >
                   {index > 0 && (
@@ -424,7 +371,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                       <ArrowDownUp className="h-3 w-3 text-muted-foreground/50" />
                     </div>
                   )}
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -446,10 +393,9 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                 { value: cargoStats.totalWeight, label: 'kg', decimals: 0 },
                 { value: cargoStats.totalVolume, label: 'm³', decimals: 2 },
               ].map((stat) => (
-                <motion.div 
+                <div 
                   key={stat.label} 
                   className="relative p-3 rounded-xl bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-xl border border-border/30 text-center overflow-hidden group/stat cursor-default transition-all duration-300 hover:border-primary/25 hover:shadow-[0_0_30px_-10px_hsl(var(--primary)/0.25)] hover:scale-[1.03]"
-                  whileHover={{ y: -2 }}
                 >
                   {/* Top highlight on hover */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
@@ -459,11 +405,10 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                     <AnimatedNumber value={stat.value} decimals={stat.decimals} />
                   </div>
                   <div className="text-[10px] text-muted-foreground">{stat.label}</div>
-                </motion.div>
+                </div>
               ))}
-              <motion.div 
+              <div 
                 className="relative p-3 rounded-xl bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-xl border border-border/30 text-center overflow-hidden group/stat cursor-default transition-all duration-300 hover:border-primary/25 hover:shadow-[0_0_30px_-10px_hsl(var(--primary)/0.25)] hover:scale-[1.03]"
-                whileHover={{ y: -2 }}
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-20%,hsl(var(--primary)/0.06),transparent)] pointer-events-none opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
@@ -476,7 +421,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                   )}
                 </div>
                 <div className="text-[10px] text-muted-foreground">Status</div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </GlassSection>
@@ -534,12 +479,8 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
         )}
 
         {/* ── Ready to Submit Banner — Elite ── */}
-        <AnimatePresence>
           {validation.isValid && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+            <div
               className="relative p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 backdrop-blur-2xl flex items-center gap-3 overflow-hidden group"
             >
               {/* Premium border highlights */}
@@ -547,9 +488,7 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
               <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-emerald-400/30 via-transparent to-transparent" />
               
               {/* Enhanced shimmer sweep */}
-              <motion.div
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: 'linear', repeatDelay: 1 }}
+              <div
                 className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-emerald-400/15 to-transparent skew-x-12 pointer-events-none"
               />
               
@@ -558,18 +497,14 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
               
               {/* Pulsating glow ring icon */}
               <div className="relative">
-                <motion.div
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
-                  transition={{ repeat: Infinity, duration: 2.5 }}
+                <div
                   className="absolute inset-0 rounded-full bg-emerald-500/30 blur-md"
                 />
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
+                <div
                   className="relative"
                 >
                   <Sparkles className="h-6 w-6 text-emerald-500 shrink-0" />
-                </motion.div>
+                </div>
               </div>
               <div className="relative">
                 <p className="font-semibold text-sm text-emerald-600 dark:text-emerald-400">Klaar om te verzenden</p>
@@ -577,10 +512,9 @@ export const BookingSummary = ({ formData, cargoStats, validation, activeVehicle
                   Alle gegevens zijn compleet. Klik op "Zending aanmaken" om door te gaan.
                 </p>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };

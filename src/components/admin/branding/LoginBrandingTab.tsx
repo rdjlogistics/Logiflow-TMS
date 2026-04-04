@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -148,9 +148,8 @@ const LoginBrandingTab = ({ settings, onUpdate, onUploadBackground }: LoginBrand
                 </Button>
               </div>
             ) : (
-              <motion.div 
-                className="h-40 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 cursor-pointer"
-                whileHover={{ borderColor: "hsl(var(--primary))" }}
+              <div 
+                className="h-40 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center bg-muted/30 cursor-pointer hover:border-primary transition-colors"
                 onClick={() => document.getElementById('login-bg-upload')?.click()}
               >
                 {uploading ? (
@@ -161,7 +160,7 @@ const LoginBrandingTab = ({ settings, onUpdate, onUploadBackground }: LoginBrand
                     <span className="text-sm text-muted-foreground">Klik om achtergrond te uploaden</span>
                   </>
                 )}
-              </motion.div>
+              </div>
             )}
             <input
               id="login-bg-upload"

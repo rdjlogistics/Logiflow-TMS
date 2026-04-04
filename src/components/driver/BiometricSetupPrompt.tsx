@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Fingerprint, X, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
@@ -35,11 +34,7 @@ export const BiometricSetupPrompt = () => {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+      <div
         className="mx-4 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-transparent border border-primary/20 p-4 backdrop-blur-sm"
       >
         <div className="flex items-start gap-3">
@@ -86,7 +81,6 @@ export const BiometricSetupPrompt = () => {
             </div>
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };

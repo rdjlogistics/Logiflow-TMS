@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { TripStatus } from "@/types/supabase-helpers";
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -223,9 +222,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
         <CardContent className="space-y-4">
           {/* Batch Results Preview */}
           {batchResults && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
               className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-green-500/10 border border-primary/20 space-y-3"
             >
               <div className="flex items-center justify-between">
@@ -254,7 +251,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Trip Selector */}
@@ -281,12 +278,10 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
               </div>
               <div className="grid gap-2">
                 {unassignedTrips?.map((trip) => (
-                  <motion.button
+                  <button
                     key={trip.id}
                     onClick={() => setSelectedTripId(trip.id)}
                     className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-accent/50 transition-all text-left"
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -313,7 +308,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                       </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </motion.button>
+                  </button>
                 ))}
                 {(!unassignedTrips || unassignedTrips.length === 0) && (
                   <div className="text-center py-8 text-muted-foreground">
@@ -326,12 +321,8 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
           )}
 
           {/* AI Analysis Results */}
-          <AnimatePresence>
             {showAnalysis && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+              <div
                 className="space-y-4"
               >
                 {/* Back button */}
@@ -350,12 +341,10 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                 {/* Loading state */}
                 {isAnalyzing && (
                   <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    <div
                     >
                       <Brain className="h-12 w-12 text-primary" />
-                    </motion.div>
+                    </div>
                     <p className="text-muted-foreground">AI analyseert chauffeurs...</p>
                     <Progress value={65} className="w-48" />
                   </div>
@@ -411,11 +400,8 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                     <ScrollArea className="h-[300px]">
                       <div className="space-y-2 pr-4">
                         {candidates.map((candidate, index) => (
-                          <motion.div
+                          <div
                             key={candidate.driver.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
                             className={cn(
                               "p-4 rounded-xl border transition-all",
                               index === 0 
@@ -509,15 +495,14 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                                 )}
                               </div>
                             </div>
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     </ScrollArea>
                   </div>
                 )}
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </CardContent>
       </Card>
 
@@ -545,7 +530,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
             <ScrollArea className="h-[400px]">
               <div className="space-y-3 pr-4">
                 {activeConversations.map((conv: any) => (
-                  <motion.div
+                  <div
                     key={conv.id}
                     className={cn(
                       "p-3 rounded-lg border cursor-pointer transition-all",
@@ -554,8 +539,6 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                         : "bg-card/50 border-border/50 hover:border-primary/30"
                     )}
                     onClick={() => setSelectedConversation(conv.id)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-sm">{conv.drivers?.name}</span>
@@ -573,7 +556,7 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                     <p className="text-xs text-muted-foreground">
                       {dedupCity(conv.trips?.pickup_city)} → {dedupCity(conv.trips?.delivery_city)}
                     </p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </ScrollArea>

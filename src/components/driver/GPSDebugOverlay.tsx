@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Satellite, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,9 +26,7 @@ export const GPSDebugOverlay = ({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="fixed bottom-24 left-3 right-3 z-50 md:left-auto md:right-4 md:max-w-[400px]"
     >
       <div className="bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
@@ -63,12 +60,8 @@ export const GPSDebugOverlay = ({
         </button>
 
         {/* Expanded details */}
-        <AnimatePresence>
           {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+            <div
               className="border-t border-white/10"
             >
               <div className="px-4 py-3 space-y-2 text-xs font-mono">
@@ -86,11 +79,10 @@ export const GPSDebugOverlay = ({
                 )}
                 {error && <Row label="Fout" value={error} color="text-red-400" />}
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

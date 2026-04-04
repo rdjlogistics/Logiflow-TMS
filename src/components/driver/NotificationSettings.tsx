@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Bell, BellOff, Check, X, TestTube, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -64,9 +63,7 @@ export const NotificationSettings = () => {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="space-y-4"
     >
       {/* Main toggle */}
@@ -102,22 +99,18 @@ export const NotificationSettings = () => {
 
         {/* Permission denied warning */}
         {permission === 'denied' && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+          <div
             className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20"
           >
             <p className="text-sm text-destructive">
               Notificaties zijn geblokkeerd. Wijzig dit in je browserinstellingen.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Success state */}
         {isSubscribed && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+          <div
             className="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20"
           >
             <div className="flex items-center gap-2">
@@ -126,16 +119,13 @@ export const NotificationSettings = () => {
                 Push notificaties zijn actief
               </p>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
 
       {/* Test button */}
       {isSubscribed && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
         >
           <Button
             variant="outline"
@@ -155,7 +145,7 @@ export const NotificationSettings = () => {
               </>
             )}
           </Button>
-        </motion.div>
+        </div>
       )}
 
       {/* Info text */}
@@ -163,6 +153,6 @@ export const NotificationSettings = () => {
         Je ontvangt instant een melding wanneer er een nieuwe rit aan je wordt toegewezen, 
         ook als de app niet open is.
       </p>
-    </motion.div>
+    </div>
   );
 };

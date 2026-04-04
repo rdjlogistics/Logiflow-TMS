@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect, KeyboardEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Search, X, Loader2, Check } from 'lucide-react';
@@ -194,15 +193,9 @@ export function Autocomplete<T extends string | number>({
           )}
         </div>
       </div>
-
-      <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <div
             ref={listRef}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.1 }}
             className="absolute z-50 w-full mt-1 py-1 bg-popover border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
           >
             {filteredOptions.length === 0 && !showCreate && (
@@ -268,9 +261,8 @@ export function Autocomplete<T extends string | number>({
                 + {createLabel}: "{inputValue}"
               </button>
             )}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }

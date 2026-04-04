@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { X, CheckCircle2, UserRound, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 type TripStatus = "offerte" | "aanvraag" | "draft" | "gepland" | "geladen" | "onderweg" | "afgeleverd" | "afgerond" | "gecontroleerd" | "gefactureerd" | "geannuleerd";
 
@@ -88,13 +87,8 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
   const count = selectedIds.size;
 
   return (
-    <AnimatePresence>
       {count > 0 && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        <div
           className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-2xl"
         >
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-2xl px-5 py-3.5">
@@ -134,8 +128,7 @@ export function BulkActionBar({ selectedIds, onClear, onComplete }: BulkActionBa
               <X className="h-4 w-4" />
             </Button>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
   );
 }

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Check, Zap, Rocket, Crown, Building2, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,39 +82,28 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
     <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
       {/* Apple-style header */}
       <div className="text-center space-y-3">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+        <p
           className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
         >
           Stap 3 van 6
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        <div
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20"
         >
           <Package className="h-7 w-7 text-white" />
-        </motion.div>
+        </div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
+        <h2
           className="text-2xl sm:text-3xl font-display font-light tracking-tight"
         >
           Kies je <span className="font-semibold">TMS pakket</span>
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+        </h2>
+        <p
           className="text-sm text-muted-foreground/50 font-light"
         >
           Alle pakketten inclusief 30 dagen gratis trial
-        </motion.p>
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -127,14 +115,9 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
           const features = KEY_FEATURES[plan.slug] || [];
 
           return (
-            <motion.button
+            <button
               key={plan.id}
               type="button"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -4, scale: 1.01, rotateY: 2, rotateX: -1 }}
-              whileTap={{ scale: 0.98 }}
               onClick={() => onSelect(plan.id, plan.slug)}
               style={{ perspective: 800, transformStyle: 'preserve-3d' }}
               className={cn(
@@ -164,10 +147,7 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
                 {isSelected && (
                   <>
                     <Check className="h-3 w-3 text-primary-foreground" />
-                    <motion.div
-                      initial={{ scale: 1, opacity: 0.5 }}
-                      animate={{ scale: 2, opacity: 0 }}
-                      transition={{ duration: 0.6 }}
+                    <div
                       className="absolute inset-0 rounded-full border-2 border-primary"
                     />
                   </>
@@ -211,7 +191,7 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
                   ))}
                 </div>
               </div>
-            </motion.button>
+            </button>
           );
         })}
       </div>

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { LayoutDashboard, FileText, Settings, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -41,22 +40,17 @@ const ConfettiParticle = ({ index }: { index: number }) => {
 const AnimatedCheckmark = () => (
   <div className="relative flex items-center justify-center">
     {/* Glow ring */}
-    <motion.div
+    <div
       className="absolute w-32 h-32 rounded-full bg-emerald-500/20"
-      animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.2, 0.5] }}
-      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
     />
-    <motion.div
+    <div
       className="absolute w-24 h-24 rounded-full bg-emerald-500/30"
-      animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.3, 0.6] }}
-      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
     />
     {/* Circle + checkmark */}
-    <motion.svg
+    <svg
       width="96" height="96" viewBox="0 0 96 96"
-      initial="hidden" animate="visible"
     >
-      <motion.circle
+      <circle
         cx="48" cy="48" r="44"
         fill="none"
         stroke="hsl(142, 76%, 50%)"
@@ -66,9 +60,8 @@ const AnimatedCheckmark = () => (
           hidden: { pathLength: 0, opacity: 0 },
           visible: { pathLength: 1, opacity: 1 },
         }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
       />
-      <motion.path
+      <path
         d="M30 50 L42 62 L66 38"
         fill="none"
         stroke="hsl(142, 76%, 50%)"
@@ -79,9 +72,8 @@ const AnimatedCheckmark = () => (
           hidden: { pathLength: 0, opacity: 0 },
           visible: { pathLength: 1, opacity: 1 },
         }}
-        transition={{ duration: 0.4, delay: 0.5, ease: 'easeOut' }}
       />
-    </motion.svg>
+    </svg>
   </div>
 );
 
@@ -165,19 +157,16 @@ const CheckoutSuccess = () => {
       </div>
 
       <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 py-16">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
+        <div
           className="max-w-lg w-full text-center space-y-8"
         >
           {/* Checkmark */}
-          <motion.div variants={fadeUp} className="flex justify-center">
+          <div className="flex justify-center">
             <AnimatedCheckmark />
-          </motion.div>
+          </div>
 
           {/* Title */}
-          <motion.div variants={fadeUp} className="space-y-2">
+          <div className="space-y-2">
             <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight">
               {paymentConfirmed ? 'Welkom bij LogiFlow!' : 'Betaling wordt verwerkt...'}
             </h1>
@@ -186,11 +175,11 @@ const CheckoutSuccess = () => {
                 ? 'Je abonnement is succesvol geactiveerd'
                 : 'Even geduld, we activeren je abonnement...'}
             </p>
-          </motion.div>
+          </div>
 
           {/* Plan details card */}
           {plan && (
-            <motion.div variants={fadeUp}>
+            <div>
               <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -216,20 +205,18 @@ const CheckoutSuccess = () => {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           )}
 
           {/* What's next */}
-          <motion.div variants={fadeUp} className="space-y-3">
+          <div className="space-y-3">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
               Wat wil je nu doen?
             </p>
             <div className="grid gap-3">
               {actions.map((action) => (
-                <motion.div
+                <div
                   key={action.path}
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <Card
                     variant="interactive"
@@ -247,18 +234,18 @@ const CheckoutSuccess = () => {
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Skip link */}
-          <motion.div variants={fadeUp}>
+          <div>
             <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
               Naar Dashboard <ArrowRight className="h-4 w-4" />
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Confetti CSS */}

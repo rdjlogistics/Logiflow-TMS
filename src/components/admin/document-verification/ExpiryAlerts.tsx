@@ -1,11 +1,9 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { type DriverDocument, documentTypeLabels } from './DocumentCard';
 import { differenceInDays, format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { AlertTriangle, Bell, Clock } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 interface ExpiryAlertsProps {
   documents: DriverDocument[];
@@ -28,11 +26,7 @@ export function ExpiryAlerts({ documents }: ExpiryAlertsProps) {
   if (expiringDocs.length === 0) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-warning/20 bg-warning/5 backdrop-blur-sm p-4"
-    >
+    <div className="rounded-xl border border-warning/20 bg-warning/5 backdrop-blur-sm p-4 animate-fade-in-up">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-warning" />
@@ -48,12 +42,10 @@ export function ExpiryAlerts({ documents }: ExpiryAlertsProps) {
           const isExpired = days < 0;
 
           return (
-            <motion.div
+            <div
               key={doc.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-card/50 border border-border/15"
+              className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-card/50 border border-border/15 animate-fade-in-up"
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium text-foreground truncate">
@@ -75,7 +67,7 @@ export function ExpiryAlerts({ documents }: ExpiryAlertsProps) {
                 <Clock className="h-2.5 w-2.5 mr-0.5" />
                 {isExpired ? 'Verlopen' : `${days}d`}
               </Badge>
-            </motion.div>
+            </div>
           );
         })}
         {expiringDocs.length > 5 && (
@@ -84,6 +76,6 @@ export function ExpiryAlerts({ documents }: ExpiryAlertsProps) {
           </p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

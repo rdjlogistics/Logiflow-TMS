@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -156,16 +155,12 @@ const DocumentTemplates = () => {
 
         {/* Templates Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
             {filteredTemplates.map((template) => {
               const config = TEMPLATE_TYPE_CONFIG[template.template_type as DocumentType] || TEMPLATE_TYPE_CONFIG.cmr;
               return (
-                <motion.div
+                <div
                   key={template.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
                 >
                   <Card className="group hover:shadow-lg transition-all duration-200">
                     <CardHeader className="pb-3">
@@ -219,11 +214,9 @@ const DocumentTemplates = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
-          </AnimatePresence>
-
           {filteredTemplates.length === 0 && (
             <div className="col-span-full text-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

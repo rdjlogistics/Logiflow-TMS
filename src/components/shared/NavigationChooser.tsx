@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { Navigation, X, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -39,21 +38,13 @@ const navApps: Array<{ id: NavApp; name: string; icon: string; color: string; ge
 
 export function NavigationChooser({ isOpen, onClose, destination, label, lat, lng }: NavigationChooserProps) {
   return (
-    <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             onClick={onClose}
           />
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          <div
             className="fixed bottom-0 left-0 right-0 z-50 p-4"
             style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
           >
@@ -114,9 +105,8 @@ export function NavigationChooser({ isOpen, onClose, destination, label, lat, ln
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
   );
 }

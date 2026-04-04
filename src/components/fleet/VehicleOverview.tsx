@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { EmptyState } from '@/components/common/EmptyState';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -434,11 +433,8 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                     {filteredVehicles.map((vehicle, index) => {
                       const isSelected = selectedIds.has(vehicle.id);
                       return (
-                        <motion.tr
+                        <tr
                           key={vehicle.id}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.02, type: 'spring', stiffness: 150, damping: 20 }}
                           className={cn(
                             'group transition-all duration-150 cursor-pointer',
                             isSelected ? 'bg-primary/5 hover:bg-primary/8' : 'hover:bg-muted/30'
@@ -495,7 +491,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                        </motion.tr>
+                        </tr>
                       );
                     })}
                   </TableBody>
@@ -505,11 +501,8 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
               {/* Mobile Cards */}
               <div className="md:hidden space-y-3">
                 {filteredVehicles.map((vehicle, i) => (
-                  <motion.div
+                  <div
                     key={vehicle.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04 }}
                     className="bg-card border border-border/30 rounded-xl p-4 cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => openVehicleDetail(vehicle)}
                   >
@@ -538,7 +531,7 @@ const VehicleOverview = ({ triggerAddVehicle, onAddVehicleHandled }: VehicleOver
                         <div className="mt-0.5">{getStatusBadge(vehicle.is_active)}</div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </>

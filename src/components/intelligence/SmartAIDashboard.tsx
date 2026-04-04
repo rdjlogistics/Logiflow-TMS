@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -192,12 +191,8 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                       onClick={() => setShowVoiceAssistant(true)}
                       className="gap-1.5 relative overflow-hidden group"
                     >
-                      <motion.div
+                      <div
                         className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-500/10 opacity-0 group-hover:opacity-100"
-                        initial={false}
-                        animate={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
                       />
                       <Mic className="w-3.5 h-3.5 relative z-10" />
                       <span className="relative z-10">Assistent</span>
@@ -206,23 +201,15 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                   <TooltipContent>AI Voice Assistent</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              
-              <AnimatePresence mode="wait">
                 {stats.criticalAlerts > 0 && (
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    variants={pulseVariants}
+                  <div
                   >
                     <Badge variant="destructive" className="animate-pulse gap-1">
                       <Activity className="w-3 h-3" />
                       {stats.criticalAlerts} kritiek
                     </Badge>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
-              
               {lastUpdated && (
                 <TooltipProvider>
                   <Tooltip>
@@ -282,11 +269,8 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
               {/* Predictions Tab */}
               <TabsContent value="predictions" className="m-0 space-y-4">
                 <div className="flex items-center justify-between mb-4">
-                  <motion.div 
+                  <div 
                     className="grid grid-cols-4 gap-2 flex-1"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
                   >
                     {[
                       { value: delayPredictions.length, label: 'Vertragingen', color: 'primary', icon: Clock },
@@ -294,31 +278,26 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                       { value: costForecasts.length, label: 'Kosten', color: 'green-500', icon: Euro },
                       { value: stats.riskCount, label: 'Risico\'s', color: 'purple-500', icon: Shield },
                     ].map((stat, i) => (
-                      <motion.div
+                      <div
                         key={stat.label}
-                        variants={itemVariants}
                         className={cn(
                           'p-2 rounded-lg text-center cursor-pointer transition-all hover:scale-105',
                           `bg-${stat.color}/5 hover:bg-${stat.color}/10`
                         )}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
                       >
-                        <motion.div 
+                        <div 
                           className={cn('text-lg font-bold', `text-${stat.color}`)}
                           key={stat.value}
-                          initial={{ scale: 1.2, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
                         >
                           {stat.value}
-                        </motion.div>
+                        </div>
                         <div className="text-[10px] text-muted-foreground flex items-center justify-center gap-1">
                           <stat.icon className="w-2.5 h-2.5" />
                           {stat.label}
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -341,40 +320,31 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                   {predictionsLoading && predictions.length === 0 ? (
                     <PredictionSkeleton />
                   ) : predictions.length === 0 ? (
-                    <motion.div 
+                    <div 
                       className="flex flex-col items-center justify-center h-[200px] text-muted-foreground"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
                     >
-                      <motion.div
-                        animate={{ rotate: [0, 10, -10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
+                      <div
                       >
                         <TrendingUp className="w-10 h-10 mb-3" />
-                      </motion.div>
+                      </div>
                       <p className="font-medium">Geen voorspellingen</p>
                       <p className="text-sm">Meer data nodig voor analyse</p>
-                    </motion.div>
+                    </div>
                   ) : (
-                    <motion.div 
+                    <div 
                       className="space-y-3"
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
                     >
                       {predictions.slice(0, 10).map((prediction, index) => (
-                        <motion.div
+                        <div
                           key={prediction.id}
-                          variants={itemVariants}
                           layout
                           className={cn(
                             'p-4 rounded-lg border transition-all hover:shadow-md',
                             prediction.confidence >= 80 && 'border-l-2 border-l-primary'
                           )}
-                          whileHover={{ x: 4 }}
                         >
                           <div className="flex items-start gap-3">
-                            <motion.div 
+                            <div 
                               className={cn(
                                 'p-2 rounded-lg',
                                 prediction.impact?.type === 'negative' 
@@ -383,10 +353,9 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                                   ? 'bg-green-500/10 text-green-500'
                                   : 'bg-muted text-muted-foreground'
                               )}
-                              whileHover={{ scale: 1.1, rotate: 5 }}
                             >
                               {predictionTypeIcons[prediction.type] || <Target className="w-4 h-4" />}
-                            </motion.div>
+                            </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <h4 className="font-medium text-sm truncate">{prediction.title}</h4>
@@ -402,21 +371,15 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                               </div>
                               <p className="text-xs text-muted-foreground mb-2">{prediction.description}</p>
                               {prediction.recommendation && (
-                                <motion.p 
+                                <p 
                                   className="text-xs text-primary font-medium flex items-center gap-1"
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.2 }}
                                 >
                                   <Lightbulb className="w-3 h-3" />
                                   {prediction.recommendation}
-                                </motion.p>
+                                </p>
                               )}
                               <div className="mt-2">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: '100%' }}
-                                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                                <div
                                 >
                                   <Progress 
                                     value={prediction.confidence} 
@@ -425,22 +388,20 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                                       prediction.confidence >= 80 && '[&>div]:bg-primary'
                                     )} 
                                   />
-                                </motion.div>
+                                </div>
                               </div>
                             </div>
                             {prediction.impact?.type === 'negative' && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
+                              <div
                                 className="text-red-500"
                               >
                                 <TrendingDown className="w-4 h-4" />
-                              </motion.div>
+                              </div>
                             )}
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
-                    </motion.div>
+                    </div>
                   )}
                 </ScrollArea>
               </TabsContent>
@@ -495,10 +456,8 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                       {activeAlerts.map(alert => {
                         const config = priorityConfig[alert.severity] || priorityConfig.low;
                         return (
-                          <motion.div
+                          <div
                             key={alert.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
                             className={cn('p-4 rounded-lg border', config.border)}
                           >
                             <div className="flex items-start gap-3">
@@ -538,7 +497,7 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                                 <XCircle className="w-4 h-4" />
                               </Button>
                             </div>
-                          </motion.div>
+                          </div>
                         );
                       })}
                     </div>
@@ -577,10 +536,8 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                   ) : (
                     <div className="space-y-3">
                       {suggestions.map(suggestion => (
-                        <motion.div
+                        <div
                           key={suggestion.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
                           className="p-4 rounded-lg border hover:bg-accent/50 transition-colors"
                         >
                           <div className="flex items-start gap-3">
@@ -614,7 +571,7 @@ export const SmartAIDashboard: React.FC<SmartAIDashboardProps> = ({
                               <XCircle className="w-4 h-4" />
                             </Button>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   )}

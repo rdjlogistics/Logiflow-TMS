@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useTheme, type ThemePreset } from '@/components/ThemeProvider';
 import { Check, Moon, Sun, Monitor, Sparkles, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -203,7 +202,7 @@ export function ThemePresetsTab() {
           const isActive = themePreset === preset.id;
           const isTenantDefault = tenantPreset === preset.id;
           return (
-            <motion.button
+            <button
               key={preset.id}
               onClick={() => handlePresetChange(preset.id)}
               className={cn(
@@ -213,9 +212,6 @@ export function ThemePresetsTab() {
                   ? "border-primary/50 shadow-glow ring-1 ring-primary/20"
                   : "border-border/40 hover:border-border/60 hover:shadow-lg"
               )}
-              whileHover={{ scale: 1.015, y: -2 }}
-              whileTap={{ scale: 0.99 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
               {/* Badges */}
               <div className="absolute top-3 right-3 z-10 flex gap-1.5">
@@ -226,12 +222,12 @@ export function ThemePresetsTab() {
                   </Badge>
                 )}
                 {isActive && (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                  <div>
                     <Badge className="badge-gradient gap-1 text-[10px] px-2 py-0.5">
                       <Check className="h-3 w-3" />
                       Actief
                     </Badge>
-                  </motion.div>
+                  </div>
                 )}
               </div>
 
@@ -262,7 +258,7 @@ export function ThemePresetsTab() {
                   )
                 )}
               </div>
-            </motion.button>
+            </button>
           );
         })}
       </div>
@@ -289,7 +285,7 @@ export function ThemePresetsTab() {
             const isActive = theme === mode.value;
             const Icon = mode.icon;
             return (
-              <motion.button
+              <button
                 key={mode.value}
                 onClick={() => setTheme(mode.value)}
                 className={cn(
@@ -298,20 +294,17 @@ export function ThemePresetsTab() {
                     ? "text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
-                whileTap={{ scale: 0.97 }}
               >
                 {isActive && (
-                  <motion.div
+                  <div
                     className="absolute inset-0 rounded-xl bg-primary shadow-md shadow-primary/25"
-                    layoutId="themeMode"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
                 <span className="relative flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   {mode.label}
                 </span>
-              </motion.button>
+              </button>
             );
           })}
         </div>

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useFuelStations } from '@/hooks/useFuelStations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,10 +30,7 @@ export function FuelStationsWidget() {
   const priceDiff = maxPrice - minPrice;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
+    <div
     >
       <Card className="relative overflow-hidden border-border/40 bg-gradient-to-br from-card via-card to-amber-500/5">
         {/* Decorative Elements */}
@@ -86,11 +82,8 @@ export function FuelStationsWidget() {
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">Voordeligste stations</p>
             {sortedByPrice.map((station, index) => (
-              <motion.div
+              <div
                 key={station.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 * index }}
                 className="flex items-center justify-between p-2.5 rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -114,7 +107,7 @@ export function FuelStationsWidget() {
                 )}>
                   €{(station.prices[selectedFuelType] ?? 0).toFixed(2)}
                 </p>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -139,6 +132,6 @@ export function FuelStationsWidget() {
           </Button>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

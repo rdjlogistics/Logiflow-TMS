@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import DOMPurify from 'dompurify';
-import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
