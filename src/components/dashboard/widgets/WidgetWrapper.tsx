@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import { GripVertical, X, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getWidgetDefinition, WidgetSize } from "../WidgetRegistry";
+import { getWidgetDefinition, WidgetSize } from "./WidgetRegistry";
 
 interface WidgetWrapperProps {
   widgetId: string;
