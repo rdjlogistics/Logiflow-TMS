@@ -3,8 +3,6 @@ import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion'
 import { Truck, Package, Weight, AlertTriangle, CheckCircle2, Info, ChevronDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VehicleCapacity, VehicleCategory, VEHICLE_CAPACITIES, VEHICLE_CATEGORIES, CargoItem } from './types';
-import { CargoFitVisualization } from './CargoFitVisualization';
-import { CargoFitVisualizationModal } from './CargoFitVisualizationModal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
 import { VehicleImage } from './VehicleImage';
