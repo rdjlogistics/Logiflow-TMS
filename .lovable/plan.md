@@ -1,51 +1,75 @@
 
 
-# Fix: Onboarding redirect glitch bij bestaande accounts
+# Fix: Echte weerdata via Open-Meteo API (gratis, geen API key)
 
-## Root Cause
+## Probleem
 
-De `useOnboardingRequired` hook heeft **3 faalscenario's** die bestaande gebruikers naar `/onboarding` sturen:
+`useWeatherData.ts` is 100% nep — `Math.random()` genereert willekeurige temperaturen op basis van seizoen. Geen API call, geen locatie, geen echte data.
 
-1. **DB onder druk** → `waitForCompanyLink` pollt 5 seconden en faalt → `needsOnboarding = true`
-2. **Stale query refetch** → `staleTime: 30s` betekent dat elke 30s bij window-focus de query opnieuw draait. Bij DB-latentie faalt de poll → redirect
-3. **Geen geheugen** → de hook weet niet dat onboarding al eerder succesvol was gecheckt. Elke refetch kan een ander resultaat geven
+## Oplossing
 
-`DashboardLayout.tsx` regel 89: `if (!onboardingLoading && needsOnboarding)` → **redirect naar /onboarding**
+**Open-Meteo API** — gratis, geen API key nodig, geen rate limits voor normaal gebruik, werkt wereldwijd.
 
-## Oplossing (2 bestanden)
+### 1 bestand: `src/hooks/useWeatherData.ts` — volledig herschrijven
 
-### 1. `src/hooks/useOnboardingRequired.ts` — bulletproof maken
+**Stap 1: Browser geolocation ophalen**
+- `navigator.geolocation.getCurrentPosition()` met `maximumAge: 300000` (5 min cache), `timeout: 5000`
+- Fallback bij weigering: Amsterdam (52.37, 4.90)
 
-- **localStorage cache**: bij eerste succesvolle check dat onboarding NIET nodig is → sla `onboarding-done-{userId}` op in localStorage
-- **Fallback bij fout**: als de query faalt (DB timeout, netwerk), check localStorage. Als daar staat dat onboarding al gedaan is → return `false` (geen redirect)
-- **staleTime verhogen**: van 30s naar 5 minuten. Onboarding-status verandert bijna nooit
-- **`waitForCompanyLink` timeout verdubbelen**: van 5s naar 10s voor trage DB
-- **Bij error niet redirecten**: als de query een error gooit → return `false` (fail-safe), niet `true`
+**Stap 2: Open-Meteo API aanroepen**
+- URL: `https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10,weather_code&timezone=auto`
+- Geen key, geen account, directe client-side fetch
+- WMO weather codes mappen naar bestaande icon types (`sunny`, `cloudy`, `rainy`, `snowy`, `foggy`, `stormy`, `partly-cloudy`)
+- Nederlandse condition labels behouden (`Zonnig`, `Bewolkt`, `Regen`, etc.)
 
-### 2. `src/components/layout/DashboardLayout.tsx` — extra guard
+**Stap 3: Traffic schatting behouden**
+- Traffic logica (spits + weer-conditie) blijft lokaal berekend — dit is geen weer-API functie
+- Gebruikt de echte weer-conditie i.p.v. random
 
-- Voeg een extra check toe: als `onboardingLoading` is `false` EN de query heeft een error → NIET redirecten
-- Alleen redirecten als de query succesvol data heeft opgehaald EN `needsOnboarding === true`
+**Stap 4: Caching & error handling**
+- `staleTime: 15 min` — weerdata verandert niet per seconde
+- Bij API-fout: fallback naar laatste bekende waarde (useState behoudt vorige data)
+- Bij geolocation-weigering: gebruik Amsterdam als default, toon echte data voor die locatie
 
-## Kernlogica (nieuw)
+**Stap 5: Reverse geocoding voor locatienaam**
+- Open-Meteo geeft geen plaatsnaam → gebruik `https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lng}&format=json` (ook gratis)
+- Toon echte stad/regio i.p.v. hardcoded "Nederland"
+
+### Interface blijft 100% identiek
 
 ```text
-queryFn:
-  1. Check localStorage → "onboarding-done-{userId}" = "true"?
-     → JA: return false (skip DB check)
-  2. Poll user_companies (max 10s)
-     → geen result: return true
-  3. Check tenant_settings.onboarding_completed_at
-     → completed: localStorage.set("onboarding-done-{userId}", "true"), return false
-     → niet completed: return true
-     
-Error handling:
-  → Query faalt: check localStorage fallback → als "done" → false
-  → Query faalt + geen localStorage → return false (NOOIT redirecten bij fouten)
+WeatherData {
+  temperature: number      ← echte API waarde
+  condition: string        ← WMO code → Nederlandse tekst
+  icon: string             ← WMO code → icon type
+  humidity: number         ← echte API waarde
+  windSpeed: number        ← echte API waarde
+  trafficExpected: string  ← berekend op basis van echte weer + tijd
+  trafficDescription: string
+  location: string         ← reverse geocoded plaatsnaam
+}
 ```
 
-## Verwacht resultaat
-- Bestaande accounts worden **nooit meer** naar onboarding gestuurd na een transient DB-fout
-- Nieuwe accounts worden nog steeds correct naar onboarding gestuurd
-- Na `signOut` wordt de localStorage-cache gewist zodat een ander account correct gecheckt wordt
+Dashboard.tsx heeft **zero wijzigingen** nodig.
+
+### WMO Weather Code mapping
+
+| Code | Conditie | Icon |
+|------|----------|------|
+| 0 | Onbewolkt | sunny |
+| 1-2 | Halfbewolkt | partly-cloudy |
+| 3 | Bewolkt | cloudy |
+| 45, 48 | Mist | foggy |
+| 51-67 | Regen/Motregen | rainy |
+| 71-77 | Sneeuw | snowy |
+| 80-82 | Buien | rainy |
+| 85-86 | Sneeuwbuien | snowy |
+| 95-99 | Onweer | stormy |
+
+### Resultaat
+- Echte temperatuur op basis van GPS-locatie van de gebruiker
+- Werkt in heel Europa (en wereldwijd)
+- Geen API key nodig, geen kosten, geen edge function
+- Fallback naar Amsterdam bij geolocation-weigering
+- 1 bestand gewijzigd, 0 breaking changes
 
