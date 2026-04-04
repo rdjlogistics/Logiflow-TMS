@@ -330,7 +330,7 @@ const OrderMobileCard = ({
                   </Badge>
                 )}
               </div>
-              <motion.div}}
+              <motion.div
               >
                 <ChevronRight className={cn("h-4 w-4 flex-shrink-0", isOnTheRoad ? "text-amber-500" : "text-muted-foreground")} />
               </motion.div>

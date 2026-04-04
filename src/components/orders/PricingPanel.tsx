@@ -92,7 +92,7 @@ const PricingPanel = ({
   onCalculateRoute, 
   isCalculating = false,
   tollResult,
-  isDetectingTolls = false, = 'sidebar',
+  isDetectingTolls = false,
   autoPriceResult,
   isAutoPricing = false,
   onApplyAutoPrice,
@@ -177,7 +177,7 @@ const PricingPanel = ({
   const profitMargin = salesAfterDiscount > 0 ? (grossProfit / salesAfterDiscount) * 100 : 0;
 
   const inputBase = "h-12 sm:h-8 text-sm sm:text-xs touch-manipulation rounded-lg";
-  const isFullwidth = === 'fullwidth';
+  const isFullwidth = false;
   const TARIFF_GRID = isFullwidth ? TARIFF_GRID_FW : TARIFF_GRID_SB;
 
   return (

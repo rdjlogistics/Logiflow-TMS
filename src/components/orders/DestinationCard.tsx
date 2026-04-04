@@ -419,7 +419,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Adres</Label>
-                        <motion.div}
+                        <motion.div
                           className="rounded-lg"
                         >
                           <Input
@@ -441,7 +441,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Woonplaats</Label>
-                        <motion.div}
+                        <motion.div
                           className="rounded-lg"
                         >
                           <Input

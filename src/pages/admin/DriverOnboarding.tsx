@@ -208,7 +208,7 @@ const DriverOnboarding = () => {
               return (
                 <div
                   key={onboarding.id}
-                  layout
+
                 >
                   <Card className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">

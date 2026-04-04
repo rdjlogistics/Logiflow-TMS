@@ -56,10 +56,6 @@ const AnimatedCheckmark = () => (
         stroke="hsl(142, 76%, 50%)"
         strokeWidth="3"
         strokeLinecap="round"
-        variants={{
-          hidden: { pathLength: 0, opacity: 0 },
-          visible: { pathLength: 1, opacity: 1 },
-        }}
       />
       <path
         d="M30 50 L42 62 L66 38"
@@ -68,10 +64,6 @@ const AnimatedCheckmark = () => (
         strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"
-        variants={{
-          hidden: { pathLength: 0, opacity: 0 },
-          visible: { pathLength: 1, opacity: 1 },
-        }}
       />
     </svg>
   </div>

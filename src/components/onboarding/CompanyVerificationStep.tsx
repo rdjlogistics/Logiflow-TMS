@@ -178,9 +178,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
       </div>
 
       {/* Fields */}
-      <div,
-          visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
-        }}
+      <div
         className="grid grid-cols-1 sm:grid-cols-2 gap-4"
       >
         {fields.map(({ key, label, placeholder, icon: Icon, span, hint }) => {
@@ -190,9 +188,7 @@ export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerifi
 
           return (
             <div
-              key={key},
-                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
-              }}
+              key={key}
               className={cn(span === 2 && 'sm:col-span-2')}
             >
               <div className="flex items-center justify-between mb-1.5">

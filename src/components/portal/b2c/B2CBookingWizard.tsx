@@ -178,7 +178,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                   isCurrent ? "bg-primary text-primary-foreground" :
                   "bg-muted/50 text-muted-foreground"
                 )}
-                initial={false}}
+                initial={false}
                 aria-label={`Stap ${index + 1}: ${step.label}${isCompleted ? ' (voltooid)' : isCurrent ? ' (huidige stap)' : ''}`}
               >
                 {isCompleted ? (
@@ -193,7 +193,7 @@ export const B2CBookingWizard = ({ onComplete, customerId }: B2CBookingWizardPro
                     "w-8 sm:w-12 h-1 mx-1 rounded-full transition-colors",
                     index < currentStepIndex ? "bg-gold" : "bg-muted/50"
                   )}
-                  initial={false}}
+                  initial={false}
                 />
               )}
             </div>

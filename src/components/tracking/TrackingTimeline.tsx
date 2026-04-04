@@ -56,7 +56,7 @@ export const TrackingTimeline = ({ steps, className }: TrackingTimelineProps) =>
             {/* Timeline line and dot */}
             <div className="flex flex-col items-center">
               <div
-                layout
+
                 className={cn(
                   'w-10 h-10 rounded-full flex items-center justify-center relative',
                   step.completed

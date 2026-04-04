@@ -89,7 +89,7 @@ const CapacityBar = ({
         </div>
       </div>
       <div className="h-3 rounded-full bg-muted/30 overflow-hidden relative border border-border/10">
-        <div}
+        <div
           className={cn(
             "h-full rounded-full relative bg-gradient-to-r",
             getBarGradient(percent),

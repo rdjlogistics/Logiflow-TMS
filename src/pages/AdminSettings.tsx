@@ -508,8 +508,7 @@ const AdminSettings = () => {
         "bg-card/40 backdrop-blur-sm border border-border/30",
         "hover:bg-card/60 transition-colors min-h-[52px]",
         disabled && "opacity-50"
-      )}
-      whileHover={disabled ? {} : { scale: 1.005 }}
+      )}}
     >
       <div className="space-y-0.5 flex-1 mr-4">
         <div className="flex items-center gap-2">
@@ -621,7 +620,6 @@ const AdminSettings = () => {
             <div className="flex-1 min-w-0">
                 <div
                   key={activeTab}
-                  exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
                   className="space-y-4 md:space-y-6"
                 >
                   {/* === ABONNEMENT === */}
