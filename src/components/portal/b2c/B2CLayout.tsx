@@ -50,7 +50,6 @@ export const B2CLayout = ({
           {/* Logo */}
           <motion.div 
             className="flex items-center gap-2"
-            whileTap={{ scale: 0.97 }}
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold">
               <Truck className="h-5 w-5 text-gold-foreground" />
@@ -62,7 +61,6 @@ export const B2CLayout = ({
           <motion.button 
             onClick={onNotificationsClick || (() => toast.info("Notificaties", { description: "Je hebt geen nieuwe notificaties." }))}
             className="relative p-3 rounded-xl hover:bg-muted/50 transition-colors touch-manipulation"
-            whileTap={{ scale: 0.95 }}
             aria-label={`Notificaties${unreadNotifications > 0 ? `, ${unreadNotifications} ongelezen` : ''}`}
           >
             <Bell className="h-5 w-5 text-muted-foreground" />
@@ -70,8 +68,6 @@ export const B2CLayout = ({
               <motion.span 
                 className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-gold text-[10px] font-bold text-gold-foreground flex items-center justify-center shadow-lg"
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 20 }}
               >
                 {unreadNotifications > 9 ? '9+' : unreadNotifications}
               </motion.span>
@@ -106,7 +102,6 @@ export const B2CLayout = ({
                   isBook && "relative",
                   !isBook && active && "bg-primary/10"
                 )}
-                whileTap={{ scale: 0.92 }}
                 aria-label={item.label}
                 aria-current={active ? "page" : undefined}
               >
@@ -114,7 +109,6 @@ export const B2CLayout = ({
                   <motion.div 
                     className="w-14 h-14 -mt-7 rounded-2xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold"
                     whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <item.icon className="h-7 w-7 text-gold-foreground" />
                   </motion.div>

@@ -168,8 +168,7 @@ export function ProactiveAlertsWidget() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div 
-              className="p-2.5 rounded-xl bg-warning/15"
-              animate={criticalAlerts.length > 0 ? { scale: [1, 1.1, 1] } : {}}
+              className="p-2.5 rounded-xl bg-warning/15"}
             >
               <Bell className="h-5 w-5 text-warning" />
             </div>
@@ -219,7 +218,6 @@ export function ProactiveAlertsWidget() {
                 return (
                   <div
                     key={alert.id}
-                    layout
                     className={cn(
                       "relative p-3 sm:p-3.5 rounded-xl border transition-all touch-manipulation",
                       config.bg,

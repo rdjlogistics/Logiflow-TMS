@@ -102,7 +102,6 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
         {activeShipments.length > 0 && (
           <motion.div 
             className="space-y-3"
-            variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
@@ -110,7 +109,7 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
               Actief ({activeShipments.length})
             </h2>
             {activeShipments.map((shipment, index) => (
-              <motion.div key={shipment.id} variants={itemVariants} custom={index}>
+              <motion.div key={shipment.id} custom={index}>
                 <ShipmentCard shipment={shipment} />
               </motion.div>
             ))}
@@ -123,7 +122,6 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
         {completedShipments.length > 0 && (
           <motion.div 
             className="space-y-3"
-            variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
@@ -131,7 +129,7 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
               Afgerond ({completedShipments.length})
             </h2>
             {completedShipments.map((shipment, index) => (
-              <motion.div key={shipment.id} variants={itemVariants} custom={index}>
+              <motion.div key={shipment.id} custom={index}>
                 <ShipmentCard shipment={shipment} />
               </motion.div>
             ))}
@@ -144,7 +142,6 @@ export const B2CShipmentsList = ({ shipments, loading }: B2CShipmentsListProps) 
         <motion.div 
           className="text-center py-12"
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
         >
           <div className="w-16 h-16 rounded-2xl bg-muted/30 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
             <Package className="h-8 w-8 text-muted-foreground" />
@@ -167,7 +164,6 @@ const ShipmentCard = ({ shipment }: { shipment: Shipment }) => {
   
   return (
     <motion.div
-      whileTap={{ scale: 0.98 }}
       className="touch-manipulation"
     >
       <Link

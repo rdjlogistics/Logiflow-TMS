@@ -112,7 +112,6 @@ export const B2BLayout = ({
           <motion.div 
             className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-muted flex items-center justify-center shadow-glow-gold"
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             <Truck className="h-5 w-5 text-gold-foreground" />
           </motion.div>
@@ -125,7 +124,7 @@ export const B2BLayout = ({
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Hoofdmenu">
           {navItems.map((item) => (
-            <motion.div key={item.id} whileTap={{ scale: 0.98 }}>
+            <motion.div key={item.id}>
               <Link
                 to={item.href}
                 className={cn(
@@ -171,7 +170,6 @@ export const B2BLayout = ({
             className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
         )}
@@ -183,9 +181,7 @@ export const B2BLayout = ({
           <motion.aside 
             className="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-card/95 backdrop-blur-xl border-r border-border/30 pt-safe"
             initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
           >
             <div className="h-16 flex items-center justify-between px-4 border-b border-border/30">
               <div className="flex items-center gap-3">
@@ -206,7 +202,7 @@ export const B2BLayout = ({
             </div>
             <nav className="px-3 py-4 space-y-1" role="navigation" aria-label="Mobiel menu">
               {navItems.map((item) => (
-                <motion.div key={item.id} whileTap={{ scale: 0.98 }}>
+                <motion.div key={item.id}>
                   <Link
                     to={item.href}
                     onClick={() => setSidebarOpen(false)}
@@ -243,7 +239,7 @@ export const B2BLayout = ({
         {/* Top Header - Premium Glassmorphism */}
         <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 lg:px-6 bg-background/60 backdrop-blur-xl border-b border-border/30 pt-safe">
           <div className="flex items-center gap-3">
-            <motion.div whileTap={{ scale: 0.95 }}>
+            <motion.div>
               <Button
                 variant="ghost"
                 size="icon"
@@ -259,7 +255,7 @@ export const B2BLayout = ({
 
           <div className="flex items-center gap-2">
             <CompactThemeToggle />
-            <motion.div whileTap={{ scale: 0.95 }}>
+            <motion.div>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -271,7 +267,7 @@ export const B2BLayout = ({
                 Importeer
               </Button>
             </motion.div>
-            <motion.div whileTap={{ scale: 0.95 }}>
+            <motion.div>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -284,7 +280,6 @@ export const B2BLayout = ({
                   <motion.span 
                     className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground flex items-center justify-center"
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
                   >
                     {unreadNotifications > 9 ? '9+' : unreadNotifications}
                   </motion.span>
@@ -311,7 +306,6 @@ export const B2BLayout = ({
                 className="absolute left-0 right-0 flex flex-col items-center justify-center z-10 pointer-events-none"
                 style={{ top: 0, height: pullDistance }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
                 <div className={cn(
@@ -322,7 +316,7 @@ export const B2BLayout = ({
                   {isRefreshing ? (
                     <RefreshCw className="h-5 w-5 text-primary animate-spin" />
                   ) : (
-                    <motion.div animate={{ rotate: progress * 180 }}>
+                    <motion.div>
                       <RefreshCw className={cn(
                         "h-5 w-5 transition-colors",
                         progress >= 1 ? "text-primary" : "text-muted-foreground"
@@ -333,7 +327,6 @@ export const B2BLayout = ({
                 {progress >= 0.5 && !isRefreshing && (
                   <motion.span
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
                     className="mt-1.5 text-[11px] text-muted-foreground font-medium"
                   >
                     {progress >= 1 ? "Loslaten om te verversen" : "Trek om te verversen"}
@@ -352,7 +345,6 @@ export const B2BLayout = ({
               {showPushBanner && (
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="mb-4 p-4 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm flex items-center justify-between gap-3"
                 >
@@ -417,7 +409,6 @@ export const B2BLayout = ({
                   <motion.div
                     layoutId="bottomTabIndicator"
                     className="absolute top-0 left-1/4 right-1/4 h-0.5 bg-primary rounded-full"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
               </Link>

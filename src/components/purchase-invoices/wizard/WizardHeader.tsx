@@ -10,8 +10,6 @@ export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="relative text-center space-y-2 px-4"
     >
       {/* Ambient glow behind */}
@@ -19,13 +17,9 @@ export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
       
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
         className="flex items-center justify-center gap-2 sm:gap-3"
       >
         <motion.div
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           className="flex-shrink-0"
         >
           <Sparkles className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
@@ -36,8 +30,6 @@ export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
         </h1>
         
         <motion.div
-          animate={{ rotate: [0, -10, 10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           className="flex-shrink-0"
         >
           <Sparkles className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
@@ -46,8 +38,6 @@ export const WizardHeader = ({ title, subtitle }: WizardHeaderProps) => {
       
       <motion.p
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
         className="text-muted-foreground text-sm sm:text-base px-2"
       >
         {subtitle}

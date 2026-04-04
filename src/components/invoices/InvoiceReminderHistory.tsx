@@ -75,8 +75,6 @@ export function InvoiceReminderHistory({ invoiceId }: InvoiceReminderHistoryProp
           <motion.div
             key={r.id}
             initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: idx * 0.05 }}
             className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-muted/20 transition-colors duration-200 group"
           >
             <div className={cn(

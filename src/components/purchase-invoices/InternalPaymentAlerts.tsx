@@ -131,7 +131,6 @@ export const PaymentAlertBanner = () => {
         <Link to="/purchase-invoices?status=verlopen">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-red-500/10 border-red-500/30 hover:bg-red-500/15"
@@ -160,8 +159,6 @@ export const PaymentAlertBanner = () => {
         <Link to="/purchase-invoices">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
             className={cn(
               "p-4 rounded-xl border cursor-pointer transition-all",
               "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/15"

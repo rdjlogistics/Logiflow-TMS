@@ -11,8 +11,6 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
       className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-card/90 via-card/80 to-muted/50 backdrop-blur-xl border border-border/40 p-4 sm:p-6"
     >
       {/* Mesh gradient overlay */}
@@ -21,8 +19,6 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
       {/* Shimmer effect */}
       <motion.div
         initial={{ x: '-100%' }}
-        animate={{ x: '200%' }}
-        transition={{ duration: 4, repeat: Infinity, repeatDelay: 3 }}
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none"
       />
 
@@ -39,21 +35,12 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
               <div className="flex flex-col items-center gap-1.5 sm:gap-2">
                 <motion.div
                   initial={{ scale: 0.8 }}
-                  animate={{ 
-                    scale: isActive ? 1.1 : 1,
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className="relative"
                 >
                   {/* Glow ring for active */}
                   {isActive && (
                     <motion.div
                       className="absolute inset-0 rounded-full bg-primary/30"
-                      animate={{
-                        scale: [1, 1.4, 1],
-                        opacity: [0.5, 0, 0.5],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
                     />
                   )}
                   
@@ -68,8 +55,6 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                     {isCompleted ? (
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
                       >
                         <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                       </motion.div>
@@ -82,8 +67,6 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                 {/* Label */}
                 <motion.span
                   initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + idx * 0.1 }}
                   className={cn(
                     "text-[10px] sm:text-xs font-medium transition-colors text-center",
                     isActive && "text-primary",
@@ -104,10 +87,6 @@ export const WizardProgress = ({ currentStep, steps }: WizardProgressProps) => {
                   {/* Animated fill */}
                   <motion.div
                     initial={{ scaleX: 0 }}
-                    animate={{ 
-                      scaleX: isCompleted ? 1 : isActive ? 0.5 : 0 
-                    }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
                     className={cn(
                       "absolute inset-0 origin-left rounded-full",
                       isCompleted ? "bg-gradient-to-r from-emerald-500 to-emerald-400" : "bg-gradient-to-r from-primary to-primary/60"

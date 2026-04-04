@@ -239,8 +239,7 @@ export default function VehicleValuation() {
                       <span>Afschrijving {formatEuro(dep.depreciationTotal)}</span>
                     </div>
                     <div className="h-2.5 rounded-full bg-muted/50 overflow-hidden">
-                      <div
-                        animate={{ width: `${Math.round(dep.residualPct * 100)}%` }}
+                      <div}
                         className={cn(
                           'h-full rounded-full',
                           dep.residualPct > 0.5

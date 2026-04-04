@@ -177,7 +177,6 @@ export const StatusVisualization = ({
             <TooltipTrigger asChild>
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
                 whileHover={{ scale: 1.05 }}
                 className="cursor-default"
               >
@@ -271,8 +270,6 @@ export const StatusVisualization = ({
         {showProgress && (
           <motion.div
             initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.2 }}
           >
             <Progress 
               value={config.progressValue} 
@@ -305,8 +302,6 @@ export const StatusTimeline = ({ currentStatus }: { currentStatus: string }) => 
                 <div className="flex items-center">
                   <motion.div
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
                     className={cn(
                       "w-6 h-6 rounded-full flex items-center justify-center transition-all",
                       isActive && cn(config.bgColor, "ring-2 ring-offset-2 ring-offset-background", config.borderColor.replace("border-", "ring-")),

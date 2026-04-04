@@ -47,7 +47,6 @@ export const InvoiceDatesCard = ({ invoice, paymentColor }: InvoiceDatesCardProp
           <motion.div 
             className="flex items-center justify-between py-3 group"
             initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
           >
             <span className="text-sm flex items-center gap-2.5 text-muted-foreground group-hover:text-foreground/80 transition-colors">
               <CalendarClock className="h-4 w-4" />
@@ -69,8 +68,6 @@ export const InvoiceDatesCard = ({ invoice, paymentColor }: InvoiceDatesCardProp
           <motion.div 
             className="flex items-center justify-between py-3 pt-4 mt-2 border-t border-border/40"
             initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
           >
             <span className="text-sm flex items-center gap-2.5 text-muted-foreground">
               <Clock className="h-4 w-4" />

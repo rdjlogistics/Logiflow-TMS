@@ -76,7 +76,7 @@ const stopTypeConfig = {
   both: { label: 'Beide', borderColor: 'border-l-amber-500', badgeBg: 'bg-amber-500/10 text-amber-700 dark:text-amber-400' },
 };
 
-/** Section header for 3-column layout */
+/** Section header for 3-column */
 const SectionHeader = ({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) => (
   <div className="flex items-center gap-1.5 mb-3 pb-1.5 border-b border-border/20">
     <Icon className="h-3 w-3 text-muted-foreground/60" />
@@ -227,9 +227,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
     >
       <Card className={cn(
         "relative border-border/40 bg-card shadow-md hover:shadow-lg hover:ring-primary/20 transition-all touch-manipulation border-l-[3px] ring-1 ring-border/10 sm:bg-card/95 bg-muted/30",
@@ -311,9 +309,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
           {isExpanded && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="overflow-hidden"
             >
               <CardContent className="px-3 sm:px-5 pb-4 pt-1">
@@ -398,12 +394,12 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
                             />
                             <AnimatePresence>
                               {postcodeLoading && (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                                <motion.div initial={{ opacity: 0 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
                                   <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
                                 </motion.div>
                               )}
                               {autoFilled && !postcodeLoading && (
-                                <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                                <motion.div initial={{ opacity: 0, scale: 0.5 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
                                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                                 </motion.div>
                               )}
@@ -423,9 +419,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Adres</Label>
-                        <motion.div
-                          animate={autoFilled ? { boxShadow: ['0 0 0 0px rgba(16,185,129,0)', '0 0 0 3px rgba(16,185,129,0.2)', '0 0 0 0px rgba(16,185,129,0)'] } : {}}
-                          transition={{ duration: 1.5 }}
+                        <motion.div}
                           className="rounded-lg"
                         >
                           <Input
@@ -447,9 +441,7 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Woonplaats</Label>
-                        <motion.div
-                          animate={autoFilled ? { boxShadow: ['0 0 0 0px rgba(16,185,129,0)', '0 0 0 3px rgba(16,185,129,0.2)', '0 0 0 0px rgba(16,185,129,0)'] } : {}}
-                          transition={{ duration: 1.5, delay: 0.1 }}
+                        <motion.div}
                           className="rounded-lg"
                         >
                           <Input

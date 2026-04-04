@@ -41,14 +41,11 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
           >
             <motion.div
               initial={{ opacity: 0, y: 24, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28, delay: 0.1 }}
               className="w-full max-w-md rounded-2xl border border-border/60 bg-card/95 p-8 shadow-2xl backdrop-blur-xl"
             >
               <div className="flex flex-col items-center text-center space-y-6">
@@ -56,8 +53,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
                 <div className="relative">
                   <motion.div
                     className="absolute inset-0 rounded-full bg-primary/20"
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.15, 0.4] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <div className="relative h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25">
                     <Crown className="h-8 w-8 text-primary-foreground" />
@@ -108,7 +103,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isPastDue && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3"
         >
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
@@ -131,7 +125,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 16 && trialDaysLeft > 3 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3"
         >
           <Crown className="h-5 w-5 text-primary shrink-0" />
@@ -158,7 +151,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 3 && trialDaysLeft > 0 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3"
         >
           <Clock className="h-5 w-5 text-amber-600 shrink-0" />

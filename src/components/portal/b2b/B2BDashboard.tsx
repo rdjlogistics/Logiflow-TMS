@@ -155,18 +155,15 @@ export const B2BDashboard = ({
   };
 
   return (
-    <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerVariants}>
+    <motion.div className="space-y-6" initial="hidden" animate="visible">
       {/* Welcome Greeting */}
       <motion.div
-        variants={itemVariants}
         className="relative rounded-2xl border border-border/20 bg-gradient-to-r from-primary/5 to-gold/5 backdrop-blur-sm p-5 overflow-hidden"
       >
         <div className="flex items-center gap-4">
           {/* Time Icon */}
           <motion.div
             initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ ...springTransition, delay: 0 }}
             className={`p-3 rounded-xl bg-background/60 ${getTimeIcon().glow}`}
           >
             {(() => { const { Icon, color } = getTimeIcon(); return <Icon className={`h-6 w-6 ${color}`} />; })()}
@@ -178,8 +175,6 @@ export const B2BDashboard = ({
               <motion.h1
                 className="text-2xl font-display font-bold"
                 initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-                animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-                transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
               >
                 {getGreeting()}
               </motion.h1>
@@ -187,8 +182,6 @@ export const B2BDashboard = ({
                 <motion.span
                   className="text-2xl font-display font-bold text-primary"
                   initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ ...springTransition, delay: 0.3 }}
                 >
                   , {companyName}
                 </motion.span>
@@ -199,8 +192,6 @@ export const B2BDashboard = ({
             <motion.p
               className="text-sm text-muted-foreground mt-0.5"
               initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
             >
               {format(new Date(), "EEEE d MMMM yyyy", { locale: nl })}
             </motion.p>
@@ -209,18 +200,18 @@ export const B2BDashboard = ({
       </motion.div>
 
       {/* Quick Actions */}
-      <motion.div className="flex flex-wrap gap-3" variants={itemVariants}>
-        <motion.div whileTap={{ scale: 0.95 }}>
+      <motion.div className="flex flex-wrap gap-3">
+        <motion.div>
           <Button onClick={onNewShipment} className="gap-2 bg-gold hover:bg-gold/90 text-gold-foreground touch-manipulation min-h-[44px]">
             <PlusCircle className="h-4 w-4" /> Nieuwe Zending
           </Button>
         </motion.div>
-        <motion.div whileTap={{ scale: 0.95 }}>
+        <motion.div>
           <Button variant="outline" onClick={onImport} className="gap-2 touch-manipulation min-h-[44px]">
             <Upload className="h-4 w-4" /> Bulk Importeren
           </Button>
         </motion.div>
-        <motion.div whileTap={{ scale: 0.95 }}>
+        <motion.div>
           <Button variant="ghost" asChild className="gap-2 touch-manipulation min-h-[44px]">
             <Link to="/portal/b2b/labels"><FileText className="h-4 w-4" /> Labels Printen</Link>
           </Button>
@@ -228,17 +219,17 @@ export const B2BDashboard = ({
       </motion.div>
 
       {/* KPI Cards */}
-      <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={containerVariants}>
+      <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           <>
             {[0, 1, 2, 3].map(i => (
-              <motion.div key={i} variants={itemVariants}><KPICardSkeleton /></motion.div>
+              <motion.div key={i}><KPICardSkeleton /></motion.div>
             ))}
           </>
         ) : (
           kpis.map((kpi, index) => (
-            <motion.div key={kpi.label} variants={itemVariants}>
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }}>
+            <motion.div key={kpi.label}>
+              <motion.div whileHover={{ scale: 1.03, y: -4 }}>
                 <Card className={`relative overflow-hidden cursor-pointer border-border/30 bg-card/60 backdrop-blur-sm ${kpi.urgent ? 'border-red-500/50' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -249,8 +240,6 @@ export const B2BDashboard = ({
                         <motion.div
                           className="flex items-center gap-0.5 text-xs text-emerald-400"
                           initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
                         >
                           <TrendingUp className="h-3 w-3" /> {kpi.trend}
                         </motion.div>
@@ -260,8 +249,6 @@ export const B2BDashboard = ({
                       <motion.p
                         className="text-2xl font-display font-bold"
                         initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15, delay: index * 0.08 }}
                       >
                         {kpi.value}
                       </motion.p>
@@ -278,7 +265,7 @@ export const B2BDashboard = ({
       {/* Main Content Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Recent Shipments */}
-        <motion.div className="lg:col-span-2" variants={itemVariants}>
+        <motion.div className="lg:col-span-2">
           <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-base font-semibold">Recente Zendingen</CardTitle>
@@ -317,7 +304,6 @@ export const B2BDashboard = ({
                       <motion.div
                         key={shipment.id}
                         custom={index}
-                        variants={listItemVariants}
                         initial="hidden"
                         animate="visible"
                         whileHover={{ backgroundColor: "hsl(var(--muted) / 0.2)", x: 4 }}
@@ -346,9 +332,9 @@ export const B2BDashboard = ({
         </motion.div>
 
         {/* Sidebar Widgets */}
-        <motion.div className="space-y-4" variants={containerVariants}>
+        <motion.div className="space-y-4">
           {/* Widget 1: Openstaande Facturen */}
-          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <motion.div whileHover={{ y: -2 }}>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
@@ -371,7 +357,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : openInvoices.length === 0 ? (
-                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }}>
                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Alles betaald</p>
                   </motion.div>
@@ -381,8 +367,6 @@ export const B2BDashboard = ({
                       <motion.p
                         className="text-2xl font-display font-bold tabular-nums"
                         initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
                       >
                         {formatEuro(openInvoicesTotal)}
                       </motion.p>
@@ -398,9 +382,7 @@ export const B2BDashboard = ({
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-emerald-500"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${paymentProgress}%` }}
-                            transition={{ type: "spring", stiffness: 80, damping: 20, delay: 0.2 }}
+                            initial={{ width: 0 }}}
                           />
                         </div>
                       </div>
@@ -414,7 +396,6 @@ export const B2BDashboard = ({
                           <motion.div
                             key={inv.id}
                             custom={i}
-                            variants={listItemVariants}
                             initial="hidden"
                             animate="visible"
                           >
@@ -446,7 +427,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-1">
+                <motion.div whileHover={{ scale: 1.02 }} className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/invoices" className="gap-1">
                       Bekijk alle facturen <ArrowUpRight className="h-3 w-3" />
@@ -458,7 +439,7 @@ export const B2BDashboard = ({
           </motion.div>
 
           {/* Widget 2: Aankomende Leveringen */}
-          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <motion.div whileHover={{ y: -2 }}>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
@@ -481,7 +462,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : activeShipments.length === 0 ? (
-                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }}>
                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Geen actieve leveringen</p>
                   </motion.div>
@@ -496,7 +477,6 @@ export const B2BDashboard = ({
                           <motion.div
                             key={s.id}
                             custom={i}
-                            variants={listItemVariants}
                             initial="hidden"
                             animate="visible"
                           >
@@ -535,7 +515,7 @@ export const B2BDashboard = ({
                     </div>
                   </>
                 )}
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-1">
+                <motion.div whileHover={{ scale: 1.02 }} className="pt-1">
                   <Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to="/portal/b2b/shipments" className="gap-1">
                       Bekijk alle zendingen <ArrowUpRight className="h-3 w-3" />
@@ -547,7 +527,7 @@ export const B2BDashboard = ({
           </motion.div>
 
           {/* Widget 3: Recente Statusupdates */}
-          <motion.div variants={itemVariants} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <motion.div whileHover={{ y: -2 }}>
             <Card className="border-border/30 bg-card/60 backdrop-blur-sm overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -563,7 +543,7 @@ export const B2BDashboard = ({
                     ))}
                   </div>
                 ) : recentUpdates.length === 0 ? (
-                  <motion.div className="text-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div className="text-center py-4" initial={{ opacity: 0 }}>
                     <Inbox className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Geen recente updates</p>
                   </motion.div>
@@ -576,7 +556,6 @@ export const B2BDashboard = ({
                         <motion.div
                           key={s.id}
                           custom={i}
-                          variants={listItemVariants}
                           initial="hidden"
                           animate="visible"
                           whileHover={{ backgroundColor: "hsl(var(--muted) / 0.15)" }}

@@ -100,10 +100,7 @@ export function WMSQuickActions({
         <motion.button
           key={action.id}
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05, duration: 0.3 }}
           whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
           onClick={() => handleAction(action)}
           className={cn(
             "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl border",
@@ -202,9 +199,7 @@ export function WMSCommandPalette() {
                 <motion.button
                   key={cmd.href}
                   initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  transition={{ delay: i * 0.02 }}
                   onClick={() => {
                     navigate(cmd.href);
                     setOpen(false);

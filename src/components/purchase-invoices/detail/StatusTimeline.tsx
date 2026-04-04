@@ -20,8 +20,7 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
   const currentStatusIndex = statusSteps.findIndex(s => s.key === currentStatus);
 
   return (
-    <motion.div 
-      variants={itemVariants}
+    <motion.div
       className="relative w-full"
     >
       {/* Desktop: Centered timeline */}
@@ -40,17 +39,12 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
                   !isActive && !isPast && "bg-muted/50 text-muted-foreground border border-border/50"
                 )}
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.08 }}
               >
                 {/* Glow effect for active */}
                 {isActive && (
                   <motion.div
                     className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl"
-                    animate={{ opacity: [0.5, 0.8, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
                   />
                 )}
                 
@@ -58,8 +52,6 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
                   {isPast && <CheckCircle2 className="h-4 w-4" />}
                   {isActive && (
                     <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                     >
                       <Sparkles className="h-4 w-4" />
                     </motion.div>
@@ -76,8 +68,6 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
                     isPast ? "bg-gradient-to-r from-emerald-500/50 to-emerald-500/30" : "bg-border"
                   )}
                   initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: idx * 0.1 + 0.2, duration: 0.4 }}
                 />
               )}
             </div>
@@ -102,8 +92,7 @@ export const StatusTimeline = ({ currentStatus }: StatusTimelineProps) => {
             
             return (
               <div key={status.key} className="flex items-center gap-2 flex-shrink-0">
-                <motion.div 
-                  whileTap={{ scale: 0.95 }}
+                <motion.div
                   className={cn(
                     "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap",
                     isActive && "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25",

@@ -271,7 +271,6 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
                       key={trip.id}
                       layoutId={trip.id}
                       initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       draggable
                       onDragStart={() => handleDragStart(trip.id)}
@@ -358,7 +357,6 @@ export const PlanningTimeline = ({ selectedDate }: { selectedDate: Date }) => {
                             <motion.div
                               layoutId={trip.id}
                               initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.8 }}
                               draggable
                               onDragStart={() => handleDragStart(trip.id)}

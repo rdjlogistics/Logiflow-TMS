@@ -401,12 +401,7 @@ const OrderDocumentDialog = ({
                   <motion.label
                     key={type.value}
                     initial={false}
-                    animate={{
-                      borderColor: isSelected ? "hsl(var(--primary))" : "hsl(var(--border))",
-                      backgroundColor: isSelected ? "hsl(var(--primary) / 0.05)" : "transparent",
-                    }}
                     whileHover={{ scale: 1.005 }}
-                    whileTap={{ scale: 0.995 }}
                     className={cn(
                       "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
                       isSelected && "ring-1 ring-primary"
@@ -430,7 +425,6 @@ const OrderDocumentDialog = ({
                         {isSelected && (
                           <motion.div
                             initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
                             className="flex items-center justify-center w-4 h-4 rounded-full bg-primary text-primary-foreground"
                           >
                             <Check className="h-3 w-3" />
@@ -452,9 +446,7 @@ const OrderDocumentDialog = ({
             {currentDocConfig?.supportsCopies && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
                 className="space-y-3 overflow-hidden"
               >
                 <Separator />
@@ -472,7 +464,6 @@ const OrderDocumentDialog = ({
                       <motion.label
                         key={copy.value}
                         whileHover={{ scale: 1.005 }}
-                        whileTap={{ scale: 0.995 }}
                         className={cn(
                           "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200",
                           isChecked ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
@@ -496,9 +487,7 @@ const OrderDocumentDialog = ({
             {selectedType === "cmr_overlay" && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
                 className="space-y-3 overflow-hidden"
               >
                 <Separator />
@@ -529,9 +518,7 @@ const OrderDocumentDialog = ({
             {currentDocConfig?.supportsBranding && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
                 className="space-y-3 overflow-hidden"
               >
                 <Separator />
@@ -601,7 +588,6 @@ const OrderDocumentDialog = ({
             {generatedUrl && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-3"
               >

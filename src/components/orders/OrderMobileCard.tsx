@@ -181,16 +181,12 @@ const OrderMobileCard = ({
         <motion.div
           className={cn("flex-1 flex items-center pl-4", thresholdReached === 'right' ? "bg-primary/60" : "bg-primary/20")}
           style={{ opacity: editOpacity }}
-          animate={{ opacity: thresholdReached === 'right' ? 1 : undefined }}
-          transition={{ duration: 0.15 }}
         >
           <Pencil className="h-5 w-5 text-primary" />
         </motion.div>
         <motion.div
           className={cn("flex-1 flex items-center justify-end pr-4", thresholdReached === 'left' ? "bg-destructive/60" : "bg-destructive/20")}
           style={{ opacity: deleteOpacity }}
-          animate={{ opacity: thresholdReached === 'left' ? 1 : undefined }}
-          transition={{ duration: 0.15 }}
         >
           <Trash2 className="h-5 w-5 text-destructive" />
         </motion.div>
@@ -202,9 +198,6 @@ const OrderMobileCard = ({
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
         style={{ x }}
-        animate={{ scale: thresholdReached ? 0.97 : 1 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
         <Card
           className={cn(
@@ -229,8 +222,6 @@ const OrderMobileCard = ({
                 {selectionMode && (
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                   >
                     <Checkbox
                       checked={selected}
@@ -339,9 +330,7 @@ const OrderMobileCard = ({
                   </Badge>
                 )}
               </div>
-              <motion.div
-                animate={isOnTheRoad ? { opacity: [0.4, 1, 0.4] } : {}}
-                transition={isOnTheRoad ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" } : {}}
+              <motion.div}}
               >
                 <ChevronRight className={cn("h-4 w-4 flex-shrink-0", isOnTheRoad ? "text-amber-500" : "text-muted-foreground")} />
               </motion.div>

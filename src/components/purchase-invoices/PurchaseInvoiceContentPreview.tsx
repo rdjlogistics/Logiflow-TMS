@@ -126,8 +126,6 @@ export const PurchaseInvoiceContentPreview = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             >
               <FileText className="h-5 w-5 text-primary" />
             </motion.div>
@@ -186,10 +184,8 @@ export const PurchaseInvoiceContentPreview = ({
                 {lines?.map((line, idx) => (
                   <motion.tr
                     key={line.id}
-                    variants={rowVariants}
                     initial="hidden"
                     animate="visible"
-                    transition={{ delay: idx * 0.05 }}
                     className={cn(
                       "group transition-all duration-200 hover:bg-primary/5",
                       idx % 2 === 0 ? "bg-background" : "bg-muted/10"
@@ -263,8 +259,6 @@ export const PurchaseInvoiceContentPreview = ({
               <span className="text-lg font-bold">Totaal</span>
               <motion.span 
                 initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.3 }}
                 className="text-2xl font-bold text-primary"
               >
                 {formatCurrency(Number(invoice.total_amount))}

@@ -511,7 +511,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           <motion.div
             key="step1"
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="glass-card border-border/50">
@@ -659,7 +658,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           <motion.div
             key="step2"
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="glass-card border-border/50">
@@ -758,7 +756,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           <motion.div
             key="step3"
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="glass-card border-border/50">
@@ -855,7 +852,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           <motion.div
             key="step4-email"
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="glass-card border-border/50">
@@ -986,16 +982,12 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
           <motion.div
             key="step5"
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
           >
             <Card className="glass-card border-border/50">
               <CardContent className="pt-8 pb-6">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <motion.div
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
                     className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center"
                   >
                     <CheckCircle2 className="h-9 w-9 text-emerald-600 dark:text-emerald-400" />
@@ -1003,8 +995,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                   
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
                     className="space-y-1"
                   >
                     <h3 className="text-xl font-bold">Facturen aangemaakt! 🎉</h3>
@@ -1021,8 +1011,6 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
 
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
                     className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-4"
                   >
                     <Button

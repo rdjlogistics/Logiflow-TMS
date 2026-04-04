@@ -149,7 +149,6 @@ const TrendsWidget = ({ data, loading }: TrendsWidgetProps) => {
         <motion.div 
           className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-5"
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
         >
           <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-success/10 to-transparent border border-success/20">
             <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">

@@ -86,7 +86,6 @@ export const Step2PreviewSection = ({
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-card/90 via-card/80 to-muted/50 backdrop-blur-2xl border border-border/40 p-8 sm:p-12"
       >
         {/* Ambient glow */}
@@ -94,7 +93,6 @@ export const Step2PreviewSection = ({
         
         <div className="relative text-center space-y-4">
           <motion.div
-            variants={floatVariants}
             initial="initial"
             animate="animate"
             className="mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center"
@@ -120,21 +118,17 @@ export const Step2PreviewSection = ({
 
   return (
     <motion.div
-      variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="space-y-4 sm:space-y-6"
     >
       {/* Premium Header Card */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
       >
         {/* Shimmer effect */}
         <motion.div
           initial={{ x: '-100%' }}
-          animate={{ x: '200%' }}
-          transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none"
         />
         
@@ -146,7 +140,6 @@ export const Step2PreviewSection = ({
             <motion.div 
               className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
               whileHover={{ scale: 1.05, rotate: 3 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
               <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
               <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-primary/10 blur-xl animate-pulse" />
@@ -181,7 +174,6 @@ export const Step2PreviewSection = ({
         {carrierGroups.map((group, idx) => (
           <motion.div
             key={group.carrier_id}
-            variants={cardVariants}
             custom={idx}
             className={cn(
               "relative overflow-hidden rounded-xl sm:rounded-2xl backdrop-blur-xl border transition-all duration-500",
@@ -202,7 +194,6 @@ export const Step2PreviewSection = ({
               <div className="flex items-start gap-3 sm:gap-4">
                 {/* Checkbox */}
                 <motion.div
-                  whileTap={{ scale: 0.95 }}
                   className="pt-0.5 sm:pt-1"
                 >
                   <Checkbox
@@ -245,7 +236,6 @@ export const Step2PreviewSection = ({
                             : "text-muted-foreground"
                         )}
                         initial={{ scale: 1 }}
-                        animate={{ scale: group.selected ? 1 : 0.95 }}
                       >
                         {formatCurrency(group.subtotal * 1.21)}
                       </motion.div>
@@ -267,8 +257,7 @@ export const Step2PreviewSection = ({
       </div>
 
       {/* Summary Footer */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent backdrop-blur-xl border border-emerald-500/30"
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(142_76%_36%/0.1),transparent)] pointer-events-none" />
@@ -304,8 +293,7 @@ export const Step2PreviewSection = ({
       </motion.div>
 
       {/* Action Buttons */}
-      <motion.div 
-        variants={cardVariants}
+      <motion.div
         className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 pb-safe"
       >
         <Button

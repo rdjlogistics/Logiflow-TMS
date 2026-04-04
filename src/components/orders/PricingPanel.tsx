@@ -92,8 +92,7 @@ const PricingPanel = ({
   onCalculateRoute, 
   isCalculating = false,
   tollResult,
-  isDetectingTolls = false,
-  layout = 'sidebar',
+  isDetectingTolls = false, = 'sidebar',
   autoPriceResult,
   isAutoPricing = false,
   onApplyAutoPrice,
@@ -178,14 +177,12 @@ const PricingPanel = ({
   const profitMargin = salesAfterDiscount > 0 ? (grossProfit / salesAfterDiscount) * 100 : 0;
 
   const inputBase = "h-12 sm:h-8 text-sm sm:text-xs touch-manipulation rounded-lg";
-  const isFullwidth = layout === 'fullwidth';
+  const isFullwidth = === 'fullwidth';
   const TARIFF_GRID = isFullwidth ? TARIFF_GRID_FW : TARIFF_GRID_SB;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: isFullwidth ? 16 : 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
     >
     <Card 
       className={cn(
@@ -473,7 +470,6 @@ const PricingPanel = ({
         {/* === Marge — prominent full-width bar === */}
         <motion.div 
           className="border-t border-border/30 pt-4"
-          layout
         >
           {/* Progress bar for margin visualization */}
           {salesAfterDiscount > 0 && (

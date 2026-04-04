@@ -50,8 +50,6 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
           <motion.div 
             className="space-y-1.5"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
               <FileCheck className="h-3.5 w-3.5" />
@@ -63,8 +61,6 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
           <motion.div 
             className="space-y-1.5"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Factuurdatum</p>
             <p className="font-semibold text-foreground">
@@ -77,8 +73,6 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
           <motion.div 
             className="space-y-1.5"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Bedrag</p>
             <p className="font-bold text-foreground text-lg">
@@ -91,8 +85,6 @@ export const ExternalInvoiceCard = ({ invoice, formatCurrency }: ExternalInvoice
           <motion.div 
             className="space-y-1.5"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
           >
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Verschil</p>
             <p className={cn(

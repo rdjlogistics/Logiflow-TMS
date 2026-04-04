@@ -132,7 +132,6 @@ export function PullToRefresh({
         onDragEnd={handleDragEnd}
         style={{ y: isRefreshing ? threshold / 2 : y }}
         className="touch-pan-y"
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
       >
         {children}
       </motion.div>

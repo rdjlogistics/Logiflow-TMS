@@ -150,8 +150,6 @@ const PurchaseInvoicesWidget = () => {
                     <motion.div
                       key={invoice.id}
                       initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
                     >
                       <Link
                         to={`/purchase-invoices/${invoice.id}`}

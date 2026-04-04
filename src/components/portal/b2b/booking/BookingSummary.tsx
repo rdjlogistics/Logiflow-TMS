@@ -119,8 +119,7 @@ const CapacityBar = ({ label, value, max, unit, icon }: { label: string; value: 
       {/* Glassmorphism track */}
       <div className="relative h-3 rounded-full bg-muted/30 overflow-hidden border border-border/10">
         {/* Fill with glow shadow */}
-        <div
-          animate={{ width: `${Math.min(pct, 100)}%` }}
+        <div}
           className={cn(
             "h-full rounded-full relative bg-gradient-to-r",
             isOver ? "from-destructive/80 to-destructive" :

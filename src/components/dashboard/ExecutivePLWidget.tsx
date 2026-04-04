@@ -202,14 +202,12 @@ const ExecutivePLWidget = () => {
 
       <CardContent className="space-y-4">
         <motion.div
-          variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="grid grid-cols-2 gap-3"
         >
           {/* Revenue */}
           <motion.div
-            variants={itemVariants}
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -243,7 +241,6 @@ const ExecutivePLWidget = () => {
 
           {/* Gross Profit */}
           <motion.div
-            variants={itemVariants}
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -262,7 +259,6 @@ const ExecutivePLWidget = () => {
 
           {/* Margin */}
           <motion.div
-            variants={itemVariants}
             className={cn(
               "relative p-3 rounded-xl border",
               marginColors[marginStatus]
@@ -290,7 +286,6 @@ const ExecutivePLWidget = () => {
 
           {/* Avg Order Value */}
           <motion.div
-            variants={itemVariants}
             className="relative p-3 rounded-xl border border-border/40 bg-gradient-to-br from-background to-muted/20"
           >
             <div className="flex items-center justify-between mb-1">
@@ -310,7 +305,6 @@ const ExecutivePLWidget = () => {
 
         {/* Bottom Stats Row */}
         <motion.div
-          variants={itemVariants}
           initial="hidden"
           animate="visible"
           className="flex items-center justify-between p-3 rounded-xl border border-border/30 bg-muted/20"

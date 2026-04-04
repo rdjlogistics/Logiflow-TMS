@@ -255,7 +255,7 @@ const FleetMapWidget = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }}>
+            <motion.div whileHover={{ rotate: 180 }}>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -287,8 +287,6 @@ const FleetMapWidget = () => {
           <motion.div 
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
           >
             <Truck className="h-4 w-4 text-success" />
             <span className="text-sm font-bold">{activeVehicles}</span>
@@ -299,8 +297,6 @@ const FleetMapWidget = () => {
             <motion.div 
               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/80 backdrop-blur-sm border border-border/30 shadow-lg pointer-events-auto"
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
               <Navigation2 className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold">

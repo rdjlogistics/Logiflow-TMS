@@ -65,10 +65,8 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
                 {lines.map((line, idx) => (
                   <motion.tr
                     key={line.id}
-                    variants={tableRowVariants}
                     initial="hidden"
                     animate="visible"
-                    transition={{ delay: idx * 0.05 }}
                     className="border-border/30 hover:bg-primary/5 transition-all duration-300 group"
                   >
                     <TableCell className="py-5">
@@ -90,8 +88,6 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
                         <div className="flex items-center gap-2.5 text-sm">
                           <span className="font-medium text-foreground">{line.trips.pickup_city}</span>
                           <motion.div
-                            animate={{ x: [0, 3, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                           >
                             <ArrowRight className="h-4 w-4 text-primary" />
                           </motion.div>
@@ -132,7 +128,6 @@ export const InvoiceLinesCard = ({ lines, formatCurrency }: InvoiceLinesCardProp
           <motion.div 
             className="flex flex-col items-center justify-center py-16 text-center"
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
           >
             <div className="relative mb-6">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 flex items-center justify-center shadow-lg">

@@ -47,8 +47,7 @@ export const InvoiceHeader = ({
   onShowPaymentModal,
 }: InvoiceHeaderProps) => {
   return (
-    <motion.div 
-      variants={itemVariants}
+    <motion.div
       className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card/90 via-card/80 to-primary/5 backdrop-blur-2xl border border-border/40 shadow-2xl"
     >
       {/* Multi-layer gradient effects */}
@@ -60,8 +59,6 @@ export const InvoiceHeader = ({
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
         initial={{ x: '-100%' }}
-        animate={{ x: '100%' }}
-        transition={{ repeat: Infinity, duration: 4, ease: 'linear', repeatDelay: 2 }}
       />
       
       <div className="relative p-6 lg:p-8">
@@ -70,7 +67,6 @@ export const InvoiceHeader = ({
           <div className="flex items-start gap-5">
             <motion.div
               whileHover={{ scale: 1.05, x: -2 }}
-              whileTap={{ scale: 0.95 }}
             >
               <Button 
                 variant="ghost" 
@@ -87,8 +83,6 @@ export const InvoiceHeader = ({
                 <motion.h1 
                   className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent tracking-tight"
                   initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
                 >
                   {invoice.invoice_number}
                 </motion.h1>
@@ -110,8 +104,6 @@ export const InvoiceHeader = ({
               <motion.p 
                 className="text-muted-foreground text-base sm:text-lg"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
               >
                 Inkoopfactuur van <span className="font-semibold text-foreground">{carrier.company_name}</span>
               </motion.p>
@@ -122,8 +114,6 @@ export const InvoiceHeader = ({
           <motion.div 
             className="flex flex-wrap gap-3 pl-17 lg:pl-0"
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
           >
             <Button 
               asChild 
@@ -135,7 +125,7 @@ export const InvoiceHeader = ({
                 <span className="sm:hidden">Versturen</span>
               </Link>
             </Button>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={{ scale: 1.02 }}>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -151,7 +141,7 @@ export const InvoiceHeader = ({
                 <span className="sm:hidden">PDF</span>
               </Button>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={{ scale: 1.02 }}>
               <Button 
                 variant="outline" 
                 className="gap-2.5 h-11 px-5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
@@ -163,7 +153,7 @@ export const InvoiceHeader = ({
               </Button>
             </motion.div>
             {invoice.status !== "betaald" && (
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div whileHover={{ scale: 1.02 }}>
                 <Button 
                   variant="outline" 
                   className="gap-2.5 h-11 px-5 border-border/60 hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-600 transition-all duration-300"
