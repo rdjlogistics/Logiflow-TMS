@@ -189,7 +189,33 @@ const Dashboard = () => {
     },
   ], [opsStats.onderweg, opsStats.afgeleverd, attentionCount, otifPercentage]);
 
-  return (
+  if (loading) {
+    return (
+      <DashboardLayout title="Command Center">
+        <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-56" />
+              <Skeleton className="h-4 w-36" />
+            </div>
+            <Skeleton className="h-10 w-32 rounded-lg" />
+          </div>
+          {/* Quick stats skeleton */}
+          <StatsGridSkeleton count={4} />
+          {/* Widgets skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2">
+              <ChartSkeleton />
+            </div>
+            <ActionQueueSkeleton count={4} />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+
     <DashboardLayout title="Command Center">
       <motion.div 
         className="space-y-4 sm:space-y-6"
