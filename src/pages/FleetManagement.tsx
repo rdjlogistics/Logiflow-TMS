@@ -154,15 +154,12 @@ function EliteStatCard({ stat, index }: EliteStatProps) {
   }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ delay: index * 0.06, type: 'spring', stiffness: 120, damping: 18 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transform }}
-      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.15)] active:scale-[0.97]"
+      style={{ transform, animationDelay: `${index * 60}ms` }}
+      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.15)] active:scale-[0.97] animate-fade-in-blur"
     >
       <div className="flex items-center gap-3">
         <div
@@ -176,7 +173,7 @@ function EliteStatCard({ stat, index }: EliteStatProps) {
           <p className="text-xs text-muted-foreground truncate mt-0.5">{stat.label}</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
