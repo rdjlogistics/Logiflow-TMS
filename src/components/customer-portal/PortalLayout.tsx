@@ -197,25 +197,45 @@ export const PortalLayout = ({
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/40 z-40 safe-area-bottom">
-        <div className="flex items-center justify-around py-2 px-2">
-          {navigationItems.slice(0, 4).map((item) => (
-            <Button
-              key={item.id}
-              variant="ghost"
-              size="sm"
-              onClick={() => onTabChange(item.id)}
-              className={cn(
-                "flex flex-col items-center gap-1 h-auto py-2 px-3 rounded-xl min-w-0",
-                activeTab === item.id 
-                  ? "text-primary bg-primary/10" 
-                  : "text-muted-foreground"
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </Button>
-          ))}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08]"
+        style={{
+          paddingBottom: "max(0px, env(safe-area-inset-bottom))",
+          background: "rgba(10, 12, 20, 0.82)",
+          backdropFilter: "blur(40px) saturate(180%)",
+          WebkitBackdropFilter: "blur(40px) saturate(180%)",
+        }}
+      >
+        <div className="grid grid-cols-4 px-2 py-1">
+          {navigationItems.slice(0, 4).map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className="relative flex flex-col items-center justify-center gap-0.5 py-1.5 min-h-[48px] touch-manipulation select-none active:scale-90 transition-transform duration-100"
+              >
+                {isActive && (
+                  <div className="absolute -top-1 w-5 h-[2.5px] rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.6)] transition-all duration-300" />
+                )}
+                <item.icon
+                  className={cn(
+                    "h-[22px] w-[22px] transition-colors duration-200",
+                    isActive ? "text-white" : "text-white/40"
+                  )}
+                  strokeWidth={isActive ? 1.8 : 1.5}
+                />
+                <span
+                  className={cn(
+                    "text-[10px] leading-none tracking-wide transition-colors duration-200",
+                    isActive ? "font-medium text-white" : "font-normal text-white/40"
+                  )}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
 
