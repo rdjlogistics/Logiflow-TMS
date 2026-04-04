@@ -1,19 +1,8 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { 
-  Home, 
-  Package, 
-  MapPin, 
-  FileText, 
-  HelpCircle, 
-  Search,
-  ArrowLeft,
-  Compass,
-  
-  Mail,
-  Clock,
-  Truck
+  Home, Package, MapPin, FileText, HelpCircle, Search,
+  ArrowLeft, Compass, Mail, Clock, Truck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,16 +15,9 @@ const NotFound = () => {
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-    
-    // Get recent pages from localStorage
     const stored = localStorage.getItem("recentPages");
     if (stored) {
-      try {
-        const pages = JSON.parse(stored);
-        setRecentPages(pages.slice(0, 3));
-      } catch (e) {
-        console.error("Failed to parse recent pages", e);
-      }
+      try { setRecentPages(JSON.parse(stored).slice(0, 3)); } catch {}
     }
   }, [location.pathname]);
 
@@ -48,7 +30,6 @@ const NotFound = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      // Navigate to a search or redirect based on query
       window.location.href = `/orders?search=${encodeURIComponent(searchQuery)}`;
     }
   };
@@ -56,45 +37,21 @@ const NotFound = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
-        >
-          {/* Animated 404 with truck icon */}
+        <div className="text-center mb-8 animate-fade-in-up">
           <div className="relative inline-block mb-6">
-            <motion.div
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-            >
+            <div className="animate-slide-up-fade">
               <Truck className="h-24 w-24 text-primary mx-auto" />
-            </motion.div>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-10 h-10 flex items-center justify-center font-bold text-sm"
-            >
+            </div>
+            <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-10 h-10 flex items-center justify-center font-bold text-sm animate-scale-fade-in animate-delay-300">
               ?
-            </motion.div>
+            </div>
           </div>
 
-          <motion.h1 
-            className="text-7xl font-bold text-primary mb-4"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
+          <h1 className="text-7xl font-bold text-primary mb-4 animate-scale-fade-in animate-delay-200">
             404
-          </motion.h1>
+          </h1>
           
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
+          <div className="animate-fade-in animate-delay-300">
             <h2 className="text-2xl font-semibold mb-2">Route niet gevonden</h2>
             <p className="text-muted-foreground mb-2">
               De pagina <code className="bg-muted px-2 py-1 rounded text-sm">{location.pathname}</code> bestaat niet.
@@ -102,16 +59,11 @@ const NotFound = () => {
             <p className="text-sm text-muted-foreground">
               Misschien is de pagina verplaatst of heb je een verkeerde URL ingevoerd.
             </p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Search bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mb-8"
-        >
+        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
             <CardContent className="p-4">
               <div className="flex gap-2">
@@ -132,26 +84,20 @@ const NotFound = () => {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Quick links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mb-8"
-        >
+        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
           <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
             <Compass className="h-4 w-4" />
             Snelle navigatie
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {quickLinks.map((link, index) => (
-              <motion.div
+              <div
                 key={link.href}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
+                className="animate-scale-fade-in"
+                style={{ animationDelay: `${600 + index * 100}ms` }}
               >
                 <Link to={link.href}>
                   <Card className="border-white/10 bg-white/5 backdrop-blur-xl hover:border-white/20 hover:bg-white/10 transition-all duration-200 cursor-pointer group">
@@ -162,19 +108,14 @@ const NotFound = () => {
                     </CardContent>
                   </Card>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Recent pages if available */}
+        {/* Recent pages */}
         {recentPages.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mb-8"
-          >
+          <div className="mb-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
             <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Recent bezocht
@@ -182,22 +123,15 @@ const NotFound = () => {
             <div className="flex flex-wrap gap-2">
               {recentPages.map((page, i) => (
                 <Link key={i} to={page}>
-                  <Button variant="outline" size="sm">
-                    {page}
-                  </Button>
+                  <Button variant="outline" size="sm">{page}</Button>
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Actions */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3"
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '900ms' }}>
           <Button variant="default" size="lg" asChild>
             <Link to="/">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -210,15 +144,10 @@ const NotFound = () => {
               Help Center
             </Link>
           </Button>
-        </motion.div>
+        </div>
 
         {/* Contact support */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-          className="mt-12 text-center"
-        >
+        <div className="mt-12 text-center animate-fade-in" style={{ animationDelay: '1000ms' }}>
           <p className="text-sm text-muted-foreground mb-3">
             Blijft het probleem? Neem contact op met support:
           </p>
@@ -231,7 +160,7 @@ const NotFound = () => {
               support@rdjlogistics.nl
             </a>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
