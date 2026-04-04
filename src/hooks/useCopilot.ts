@@ -38,7 +38,8 @@ interface CopilotContext {
   filters?: Record<string, unknown>;
 }
 
-const COPILOT_URL = edgeFunctionUrl('copilot');
+// ─── Now uses the unified chatgpt edge function ───
+const CHATGPT_URL = edgeFunctionUrl('chatgpt');
 
 export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') => {
   const { user } = useAuth();
@@ -48,7 +49,6 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [context, setContext] = useState<CopilotContext>({});
-  const [conversationId, setConversationId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Parse SSE stream and extract content
@@ -86,7 +86,6 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) onDelta(content);
         } catch {
-          // Incomplete JSON, put back and wait for more data
           textBuffer = line + "\n" + textBuffer;
           break;
         }
@@ -96,11 +95,10 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
     onDone();
   };
 
-  // Send message to copilot with abort support
+  // Send message using the unified chatgpt engine
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
 
-    // Cancel any existing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -140,32 +138,39 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        throw new Error('Je moet ingelogd zijn om Copilot te gebruiken.');
+        throw new Error('Je moet ingelogd zijn om de AI assistent te gebruiken.');
       }
 
+      // Build message history (last 15 for optimal latency)
       const allMessages = [...messages, userMessage].slice(-15).map(m => ({
         role: m.role,
         content: m.content,
       }));
 
-      const response = await fetch(COPILOT_URL, {
+      // Call the unified chatgpt edge function with copilot mode
+      const response = await fetch(CHATGPT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          messages: allMessages,
-          assistant_type: assistantType,
-          context,
+          action: 'chat',
+          message: content.trim(),
+          context: {
+            currentPage: context.current_page || 'Copilot',
+            selectedOrders: context.selected_orders || [],
+            filters: context.filters || {},
+            userRole: 'Admin',
+            copilotMode: assistantType,
+          },
+          stream: true,
         }),
         signal: abortControllerRef.current.signal,
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        
-        // Handle rate limiting
         if (response.status === 429) {
           throw new Error('Te veel verzoeken. Wacht even en probeer opnieuw.');
         }
@@ -185,16 +190,15 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
       });
 
     } catch (err) {
-      // Don't show error for aborted requests
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
       
-      console.error('Copilot error:', err);
+      console.error('AI Assistent error:', err);
       setError(err instanceof Error ? err : new Error('Unknown error'));
       setIsLoading(false);
       toast({
-        title: "Copilot Error",
+        title: "AI Assistent",
         description: err instanceof Error ? err.message : "Er ging iets mis",
         variant: "destructive",
       });
@@ -212,32 +216,16 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
 
   // Handle slash commands
   const handleInput = useCallback((input: string) => {
-    const { command, query } = parseCommand(input);
-    
-    // Map commands to assistant types
-    const commandMap: Record<string, AssistantType> = {
-      plan: 'dispatch_planner',
-      replan: 'dispatch_planner',
-      dispatch: 'dispatch_planner',
-      invoice: 'finance_autopilot',
-      payout: 'finance_autopilot',
-      explain: 'control_tower',
-      search: 'knowledge_search',
-      help: 'knowledge_search',
-    };
-
-    // For now, just send the message (assistant switching would require more complex state)
+    const { query } = parseCommand(input);
     sendMessage(query || input);
   }, [parseCommand, sendMessage]);
 
   // Clear conversation
   const clearConversation = useCallback(() => {
-    // Cancel any pending request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     setMessages([]);
-    setConversationId(null);
     setError(null);
   }, []);
 
@@ -250,19 +238,6 @@ export const useCopilot = (assistantType: AssistantType = 'dispatch_planner') =>
   const toggle = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
-
-  // Keyboard shortcut handler
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        toggle();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggle]);
 
   // Cleanup on unmount
   useEffect(() => {
