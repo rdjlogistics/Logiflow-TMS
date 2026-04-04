@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalData } from "@/components/portal/shared/usePortalData";

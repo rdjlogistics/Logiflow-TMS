@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format, addHours, startOfDay, differenceInMinutes, parseISO, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
