@@ -45,7 +45,8 @@ import { ModuleOnboarding } from "@/components/onboarding/ModuleOnboarding";
 import { useUserRole } from "@/hooks/useUserRole";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { StatsGridSkeleton } from "@/components/ui/skeleton-loaders";
+import { StatsGridSkeleton, ChartSkeleton, ActionQueueSkeleton } from "@/components/ui/skeleton-loaders";
+import { Skeleton } from "@/components/ui/skeleton";
 import { nl } from "date-fns/locale";
 
 const Dashboard = () => {
