@@ -1,41 +1,65 @@
 
 
-# Status Rapport — Klaar voor Launch 🏁
+# Audit: Mobiele UX & Bulk Action Bars — Fix Plan
 
-## Alle batches maart: 100% afgerond
+## Probleem Analyse
 
-| Taak | Status |
-|---|---|
-| PWA precache fix (11.8MB → 907KB) | ✅ Done |
-| Dead code & dependencies opruimen | ✅ Done |
-| Framer-motion → CSS conversie | ✅ Done |
-| Smart-AI consolidatie naar ChatGPT engine | ✅ Done |
-| Broken files hersteld (6+ bestanden) | ✅ Done |
-| Realtime sync fix (1/19 → 19/19 tabellen) | ✅ Done (vandaag) |
-| Lighthouse optimalisaties (chunks, fonts, fetchpriority) | ✅ Done |
-| robots.txt + sitemap.xml | ✅ Done |
-| Accessibility (aria-labels, heading hierarchy) | ✅ Done |
+Na grondige inspectie van de codebase zijn er **3 categorieën kritieke mobiele UX-bugs** gevonden:
 
-## Huidige technische status
+### 1. Bulk Action Bars vallen buiten beeld op mobiel (6 bestanden)
+Alle bulk action bars gebruiken `max-w-fit` waardoor de breedte onbeperkt groeit en op kleine schermen (375px) buiten het viewport valt. Knoppen zijn dan onbereikbaar.
 
-- **TypeScript errors:** 0
-- **Production build:** succesvol (7.5s)
-- **PWA precache:** 907KB (was 11.8MB)
-- **Realtime tabellen:** 19/19 actief
-- **Edge functions:** draaien normaal (process-email-queue boot ~28ms)
+**Getroffen bestanden:**
+- `src/components/orders/EnhancedBulkActionsBar.tsx` — meeste knoppen, ergste overflow
+- `src/components/fleet/FleetBulkActions.tsx`
+- `src/components/drivers/DriverBulkActions.tsx`
+- `src/components/admin/document-verification/BulkActions.tsx`
+- `src/components/trips/BulkActionBar.tsx` — Select dropdowns te breed op mobiel
+- `src/components/invoices/InvoiceBulkActionsBar.tsx`
+- `src/components/purchase-invoices/PurchaseInvoiceBulkActions.tsx`
 
-## Wat is er nog te doen?
+### 2. QuickDriverAssign ref warning (console error)
+`QuickDriverAssign` is een function component dat als child van `Dialog` een ref ontvangt maar geen `forwardRef` gebruikt. Veroorzaakt React warning in console.
 
-**Niets blokkerends.** De app is technisch lanceerklaar.
+### 3. `size="icon-sm"` bestaat niet op Button component
+5 bestanden gebruiken `size="icon-sm"` maar dit is geen geregistreerde variant in de Button component, wat onvoorspelbaar gedrag geeft.
 
-### Optioneel (post-launch)
+---
 
-1. **Custom domein** — koppel rdjlogistics.nl via Publish → Custom Domain
-2. **E-mail domein** — custom sender adres voor factuur-e-mails
-3. **Lighthouse fine-tuning** — score zit op ~78-82, kan naar 90+ met image optimization
-4. **Resterende framer-motion files** — 248 bestanden gebruiken nog `motion.div` (werkt correct, puur performance)
+## Uitvoeringsplan
 
-## Aanbeveling
+### Batch 1: Bulk Action Bars mobiel-proof maken (7 bestanden)
 
-Er is geen code meer te schrijven. **Publiceer nu** via de Publish knop en start je marketing. Alle optimalisaties hierboven zijn nice-to-haves die we in volgende sessies kunnen doen terwijl je al live bent en klanten binnenhaalt.
+**Aanpak per bestand — zelfde patroon overal:**
+
+1. Vervang `max-w-fit` door `max-w-[calc(100vw-1.5rem)]` zodat de bar nooit breder is dan het scherm
+2. Voeg `overflow-x-auto scrollbar-none` toe aan de inner container zodat je horizontaal kunt scrollen als nodig
+3. Maak de inner container `flex-nowrap` met `min-w-0` op children zodat items krimpen
+4. Op mobiel (<640px): verberg tekst-labels, toon alleen iconen (al deels gedaan met `hidden md:inline`)
+5. Trip BulkActionBar: maak Select triggers smaller op mobiel (`w-[130px] sm:w-[160px]`)
+
+### Batch 2: Component fixes (2 bestanden)
+
+1. **QuickDriverAssign.tsx**: Wrap component in `React.forwardRef` zodat Dialog geen ref-warning geeft
+2. **Button component check**: Voeg `icon-sm` als geldige size variant toe OF vervang alle 5 usages door `size="icon"` met `h-7 w-7` class
+
+### Batch 3: Trips BulkActionBar responsive fix
+
+De trips bar heeft twee vaste-breedte Select dropdowns (`w-[160px]` + `w-[180px]` = 340px) plus tekst en knop. Op 375px scherm past dit niet.
+
+**Fix:** Stack de selects verticaal op mobiel met `flex-col sm:flex-row` of maak ze smaller (`w-full sm:w-[160px]`)
+
+---
+
+## Technische Details
+
+```text
+Bestanden te wijzigen:     9
+Patroon:                   Uniform responsive bulk bar
+Mobile breakpoint:         < 640px (sm:)
+Scroll fallback:           overflow-x-auto scrollbar-none
+Touch:                     touch-manipulation op alle knoppen
+```
+
+**Verwacht resultaat:** Alle bulk action bars zijn 100% bruikbaar op elk schermformaat, geen content valt buiten beeld, alle knoppen bereikbaar.
 
