@@ -156,6 +156,15 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("node_modules/framer-motion")) {
             return "vendor-motion";
           }
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
+            return "vendor-charts";
+          }
+          if (id.includes("node_modules/exceljs")) {
+            return "vendor-excel";
+          }
+          if (id.includes("node_modules/jspdf")) {
+            return "vendor-pdf";
+          }
           // 3d, pdf, excel, charts, animation: NOT chunked separately
           if (id.includes("node_modules/date-fns")) {
             return "vendor-date";

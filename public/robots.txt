@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rdjlogistics.lovable.app/sitemap.xml
