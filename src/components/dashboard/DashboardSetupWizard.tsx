@@ -1265,7 +1265,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                 <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/10">
                   <div>
                     {step > 0 && step < 3 && (
-                      <motion.div} whileTap={{ scale: 0.98 }}>
+                      <motion.div whileTap={{ scale: 0.98 }}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1278,7 +1278,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                       </motion.div>
                     )}
                     {step === 0 && (
-                      <motion.div} whileTap={{ scale: 0.98 }}>
+                      <motion.div whileTap={{ scale: 0.98 }}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1291,7 +1291,7 @@ export function DashboardSetupWizard({ onComplete, onSkip }: DashboardSetupWizar
                     )}
                   </div>
 
-                  <motion.div} whileTap={{ scale: 0.97 }}>
+                  <motion.div whileTap={{ scale: 0.97 }}>
                     <Button
                       size="lg"
                       onClick={handleNext}

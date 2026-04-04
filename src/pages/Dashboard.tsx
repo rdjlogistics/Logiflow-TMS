@@ -306,7 +306,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-4">
                   <motion.div 
                     className="relative"
-                   }
+                    whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
                     <div className="absolute -inset-1 bg-gradient-to-br from-primary via-primary/50 to-gold/50 rounded-xl blur opacity-40" />
@@ -375,7 +375,7 @@ const Dashboard = () => {
 
               {/* Right: Quick Actions */}
               <div className="flex items-center gap-3">
-                <motion.div} whileTap={{ scale: 0.98 }}>
+                <motion.div whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="premium" size="default" className="shadow-lg shadow-primary/20 h-11">
                     <Link to="/orders">
                       <Plus className="h-4 w-4 mr-2" />
@@ -383,7 +383,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div} whileTap={{ scale: 0.98 }}>
+                <motion.div whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="outline" size="default" className="group h-11">
                     <Link to="/track-chauffeurs">
                       <Route className="h-4 w-4 mr-2" />
@@ -392,7 +392,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div} whileTap={{ scale: 0.98 }}>
+                <motion.div whileTap={{ scale: 0.98 }}>
                   <Button asChild variant="ghost" size="icon" className="h-11 w-11 relative">
                     <Link to="/email">
                       <Mail className="h-5 w-5" />
@@ -404,7 +404,7 @@ const Dashboard = () => {
                     </Link>
                   </Button>
                 </motion.div>
-                <motion.div} whileTap={{ scale: 0.98 }}>
+                <motion.div whileTap={{ scale: 0.98 }}>
                   <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsCustomizing(true)}>
                     <Settings2 className="h-5 w-5" />
                   </Button>
