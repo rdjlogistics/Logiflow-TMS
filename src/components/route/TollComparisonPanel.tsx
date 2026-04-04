@@ -64,7 +64,7 @@ const TollComparisonPanel: React.FC<TollComparisonPanelProps> = ({
   const netSavingsMax = tollCostMax - extraFuelCost;
 
   return (
-    <div, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+    <div
       className="space-y-3"
     >
       {/* Header */}

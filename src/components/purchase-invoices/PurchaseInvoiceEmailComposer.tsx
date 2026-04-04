@@ -338,7 +338,7 @@ ${company || "Uw transportbedrijf"}`
                   disabled={!emailValid}
                   className="h-8 w-8 flex-shrink-0 touch-manipulation active:scale-95"
                 >
-                  <motion.div}
+                  <motion.div
                   >
                     <Plus className="h-4 w-4" />
                   </motion.div>
