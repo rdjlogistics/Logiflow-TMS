@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+
 
 interface ChatGPTMessageProps {
   message: ChatMessage;
