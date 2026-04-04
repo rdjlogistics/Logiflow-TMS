@@ -29,6 +29,7 @@ interface FieldValidation {
 }
 
 const ValidationIcon = ({ status }: { status: ValidationStatus }) => (
+  <>
     {status === 'valid' && (
       <div
         key="valid"
@@ -45,6 +46,7 @@ const ValidationIcon = ({ status }: { status: ValidationStatus }) => (
         <X className="h-3 w-3 text-destructive" />
       </div>
     )}
+  </>
 );
 
 export const CompanyVerificationStep = ({ companyForm, onUpdate }: CompanyVerificationStepProps) => {

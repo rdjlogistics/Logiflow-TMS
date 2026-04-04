@@ -282,73 +282,70 @@ export function MapStyleSelector({ currentStyle, onStyleChange, className }: Map
 
   // Mobile: Use bottom sheet (existing implementation)
   const bottomSheet = isOpen ? createPortal(
-      {isOpen && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            style={{ zIndex: 9998 }}
-            onClick={handleClose}
-          />
-          
-          <div
-            className="fixed bottom-0 left-0 right-0 touch-pan-y"
-            style={{ 
-              zIndex: 9999,
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
-            }}
-          >
-            <div className="bg-card/95 backdrop-blur-xl rounded-t-3xl shadow-2xl border-t border-x border-border/20">
-              <div className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
-                <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-              </div>
-
-              <div className="flex items-center justify-between px-5 pb-3">
-                <h3 className="font-semibold text-foreground tracking-tight">Kaartstijl</h3>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 rounded-full hover:bg-muted/50"
-                  onClick={handleClose}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="px-4 pb-5 grid grid-cols-3 gap-2.5">
-                {mapStyles.map((style, index) => {
-                  const isSelected = currentStyle === style.id;
-                  return (
-                    <button
-                      key={style.id}
-                      className="flex flex-col items-center gap-1.5 touch-manipulation"
-                      onClick={() => handleSelect(style.id)}
-                    >
-                      <div
-                        className={cn(
-                          "relative w-full aspect-[4/3] rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.96]",
-                          "ring-2 ring-offset-2 ring-offset-card",
-                          isSelected 
-                            ? 'ring-primary shadow-lg shadow-primary/25'
-                            : 'ring-transparent hover:ring-border/50'
-                        )}
-                      >
-                        <MapPreviewImage style={style} token={token} isSelected={isSelected} />
-                      </div>
-                      <span className={cn(
-                        "text-[11px] font-medium transition-colors",
-                        isSelected ? "text-primary" : "text-muted-foreground"
-                      )}>
-                        {style.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+    <>
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        style={{ zIndex: 9998 }}
+        onClick={handleClose}
+      />
+      
+      <div
+        className="fixed bottom-0 left-0 right-0 touch-pan-y"
+        style={{ 
+          zIndex: 9999,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
+        }}
+      >
+        <div className="bg-card/95 backdrop-blur-xl rounded-t-3xl shadow-2xl border-t border-x border-border/20">
+          <div className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
-        </>
-      )}
-    </AnimatePresence>,
+
+          <div className="flex items-center justify-between px-5 pb-3">
+            <h3 className="font-semibold text-foreground tracking-tight">Kaartstijl</h3>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full hover:bg-muted/50"
+              onClick={handleClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="px-4 pb-5 grid grid-cols-3 gap-2.5">
+            {mapStyles.map((style) => {
+              const isSelected = currentStyle === style.id;
+              return (
+                <button
+                  key={style.id}
+                  className="flex flex-col items-center gap-1.5 touch-manipulation"
+                  onClick={() => handleSelect(style.id)}
+                >
+                  <div
+                    className={cn(
+                      "relative w-full aspect-[4/3] rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.96]",
+                      "ring-2 ring-offset-2 ring-offset-card",
+                      isSelected 
+                        ? 'ring-primary shadow-lg shadow-primary/25'
+                        : 'ring-transparent hover:ring-border/50'
+                    )}
+                  >
+                    <MapPreviewImage style={style} token={token} isSelected={isSelected} />
+                  </div>
+                  <span className={cn(
+                    "text-[11px] font-medium transition-colors",
+                    isSelected ? "text-primary" : "text-muted-foreground"
+                  )}>
+                    {style.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </>,
     document.body
   ) : null;
 

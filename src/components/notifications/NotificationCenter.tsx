@@ -159,6 +159,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const { notifications, markAsRead, markAllAsRead, removeNotification, clearAll, unreadCount } = useNotifications();
 
   return (
+    <>
       {isOpen && (
         <>
           {/* Backdrop */}
