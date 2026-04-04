@@ -128,9 +128,9 @@ const PurchaseInvoiceSendPage = () => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
           >
             <motion.div
-              variants={successVariants}
-              initial="hidden"
-              animate="visible"
+             
+             
+             
               className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border shadow-2xl"
             >
               <div className="relative">
@@ -165,9 +165,9 @@ const PurchaseInvoiceSendPage = () => {
       </AnimatePresence>
 
       <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+       
+       
+       
         className="space-y-6"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -176,7 +176,7 @@ const PurchaseInvoiceSendPage = () => {
       >
         {/* Premium Header */}
         <motion.div 
-          variants={cardVariants}
+         
           className="relative overflow-hidden rounded-2xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl shadow-primary/5"
         >
           {/* Gradient highlight */}
@@ -259,7 +259,7 @@ const PurchaseInvoiceSendPage = () => {
 
         {/* Status Timeline - Swipeable on mobile */}
         <motion.div 
-          variants={cardVariants}
+         
           className="relative w-full"
         >
           {/* Fade edges on mobile */}
@@ -315,12 +315,12 @@ const PurchaseInvoiceSendPage = () => {
         {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: Invoice Content Preview */}
-          <motion.div variants={cardVariants}>
+          <motion.div>
             <PurchaseInvoiceContentPreview invoiceId={id} />
           </motion.div>
 
           {/* Right: Email Composer */}
-          <motion.div variants={cardVariants}>
+          <motion.div>
             <PurchaseInvoiceEmailComposer
               invoiceId={id}
               onSuccess={handleSuccess}

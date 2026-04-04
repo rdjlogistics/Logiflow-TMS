@@ -85,7 +85,7 @@ const B2BShipments = () => {
         className="space-y-6"
       >
         {/* Header */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Zendingen</h1>
             <p className="text-sm text-muted-foreground">{shipments.length} zendingen in totaal</p>
@@ -107,7 +107,7 @@ const B2BShipments = () => {
         </div>
 
         {/* Filters */}
-        <div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -187,7 +187,7 @@ const B2BShipments = () => {
         </div>
 
         {/* Desktop Table */}
-        <div variants={itemVariants} className="hidden md:block bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm">
+        <div className="hidden md:block bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full w-full">
               <thead>

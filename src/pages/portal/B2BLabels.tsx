@@ -72,9 +72,9 @@ const B2BLabels = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} onRefresh={refetch}>
-      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
+      <motion.div className="space-y-6">
         {/* Header */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Labels</h1>
             <p className="text-sm text-muted-foreground">Download en print verzendlabels</p>
@@ -84,14 +84,14 @@ const B2BLabels = () => {
               { label: 'PDF', icon: Download, onClick: () => downloadLabels(getSelectedShipments(), 'pdf') },
               { label: 'ZPL', icon: FileText, onClick: () => downloadLabels(getSelectedShipments(), 'zpl') },
             ].map(btn => (
-              <motion.div key={btn.label} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <motion.div key={btn.label}} whileTap={{ scale: 0.97 }}>
                 <Button variant="outline" disabled={selected.length === 0 || generating} onClick={btn.onClick} className="gap-2">
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <btn.icon className="h-4 w-4" />}
                   {btn.label}
                 </Button>
               </motion.div>
             ))}
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <motion.div} whileTap={{ scale: 0.97 }}>
               <Button 
                 disabled={selected.length === 0 || generating}
                 onClick={() => printLabels(getSelectedShipments())}
@@ -105,12 +105,12 @@ const B2BLabels = () => {
         </motion.div>
 
         {/* Search & Select All */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
+        <motion.div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken op referentie of tracking..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <motion.div} whileTap={{ scale: 0.98 }}>
             <Button variant="outline" onClick={selectAll} disabled={filteredShipments.length === 0}>
               {selected.length === filteredShipments.length && filteredShipments.length > 0 ? 'Deselecteer alles' : 'Selecteer alles'}
             </Button>
@@ -119,7 +119,7 @@ const B2BLabels = () => {
 
         {/* Labels Grid */}
         {filteredShipments.length > 0 ? (
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" variants={containerVariants}>
+          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredShipments.map((shipment, index) => {
               const isSelected = selected.includes(shipment.id);
               const status = statusConfig[shipment.status];
@@ -128,8 +128,8 @@ const B2BLabels = () => {
                 <motion.div
                   key={shipment.id}
                   custom={index}
-                  variants={cardVariants}
-                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                 
+                  }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Card 

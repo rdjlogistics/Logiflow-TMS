@@ -208,7 +208,7 @@ const B2BDeliveries = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <motion.div className="space-y-6" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="show">
+      <motion.div className="space-y-6" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }}>
         {/* Header */}
         <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25 } } }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

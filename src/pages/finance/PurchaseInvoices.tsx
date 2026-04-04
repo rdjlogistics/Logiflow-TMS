@@ -244,7 +244,7 @@ const PurchaseInvoices = () => {
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4"
         >
           {kpiCards.map((kpi) => (
-            <div key={kpi.id} variants={itemVariants} className="h-full">
+            <div key={kpi.id} className="h-full">
               <Card 
                 className={cn(
                   "relative overflow-hidden border-border/40 bg-card/90 backdrop-blur-sm shadow-lg cursor-pointer transition-all duration-300 group h-full",
@@ -281,7 +281,7 @@ const PurchaseInvoices = () => {
         </div>
 
         {/* Filters */}
-        <div variants={itemVariants} initial="hidden" animate="visible">
+        <div>
           <Card className="border-border/40 bg-card/90 backdrop-blur-sm">
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row gap-4">
@@ -324,7 +324,7 @@ const PurchaseInvoices = () => {
         </div>
 
         {/* Table - Desktop */}
-        <div variants={itemVariants} initial="hidden" animate="visible" className="hidden md:block">
+        <div className="hidden md:block">
           <Card className="border-border/40 bg-card/90 backdrop-blur-sm shadow-lg">
             <CardContent className="p-0">
               <Table>
