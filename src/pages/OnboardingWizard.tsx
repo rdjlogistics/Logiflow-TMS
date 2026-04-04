@@ -473,7 +473,6 @@ const OnboardingWizard = () => {
                     ))}
                     {/* Sliding indicator */}
                     <div
-                      layout
                       className="absolute top-1 bottom-1 rounded-xl bg-white/[0.08] border border-white/[0.1]"
                       style={{
                         width: 'calc(33.333% - 2px)',

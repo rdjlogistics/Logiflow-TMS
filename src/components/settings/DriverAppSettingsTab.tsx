@@ -41,7 +41,7 @@ export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSe
         "bg-card/40 backdrop-blur-sm border border-border/30",
         "hover:bg-card/60 transition-colors",
         disabled && "opacity-50"
-      )}}
+      )}
     >
       <div className="space-y-0.5 flex-1 mr-4">
         <div className="flex items-center gap-2">
