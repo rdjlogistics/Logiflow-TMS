@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -65,18 +65,16 @@ export function DocumentCard({ doc, index, selected, onSelect, onClick }: Docume
   const hasFraud = doc.ai_analysis_json?.fraudIndicators?.length > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ delay: index * 0.04, type: 'spring', stiffness: 120, damping: 18 }}
+    <div
       className={cn(
+        'animate-fade-in-up',
         'group rounded-xl border bg-card/60 backdrop-blur-sm p-3 md:p-4 cursor-pointer',
         'transition-all duration-200 hover:shadow-[var(--shadow-card-hover)] hover:border-primary/30 hover:-translate-y-0.5',
         'active:scale-[0.995]',
         selected && 'ring-2 ring-primary/40 border-primary/40',
         hasFraud && 'border-destructive/40'
       )}
+      style={{ animationDelay: `${index * 40}ms` }}
       onClick={onClick}
     >
       <div className="flex items-center gap-3">
@@ -160,6 +158,6 @@ export function DocumentCard({ doc, index, selected, onSelect, onClick }: Docume
           </p>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

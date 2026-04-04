@@ -1,11 +1,9 @@
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { type DriverDocument, documentTypeLabels } from './DocumentCard';
 import { differenceInDays, format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Calendar, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 
 interface ComplianceTimelineProps {
   documents: DriverDocument[];
@@ -43,17 +41,15 @@ export function ComplianceTimeline({ documents }: ComplianceTimelineProps) {
             const date = doc.expiry_date || doc.ai_detected_expiry;
             const status = getExpiryStatus(date);
             return (
-              <motion.div
+              <div
                 key={doc.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05 }}
                 className={cn(
-                  'flex flex-col items-center gap-1.5 p-3 rounded-xl border min-w-[100px]',
+                  'flex flex-col items-center gap-1.5 p-3 rounded-xl border min-w-[100px] animate-scale-fade-in',
                   'bg-card/60 border-border/20',
                   status.urgency >= 3 && 'border-destructive/30 bg-destructive/5',
                   status.urgency === 2 && 'border-warning/30 bg-warning/5'
                 )}
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 <span className="text-[10px] text-muted-foreground text-center leading-tight">
                   {documentTypeLabels[doc.document_type]?.split(' ')[0] || doc.document_type}
@@ -72,7 +68,7 @@ export function ComplianceTimeline({ documents }: ComplianceTimelineProps) {
                     {format(new Date(date), 'dd MMM yy', { locale: nl })}
                   </span>
                 )}
-              </motion.div>
+              </div>
             );
           })}
         </div>
