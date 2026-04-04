@@ -87,7 +87,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({
     if (!map.current || !mapLoaded) return;
 
     const update = async () => {
-      const mb = (await import("mapbox-gl")).default;
+      const mb = await loadMapboxGL();
 
       if (driverLocation && showDriverMarker) {
         const el = document.createElement("div");
