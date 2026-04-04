@@ -1,65 +1,89 @@
 
 
-# Audit: Mobiele UX & Bulk Action Bars — Fix Plan
+# Volledige Feature Audit — Scale Pakket (36 functies)
 
-## Probleem Analyse
+## Audit Resultaten
 
-Na grondige inspectie van de codebase zijn er **3 categorieën kritieke mobiele UX-bugs** gevonden:
+### ✅ Volledig Werkend (26 functies)
 
-### 1. Bulk Action Bars vallen buiten beeld op mobiel (6 bestanden)
-Alle bulk action bars gebruiken `max-w-fit` waardoor de breedte onbeperkt groeit en op kleine schermen (375px) buiten het viewport valt. Knoppen zijn dan onbereikbaar.
+| # | Feature | Status | Bewijs |
+|---|---------|--------|--------|
+| 1 | Orderbeheer | ✅ | OrderOverview + OrderForm, CRUD, realtime |
+| 2 | Digitale POD | ✅ | DigitalPOD pagina, storage, PDF download |
+| 3 | CMR / Vrachtbrief | ✅ | generate-document-pdf edge function, download flow |
+| 4 | Live Tracking | ✅ | GPSTracking pagina, Mapbox, driver_locations tabel |
+| 5 | Facturatie | ✅ | Invoices, batch-create, PDF, email verzending |
+| 6 | CRM | ✅ | Customers pagina, volledig CRUD |
+| 7 | KPI Dashboard | ✅ | KPIDashboard, get_dashboard_ops RPC |
+| 8 | Chauffeurs App | ✅ | DriverPortal, offline sync, GPS push |
+| 9 | Multi-stop Orders | ✅ | OrderForm multi-stop support |
+| 10 | AI Dispatch | ✅ | ai-dispatch-engine + intelligent-dispatch edge functions |
+| 11 | Route Optimalisatie | ✅ | RouteOptimization pagina, Mapbox layers |
+| 12 | Dienstplanning | ✅ | PlanningProgram, shifts CRUD, publish flow |
+| 13 | Proactieve Alerts | ✅ | proactive-alerts edge function, anomaly_events tabel |
+| 14 | SLA Monitoring | ✅ | SLAMonitoring pagina, useSLADefinitions hook (DB-connected) |
+| 15 | Debiteurenbeheer | ✅ | Receivables pagina, aging badges, reminders |
+| 16 | Inkoopfacturatie | ✅ | PurchaseInvoices, batch wizard, SEPA export |
+| 17 | Creditnota's | ✅ | Credit flow in invoice system |
+| 18 | Marge Analyse | ✅ | MarginIntelligence pagina |
+| 19 | Cashflow Dashboard | ✅ | CashflowCockpit pagina |
+| 20 | Klanten Portaal | ✅ | B2B Portal, login, tracking, cases |
+| 21 | Tariefcontracten | ✅ | RateManagement pagina, rate_contracts tabel |
+| 22 | Tendering / Charter | ✅ | TenderDashboard, rfq-parser edge function |
+| 23 | Smart OCR | ✅ | SmartDocumentOCR pagina, smart-document-ocr edge function |
+| 24 | WMS / Magazijn | ✅ | 8 WMS pagina's, allemaal DB-connected |
+| 25 | E-commerce | ✅ | EcommerceIntegrations, ecommerce-sync edge function |
+| 26 | Exception Management | ✅ | ExceptionsInbox + Playbooks, anomaly_events DB |
+| 27 | WhatsApp Chat | ✅ | Messenger, notification channels, WhatsApp API config |
+| 28 | Push Notificaties | ✅ | send-push-notification edge function, PushNotificationPrompt |
+| 29 | Fleet Management | ✅ | FleetManagement pagina, vehicles CRUD |
+| 30 | Bank Reconciliatie | ✅ | BankReconciliation pagina, bank-reconcile edge function |
+| 31 | Boekhouding Koppeling | ✅ | exact-oauth-start + exact-sync-invoices edge functions |
 
-**Getroffen bestanden:**
-- `src/components/orders/EnhancedBulkActionsBar.tsx` — meeste knoppen, ergste overflow
-- `src/components/fleet/FleetBulkActions.tsx`
-- `src/components/drivers/DriverBulkActions.tsx`
-- `src/components/admin/document-verification/BulkActions.tsx`
-- `src/components/trips/BulkActionBar.tsx` — Select dropdowns te breed op mobiel
-- `src/components/invoices/InvoiceBulkActionsBar.tsx`
-- `src/components/purchase-invoices/PurchaseInvoiceBulkActions.tsx`
+### ⚠️ Problemen Gevonden (5 functies)
 
-### 2. QuickDriverAssign ref warning (console error)
-`QuickDriverAssign` is een function component dat als child van `Dialog` een ref ontvangt maar geen `forwardRef` gebruikt. Veroorzaakt React warning in console.
-
-### 3. `size="icon-sm"` bestaat niet op Button component
-5 bestanden gebruiken `size="icon-sm"` maar dit is geen geregistreerde variant in de Button component, wat onvoorspelbaar gedrag geeft.
+| # | Feature | Probleem | Fix |
+|---|---------|----------|-----|
+| 32 | **UBL Export** | Frontend heeft UBL toggle in InvoiceEmailComposer, maar `send-invoice-email` edge function **negeert `include_ubl` parameter volledig** — er wordt geen UBL XML gegenereerd of bijgevoegd | Nieuwe edge function logica nodig om UBL 2.1 XML te genereren en als attachment mee te sturen |
+| 33 | **Multi-vestiging** | **Geen dedicated pagina of UI**. Feature key bestaat in subscription system maar er is geen multi-location management scherm | Nieuwe pagina nodig voor vestigingenbeheer (locaties, teams per vestiging) |
+| 34 | **Vervoerdersnetwerk** | Alle 4 community pagina's (JointOrders, Workspaces, Settlements, Ledger) zijn **lege placeholders** met alleen tekst "wordt beschikbaar zodra..." | Database-connected UI nodig |
+| 35 | **API Toegang** | PublicAPI pagina bestaat en is functioneel (key management, docs) ✅ | OK |
+| 36 | **White Label** | BrandingSettings pagina bestaat en is functioneel (logo, kleuren) ✅ | OK |
 
 ---
 
-## Uitvoeringsplan
+## Samenvatting: 3 Kritieke Fixes Nodig
 
-### Batch 1: Bulk Action Bars mobiel-proof maken (7 bestanden)
+### Fix 1: UBL Export — Edge function uitbreiden
+- `send-invoice-email` moet `include_ubl` parameter lezen
+- UBL 2.1 XML genereren op basis van factuurdata (standaard Nederlands belastingformaat)
+- XML als bijlage meesturen via Resend attachments API
+- **Geschatte omvang**: 1 edge function wijziging
 
-**Aanpak per bestand — zelfde patroon overal:**
+### Fix 2: Multi-vestiging — Pagina bouwen
+- Nieuwe pagina `/admin/locations` of `/enterprise/locations`
+- CRUD voor vestigingen (naam, adres, contactpersoon)
+- Koppeling aan bestaande `companies` tabel of nieuwe `company_branches` tabel
+- FeatureGate op `multi_vestiging`
+- **Geschatte omvang**: 1 migratie + 1 pagina + 1 route
 
-1. Vervang `max-w-fit` door `max-w-[calc(100vw-1.5rem)]` zodat de bar nooit breder is dan het scherm
-2. Voeg `overflow-x-auto scrollbar-none` toe aan de inner container zodat je horizontaal kunt scrollen als nodig
-3. Maak de inner container `flex-nowrap` met `min-w-0` op children zodat items krimpen
-4. Op mobiel (<640px): verberg tekst-labels, toon alleen iconen (al deels gedaan met `hidden md:inline`)
-5. Trip BulkActionBar: maak Select triggers smaller op mobiel (`w-[130px] sm:w-[160px]`)
+### Fix 3: Vervoerdersnetwerk — Community pagina's vullen
+- JointOrders: Toon gedeelde ritten tussen connected partners
+- CommunityWorkspaces: Workspace beheer (al deels in Network pagina)
+- Settlements & Ledger: Financiële afrekeningen tussen partners
+- Alle 4 pagina's moeten DB-connected worden met echte data
+- **Geschatte omvang**: 4 pagina's herschrijven
 
-### Batch 2: Component fixes (2 bestanden)
-
-1. **QuickDriverAssign.tsx**: Wrap component in `React.forwardRef` zodat Dialog geen ref-warning geeft
-2. **Button component check**: Voeg `icon-sm` als geldige size variant toe OF vervang alle 5 usages door `size="icon"` met `h-7 w-7` class
-
-### Batch 3: Trips BulkActionBar responsive fix
-
-De trips bar heeft twee vaste-breedte Select dropdowns (`w-[160px]` + `w-[180px]` = 340px) plus tekst en knop. Op 375px scherm past dit niet.
-
-**Fix:** Stack de selects verticaal op mobiel met `flex-col sm:flex-row` of maak ze smaller (`w-full sm:w-[160px]`)
+### Bonus Fix: Console Warning
+- `ConfirmDialog` → AlertDialogContent geeft ref warning (uit console logs)
+- Fix: `forwardRef` wrapper toevoegen
 
 ---
 
-## Technische Details
+## Aanbeveling
 
-```text
-Bestanden te wijzigen:     9
-Patroon:                   Uniform responsive bulk bar
-Mobile breakpoint:         < 640px (sm:)
-Scroll fallback:           overflow-x-auto scrollbar-none
-Touch:                     touch-manipulation op alle knoppen
-```
+**Fix 1 (UBL)** is kritiek voor Nederlandse markt — klanten verwachten UBL bij facturen.
+**Fix 2 (Multi-vestiging)** en **Fix 3 (Vervoerdersnetwerk)** zijn Scale-only features die actief verkocht worden.
 
-**Verwacht resultaat:** Alle bulk action bars zijn 100% bruikbaar op elk schermformaat, geen content valt buiten beeld, alle knoppen bereikbaar.
+Alle 3 moeten gefixt worden voor launch. Ik kan ze in 3 batches uitvoeren.
 
