@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import type mapboxgl from "mapbox-gl";
+import { loadMapboxGL } from "@/utils/mapbox-loader";
 
 type MapboxGL = typeof mapboxgl;
 import { useMapboxToken } from "@/hooks/useMapboxToken";
