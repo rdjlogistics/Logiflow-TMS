@@ -20,7 +20,7 @@ interface DriverAppSettingsTabProps {
   onSettingsChange: (updates: Partial<DriverAppSettings>) => void;
 }
 
-};
+
 
 export const DriverAppSettingsTab = ({ settings, onSettingsChange }: DriverAppSettingsTabProps) => {
   const ToggleRow = ({ 
