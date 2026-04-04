@@ -147,6 +147,7 @@ const WidgetCustomizer = ({
             <motion.div 
               className="relative"
               whileHover={{ scale: 1.08, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
               <div className="absolute -inset-0.5 bg-gradient-to-br from-primary to-primary/50 rounded-xl blur opacity-40" />
               <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
@@ -156,7 +157,7 @@ const WidgetCustomizer = ({
             <div>
               <SheetTitle className="text-lg font-bold">Dashboard Aanpassen</SheetTitle>
               <SheetDescription className="text-xs mt-0.5">
-                Kies een thema of stel je eigen samen
+                Kies een thema of stel je eigen layout samen
               </SheetDescription>
             </div>
           </div>
@@ -181,6 +182,7 @@ const WidgetCustomizer = ({
                   <motion.div
                     layoutId="panel-tab"
                     className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-lg shadow-lg shadow-primary/20"
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
                 <tab.icon className="relative z-10 h-3.5 w-3.5" />
@@ -196,7 +198,9 @@ const WidgetCustomizer = ({
               <motion.div
                 key="presets"
                 initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
                 className="p-5 sm:p-6"
               >
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -208,6 +212,9 @@ const WidgetCustomizer = ({
                       <motion.button
                         key={preset.id}
                         initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => handleSelectPreset(preset)}
                         className={cn(
                           "group relative flex flex-col text-left p-4 rounded-xl border-2 transition-all duration-200 touch-manipulation",
@@ -260,7 +267,9 @@ const WidgetCustomizer = ({
               <motion.div
                 key="widgets"
                 initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
                 className="p-5 sm:p-6 space-y-6"
               >
                 {/* Active Widgets */}
@@ -292,7 +301,9 @@ const WidgetCustomizer = ({
                             className="cursor-grab active:cursor-grabbing touch-manipulation"
                           >
                             <motion.div
+                              layout
                               initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, x: -20, scale: 0.9 }}
                               className={cn(
                                 "flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl overflow-hidden",
@@ -334,6 +345,7 @@ const WidgetCustomizer = ({
                   {localWidgets.length === 0 && (
                     <motion.div
                       initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       className="flex flex-col items-center justify-center py-8 text-center"
                     >
                       <div className="p-4 rounded-full glass-panel-subtle mb-3">
@@ -375,6 +387,7 @@ const WidgetCustomizer = ({
                         <motion.div
                           layoutId="category-pill"
                           className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-full shadow-lg shadow-primary/20"
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
                         />
                       )}
                       <span className="relative z-10">{CATEGORY_LABELS[category]}</span>
@@ -389,7 +402,10 @@ const WidgetCustomizer = ({
                       <motion.button
                         key={widget.id}
                         initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ delay: index * 0.03 }}
+                        whileTap={{ scale: 0.95 }}
                         whileHover={{ y: -3, transition: { type: "spring", stiffness: 400, damping: 20 } }}
                         onClick={() => handleAddWidget(widget.id)}
                         className={cn(
@@ -445,7 +461,7 @@ const WidgetCustomizer = ({
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset
             </Button>
-            <motion.div className="flex-1">
+            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
               <Button
                 variant="premium"
                 size="sm"

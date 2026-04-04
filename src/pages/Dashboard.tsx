@@ -36,7 +36,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useWeatherData } from "@/hooks/useWeatherData";
 import { useUserPreferences, DashboardWidgetConfig } from "@/hooks/useUserPreferences";
 import OpsSnapshot from "@/components/dashboard/OpsSnapshot";
-import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
+import DashboardEmptyState from "@/components/dashboard/DashboardEmptyState";
 import DraggableWidgetGrid from "@/components/dashboard/DraggableWidgetGrid";
 import WidgetCustomizer from "@/components/dashboard/WidgetCustomizer";
 import { DASHBOARD_PRESETS, DashboardPreset } from "@/components/dashboard/DashboardPresetSelector";
@@ -45,8 +45,7 @@ import { ModuleOnboarding } from "@/components/onboarding/ModuleOnboarding";
 import { useUserRole } from "@/hooks/useUserRole";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { StatsGridSkeleton, ChartSkeleton, ActionQueueSkeleton } from "@/components/ui/skeleton-loaders";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatsGridSkeleton } from "@/components/ui/skeleton-loaders";
 import { nl } from "date-fns/locale";
 
 const Dashboard = () => {
@@ -189,31 +188,6 @@ const Dashboard = () => {
     },
   ], [opsStats.onderweg, opsStats.afgeleverd, attentionCount, otifPercentage]);
 
-  if (loading) {
-    return (
-      <DashboardLayout title="Command Center">
-        <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-          {/* Header skeleton */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-56" />
-              <Skeleton className="h-4 w-36" />
-            </div>
-            <Skeleton className="h-10 w-32 rounded-lg" />
-          </div>
-          {/* Quick stats skeleton */}
-          <StatsGridSkeleton count={4} />
-          {/* Widgets skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <ChartSkeleton />
-            </div>
-            <ActionQueueSkeleton count={4} />
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
   return (
     <DashboardLayout title="Command Center">
       <motion.div 
@@ -513,7 +487,7 @@ const Dashboard = () => {
                   </Link>
                 )}
                 {opsStats.podMissing > 0 && (
-                  <Link to="/operations/pod?tab=pending" className="block">
+                  <Link to="/claims?filter=pod-missing" className="block">
                     <motion.div 
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20"
@@ -534,9 +508,6 @@ const Dashboard = () => {
             </div>
           )}
         </motion.section>
-
-        {/* Onboarding Checklist */}
-        <OnboardingChecklist />
 
         {/* Customizable Widget Grid */}
         <motion.section variants={itemVariants}>
@@ -617,6 +588,21 @@ const Dashboard = () => {
         </motion.section>
 
 
+        {/* Empty State / Setup Guide */}
+        {!hasEnoughData && !loading && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <DashboardEmptyState
+              hasOrders={stats.tripsThisMonth > 0}
+              hasRates={true}
+              hasBankConnected={false}
+              hasCustomers={stats.customers > 0}
+            />
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Widget Customizer + Presets — unified panel */}

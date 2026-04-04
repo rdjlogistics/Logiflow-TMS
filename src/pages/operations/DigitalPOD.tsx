@@ -1,5 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -77,38 +76,23 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
       const payload = { stop_proof_id: pod.id };
       const { data, error } = await supabase.functions.invoke('generate-pod-pdf', { body: payload });
       if (error) throw error;
-      const fileName = data?.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}`;
+      if (!data?.pdf) throw new Error('Geen PDF data ontvangen');
 
-      if (data?.pdf) {
-        // Decode base64 PDF
-        const binaryString = atob(data.pdf);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } else if (data?.html) {
-        // Fallback: download as HTML (consistent with vrachtbrief pattern)
-        const blob = new Blob([data.html], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName.endsWith('.html') ? fileName : `${fileName}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } else {
-        throw new Error('Geen PDF of HTML data ontvangen');
+      // Decode base64 PDF (consistent with invoice/purchase-invoice pattern)
+      const binaryString = atob(data.pdf);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       toast.success('PDF gedownload');
     } catch (err: any) {
       console.error('PDF download error:', err);
@@ -232,20 +216,8 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
           className="grid grid-cols-3 gap-2.5"
         >
           <TimeCard icon={<Clock className="h-4 w-4 text-emerald-500" />} label="Aankomst" value={pod.arrival_time} />
-          <TimeCard 
-            icon={<Clock className="h-4 w-4 text-blue-500" />} 
-            label="Vertrek" 
-            value={pod.departure_time && pod.arrival_time && pod.departure_time !== pod.arrival_time ? pod.departure_time : null} 
-          />
-          <TimeCard 
-            icon={<Timer className="h-4 w-4 text-amber-500" />} 
-            label="Wachttijd" 
-            timeValue={
-              pod.arrival_time && pod.departure_time && pod.departure_time !== pod.arrival_time && pod.waiting_minutes != null
-                ? `${pod.waiting_minutes} min`
-                : '-'
-            } 
-          />
+          <TimeCard icon={<Clock className="h-4 w-4 text-blue-500" />} label="Vertrek" value={pod.departure_time} />
+          <TimeCard icon={<Timer className="h-4 w-4 text-amber-500" />} label="Wachttijd" timeValue={pod.waiting_minutes != null ? `${pod.waiting_minutes} min` : '-'} />
         </motion.div>
       )}
 
@@ -387,9 +359,6 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
         onOpenChange={setShowSendDialog}
         tripId={pod.trip_id}
         orderNumber={pod.order_number || pod.id.slice(0, 8)}
-        customerEmail={pod.customer_email}
-        defaultDocumentType="pod"
-        stopProofId={pod.id}
         isDemo={false}
       />
 
@@ -519,8 +488,7 @@ export default function DigitalPOD() {
   const { proofs: liveProofs, loading, stats: liveStats, getCachedSignedUrl, refetch } = useStopProofs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPod, setSelectedPod] = useState<StopProofRecord | null>(null);
-  const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'all');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const [searchFocused, setSearchFocused] = useState(false);
 
   const stats = useMemo(() => ({
