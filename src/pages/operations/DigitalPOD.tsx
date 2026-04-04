@@ -280,7 +280,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             {photoUrls.map((url, idx) => (
               <motion.button
                 key={idx}
-               }
+                whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 transition={spring}
                 onClick={() => setExpandedPhoto(url)}
