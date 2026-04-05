@@ -313,6 +313,50 @@ export function useCreateSurgeFactor() {
   });
 }
 
+export function useDeletePricingRule() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("pricing_rules")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pricing-rules"] });
+      toast({ title: "Regel verwijderd", description: "De prijsregel is succesvol verwijderd." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Fout", description: error.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useDeleteSurgeFactor() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("surge_factors")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surge-factors"] });
+      toast({ title: "Factor verwijderd", description: "De surge factor is succesvol verwijderd." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Fout", description: error.message, variant: "destructive" });
+    },
+  });
+}
+
 export function useToggleSurgeFactor() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
