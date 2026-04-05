@@ -16,7 +16,8 @@ const tabs: NavTab[] = [
   { id: "home", icon: Home, label: "Home", path: "/" },
   { id: "orders", icon: FileText, label: "Orders", path: "/orders" },
   { id: "new", icon: Plus, label: "Nieuw", path: "/orders/edit", isCta: true },
-  { id: "instellingen", icon: Settings, label: "Instellingen", path: "/admin/settings" },
+  { id: "finance", icon: Euro, label: "Financieel", path: "/finance/cashflow" },
+  { id: "instellingen", icon: Settings, label: "Meer", path: "/admin/settings" },
 ];
 
 function getActiveTab(pathname: string, search: string): string {
