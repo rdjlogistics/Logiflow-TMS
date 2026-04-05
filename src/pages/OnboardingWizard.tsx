@@ -47,7 +47,7 @@ const OnboardingWizard = () => {
   const queryClient = useQueryClient();
   const { needsOnboarding, loading: onboardingLoading } = useOnboardingRequired();
   const { company } = useCompany();
-  const { setTheme: applyTheme } = useTheme();
+  const { setTheme: applyTheme, setThemePreset: applyPreset, themePreset: currentPreset } = useTheme();
   const { reorderWidgets, updatePreference } = useUserPreferences();
 
   const [step, setStep] = useState(0);
