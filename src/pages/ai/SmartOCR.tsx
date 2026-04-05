@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -67,6 +68,7 @@ export default function SmartOCR() {
   });
 
   return (
+    <DashboardLayout title="Smart OCR" description="Upload een document voor automatische herkenning">
     <div className="space-y-6">
       <PageHeader title="Smart OCR" description="Upload een document voor automatische herkenning en data-extractie" />
 
@@ -162,5 +164,6 @@ export default function SmartOCR() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

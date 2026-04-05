@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -53,6 +54,7 @@ export default function AccountingIntegration() {
   const activeIntegration = integrations.find((i: any) => i.is_active);
 
   return (
+    <DashboardLayout title="Boekhouding Koppeling" description="Verbind je boekhoudpakket">
     <div className="space-y-6">
       <PageHeader title="Boekhouding Koppeling" description="Verbind je boekhoudpakket voor automatische synchronisatie" />
 
@@ -143,5 +145,6 @@ export default function AccountingIntegration() {
         </CardContent>
       </Card>
     </div>
+    </DashboardLayout>
   );
 }

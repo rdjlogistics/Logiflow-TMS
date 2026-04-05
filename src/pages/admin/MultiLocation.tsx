@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
@@ -65,6 +66,7 @@ export default function MultiLocation() {
   });
 
   return (
+    <DashboardLayout title="Multi-vestiging" description="Beheer je bedrijfsvestigingen">
     <div className="space-y-6">
       <PageHeader
         title="Multi-vestiging"
@@ -146,5 +148,6 @@ export default function MultiLocation() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

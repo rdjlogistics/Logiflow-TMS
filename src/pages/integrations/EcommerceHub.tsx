@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
@@ -77,6 +78,7 @@ export default function EcommerceHub() {
   ];
 
   return (
+    <DashboardLayout title="E-commerce Hub" description="Verbind je webshops">
     <div className="space-y-6">
       <PageHeader
         title="E-commerce Hub"
@@ -182,5 +184,6 @@ export default function EcommerceHub() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }
