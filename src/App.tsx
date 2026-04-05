@@ -310,7 +310,8 @@ const App = () => (
                           <Route path="/admin/document-templates" element={<StaffPR><DocumentTemplates /></StaffPR>} />
                           <Route path="/admin/help" element={<PR><HelpCenter /></PR>} />
                           <Route path="/admin/workflows" element={<AdminPR><WorkflowAutomation /></AdminPR>} />
-                          <Route path="/admin/api" element={<AdminPR><AdminSettings /></AdminPR>} />
+                          <Route path="/admin/api" element={<AdminPR><APIAccess /></AdminPR>} />
+                          <Route path="/admin/locations" element={<AdminPR><MultiLocation /></AdminPR>} />
                           <Route path="/network" element={<PR><Network /></PR>} />
                           <Route path="/email" element={<PR><EmailInbox /></PR>} />
                           
