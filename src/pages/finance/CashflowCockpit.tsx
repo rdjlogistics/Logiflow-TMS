@@ -70,6 +70,7 @@ const formatPercentage = (value: number) => {
 const CashflowCockpit = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'month' | 'quarter' | 'year'>('month');
   const [showAlerts, setShowAlerts] = useState(false);
+  const [showPayments, setShowPayments] = useState(false);
   const [showAddCost, setShowAddCost] = useState(false);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
@@ -85,6 +86,40 @@ const CashflowCockpit = () => {
   const createGoal = useCreateFinanceGoal();
   const deleteGoal = useDeleteFinanceGoal();
   const dismissAlert = useDismissAlert();
+
+  // Payments query
+  const { data: payments, isLoading: paymentsLoading } = useQuery({
+    queryKey: ["payments-cashflow"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select(`*, invoices:invoice_id (invoice_number, customers:customer_id (company_name))`)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const paymentStats = {
+    total: payments?.length || 0,
+    paid: payments?.filter((p) => p.status === "paid").length || 0,
+    pending: payments?.filter((p) => p.status === "pending" || p.status === "open").length || 0,
+    paidAmount: payments?.filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0) || 0,
+  };
+
+  const getPaymentStatusBadge = (status: string) => {
+    const map: Record<string, { className: string; label: string }> = {
+      paid: { className: "bg-emerald-500/15 text-emerald-500 border-emerald-500/25", label: "Betaald" },
+      open: { className: "bg-amber-500/15 text-amber-500 border-amber-500/25", label: "Open" },
+      pending: { className: "bg-blue-500/15 text-blue-500 border-blue-500/25", label: "In behandeling" },
+      failed: { className: "bg-red-500/15 text-red-500 border-red-500/25", label: "Mislukt" },
+      expired: { className: "bg-muted-foreground/15 text-muted-foreground border-muted-foreground/25", label: "Verlopen" },
+      canceled: { className: "bg-muted-foreground/15 text-muted-foreground border-muted-foreground/25", label: "Geannuleerd" },
+    };
+    const s = map[status] || { className: "bg-muted", label: status };
+    return <Badge className={s.className}>{s.label}</Badge>;
+  };
   
   // Goal form state
   const [goalForm, setGoalForm] = useState({
@@ -879,6 +914,75 @@ Overig,${summary.costs.other}
             </Card>
           </div>
         )}
+
+        {/* Betalingen Section */}
+        <Card variant="glass">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                Betalingen
+                {paymentStats.pending > 0 && (
+                  <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-amber-500/10 text-amber-500 border-amber-500/20">
+                    {paymentStats.pending} open
+                  </Badge>
+                )}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {formatCurrency(paymentStats.paidAmount)} ontvangen
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {paymentsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : payments && payments.length > 0 ? (
+              <div className="overflow-x-auto -mx-6 px-6">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border/30 hover:bg-transparent">
+                      <TableHead className="text-xs font-semibold text-muted-foreground">Datum</TableHead>
+                      <TableHead className="text-xs font-semibold text-muted-foreground">Factuur</TableHead>
+                      <TableHead className="text-xs font-semibold text-muted-foreground">Klant</TableHead>
+                      <TableHead className="text-xs font-semibold text-muted-foreground text-right">Bedrag</TableHead>
+                      <TableHead className="text-xs font-semibold text-muted-foreground">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payments.map((payment) => (
+                      <TableRow key={payment.id} className="border-border/20 hover:bg-muted/30 transition-colors">
+                        <TableCell className="text-sm tabular-nums">
+                          {format(new Date(payment.created_at), "d MMM", { locale: nl })}
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-mono text-xs text-primary">
+                            {payment.invoices?.invoice_number || "—"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {payment.invoices?.customers?.company_name || "—"}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold tabular-nums text-sm">
+                          €{Number(payment.amount).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}
+                        </TableCell>
+                        <TableCell>{getPaymentStatusBadge(payment.status)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <CreditCard className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Geen betalingen gevonden</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Alerts Sheet */}

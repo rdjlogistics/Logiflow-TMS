@@ -177,7 +177,7 @@ const financieelItems = [
   { title: "Facturen", icon: FileText, href: "/invoices" },
   { title: "Inkoopfacturen", icon: Receipt, href: "/purchase-invoices" },
   { title: "Debiteuren", icon: Users, href: "/finance/receivables" },
-  { title: "Betalingen", icon: CreditCard, href: "/payments" },
+  
   { title: "Cashflow", icon: Wallet, href: "/finance/cashflow" },
   { title: "Tankpassen", icon: Fuel, href: "/finance/fuel-cards" },
   { title: "Diesel Staffels", icon: TrendingUp, href: "/finance/diesel" },
