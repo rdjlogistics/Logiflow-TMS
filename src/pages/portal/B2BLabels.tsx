@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalData } from "@/components/portal/shared/usePortalData";
 import { usePortalAuth } from "@/hooks/usePortalAuth";
@@ -72,7 +71,7 @@ const B2BLabels = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} onRefresh={refetch}>
-      <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
+      <div className="space-y-6" variants={containerVariants} initial="hidden" animate="show">
         {/* Header */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -89,7 +88,7 @@ const B2BLabels = () => {
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <btn.icon className="h-4 w-4" />}
                   {btn.label}
                 </Button>
-              </motion.div>
+              </div>
             ))}
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Button 
@@ -100,9 +99,9 @@ const B2BLabels = () => {
                 {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
                 Print ({selected.length})
               </Button>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Search & Select All */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3">
@@ -114,12 +113,12 @@ const B2BLabels = () => {
             <Button variant="outline" onClick={selectAll} disabled={filteredShipments.length === 0}>
               {selected.length === filteredShipments.length && filteredShipments.length > 0 ? 'Deselecteer alles' : 'Selecteer alles'}
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Labels Grid */}
         {filteredShipments.length > 0 ? (
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" variants={containerVariants}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" variants={containerVariants}>
             {filteredShipments.map((shipment, index) => {
               const isSelected = selected.includes(shipment.id);
               const status = statusConfig[shipment.status];
@@ -144,22 +143,21 @@ const B2BLabels = () => {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <motion.div 
-                            className={cn(
+                          <div className={cn(
                               "w-5 h-5 rounded border-2 flex items-center justify-center",
                               isSelected ? "bg-gold border-gold" : "border-muted-foreground/30"
                             )}
                             animate={isSelected ? { scale: [1, 1.2, 1] } : { scale: 1 }}
                             transition={{ duration: 0.2 }}
                           >
-                            <AnimatePresence>
+                            
                               {isSelected && (
                                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
                                   <Check className="h-3 w-3 text-gold-foreground" />
-                                </motion.div>
+                                </div>
                               )}
-                            </AnimatePresence>
-                          </motion.div>
+                            
+                          </div>
                           <div>
                             <p className="font-semibold text-sm">{shipment.referenceNumber}</p>
                             <p className="text-xs text-muted-foreground font-mono">{shipment.trackingCode || 'Geen tracking'}</p>
@@ -181,14 +179,14 @@ const B2BLabels = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         ) : (
           <EmptyLabels />
         )}
-      </motion.div>
+      </div>
     </B2BLayout>
   );
 };

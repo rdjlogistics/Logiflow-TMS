@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { 
   Calendar, 
   Truck, 
@@ -82,14 +81,10 @@ export const Step1SelectionSection = ({
   isLoading,
 }: Step1SelectionSectionProps) => {
   return (
-    <motion.div
-     
-     
-      className="space-y-4 sm:space-y-6"
+    <div className="space-y-4 sm:space-y-6"
     >
       {/* Section Header */}
-      <motion.div
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent backdrop-blur-2xl border border-primary/20 p-4 sm:p-6"
       >
         {/* Shimmer */}
         <motion.div
@@ -100,13 +95,12 @@ export const Step1SelectionSection = ({
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)] pointer-events-none" />
         
         <div className="relative flex items-center gap-3 sm:gap-4">
-          <motion.div 
-            className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
+          <div className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-lg shadow-primary/20 flex-shrink-0"
 
           >
             <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
             <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-primary/10 blur-xl animate-pulse" />
-          </motion.div>
+          </div>
           <div className="min-w-0">
             <h2 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
               <span className="truncate">Selecteer Parameters</span>
@@ -117,11 +111,10 @@ export const Step1SelectionSection = ({
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Period Selection */}
-      <motion.div
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
@@ -152,7 +145,7 @@ export const Step1SelectionSection = ({
                 )}
                 <preset.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 relative z-10 flex-shrink-0" />
                 <span className="relative z-10 truncate">{preset.label}</span>
-              </motion.button>
+              </button>
             ))}
           </div>
           
@@ -167,13 +160,12 @@ export const Step1SelectionSection = ({
               {format(new Date(periodDates.from), "d MMM", { locale: nl })} t/m{" "}
               {format(new Date(periodDates.to), "d MMM yyyy", { locale: nl })}
             </span>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Carrier Selection */}
-      <motion.div
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
@@ -202,11 +194,10 @@ export const Step1SelectionSection = ({
             </SelectContent>
           </Select>
         </div>
-      </motion.div>
+      </div>
 
       {/* Invoice Type Selection */}
-      <motion.div
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
@@ -247,7 +238,7 @@ export const Step1SelectionSection = ({
                   className="absolute top-3 right-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary shadow-lg shadow-primary/50"
                 />
               )}
-            </motion.button>
+            </button>
             
             {/* Self-billing Card */}
             <motion.button
@@ -279,14 +270,13 @@ export const Step1SelectionSection = ({
                   className="absolute top-3 right-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary shadow-lg shadow-primary/50"
                 />
               )}
-            </motion.button>
+            </button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Footnote */}
-      <motion.div
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30 backdrop-blur-xl border border-border/40 p-4 sm:p-5"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
@@ -304,10 +294,10 @@ export const Step1SelectionSection = ({
             className="rounded-xl text-sm touch-manipulation"
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Action Button - Fixed bottom on mobile for better UX */}
-      <motion.div className="pb-safe">
+      <div className="pb-safe">
         <Button
           onClick={onNext}
           disabled={isLoading}
@@ -322,7 +312,7 @@ export const Step1SelectionSection = ({
             </>
           )}
         </Button>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };

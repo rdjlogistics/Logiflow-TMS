@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect, memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Radio, Truck, Package, CheckCircle2, XCircle, AlertTriangle, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -105,7 +104,7 @@ const LiveEventStreamWidget = () => {
 
       {/* Event List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-1.5 max-h-[380px]">
-        <AnimatePresence initial={false}>
+        
           {events.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3">
               <div className="p-3 rounded-2xl bg-muted/30">
@@ -123,11 +122,7 @@ const LiveEventStreamWidget = () => {
               const config = eventConfig[ev.type];
               const Icon = config.icon;
               return (
-                <motion.div
-                  key={ev.id}
-                  initial={{ opacity: 0, x: 12, height: 0 }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className={cn(
+                <div key={ev.id} className="animate-fade-in {cn(
                     "flex items-start gap-2.5 rounded-xl px-3 py-2.5",
                     "bg-card/60 border border-border/20 backdrop-blur-sm"
                   )}
@@ -144,11 +139,11 @@ const LiveEventStreamWidget = () => {
                       {ev.time}
                     </span>
                   </div>
-                </motion.div>
+                </div>
               );
             })
           )}
-        </AnimatePresence>
+        
       </div>
     </div>
   );

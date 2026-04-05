@@ -11,7 +11,6 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { UsersRound, Search, Building2, Phone, Mail, Globe, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 
 const CommunityWorkspaces = () => {
   const [search, setSearch] = useState("");
@@ -39,7 +38,7 @@ const CommunityWorkspaces = () => {
   return (
     <DashboardLayout title="Community Workspaces">
       <FeatureGate feature="vervoerders_netwerk">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+        <div className="animate-fade-in "space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card><CardContent className="pt-4 text-center">
@@ -126,7 +125,7 @@ const CommunityWorkspaces = () => {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </FeatureGate>
     </DashboardLayout>
   );

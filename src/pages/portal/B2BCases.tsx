@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { usePortalData } from "@/components/portal/shared/usePortalData";
@@ -89,24 +88,24 @@ const B2BCases = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"} unreadNotifications={statusCounts.open} onRefresh={refetch}>
-      <motion.div className="space-y-6">
+      <div className="space-y-6">
         {/* Header */}
-        <motion.div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold">Cases</h1>
             <p className="text-sm text-muted-foreground">
               {statusCounts.open} open, {statusCounts.in_progress} in behandeling
             </p>
           </div>
-          <motion.div>
+          <div>
             <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 bg-gold hover:bg-gold/90 text-gold-foreground">
               <Plus className="h-4 w-4" /> Nieuwe Case
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Status Cards */}
-        <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {statusCards.map((sc, index) => (
             <motion.div key={sc.key}>
               <Card 
@@ -118,9 +117,9 @@ const B2BCases = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <motion.div className={cn("p-1.5 rounded-lg", sc.bg)}>
+                    <div className={cn("p-1.5 rounded-lg", sc.bg)}>
                       <sc.icon className={cn("h-4 w-4", sc.color)} />
-                    </motion.div>
+                    </div>
                     <span className="text-xs text-muted-foreground">{sc.label}</span>
                   </div>
                   <motion.p
@@ -133,17 +132,17 @@ const B2BCases = () => {
                   </motion.p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Search + Filter */}
-        <motion.div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Zoeken in cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 text-base" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Cases List */}
         <div className="space-y-3">
@@ -167,12 +166,11 @@ const B2BCases = () => {
                 >
                   <CardContent className="p-4 min-h-[56px]">
                     <div className="flex items-start gap-4">
-                      <motion.div
-                        className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", status.bgColor)}
+                      <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", status.bgColor)}
 
                       >
                         <StatusIcon className={cn("h-5 w-5", status.color)} />
-                      </motion.div>
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-sm truncate">{caseItem.description}</span>
@@ -197,15 +195,14 @@ const B2BCases = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Empty State */}
         {filteredCases.length === 0 && (
-          <motion.div 
-            className="text-center py-16"
+          <div className="text-center py-16"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -214,12 +211,12 @@ const B2BCases = () => {
               <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="h-8 w-8 text-emerald-400" />
               </div>
-            </motion.div>
+            </div>
             <h3 className="text-lg font-semibold mb-1">Geen cases</h3>
             <p className="text-sm text-muted-foreground">
               {statusFilter ? 'Geen cases met deze status' : 'Alles verloopt soepel!'}
             </p>
-          </motion.div>
+          </div>
         )}
 
         <CreateCaseDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} shipments={shipments} onSuccess={refetch} />
@@ -232,7 +229,7 @@ const B2BCases = () => {
               <SheetDescription>{selectedCase?.description}</SheetDescription>
             </SheetHeader>
             {selectedCase && (
-              <motion.div className="mt-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+              <div className="mt-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className={cn(caseStatusConfig[selectedCase.status]?.bgColor, caseStatusConfig[selectedCase.status]?.color, "border-0")}>
                     {caseStatusConfig[selectedCase.status]?.label}
@@ -263,20 +260,16 @@ const B2BCases = () => {
                   <h4 className="font-medium mb-3">Berichten</h4>
                   <ScrollArea className="h-48 pr-4">
                     <div className="space-y-3">
-                      <motion.div className="p-3 rounded-lg bg-muted/30 backdrop-blur-sm" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+                      <div className="p-3 rounded-lg bg-muted/30 backdrop-blur-sm" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
                         <p className="text-sm">{selectedCase.description}</p>
                         <p className="text-xs text-muted-foreground mt-1">{format(new Date(selectedCase.createdAt), "d MMM, HH:mm", { locale: nl })}</p>
-                      </motion.div>
+                      </div>
                       {messagesLoading ? (
                         <div className="flex items-center justify-center py-4"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
                       ) : (
                         messages.map((msg, i) => (
-                          <motion.div
-                            key={msg.id}
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                            className={cn("p-3 rounded-lg", msg.sender_role === 'customer' ? "bg-primary/10 ml-4" : "bg-muted/30 mr-4")}
+                          <div
+                            key={msg.id} className="animate-fade-in {cn("p-3 rounded-lg", msg.sender_role === 'customer' ? "bg-primary/10 ml-4" : "bg-muted/30 mr-4")}
                           >
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-medium">{msg.sender_name}</span>
@@ -284,7 +277,7 @@ const B2BCases = () => {
                             </div>
                             <p className="text-sm">{msg.content}</p>
                             <p className="text-xs text-muted-foreground mt-1">{format(new Date(msg.created_at), "d MMM, HH:mm", { locale: nl })}</p>
-                          </motion.div>
+                          </div>
                         ))
                       )}
                     </div>
@@ -296,21 +289,21 @@ const B2BCases = () => {
                   <div className="space-y-3">
                     <Textarea placeholder="Typ je bericht..." value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)} rows={3} />
                     <div className="flex gap-2">
-                      <motion.div className="flex-1">
+                      <div className="flex-1">
                         <Button className="w-full" onClick={handleSendMessage} disabled={!replyMessage.trim() || sendMessage.isPending}>
                           {sendMessage.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                           Versturen
                         </Button>
-                      </motion.div>
+                      </div>
                       <Button variant="outline" onClick={() => setSelectedCase(null)}>Sluiten</Button>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
           </SheetContent>
         </Sheet>
-      </motion.div>
+      </div>
     </B2BLayout>
   );
 };

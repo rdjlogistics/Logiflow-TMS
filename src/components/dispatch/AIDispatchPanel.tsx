@@ -1,5 +1,4 @@
 import React, { useState, memo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -181,9 +180,9 @@ const AIDispatchPanel = () => {
           </ScrollArea>
         </div>
 
-        <AnimatePresence mode="wait">
+        
           {selectedTrip && (
-            <motion.div key="recs" initial={{ opacity: 0, height: 0 }} exit={{ opacity: 0, height: 0 }} className="space-y-2">
+            <div key="recs" className="animate-fade-in "space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase text-muted-foreground">AI Aanbevelingen</p>
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => refetch()}>
@@ -221,12 +220,12 @@ const AIDispatchPanel = () => {
                         <UserCheck className="h-3 w-3 mr-1" />Toewijzen
                       </Button>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        
 
         {!selectedTrip && (
           <div className="grid grid-cols-3 gap-2">

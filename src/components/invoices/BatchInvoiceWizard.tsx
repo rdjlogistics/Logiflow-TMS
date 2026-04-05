@@ -25,7 +25,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   ArrowLeft,
@@ -505,7 +504,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
+      
         {/* Step 1: Filters */}
         {currentStep === 1 && (
           <motion.div
@@ -650,7 +649,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {/* Step 2: Preview */}
@@ -748,7 +747,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {/* Step 3: Confirmation */}
@@ -845,7 +844,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
         {/* Step 4: Email Sending */}
         {currentStep === 4 && createdInvoices.length > 0 && (
@@ -974,7 +973,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {/* Step 5: Success */}
@@ -991,7 +990,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                     className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center"
                   >
                     <CheckCircle2 className="h-9 w-9 text-emerald-600 dark:text-emerald-400" />
-                  </motion.div>
+                  </div>
                   
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -1007,7 +1006,7 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                         ✉️ {Object.values(emailStatuses).filter(s => s === "sent").length} per e-mail verzonden
                       </p>
                     )}
-                  </motion.div>
+                  </div>
 
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -1037,13 +1036,13 @@ export function BatchInvoiceWizard({ onComplete, onCancel }: BatchInvoiceWizardP
                     >
                       Nieuwe batch
                     </Button>
-                  </motion.div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      
 
       {/* Navigation Buttons - Mobile Optimized (hidden on email/success steps) */}
       {currentStep < 4 && (

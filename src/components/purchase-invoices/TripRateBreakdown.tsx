@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -154,7 +153,7 @@ export const TripRateBreakdown = ({
                   <span className="opacity-70 text-xs">({Math.round(data.totalKm)} km)</span>
                 )}
               </Badge>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -180,10 +179,10 @@ export const TripRateBreakdown = ({
         <motion.div
         >
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        </motion.div>
+        </div>
       </Button>
 
-      <AnimatePresence>
+      
         {isExpanded && (
           <motion.div
            
@@ -314,7 +313,7 @@ export const TripRateBreakdown = ({
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
 
@@ -351,11 +350,10 @@ export const TripRateBreakdown = ({
                 {/* Grand Total */}
                 <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-500/15 to-emerald-400/8 border border-emerald-500/30">
                   <div className="flex items-center gap-3">
-                    <motion.div 
-                      className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/15"
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-400/15"
                     >
                       <Sparkles className="h-4 w-4 text-emerald-500" />
-                    </motion.div>
+                    </div>
                     <span className="font-bold text-emerald-700 dark:text-emerald-300">
                       Totaal incl. BTW
                     </span>
@@ -364,11 +362,11 @@ export const TripRateBreakdown = ({
                     {formatCurrency(subtotal * 1.21)}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, 
   MapPin, 
@@ -193,13 +192,9 @@ export const QuickDriverAssign = ({
                 <p className="text-sm">Geen beschikbare chauffeurs</p>
               </div>
             ) : (
-              <AnimatePresence>
+              
                 {filteredDrivers.map((driver, index) => (
-                  <motion.button
-                    key={driver.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    onClick={() => handleAssign(driver.id)}
+                  <button key={driver.id} onClick={() => handleAssign(driver.id)}
                     disabled={assignMutation.isPending}
                     className={cn(
                       "w-full p-3 rounded-xl text-left transition-all",
@@ -252,9 +247,9 @@ export const QuickDriverAssign = ({
                         )}
                       </div>
                     </div>
-                  </motion.button>
+                  </button>
                 ))}
-              </AnimatePresence>
+              
             )}
           </div>
         </ScrollArea>

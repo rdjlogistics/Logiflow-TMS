@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -98,14 +97,6 @@ const Dashboard = () => {
     setCurrentPresetId(preset.id);
   };
 
-  // Instant render — no stagger delay. Soft 150ms fade for premium feel.
-  const containerVariants = useMemo(() => ({
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0 }
-    }
-  }), []);
 
   const itemVariants = useMemo(() => ({
     hidden: { opacity: 0 },
@@ -190,16 +181,10 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout title="Command Center">
-      <motion.div 
-        className="space-y-4 sm:space-y-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+      <div className="space-y-4 sm:space-y-6 animate-fade-in">
         {/* Mobile: Compact Header with Quick Actions */}
         {/* Desktop: Full Elite Header */}
-        <motion.div 
-          variants={itemVariants}
+        <div
           className="relative overflow-hidden rounded-xl sm:rounded-2xl"
         >
         {/* Multi-layer mesh gradient background */}
@@ -273,16 +258,12 @@ const Dashboard = () => {
               {/* Left: Branding & Status */}
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <motion.div 
-                    className="relative"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                  >
+                  <div className="relative hover:scale-105 transition-transform">
                     <div className="absolute -inset-1 bg-gradient-to-br from-primary via-primary/50 to-gold/50 rounded-xl blur opacity-40" />
                     <div className="relative p-4 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-2xl shadow-primary/25">
                       <Activity className="h-6 w-6 text-primary-foreground" />
                     </div>
-                  </motion.div>
+                  </div>
                   <div>
                     <div className="flex items-center gap-3">
                       <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Command Center</h1>
@@ -303,12 +284,7 @@ const Dashboard = () => {
                     
                     {/* Weather & Traffic Info */}
                     {!weatherLoading && weather && (
-                      <motion.div 
-                        className="flex items-center gap-3 mt-2"
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                      >
+                      <div className="flex items-center gap-3 mt-2 animate-fade-in">
                         <div className="flex items-center gap-1.5 text-sm">
                           <WeatherIcon className="h-4 w-4 text-gold" />
                           <span className="font-bold tabular-nums">{weather.temperature}°C</span>
@@ -326,7 +302,7 @@ const Dashboard = () => {
                           )}
                           <span className={trafficConfig.color}>{trafficConfig.label}</span>
                         </div>
-                      </motion.div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -343,15 +319,15 @@ const Dashboard = () => {
 
               {/* Right: Quick Actions */}
               <div className="flex items-center gap-3">
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <div className="hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                   <Button asChild variant="premium" size="default" className="shadow-lg shadow-primary/20 h-11">
                     <Link to="/orders">
                       <Plus className="h-4 w-4 mr-2" />
                       Nieuwe order
                     </Link>
                   </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                </div>
+                <div className="hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                   <Button asChild variant="outline" size="default" className="group h-11">
                     <Link to="/track-chauffeurs">
                       <Route className="h-4 w-4 mr-2" />
@@ -359,8 +335,8 @@ const Dashboard = () => {
                       <ChevronRight className="h-4 w-4 ml-1 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                     </Link>
                   </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                </div>
+                <div className="hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                   <Button asChild variant="ghost" size="icon" className="h-11 w-11 relative">
                     <Link to="/email">
                       <Mail className="h-5 w-5" />
@@ -371,30 +347,28 @@ const Dashboard = () => {
                       )}
                     </Link>
                   </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                </div>
+                <div className="hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] transition-transform">
                   <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsCustomizing(true)}>
                     <Settings2 className="h-5 w-5" />
                   </Button>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Mobile: iOS-Style Quick Stats Grid */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2.5 sm:hidden">
+        <div className="grid grid-cols-2 gap-2.5 sm:hidden">
           {loading ? (
             <StatsGridSkeleton count={4} />
           ) : (
             quickStats.map((stat, index) => (
               <Link key={stat.label} to={stat.href}>
-                <motion.div
-                  whileTap={{ scale: 0.97 }}
-                  className={cn(
+                <div className={cn(
                     "relative p-3.5 rounded-2xl glass-panel-subtle",
                     "bg-gradient-to-br from-card/80 to-card/40",
-                    "active:scale-[0.98] transition-transform touch-manipulation"
+                    "active:scale-[0.97] transition-transform touch-manipulation"
                   )}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -414,14 +388,14 @@ const Dashboard = () => {
                   <p className={cn("text-2xl font-bold tabular-nums", stat.color)}>
                     {`${stat.value}${'suffix' in stat ? stat.suffix : ''}`}
                   </p>
-                </motion.div>
+                </div>
               </Link>
             ))
           )}
-        </motion.div>
+        </div>
 
         {/* Desktop: Full OPS Snapshot */}
-        <motion.section variants={itemVariants} className="hidden sm:block">
+        <section className="hidden sm:block">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -440,10 +414,10 @@ const Dashboard = () => {
             hold={opsStats.hold}
             loading={loading}
           />
-        </motion.section>
+        </section>
 
         {/* Mobile: Compact OPS Row (just critical alerts) */}
-        <motion.section variants={itemVariants} className="sm:hidden">
+        <section className="sm:hidden">
           {(opsStats.chauffeurNodig > 0 || opsStats.atRisk > 0 || opsStats.podMissing > 0) && (
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">
@@ -452,9 +426,7 @@ const Dashboard = () => {
               <div className="space-y-1.5">
                 {opsStats.chauffeurNodig > 0 && (
                   <Link to="/driver/assign" className="block">
-                    <motion.div 
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-destructive/10 border border-destructive/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-destructive/10 border border-destructive/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-destructive/15">
@@ -465,14 +437,12 @@ const Dashboard = () => {
                       <Badge variant="destructive" className="text-xs font-bold">
                         {opsStats.chauffeurNodig}
                       </Badge>
-                    </motion.div>
+                    </div>
                   </Link>
                 )}
                 {opsStats.atRisk > 0 && (
                   <Link to="/trips?filter=at-risk" className="block">
-                    <motion.div 
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-warning/15">
@@ -483,14 +453,12 @@ const Dashboard = () => {
                       <Badge variant="warning" className="text-xs font-bold">
                         {opsStats.atRisk}
                       </Badge>
-                    </motion.div>
+                    </div>
                   </Link>
                 )}
                 {opsStats.podMissing > 0 && (
                   <Link to="/claims?filter=pod-missing" className="block">
-                    <motion.div 
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-primary/15">
@@ -501,16 +469,16 @@ const Dashboard = () => {
                       <Badge variant="outline" className="text-xs font-bold">
                         {opsStats.podMissing}
                       </Badge>
-                    </motion.div>
+                    </div>
                   </Link>
                 )}
               </div>
             </div>
           )}
-        </motion.section>
+        </section>
 
         {/* Customizable Widget Grid */}
-        <motion.section variants={itemVariants}>
+        <section>
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
               <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-gold to-gold/50" />
@@ -548,10 +516,10 @@ const Dashboard = () => {
             hasEnoughData={hasEnoughData}
           />
           </div>
-        </motion.section>
+        </section>
 
         {/* Snelle acties */}
-        <motion.section variants={itemVariants}>
+        <section>
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <div className="w-1 h-4 sm:h-5 rounded-full bg-gradient-to-b from-primary to-primary/50" />
             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -566,11 +534,9 @@ const Dashboard = () => {
               { label: "Planning", icon: Route, href: "/planning", color: "text-primary", bg: "bg-primary/8", border: "border-primary/15" },
             ].map((action) => (
               <Link key={action.href} to={action.href}>
-                <motion.div
-                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 20 } }}
-                  whileTap={{ scale: 0.97 }}
+                <div
                   className={cn(
-                    "action-card-3d",
+                    "action-card-3d hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.97] transition-all",
                     "relative flex flex-col items-center justify-center gap-3 p-5 cursor-pointer",
                     "group touch-manipulation min-h-[88px] sm:min-h-0",
                     action.border
@@ -581,29 +547,25 @@ const Dashboard = () => {
                   </div>
                   <span className="text-sm font-semibold text-center leading-tight">{action.label}</span>
                   <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground/60 transition-all group-hover:translate-x-0.5" />
-                </motion.div>
+                </div>
               </Link>
             ))}
           </div>
-        </motion.section>
+        </section>
 
 
         {/* Empty State / Setup Guide */}
         {!hasEnoughData && !loading && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div className="animate-scale-in">
             <DashboardEmptyState
               hasOrders={stats.tripsThisMonth > 0}
               hasRates={true}
               hasBankConnected={false}
               hasCustomers={stats.customers > 0}
             />
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Widget Customizer + Presets — unified panel */}
       <WidgetCustomizer

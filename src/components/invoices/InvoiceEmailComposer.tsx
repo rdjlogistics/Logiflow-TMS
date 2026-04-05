@@ -18,7 +18,6 @@ import {
   ScrollText,
 } from "lucide-react";
 import { useTenantSettings } from "@/hooks/useTenantSettings";
-import { motion, AnimatePresence } from "framer-motion";
 
 // --- Animation Variants ---
 const containerVariants = {
@@ -236,7 +235,7 @@ ${company?.name || ""}`);
         <motion.div
         >
           <Loader2 className="h-8 w-8 text-primary" />
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -252,10 +251,7 @@ ${company?.name || ""}`);
   const hasRecipients = selectedRecipients.size > 0 || customEmail;
 
   return (
-    <motion.div
-     
-     
-      className="relative rounded-2xl overflow-hidden border border-border/30 shadow-xl"
+    <div className="relative rounded-2xl overflow-hidden border border-border/30 shadow-xl"
       style={{
         background: 'hsl(var(--card) / 0.55)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -268,22 +264,17 @@ ${company?.name || ""}`);
       <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-primary/20 via-transparent to-transparent" />
 
       {/* Animated shimmer */}
-      <motion.div
-       
-       
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.03] to-transparent pointer-events-none"
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.03] to-transparent pointer-events-none"
       />
 
       {/* Mesh gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.06),transparent)] pointer-events-none" />
 
       {/* ── Header ── */}
-      <motion.div
-        className="relative px-6 py-5 border-b border-border/20"
+      <div className="relative px-6 py-5 border-b border-border/20"
       >
         <div className="flex items-center gap-4">
-          <motion.div
-            className="relative flex items-center justify-center w-12 h-12 rounded-xl"
+          <div className="relative flex items-center justify-center w-12 h-12 rounded-xl"
             style={{
               background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))',
               boxShadow: '0 0 24px -8px hsl(var(--primary) / 0.25)',
@@ -292,7 +283,7 @@ ${company?.name || ""}`);
           >
             <Mail className="h-5 w-5 text-primary" />
             <div className="absolute inset-0 rounded-xl bg-primary/5 blur-xl animate-pulse" />
-          </motion.div>
+          </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground tracking-tight">E-mail Versturen</h2>
             <p className="text-sm text-muted-foreground">
@@ -300,11 +291,11 @@ ${company?.name || ""}`);
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <div className="relative p-6 space-y-5">
         {/* ── Recipients ── */}
-        <motion.div className="space-y-2.5">
+        <div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aan</Label>
           <div
             className="flex flex-wrap items-center gap-2 p-3 min-h-[52px] rounded-xl border border-border/20 transition-all duration-200 focus-within:border-primary/30 focus-within:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.12)]"
@@ -314,7 +305,7 @@ ${company?.name || ""}`);
               WebkitBackdropFilter: 'blur(12px)',
             }}
           >
-            <AnimatePresence mode="popLayout">
+            
               {Array.from(selectedRecipients).map((email) => {
                 const contact = contacts.find(c => c.email === email);
                 return (
@@ -337,11 +328,11 @@ ${company?.name || ""}`);
 
                     >
                       <X className="h-3.5 w-3.5" />
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
                 );
               })}
-            </AnimatePresence>
+            
 
             {!showCustomInput ? (
               <div className="flex items-center gap-2">
@@ -354,7 +345,7 @@ ${company?.name || ""}`);
                   >
                     <Plus className="h-3.5 w-3.5" />
                     {contact.name}
-                  </motion.button>
+                  </button>
                 ))}
                 <motion.button
                   onClick={() => setShowCustomInput(true)}
@@ -363,13 +354,10 @@ ${company?.name || ""}`);
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ander adres
-                </motion.button>
+                </button>
               </div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, width: 0 }}
-                exit={{ opacity: 0, width: 0 }}
-                className="flex items-center gap-2 flex-1 min-w-[200px]"
+              <div className="animate-fade-in "flex items-center gap-2 flex-1 min-w-[200px]"
               >
                 <Input
                   type="email"
@@ -386,13 +374,13 @@ ${company?.name || ""}`);
                 <Button size="sm" variant="ghost" onClick={() => { setShowCustomInput(false); setCustomEmail(""); }} className="h-8 px-2">
                   <X className="h-4 w-4" />
                 </Button>
-              </motion.div>
+              </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* ── Subject ── */}
-        <motion.div className="space-y-2.5">
+        <div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Onderwerp</Label>
           <Input
             value={emailSubject}
@@ -400,10 +388,10 @@ ${company?.name || ""}`);
             placeholder="Onderwerp van de e-mail"
             className="h-11 rounded-xl border-border/20 bg-card/40 backdrop-blur-sm focus-visible:border-primary/30 focus-visible:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.12)] transition-all duration-200"
           />
-        </motion.div>
+        </div>
 
         {/* ── Message ── */}
-        <motion.div className="space-y-2.5">
+        <div className="space-y-2.5">
           <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Bericht</Label>
           <Textarea
             value={emailBody}
@@ -412,10 +400,10 @@ ${company?.name || ""}`);
             placeholder="Schrijf uw bericht..."
             className="resize-none text-sm leading-relaxed rounded-xl border-border/20 bg-card/40 backdrop-blur-sm focus-visible:border-primary/30 focus-visible:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.12)] transition-all duration-200"
           />
-        </motion.div>
+        </div>
 
         {/* ── Attachments ── */}
-        <motion.div className="space-y-3">
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Bijlagen</Label>
@@ -444,12 +432,9 @@ ${company?.name || ""}`);
           </div>
 
           {/* Order documents */}
-          <AnimatePresence>
+          
             {showDocAttachments && orderDocuments && orderDocuments.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-3 space-y-2 overflow-hidden"
+              <div className="animate-fade-in "mt-3 space-y-2 overflow-hidden"
               >
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Order Documenten</p>
                 {orderDocuments.map((doc: any) => (
@@ -473,15 +458,14 @@ ${company?.name || ""}`);
                     <span className="text-sm text-foreground">{doc.name || doc.document_type}</span>
                   </motion.label>
                 ))}
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
-        </motion.div>
+          
+        </div>
       </div>
 
       {/* ── Footer / Send ── */}
-      <motion.div
-        className="relative px-6 py-4 border-t border-border/20"
+      <div className="relative px-6 py-4 border-t border-border/20"
         style={{
           background: 'hsl(var(--card) / 0.4)',
           backdropFilter: 'blur(20px)',
@@ -502,8 +486,7 @@ ${company?.name || ""}`);
         >
           {/* Button shimmer */}
           {hasRecipients && (
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
               initial={{ x: '-100%' }}
             />
           )}
@@ -511,9 +494,9 @@ ${company?.name || ""}`);
           <span className="relative z-10 flex items-center justify-center gap-2">
             {sendEmailMutation.isPending ? (
               <>
-                <motion.div>
+                <div>
                   <Loader2 className="h-5 w-5" />
-                </motion.div>
+                </div>
                 Verzenden...
               </>
             ) : (
@@ -523,9 +506,9 @@ ${company?.name || ""}`);
               </>
             )}
           </span>
-        </motion.button>
+        </button>
 
-        <AnimatePresence>
+        
           {!hasRecipients && (
             <motion.p
               initial={{ opacity: 0, y: -4 }}
@@ -535,8 +518,8 @@ ${company?.name || ""}`);
               Voeg minimaal één ontvanger toe om te versturen
             </motion.p>
           )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+        
+      </div>
+    </div>
   );
 }

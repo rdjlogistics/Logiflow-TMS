@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -428,7 +427,7 @@ const OrderDocumentDialog = ({
                             className="flex items-center justify-center w-4 h-4 rounded-full bg-primary text-primary-foreground"
                           >
                             <Check className="h-3 w-3" />
-                          </motion.div>
+                          </div>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
@@ -442,12 +441,9 @@ const OrderDocumentDialog = ({
           </div>
 
           {/* Copies Selection - Only for vrachtbrief and CMR */}
-          <AnimatePresence mode="wait">
+          
             {currentDocConfig?.supportsCopies && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-3 overflow-hidden"
+              <div className="animate-fade-in "space-y-3 overflow-hidden"
               >
                 <Separator />
                 <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -478,17 +474,14 @@ const OrderDocumentDialog = ({
                     );
                   })}
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          
 
           {/* Overlay Count - Only for CMR overlay */}
-          <AnimatePresence mode="wait">
+          
             {selectedType === "cmr_overlay" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-3 overflow-hidden"
+              <div className="animate-fade-in "space-y-3 overflow-hidden"
               >
                 <Separator />
                 <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -509,17 +502,14 @@ const OrderDocumentDialog = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          
 
           {/* Carrier Branding Selection */}
-          <AnimatePresence mode="wait">
+          
             {currentDocConfig?.supportsBranding && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-3 overflow-hidden"
+              <div className="animate-fade-in "space-y-3 overflow-hidden"
               >
                 <Separator />
                 <div className="flex items-center gap-2">
@@ -559,9 +549,9 @@ const OrderDocumentDialog = ({
                     </label>
                   ))}
                 </RadioGroup>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          
 
           {/* Language Selection */}
           <div className="space-y-3">
@@ -584,12 +574,9 @@ const OrderDocumentDialog = ({
           </div>
 
           {/* Success Actions */}
-          <AnimatePresence>
+          
             {generatedUrl && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-3"
+              <div className="animate-fade-in "space-y-3"
               >
                 <Separator />
                 <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -637,9 +624,9 @@ const OrderDocumentDialog = ({
                     </Button>
                   )}
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0 shrink-0">
