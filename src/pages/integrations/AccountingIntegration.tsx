@@ -124,7 +124,10 @@ export default function AccountingIntegration() {
                     {connected ? "Opnieuw verbinden" : "Verbinden"}
                   </Button>
                 ) : (
-                  <Button variant="outline" disabled className="w-full">Binnenkort beschikbaar</Button>
+                  <Button variant="outline" className="w-full gap-2" onClick={() => window.open('mailto:support@rdjlogistics.nl?subject=Interesse%20' + p.name, '_blank')}>
+                    <ExternalLink className="h-4 w-4" />
+                    Contact voor {p.name}
+                  </Button>
                 )}
               </CardContent>
             </Card>
