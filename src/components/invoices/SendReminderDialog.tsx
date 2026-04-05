@@ -32,7 +32,6 @@ import { format, differenceInDays } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCompany } from "@/hooks/useCompany";
-import { AnimatePresence, motion } from "framer-motion";
 
 // ---------- types ----------
 
@@ -487,7 +486,7 @@ export function SendReminderDialog({
           <Separator />
 
           {/* Message Preview */}
-          <AnimatePresence mode="wait">
+          
             <motion.div
               key={`${reminderType}-${activePreviewTab}-${isEditing}`}
               initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
@@ -589,8 +588,8 @@ export function SendReminderDialog({
                   Dit is een preview — het daadwerkelijke bericht kan kleine verschillen bevatten (betaallink, opmaak).
                 </p>
               </div>
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          
         </div>
 
         <DialogFooter>

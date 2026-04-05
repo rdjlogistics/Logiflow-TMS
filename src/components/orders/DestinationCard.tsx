@@ -16,7 +16,6 @@ import { capitalizeCity } from "@/lib/date-utils";
 import { supabase } from "@/integrations/supabase/client";
 import { usePostcodeLookup, formatDutchPostcode } from "@/hooks/usePostcodeLookup";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Address {
@@ -305,12 +304,9 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
           </div>
         </CardHeader>
 
-        <AnimatePresence initial={false}>
+        
           {isExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
+            <div className="animate-fade-in "overflow-hidden"
             >
               <CardContent className="px-3 sm:px-5 pb-4 pt-1">
                 {/* Radio group */}
@@ -392,18 +388,18 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
                               className={cn(inputMobile, "pr-8")}
                               maxLength={7}
                             />
-                            <AnimatePresence>
+                            
                               {postcodeLoading && (
-                                <motion.div initial={{ opacity: 0 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                                <div className="animate-fade-in "absolute right-2.5 top-1/2 -translate-y-1/2">
                                   <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                                </motion.div>
+                                </div>
                               )}
                               {autoFilled && !postcodeLoading && (
-                                <motion.div initial={{ opacity: 0, scale: 0.5 }} exit={{ opacity: 0 }} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                                <div className="animate-fade-in "absolute right-2.5 top-1/2 -translate-y-1/2">
                                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                                </motion.div>
+                                </div>
                               )}
-                            </AnimatePresence>
+                            
                           </div>
                         </div>
                         <div className="space-y-1">
@@ -419,15 +415,14 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Adres</Label>
-                        <motion.div
-                          className="rounded-lg"
+                        <div className="rounded-lg"
                         >
                           <Input
                             value={data.street}
                             onChange={(e) => handleChange('street', e.target.value)}
                             className={cn(inputMobile, "transition-colors", autoFilled && "border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-950/20")}
                           />
-                        </motion.div>
+                        </div>
                       </div>
 
                       <div className="space-y-1">
@@ -441,15 +436,14 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
 
                       <div className="space-y-1">
                         <Label className={labelClass}>Woonplaats</Label>
-                        <motion.div
-                          className="rounded-lg"
+                        <div className="rounded-lg"
                         >
                           <Input
                             value={data.city}
                             onChange={(e) => handleChange('city', e.target.value)}
                             className={cn(inputMobile, "transition-colors", autoFilled && "border-emerald-400/50 bg-emerald-50/30 dark:bg-emerald-950/20", cityMismatch && "border-yellow-500/50")}
                           />
-                        </motion.div>
+                        </div>
                         {cityMismatch && (
                           <p className="text-[11px] text-yellow-600 dark:text-yellow-400 mt-0.5">
                             De postcode hoort bij {cityMismatch}, niet {data.city}
@@ -596,11 +590,11 @@ const DestinationCard = ({ index, data, onChange, onRemove, canRemove, onCopyToD
                   </div>
                 </div>
               </CardContent>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

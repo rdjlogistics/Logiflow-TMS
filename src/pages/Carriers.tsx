@@ -27,7 +27,6 @@ import { CreateDriverPortalDialog } from "@/components/drivers/CreateDriverPorta
 import { writeExcelMultiSheet, writeCsvFile } from "@/lib/excelUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -394,12 +393,8 @@ const DriversTab = () => {
       {/* KPI Cards — Elite Glass */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpiCards.map((kpi, i) => (
-          <motion.div
-            key={kpi.label}
-            initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-2xl border border-border/30 bg-card/60 backdrop-blur-xl p-4 space-y-1.5 hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300"
+          <div
+            key={kpi.label} className="animate-fade-in "rounded-2xl border border-border/30 bg-card/60 backdrop-blur-xl p-4 space-y-1.5 hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</span>
@@ -408,7 +403,7 @@ const DriversTab = () => {
               </div>
             </div>
             <p className="text-2xl font-bold tracking-tight tabular-nums">{kpi.value}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -1109,11 +1104,7 @@ const Carriers = () => {
 
           {/* CHARTERS TAB */}
           <TabsContent value="charters" className="space-y-6 mt-6">
-            <motion.div
-              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+            <div className="animate-fade-in "flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
             >
               <div className="flex gap-2 flex-wrap">
                 <Button variant="outline" onClick={() => setImportDialogOpen(true)} className="gap-2 rounded-xl min-h-[44px]">
@@ -1357,14 +1348,10 @@ const Carriers = () => {
                   </form>
                 </DialogContent>
               </Dialog>
-            </motion.div>
+            </div>
 
             {/* Search + Status Filter */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
+            <div className="animate-fade-in "flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
             >
               <div className="relative flex-1 sm:max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -1378,17 +1365,12 @@ const Carriers = () => {
                   <SelectItem value="inactive">Inactieve charters</SelectItem>
                 </SelectContent>
               </Select>
-            </motion.div>
+            </div>
 
             {/* Bulk Actions — Floating Glass Bar */}
-            <AnimatePresence>
+            
               {someSelected && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  className="flex flex-col sm:flex-row items-center gap-3 p-4 bg-card/70 backdrop-blur-xl rounded-2xl border border-border/30 shadow-lg"
+                <div className="animate-fade-in "flex flex-col sm:flex-row items-center gap-3 p-4 bg-card/70 backdrop-blur-xl rounded-2xl border border-border/30 shadow-lg"
                 >
                   <div className="flex items-center gap-2">
                     <CheckSquare className="h-4 w-4 text-primary" />
@@ -1399,9 +1381,9 @@ const Carriers = () => {
                     <Button size="sm" variant="outline" onClick={() => handleBulkAction('deactivate')} className="gap-1.5 rounded-xl min-h-[40px]"><Pause className="h-3.5 w-3.5" /> Deactiveren</Button>
                     <Button size="sm" variant="destructive" onClick={() => handleBulkAction('delete')} className="gap-1.5 rounded-xl min-h-[40px]"><Trash2 className="h-3.5 w-3.5" /> Verwijderen</Button>
                   </div>
-                </motion.div>
+                </div>
               )}
-            </AnimatePresence>
+            
 
             <motion.div
               initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
@@ -1508,12 +1490,8 @@ const Carriers = () => {
                     {/* Mobile cards */}
                     <div className="md:hidden space-y-3">
                       {filteredCarriers.map((carrier, i) => (
-                        <motion.div
-                          key={carrier.id}
-                          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-                          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                          transition={{ delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                          className={`bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform duration-150 ${!carrier.is_active ? 'opacity-60' : ''}`}
+                        <div
+                          key={carrier.id} className="animate-fade-in {`bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform duration-150 ${!carrier.is_active ? 'opacity-60' : ''}`}
                           onClick={() => navigate(`/carriers/${carrier.id}`)}
                         >
                           <div className="flex items-center justify-between mb-3">
@@ -1552,14 +1530,14 @@ const Carriers = () => {
                               </p>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </>
                 )}
               </CardContent>
             </Card>
-            </motion.div>
+            </div>
           </TabsContent>
 
           {/* EIGEN CHAUFFEURS TAB */}

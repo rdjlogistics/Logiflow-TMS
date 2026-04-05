@@ -28,7 +28,6 @@ import {
   Keyboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface SavedSearch {
   id: string;
@@ -156,7 +155,7 @@ const EnhancedSearchBar = ({
             
             {/* Right side actions */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <AnimatePresence>
+              
                 {localValue && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -170,9 +169,9 @@ const EnhancedSearchBar = ({
                     >
                       <X className="h-3.5 w-3.5" />
                     </Button>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+              
               
               {!focused && (
                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 gap-0.5 text-muted-foreground">

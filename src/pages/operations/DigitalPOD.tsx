@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -161,11 +160,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
   const receiverName = [pod.receiver_first_name, pod.receiver_last_name].filter(Boolean).join(' ');
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-5 max-h-[75vh] overflow-y-auto pr-1 scrollbar-thin"
+    <div className="animate-fade-in "space-y-5 max-h-[75vh] overflow-y-auto pr-1 scrollbar-thin"
     >
       {/* Header info cards */}
       <motion.div 
@@ -191,9 +186,9 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
               <span className="text-[11px] font-medium text-muted-foreground">{item.label}</span>
             </div>
             <p className="font-semibold text-sm truncate">{item.value}</p>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Klant & Adres */}
       <motion.div 
@@ -207,7 +202,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           {[pod.stop_address, pod.stop_city].filter(Boolean).join(', ') || '-'}
         </p>
-      </motion.div>
+      </div>
 
       {/* Times */}
       {(pod.arrival_time || pod.departure_time) && (
@@ -218,7 +213,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
           <TimeCard icon={<Clock className="h-4 w-4 text-emerald-500" />} label="Aankomst" value={pod.arrival_time} />
           <TimeCard icon={<Clock className="h-4 w-4 text-blue-500" />} label="Vertrek" value={pod.departure_time} />
           <TimeCard icon={<Timer className="h-4 w-4 text-amber-500" />} label="Wachttijd" timeValue={pod.waiting_minutes != null ? `${pod.waiting_minutes} min` : '-'} />
-        </motion.div>
+        </div>
       )}
 
       {/* Signature */}
@@ -234,11 +229,11 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             className="bg-white dark:bg-zinc-900/80 border-2 border-dashed border-muted-foreground/15 rounded-xl p-6 flex items-center justify-center backdrop-blur-sm"
           >
             <img src={signatureUrl} alt="Handtekening" className="max-h-36 object-contain" />
-          </motion.div>
+          </div>
         ) : (
           <EmptyState text="Geen handtekening beschikbaar" />
         )}
-      </motion.div>
+      </div>
 
       {/* Photos */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={spring} className="space-y-2">
@@ -262,13 +257,13 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <Eye className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                 </div>
-              </motion.button>
+              </button>
             ))}
           </div>
         ) : (
           <EmptyState text="Geen foto's beschikbaar" />
         )}
-      </motion.div>
+      </div>
 
       {/* GPS */}
       {pod.latitude && pod.longitude && (
@@ -295,7 +290,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
               </a>
             </Button>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Note */}
@@ -306,13 +301,11 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
         >
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">Opmerkingen</p>
           <p className="text-sm text-amber-700 dark:text-amber-400">{pod.note}</p>
-        </motion.div>
+        </div>
       )}
 
       {/* Action Buttons — simplified */}
-      <motion.div 
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.15 }}
-        className="flex flex-col gap-2 pt-1"
+      <div className="animate-fade-in "flex flex-col gap-2 pt-1"
       >
         <Button 
           onClick={handleDownloadPdf} 
@@ -351,7 +344,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             Verstuur
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Send Email Dialog */}
       <SendPodEmailDialog
@@ -363,7 +356,7 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
       />
 
       {/* Photo lightbox */}
-      <AnimatePresence>
+      
         {expandedPhoto && (
           <Dialog open={!!expandedPhoto} onOpenChange={() => setExpandedPhoto(null)}>
             <DialogContent className="max-w-4xl p-2 bg-black/95 border-none">
@@ -378,8 +371,8 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
             </DialogContent>
           </Dialog>
         )}
-      </AnimatePresence>
-    </motion.div>
+      
+    </div>
   );
 }
 
@@ -454,7 +447,7 @@ function StatCard({ icon, value, label, loading, accent }: { icon: React.ReactNo
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -479,7 +472,7 @@ function TabButton({ active, label, count, onClick }: { active: boolean; label: 
       )}>
         {count}
       </span>
-    </motion.button>
+    </button>
   );
 }
 
@@ -519,11 +512,7 @@ export default function DigitalPOD() {
 
   return (
     <DashboardLayout title="Digital POD" description="Digitale afleverbewijzen met foto's en handtekeningen">
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ duration: 0.4 }}
-        className="space-y-6"
+      <div className="animate-fade-in "space-y-6"
       >
         {/* Stats */}
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
@@ -547,8 +536,7 @@ export default function DigitalPOD() {
                   <CardDescription className="text-sm mt-0.5">Live gesynchroniseerd met de chauffeurs-app</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <motion.div 
-                    className="relative"
+                  <div className="relative"
                     animate={{ width: searchFocused ? 240 : 200 }}
                     transition={spring}
                   >
@@ -561,12 +549,12 @@ export default function DigitalPOD() {
                       onFocus={() => setSearchFocused(true)}
                       onBlur={() => setSearchFocused(false)}
                     />
-                  </motion.div>
+                  </div>
                   <motion.div whileTap={{ scale: 0.92, rotate: -90 }} transition={spring}>
                     <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-border/50" onClick={refetch}>
                       <RefreshCw className="h-4 w-4" />
                     </Button>
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -600,7 +588,7 @@ export default function DigitalPOD() {
                   <p className="text-sm mt-1.5 max-w-sm mx-auto text-muted-foreground/70">
                     POD's verschijnen hier automatisch zodra chauffeurs stops afmelden in de app
                   </p>
-                </motion.div>
+                </div>
               ) : (
                 <div className="rounded-xl border border-border/40 overflow-hidden">
                   <Table>
@@ -616,7 +604,7 @@ export default function DigitalPOD() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <AnimatePresence mode="popLayout">
+                      
                         {filteredProofs.map((pod, idx) => (
                           <motion.tr
                             key={pod.id}
@@ -675,15 +663,15 @@ export default function DigitalPOD() {
                             </TableCell>
                           </motion.tr>
                         ))}
-                      </AnimatePresence>
+                      
                     </TableBody>
                   </Table>
                 </div>
               )}
             </CardContent>
           </Card>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedPod} onOpenChange={(open) => !open && setSelectedPod(null)}>

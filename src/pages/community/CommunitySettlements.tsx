@@ -8,7 +8,6 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Scale, Loader2, TrendingUp, TrendingDown } from "lucide-react";
-import { motion } from "framer-motion";
 
 const CommunitySettlements = () => {
   // Aggregate purchase invoices per carrier = settlements overview
@@ -43,7 +42,7 @@ const CommunitySettlements = () => {
   return (
     <DashboardLayout title="Afrekeningen">
       <FeatureGate feature="vervoerders_netwerk">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+        <div className="animate-fade-in "space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card><CardContent className="pt-4 text-center">
               <TrendingDown className="h-5 w-5 mx-auto mb-1 text-primary" />
@@ -107,7 +106,7 @@ const CommunitySettlements = () => {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </FeatureGate>
     </DashboardLayout>
   );

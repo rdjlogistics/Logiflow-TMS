@@ -21,7 +21,6 @@ import {
 import {
   Building2, Plus, MapPin, Pencil, Trash2, Crown, Loader2,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface Branch {
   id: string;
@@ -185,7 +184,7 @@ const Locations = () => {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
