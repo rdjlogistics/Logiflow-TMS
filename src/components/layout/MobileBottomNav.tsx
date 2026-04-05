@@ -21,9 +21,10 @@ const tabs: NavTab[] = [
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  if (pathname.startsWith("/admin/settings")) return "instellingen";
+  if (pathname.startsWith("/admin")) return "instellingen";
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
+  if (pathname.startsWith("/finance") || pathname.startsWith("/invoices") || pathname.startsWith("/purchase-invoices")) return "finance";
   return "home";
 }
 
