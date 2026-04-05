@@ -104,14 +104,14 @@ function useDriverPerformance(companyId: string | undefined, days: number) {
     queryFn: async () => {
       const since = new Date();
       since.setDate(since.getDate() - days);
-      const { data, error } = await supabase
+      const result = await supabase
         .from("drivers")
         .select("id, name, deleted_at")
         .eq("company_id", companyId!)
         .is("deleted_at", null)
-        .limit(50)
-        .returns<{ id: string; name: string; deleted_at: string | null }[]>();
-      if (error) throw error;
+        .limit(50);
+      if (result.error) throw result.error;
+      const data = result.data as unknown as { id: string; name: string; deleted_at: string | null }[];
 
       // Get trips per driver
       const { data: trips } = await supabase
