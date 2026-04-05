@@ -563,14 +563,16 @@ const App = () => (
                           <Route path="/legal/terms" element={<TermsOfService />} />
                           
                           <Route path="*" element={<NotFound />} />
-                        </Routes>
-                        <LegalConsentBanner />
-                      </Suspense>
-                      </main>
-                    </GlobalUXProvider>
-                  </BrowserRouter>
-                </LazyCopilotProvider>
-              </Suspense>
+                            </Routes>
+                            <LegalConsentBanner />
+                          </Suspense>
+                          </main>
+                        </GlobalUXProvider>
+                      </LazyCopilotProvider>
+                    </Suspense>
+                  } />
+                </Routes>
+              </BrowserRouter>
             </TooltipProvider>
           </NotificationProvider>
         </ThemeProvider>
