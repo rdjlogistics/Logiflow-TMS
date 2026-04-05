@@ -1,30 +1,34 @@
 
 
-# Fix: Witte auth-pagina → login werkt weer
+# Fix: Overdue facturen batch-update
 
 ## Probleem
-De `/auth` pagina is wit omdat:
-1. **AuthLoader** (regel 277) gebruikt `bg-background` — in light-theme wordt dit wit/lichtgrijs
-2. **Auth-routes zitten binnen `LazyCopilotProvider`** (regel 322-323) — als die Suspense `fallback={null}` hangt, rendert er niets
+9 facturen met status 'verzonden' hebben een `due_date` die al maanden verstreken is (jan-feb 2026, het is nu april 2026). De cron job `check-overdue-invoices` triggert alleen workflow-acties maar **update de status niet** naar 'vervallen'. Dit is een gap in de edge function.
 
-## Oplossing (1 bestand: `src/App.tsx`)
+## Wat is schoon (geen actie nodig)
+- Email queue: leeg, 0 items
+- Workflow runs: 0 incomplete
+- Factureerbare ritten (15): wachten terecht op handmatige batch-wizard — geen automatische actie
+- Inkoopfactureerbare ritten (2): idem
 
-### Stap 1 — AuthLoader donker maken
-Regel 277: vervang `bg-background` door `bg-[#0F172A]` en pas tekstkleuren aan naar hardcoded lichte kleuren, zodat het altijd matcht met de boot-splash ongeacht het thema.
+## Oplossing (1 bestand)
 
-### Stap 2 — Auth-routes buiten CopilotProvider Suspense
-Verplaats de `BrowserRouter` + auth-routes (`/auth`, `/login`, `/demo`) naar **boven** de `LazyCopilotProvider` Suspense-boundary. De CopilotProvider wraps dan alleen de beschermde routes. Hierdoor kan de loginpagina altijd renderen, zelfs als Copilot niet laadt.
+### `supabase/functions/check-overdue-invoices/index.ts`
+Voeg een automatische status-update toe: facturen die 7+ dagen voorbij due_date zijn EN status 'verzonden' of 'concept' hebben → status wordt 'vervallen'.
 
 Concreet:
-- `BrowserRouter` verplaatsen naar net na `TooltipProvider`
-- Auth-routes direct in een eigen `Routes` blok, buiten `LazyCopilotProvider`
-- Beschermde routes blijven binnen `LazyCopilotProvider`
+- Na het ophalen van overdue facturen, batch-update alle facturen met `due_date < today - 7 dagen` naar status `'vervallen'`
+- Log het aantal bijgewerkte facturen
+- De workflow-trigger logica (herinneringen) blijft intact
+
+### Resultaat na uitvoering
+- 9 facturen automatisch gemarkeerd als 'vervallen'
+- Dashboard KPI's tonen correcte aantallen
+- Toekomstige cron-runs houden dit automatisch bij
 
 ### Geen wijzigingen aan
-- Auth.tsx, useAuth.tsx, main.tsx, backend, edge functions
-
-## Resultaat
-- Loginpagina laadt altijd met donkere achtergrond — geen witte flits
-- CopilotProvider-problemen blokkeren login niet meer
-- Naadloze overgang: boot-splash → AuthLoader → loginformulier
+- Handmatige batch-facturatie flows
+- Email queue processing
+- Andere edge functions
+- Frontend code
 
