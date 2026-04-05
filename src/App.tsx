@@ -65,6 +65,7 @@ const PurchaseInvoiceSendPage = lazyWithRetry(() => import("./pages/finance/Purc
 const Costs = lazyWithRetry(() => import("./pages/finance/Costs"));
 const BankPayments = lazyWithRetry(() => import("./pages/finance/BankReconciliation"));
 const DieselModule = lazyWithRetry(() => import("./pages/finance/DieselModule"));
+const CreditNotes = lazyWithRetry(() => import("./pages/finance/CreditNotes"));
 const Reporting = lazyWithRetry(() => import("./pages/Reporting"));
 
 // Charter (tendering)
@@ -104,10 +105,13 @@ const DocumentTemplates = lazyWithRetry(() => import("./pages/admin/DocumentTemp
 const HelpCenter = lazyWithRetry(() => import("./pages/admin/HelpCenter"));
 const AIUsage = lazyWithRetry(() => import("./pages/admin/AIUsage"));
 const WorkflowAutomation = lazyWithRetry(() => import("./pages/admin/WorkflowAutomation"));
+const MultiLocation = lazyWithRetry(() => import("./pages/admin/MultiLocation"));
+const APIAccess = lazyWithRetry(() => import("./pages/admin/APIAccess"));
 
 // AI
 const AutoDispatch = lazyWithRetry(() => import("./pages/ai/AutoDispatch"));
 const AnomalyDetection = lazyWithRetry(() => import("./pages/ai/AnomalyDetection"));
+const SmartOCR = lazyWithRetry(() => import("./pages/ai/SmartOCR"));
 
 // Operations & Maintenance
 const DigitalPOD = lazyWithRetry(() => import("./pages/operations/DigitalPOD"));
@@ -115,6 +119,8 @@ const PredictiveMaintenance = lazyWithRetry(() => import("./pages/maintenance/Pr
 
 // Integrations
 const EDIIntegration = lazyWithRetry(() => import("./pages/integrations/EDIIntegration"));
+const AccountingIntegration = lazyWithRetry(() => import("./pages/integrations/AccountingIntegration"));
+const EcommerceHub = lazyWithRetry(() => import("./pages/integrations/EcommerceHub"));
 
 // Portal Guard
 const PortalGuard = lazyWithRetry(() => import("@/components/portal/shared/PortalGuard"));
