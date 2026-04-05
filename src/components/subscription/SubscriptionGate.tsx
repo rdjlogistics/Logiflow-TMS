@@ -126,6 +126,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 16 && trialDaysLeft > 3 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3"
         >
           <Crown className="h-5 w-5 text-primary shrink-0" />
