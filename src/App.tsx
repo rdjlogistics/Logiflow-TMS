@@ -314,10 +314,10 @@ const App = () => (
                       <main role="main">
                       <Suspense fallback={<PageLoader />}>
                         <Routes>
-                          {/* Auth routes - public */}
-                          <Route path="/auth" element={<Auth />} />
-                          <Route path="/login" element={<Auth />} />
-                          <Route path="/demo" element={<Auth />} />
+                          {/* Auth routes - public, own Suspense to avoid dashboard skeleton flash */}
+                          <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                          <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                          <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
                           <Route path="/pricing" element={<PricingPage />} />
                           <Route path="/checkout/success" element={<CheckoutSuccess />} />
                           <Route path="/onboarding" element={<PR><OnboardingWizard /></PR>} />
