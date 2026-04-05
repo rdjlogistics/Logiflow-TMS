@@ -496,8 +496,78 @@ const OnboardingWizard = () => {
               </div>
             )}
 
-            {/* Step 5: Launch Sequence */}
+            {/* Step 5: Theme Preset Selection */}
             {step === 5 && (
+              <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
+                <div className="text-center space-y-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium">
+                    Stap 6 van {STEPS.length}
+                  </p>
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 shadow-lg shadow-pink-500/20">
+                    <Palette className="h-7 w-7 text-white" />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-display font-light tracking-tight">
+                    Kies jouw <span className="font-semibold">stijl</span>
+                  </h2>
+                  <p className="text-sm text-muted-foreground/50 font-light">
+                    Personaliseer het uiterlijk van je platform
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {THEME_PRESETS.map((preset) => {
+                    const isSelected = selectedThemePreset === preset.id;
+                    const PresetIcon = preset.icon;
+                    return (
+                      <button
+                        key={preset.id}
+                        onClick={() => {
+                          setSelectedThemePreset(preset.id);
+                          applyPreset(preset.id);
+                        }}
+                        className={cn(
+                          'relative p-4 rounded-2xl text-left transition-all duration-300 backdrop-blur-xl border',
+                          'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]',
+                          'active:scale-[0.98]',
+                          isSelected
+                            ? 'bg-primary/[0.08] border-primary/30 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.25)] ring-1 ring-primary/20'
+                            : 'bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.05]',
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0', preset.bg)}>
+                            <PresetIcon className={cn('h-5 w-5', preset.color)} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-sm">{preset.name}</span>
+                              {preset.id === 'ios' && (
+                                <span className="text-[9px] uppercase tracking-widest bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
+                                  Standaard
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground/60 mt-0.5 line-clamp-2">{preset.description}</p>
+                          </div>
+                        </div>
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground/40">
+                  Je kunt je thema altijd later wijzigen via Instellingen
+                </p>
+              </div>
+            )}
+
+            {/* Step 6: Launch Sequence */}
+            {step === 6 && (
               <LaunchSequence
                 companyName={companyForm.name}
                 tmsPlan={selectedTMSSlug}
