@@ -365,10 +365,10 @@ const Dashboard = () => {
           ) : (
             quickStats.map((stat, index) => (
               <Link key={stat.label} to={stat.href}>
-                <div className="active:scale-[0.98] transition-transform {cn(
+                <div className={cn(
                     "relative p-3.5 rounded-2xl glass-panel-subtle",
                     "bg-gradient-to-br from-card/80 to-card/40",
-                    "active:scale-[0.98] transition-transform touch-manipulation"
+                    "active:scale-[0.97] transition-transform touch-manipulation"
                   )}
                 >
                   <div className="flex items-start justify-between mb-2">
