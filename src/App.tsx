@@ -319,23 +319,26 @@ const App = () => (
         <ThemeProvider defaultTheme="system" storageKey="nextgen-tms-theme">
           <NotificationProvider>
             <TooltipProvider>
-              <Suspense fallback={null}>
-                <LazyCopilotProvider>
-                  <Toaster />
-                  <Sonner />
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Auth routes — OUTSIDE CopilotProvider so they always render */}
+                  <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
                   
-                  <BrowserRouter>
-                    <GlobalUXProvider>
-                      <Suspense fallback={null}>
-                        <CommandPalette />
-                      </Suspense>
-                      <main role="main">
-                      <Suspense fallback={<PageLoader />}>
-                        <Routes>
-                          {/* Auth routes - public, own Suspense to avoid dashboard skeleton flash */}
-                          <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                          <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                          <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  {/* Everything else goes through CopilotProvider */}
+                  <Route path="*" element={
+                    <Suspense fallback={<AuthLoader />}>
+                      <LazyCopilotProvider>
+                        <GlobalUXProvider>
+                          <Suspense fallback={null}>
+                            <CommandPalette />
+                          </Suspense>
+                          <main role="main">
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
                           <Route path="/pricing" element={<PricingPage />} />
                           <Route path="/checkout/success" element={<CheckoutSuccess />} />
                           <Route path="/onboarding" element={<PR><OnboardingWizard /></PR>} />
