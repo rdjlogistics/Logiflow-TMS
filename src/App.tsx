@@ -103,6 +103,7 @@ const MigrationHub = lazyWithRetry(() => import("./pages/migration/MigrationHub"
 const DocumentTemplates = lazyWithRetry(() => import("./pages/admin/DocumentTemplates"));
 const HelpCenter = lazyWithRetry(() => import("./pages/admin/HelpCenter"));
 const AIUsage = lazyWithRetry(() => import("./pages/admin/AIUsage"));
+const WorkflowAutomation = lazyWithRetry(() => import("./pages/admin/WorkflowAutomation"));
 
 // AI
 const AutoDispatch = lazyWithRetry(() => import("./pages/ai/AutoDispatch"));
@@ -302,6 +303,7 @@ const App = () => (
                           <Route path="/admin/migration" element={<AdminPR><MigrationHub /></AdminPR>} />
                           <Route path="/admin/document-templates" element={<StaffPR><DocumentTemplates /></StaffPR>} />
                           <Route path="/admin/help" element={<PR><HelpCenter /></PR>} />
+                          <Route path="/admin/workflows" element={<AdminPR><WorkflowAutomation /></AdminPR>} />
                           <Route path="/admin/api" element={<AdminPR><AdminSettings /></AdminPR>} />
                           <Route path="/network" element={<PR><Network /></PR>} />
                           <Route path="/email" element={<PR><EmailInbox /></PR>} />

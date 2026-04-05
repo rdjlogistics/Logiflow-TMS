@@ -95,7 +95,7 @@ const FEATURE_GATE_MAP: Record<string, FeatureKey> = {
   "/ai/dispatch": "ai_dispatch",
   "/maintenance/predictive": "fleet_advanced",
   "/co2": "fleet_advanced",
-  "/sla": "sla_monitoring",
+  "/enterprise/health": "sla_monitoring",
   "/enterprise/exceptions": "exception_management",
   "/enterprise/alerts": "proactive_alerts",
   "/ai/anomaly": "exception_management",
@@ -190,7 +190,7 @@ const financieelItems = [
 // 5. ANALYTICS — Monitoring & reporting
 const analyticsItems = [
   { title: "KPI Dashboard", icon: BarChart3, href: "/kpi" },
-  { title: "SLA Monitoring", icon: Shield, href: "/sla" },
+  { title: "SLA Monitoring", icon: Shield, href: "/enterprise/health" },
   { title: "Rapportage", icon: TrendingUp, href: "/reporting" },
   { title: "Exceptions", icon: AlertCircle, href: "/enterprise/exceptions" },
   { title: "Alerts", icon: Bell, href: "/enterprise/alerts" },
