@@ -719,6 +719,12 @@ export const useRateContractEngine = () => {
     deleteAccessorial,
     duplicateAccessorial,
     
+    // Rate lane hooks & mutations
+    useContractLanes,
+    createRateLane,
+    updateRateLane,
+    deleteRateLane,
+    
     // Loading state
     isLoading: zonesLoading || contractsLoading || accessorialsLoading,
   };
