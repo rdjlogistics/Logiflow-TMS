@@ -5,4 +5,4 @@ Disallow: /driver/
 Disallow: /admin/
 Disallow: /portal/
 
-Sitemap: https://logiflowtms.eu/sitemap.xml
+Sitemap: https://rdjlogistics.lovable.app/sitemap.xml

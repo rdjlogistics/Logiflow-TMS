@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Shield, Users, Settings, Key, Loader2, Copy, Send, RefreshCw, Globe, CheckCircle2 } from 'lucide-react';
 
-const PORTAL_URL = 'https://rdjlogistics.lovable.app/carrier';
+const PORTAL_URL = typeof window !== 'undefined' ? `${window.location.origin}/carrier` : '/carrier';
 
 interface CarrierPortalAccessTabProps {
   carrierId: string;
