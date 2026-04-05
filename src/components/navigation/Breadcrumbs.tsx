@@ -27,7 +27,6 @@ const ROUTE_LABELS: Record<string, string> = {
   'b2c': 'B2C',
   'wms': 'Warehouse',
   'finance': 'Financiën',
-  'cashflow': 'Cashflow',
   'tendering': 'Tendering',
   'enterprise': 'Enterprise',
   'crm': 'CRM',

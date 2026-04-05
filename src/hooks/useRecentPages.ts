@@ -27,7 +27,6 @@ const ROUTE_LABELS: Record<string, string> = {
   '/email': 'E-mail Inbox',
   '/kpi': 'KPI Dashboard',
   '/reporting': 'Rapportage',
-  '/finance/cashflow': 'Cashflow',
   '/finance/receivables': 'Debiteuren',
   '/operations/pod': 'Digitale POD',
   '/admin/settings': 'Instellingen',
