@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, FileText, Plus, Settings, LucideIcon } from "lucide-react";
+import { Home, FileText, Plus, Euro, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
@@ -16,13 +16,15 @@ const tabs: NavTab[] = [
   { id: "home", icon: Home, label: "Home", path: "/" },
   { id: "orders", icon: FileText, label: "Orders", path: "/orders" },
   { id: "new", icon: Plus, label: "Nieuw", path: "/orders/edit", isCta: true },
-  { id: "instellingen", icon: Settings, label: "Instellingen", path: "/admin/settings" },
+  { id: "finance", icon: Euro, label: "Financieel", path: "/finance/cashflow" },
+  { id: "instellingen", icon: Settings, label: "Meer", path: "/admin/settings" },
 ];
 
 function getActiveTab(pathname: string, search: string): string {
-  if (pathname.startsWith("/admin/settings")) return "instellingen";
+  if (pathname.startsWith("/admin")) return "instellingen";
   if (pathname === "/") return "home";
   if (pathname.startsWith("/orders") || pathname.startsWith("/order")) return "orders";
+  if (pathname.startsWith("/finance") || pathname.startsWith("/invoices") || pathname.startsWith("/purchase-invoices")) return "finance";
   return "home";
 }
 
@@ -46,7 +48,7 @@ export function MobileBottomNav() {
           WebkitBackdropFilter: "blur(40px) saturate(180%)",
         }}
       >
-        <div className="grid grid-cols-4 px-2 py-1">
+        <div className="grid grid-cols-5 px-2 py-1">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
 
