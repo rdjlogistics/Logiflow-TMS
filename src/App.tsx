@@ -329,7 +329,7 @@ const App = () => (
                           
                           {/* Protected routes */}
                           <Route path="/" element={<PR><Dashboard /></PR>} />
-                          {/* Legacy redirects removed — routes consolidated */}
+                          <Route path="/customers" element={<PR><Customers /></PR>} />
                           <Route path="/orders" element={<PR><OrderOverview /></PR>} />
                           <Route path="/orders/edit/:orderId" element={<PR><OrderForm /></PR>} />
                           <Route path="/orders/edit" element={<PR><OrderForm /></PR>} />
