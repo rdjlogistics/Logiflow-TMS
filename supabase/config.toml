@@ -130,7 +130,6 @@ verify_jwt = false
 [functions.process-email-queue]
 verify_jwt = false
 
-
 [functions.intelligent-dispatch]
 verify_jwt = false
 
@@ -159,9 +158,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.convert-ecommerce-order]
-verify_jwt = false
-
-[functions.process-email-queue]
 verify_jwt = false
 
 [functions.execute-workflow]
