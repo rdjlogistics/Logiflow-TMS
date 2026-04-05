@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useMouseParallax } from "@/hooks/useMouseParallax";
 import { useTenantSettings } from "@/hooks/useTenantSettings";
+import { useAuth } from "@/hooks/useAuth";
 
 type Theme = "dark" | "light" | "system" | "auto";
 export type ThemePreset = "imperial" | "vision-pro" | "horizon" | "carbon" | "aurora" | "ios";
@@ -49,7 +50,10 @@ export function ThemeProvider({
   storageKey = "nextgen-tms-theme",
   ...props
 }: ThemeProviderProps) {
-  const { data: tenantSettings } = useTenantSettings();
+  const { user, authReady } = useAuth();
+  const { data: tenantSettings } = useTenantSettings({
+    enabled: authReady && !!user,
+  });
 
   // Resolve initial values: localStorage → tenant DB → default
   const [theme, setTheme] = useState<Theme>(() => {

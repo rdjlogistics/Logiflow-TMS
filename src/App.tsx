@@ -308,11 +308,12 @@ const App = () => (
   <ErrorBoundary>
     
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="nextgen-tms-theme">
-        <AuthProvider>
-            <NotificationProvider>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="system" storageKey="nextgen-tms-theme">
+          <NotificationProvider>
             <TooltipProvider>
-              <Suspense fallback={null}><LazyCopilotProvider>
+              <Suspense fallback={null}>
+                <LazyCopilotProvider>
                   <Toaster />
                   <Sonner />
                   
@@ -558,11 +559,12 @@ const App = () => (
                       </main>
                     </GlobalUXProvider>
                   </BrowserRouter>
-              </LazyCopilotProvider></Suspense>
+                </LazyCopilotProvider>
+              </Suspense>
             </TooltipProvider>
           </NotificationProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </QueryClientProvider>
     
   </ErrorBoundary>
