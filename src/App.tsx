@@ -232,7 +232,7 @@ const FleetManagement = lazyWithRetry(() => import("./pages/FleetManagement"));
 const RateManagement = lazyWithRetry(() => import("./pages/RateManagement"));
 const CO2Reporting = lazyWithRetry(() => import("./pages/CO2Reporting"));
 const KPIDashboard = lazyWithRetry(() => import("./pages/KPIDashboard"));
-const SLAMonitoring = lazyWithRetry(() => import("./pages/SLAMonitoring"));
+// SLAMonitoring removed — use /enterprise/sla (SLAMonitor) instead
 
 // Legal Pages
 const PrivacyPolicy = lazyWithRetry(() => import("./pages/legal/PrivacyPolicy"));
