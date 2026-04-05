@@ -105,11 +105,11 @@ function useDriverPerformance(companyId: string | undefined, days: number) {
       const since = new Date();
       since.setDate(since.getDate() - days);
 
-      // Use explicit type to avoid TS2589 deep instantiation
-      const driversResult: { data: { id: string; name: string }[] | null; error: any } =
-        await (supabase.from("drivers").select("id, name").eq("company_id", companyId!).is("deleted_at", null).limit(50) as any);
+      const query = supabase.from("drivers").select("id, name").eq("company_id", companyId!);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const driversResult = await (query as any).is("deleted_at", null).limit(50);
       if (driversResult.error) throw driversResult.error;
-      const data = driversResult.data ?? [];
+      const data = (driversResult.data ?? []) as { id: string; name: string }[];
 
       // Get trips per driver
       const { data: trips } = await supabase
