@@ -322,6 +322,7 @@ const App = () => (
                           <Route path="/finance/costs" element={<AdminPR><Costs /></AdminPR>} />
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
                           <Route path="/finance/diesel" element={<AdminPR><DieselModule /></AdminPR>} />
+                          <Route path="/finance/credit-notes" element={<AdminPR><CreditNotes /></AdminPR>} />
                           <Route path="/reporting" element={<StaffPR><Reporting /></StaffPR>} />
                           
                           {/* Sales */}

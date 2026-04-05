@@ -142,6 +142,7 @@ const operatieItems = [
   { title: "AI Assistent", icon: Bot, href: "/chatgpt" },
   { title: "Digitale POD", icon: ClipboardCheck, href: "/operations/pod" },
   { title: "Auto Dispatch", icon: Zap, href: "/ai/dispatch" },
+  { title: "Smart OCR", icon: ScanLine, href: "/ai/ocr" },
 ];
 
 // 2a. VLOOT — Asset management (voertuigen, brandstof, onderhoud, uitstoot)
@@ -176,8 +177,8 @@ const chauffeursBaseItems = [
 const financieelItems = [
   { title: "Facturen", icon: FileText, href: "/invoices" },
   { title: "Inkoopfacturen", icon: Receipt, href: "/purchase-invoices" },
+  { title: "Creditnota's", icon: FileText, href: "/finance/credit-notes" },
   { title: "Debiteuren", icon: Users, href: "/finance/receivables" },
-  
   { title: "Cashflow", icon: Wallet, href: "/finance/cashflow" },
   { title: "Tankpassen", icon: Fuel, href: "/finance/fuel-cards" },
   { title: "Diesel Staffels", icon: TrendingUp, href: "/finance/diesel" },
@@ -207,8 +208,11 @@ const beheerItems = [
   { title: "Sjablonen", icon: FileText, href: "/admin/document-templates" },
   { title: "Chartergroepen", icon: UsersRound, href: "/charter/pools" },
   { title: "Scorekaarten", icon: Award, href: "/charter/scorecards" },
-  { title: "API & Webhooks", icon: Key, href: "/admin/api" },
-  { title: "Integraties", icon: ArrowRightLeft, href: "/integrations/edi" },
+  { title: "API Toegang", icon: Key, href: "/admin/api" },
+  { title: "Boekhouding", icon: ArrowRightLeft, href: "/integrations/accounting" },
+  { title: "E-commerce", icon: ShoppingCart, href: "/integrations/ecommerce" },
+  { title: "EDI Integraties", icon: ArrowRightLeft, href: "/integrations/edi" },
+  { title: "Multi-vestiging", icon: Building2, href: "/admin/locations" },
   { title: "Migratie Hub", icon: Database, href: "/admin/migration" },
 ];
 
