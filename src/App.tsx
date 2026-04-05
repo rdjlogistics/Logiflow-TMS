@@ -311,6 +311,7 @@ const App = () => (
                       <Suspense fallback={null}>
                         <CommandPalette />
                       </Suspense>
+                      <main role="main">
                       <Suspense fallback={<PageLoader />}>
                         <Routes>
                           {/* Auth routes - public */}
@@ -544,6 +545,7 @@ const App = () => (
                         </Routes>
                         <LegalConsentBanner />
                       </Suspense>
+                      </main>
                     </GlobalUXProvider>
                   </BrowserRouter>
               </LazyCopilotProvider></Suspense>
