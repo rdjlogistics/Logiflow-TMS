@@ -1,58 +1,44 @@
 
 
-# Nieuwe Modules Integreren in Sidebar + Console Fix
+# Grondige Code Audit — Stale References & Nieuwe Routes
 
-## Probleem
+## Gevonden Problemen (4 bestanden)
 
-1. **Diesel Module** (`/finance/diesel`) — heeft route maar is **niet bereikbaar via sidebar**
-2. **Offertes Dashboard** (`/sales/quotes`) — heeft route maar is **niet bereikbaar via sidebar**
-3. **CO2 Rapportage** (`/co2`) — al in sidebar ✅
-4. **Console error** — `DialogFooter` in DieselModule krijgt een `ref` maar is geen `forwardRef` component
+### 1. CommandPalette — 3 dode routes
+**Bestand:** `src/components/command-palette/CommandPalette.tsx`
+- Regel 81: `/trips` navigatie → wijzigen naar `/orders`
+- Regel 87: `/payments` navigatie → wijzigen naar `/finance/cashflow` met label "Cashflow"
+- Regel 96: `/trips` in actie "Nieuwe Rit" → wijzigen naar `/orders`
+- Toevoegen: Diesel Staffels (`/finance/diesel`) en Offertes (`/sales/quotes`) als navigatie-items
 
-## Oplossing
+### 2. Breadcrumbs — dode + ontbrekende labels
+**Bestand:** `src/components/navigation/Breadcrumbs.tsx`
+- Verwijder: `'payments': 'Betalingen'` (regel 20)
+- Verwijder: `'trips': 'Ritten'` (regel 16) — redirect naar orders
+- Toevoegen: `'diesel': 'Diesel Staffels'`, `'quotes': 'Offertes'`, `'sales': 'Sales'`, `'cashflow': 'Cashflow'`
 
-### 1. Sidebar: Diesel toevoegen aan Financieel sectie
-**Bestand:** `src/components/layout/AppSidebar.tsx`
+### 3. useRecentPages — dode + ontbrekende routes
+**Bestand:** `src/hooks/useRecentPages.ts`
+- Verwijder: `'/payments': 'Betalingen'` (regel 21)
+- Toevoegen: `'/finance/diesel': 'Diesel Staffels'`, `'/sales/quotes': 'Offertes'`, `'/finance/cashflow': 'Cashflow'`
 
-- Voeg toe aan `financieelItems` array (na "Tankpassen"):
-  ```
-  { title: "Diesel Staffels", icon: Fuel, href: "/finance/diesel" }
-  ```
-- Voeg toe aan `FEATURE_GATE_MAP`:
-  ```
-  "/finance/diesel": "basic_invoicing"
-  ```
+### 4. PageHeader — dode label
+**Bestand:** `src/components/common/PageHeader.tsx`
+- Verwijder: `'payments': 'Betalingen'` (regel 30)
+- Toevoegen: `'diesel': 'Diesel Staffels'`, `'quotes': 'Offertes'`, `'cashflow': 'Cashflow'`, `'sales': 'Sales'`
 
-### 2. Sidebar: Offertes toevoegen aan Relatiebeheer sectie
-- Voeg toe aan `relatiesBaseItems` array (na "Producten"):
-  ```
-  { title: "Offertes", icon: FileText, href: "/sales/quotes" }
-  ```
-  (Logische plek: offertes horen bij klantrelaties/CRM)
+## Niet-kritiek (bewust behouden)
 
-### 3. Console Error Fix: DialogFooter forwardRef
-**Bestand:** `src/components/ui/dialog.tsx`
-
-- Wrap `DialogFooter` in `React.forwardRef` zodat het refs kan ontvangen:
-  ```typescript
-  const DialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-      <div ref={ref} className={cn(...)} {...props} />
-    )
-  );
-  ```
-
-### 4. Browser Test
-- Na implementatie: navigeer naar sidebar, check of Diesel Staffels en Offertes zichtbaar en klikbaar zijn
-- Check console op 0 errors
+- **Dashboard links naar `/trips?filter=...`** — Deze werken correct via de redirect (`/trips` → `/orders`). Query params gaan mee. Geen actie nodig.
+- **`useTripsData.ts`**, services, en componenten die `trips` DB-tabel gebruiken — Dit zijn database queries, niet routes. De tabel heet nog steeds `trips`. Correct.
+- **Mollie edge functions** — Gebruiken `api.mollie.com/v2/payments` (externe API). Geen relatie met onze `/payments` route.
 
 ## Technische Details
 
 ```text
-Bestanden te wijzigen:  2
-  - src/components/layout/AppSidebar.tsx (2 items toevoegen)
-  - src/components/ui/dialog.tsx (forwardRef fix)
-Impact:                 Sidebar navigatie + console warning fix
-Risico:                 Laag — alleen menu items + ref wrapper
+Bestanden:    4
+Type:         Label cleanup + nieuwe route registratie
+Risico:       Minimaal
+Impact:       Command Palette, breadcrumbs en recent pages tonen correcte info
 ```
 
