@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Promise-based deduplication: if a call is already in-flight, reuse it
   const ensureCompanyPromiseRef = useRef<Promise<void> | null>(null);
+  const authBootResolvedRef = useRef(false);
 
   const ensureUserCompanyLink = useCallback(async (retries = 2) => {
     if (ensuredCompanyRef.current) return;
@@ -39,7 +40,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const doEnsure = async () => {
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-          const { error } = await supabase.functions.invoke("ensure-user-company");
+          let timeoutId: number | undefined;
+
+          const { error } = await Promise.race([
+            supabase.functions.invoke("ensure-user-company"),
+            new Promise<{ data: null; error: Error }>((resolve) => {
+              timeoutId = window.setTimeout(() => {
+                resolve({ data: null, error: new Error("ensure-user-company timeout") });
+              }, 6000);
+            }),
+          ]).finally(() => {
+            if (timeoutId) {
+              window.clearTimeout(timeoutId);
+            }
+          });
+
           if (!error) {
             ensuredCompanyRef.current = true;
             return;
@@ -65,6 +80,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const syncAuthState = useCallback((nextSession: Session | null) => {
+    authBootResolvedRef.current = true;
+    setAuthStalled(false);
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+    setLoading(false);
+
+    if (nextSession?.user) {
+      window.setTimeout(() => {
+        void ensureUserCompanyLink();
+      }, 0);
+    }
+  }, [ensureUserCompanyLink]);
+
   const handleSignOut = useCallback(async () => {
     // Always clear local auth storage as well; if the network signOut fails due to
     // a corrupted token, the UI should still reliably log the user out.
@@ -78,11 +107,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearAllRoleCache();
     clearOnboardingCache();
     ensuredCompanyRef.current = false;
-    setSession(null);
-    setUser(null);
-  }, []);
+    ensureCompanyPromiseRef.current = null;
+    syncAuthState(null);
+  }, [syncAuthState]);
 
   useEffect(() => {
+    const stallTimer = window.setTimeout(() => {
+      if (!authBootResolvedRef.current) {
+        console.warn("[Auth] Initialization stalled; releasing loading state");
+        setAuthStalled(true);
+        setLoading(false);
+      }
+    }, 8000);
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -93,34 +130,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // so we handle the "lost session" case defensively here.
       if (event === "TOKEN_REFRESHED" && !session) {
         console.warn("[Auth] Token refresh resulted in empty session; clearing auth storage and signing out");
+        authBootResolvedRef.current = true;
+        setAuthStalled(false);
+        setLoading(false);
         setTimeout(() => {
           clearAuthStorage();
           void handleSignOut();
         }, 0);
-        setLoading(false);
         return;
       }
 
       if (event === "SIGNED_OUT") {
         ensuredCompanyRef.current = false;
-        setSession(null);
-        setUser(null);
-        setLoading(false);
+        ensureCompanyPromiseRef.current = null;
+        syncAuthState(null);
         return;
       }
 
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        // Defer backend call; only finish loading after company link is ensured
-        setTimeout(async () => {
-          await ensureUserCompanyLink();
-          setLoading(false);
-        }, 0);
-      } else {
-        setLoading(false);
-      }
+      syncAuthState(session);
     });
 
     // Initial session check with error handling
@@ -129,6 +156,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Session retrieval error:", error.message);
         // Clear potentially corrupted session (e.g. refresh_token_not_found)
         if (error.message?.toLowerCase().includes("refresh token") || error.message?.toLowerCase().includes("refresh_token")) {
+          authBootResolvedRef.current = true;
           setTimeout(() => {
             clearAuthStorage();
             void handleSignOut();
@@ -137,19 +165,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        // Wait for company link before marking loading as done
-        ensureUserCompanyLink().finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
+      syncAuthState(session);
     });
 
-    return () => subscription.unsubscribe();
-  }, [ensureUserCompanyLink, handleSignOut]);
+    return () => {
+      window.clearTimeout(stallTimer);
+      subscription.unsubscribe();
+    };
+  }, [handleSignOut, syncAuthState]);
 
   const refreshSession = useCallback(async () => {
     try {
