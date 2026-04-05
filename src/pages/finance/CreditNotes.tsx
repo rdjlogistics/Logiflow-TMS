@@ -79,7 +79,7 @@ export default function CreditNotes() {
       const sub = parseFloat(subtotal) || 0;
       const vat = parseFloat(vatPct) || 21;
       const vatAmt = sub * (vat / 100);
-      const { data: numData } = await supabase.rpc("generate_credit_note_number", { p_company_id: tenantId });
+      const { data: numData } = await supabase.rpc("generate_credit_note_number");
       const { error } = await supabase.from("credit_notes").insert({
         company_id: tenantId!,
         customer_id: customerId,

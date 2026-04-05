@@ -1,19 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { PageHeader } from "@/components/common/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { ArrowRightLeft, CheckCircle, XCircle, RefreshCw, ExternalLink } from "lucide-react";
-import { format } from "date-fns";
-import { nl } from "date-fns/locale";
+import { useCompany } from "@/hooks/useCompany";
 
 export default function AccountingIntegration() {
-  const { profile } = useAuth();
+  const { company } = useCompany();
   const { toast } = useToast();
-  const tenantId = profile?.company_id;
+  const tenantId = company?.id;
 
   const { data: integrations = [], isLoading } = useQuery({
     queryKey: ["accounting-integrations", tenantId],
