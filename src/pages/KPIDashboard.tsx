@@ -109,7 +109,8 @@ function useDriverPerformance(companyId: string | undefined, days: number) {
         .select("id, name, deleted_at")
         .eq("company_id", companyId!)
         .is("deleted_at", null)
-        .limit(50);
+        .limit(50)
+        .returns<{ id: string; name: string; deleted_at: string | null }[]>();
       if (error) throw error;
 
       // Get trips per driver
