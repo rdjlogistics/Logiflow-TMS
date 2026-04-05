@@ -1,115 +1,142 @@
 
 
-# Launch Audit — LogiFlow TMS
+# Volledige Feature Audit — Scale Pakket (36 functies)
 
-## Status Batches Vandaag
-- **Email queue**: 0 items — schoon
-- **Workflow runs**: 0 incomplete — schoon
-- **Overdue facturen**: Reeds gepatcht (vorige sessie) — 17 vervallen, 7 betaald, 2 gedeeltelijk betaald, 1 concept — correct
-- **Factureerbare ritten (verkoop)**: 14 wachten op handmatige batch — geen actie (by design)
-- **Factureerbare ritten (inkoop)**: 2 wachten op handmatige batch — geen actie (by design)
-- **Cron jobs**: Niet geregistreerd (pg_cron schema ontoegankelijk) — eerdere sessie meldde database-timeouts
+## Audit Resultaat per Functie
 
-**Conclusie batches**: Alles schoon, geen dubbel werk nodig.
+### WERKEND (End-to-End met live DB) — 24 functies
 
----
+| # | Functie | Status | Toelichting |
+|---|---------|--------|-------------|
+| 1 | Orderbeheer | OK | Trips CRUD, bulk acties, status flow, alle DB-koppelingen |
+| 2 | Digitale POD | OK | stop_proofs tabel, foto/handtekening upload, auto-vrachtbrief |
+| 3 | CMR / Vrachtbrief | OK | CMR-nummers in orderformulier, auto-send vrachtbrief edge function, DocumentsSheet |
+| 4 | Live Tracking | OK | driver_locations tabel, GPS hooks, Mapbox kaart, realtime |
+| 5 | Facturatie | OK | Batch wizard, PDF, email verzending, 11-stadia flow |
+| 6 | CRM | OK | Klantenbeheer, contacts, settings, portaal uitnodigingen |
+| 7 | KPI Dashboard | OK | get_dashboard_ops RPC, kpi_snapshots, live stats |
+| 8 | Chauffeurs App | OK | Volledig portaal met ritten, checkout, GPS, chat, offline sync |
+| 9 | Multi-stop Orders | OK | route_stops tabel, drag-and-drop, stop-level checkout |
+| 10 | AI Dispatch | OK | AutoDispatch pagina + ai-dispatch-engine edge function |
+| 11 | Route Optimalisatie | OK | RouteOptimization pagina met Mapbox Directions |
+| 12 | Dienstplanning | OK | Rosters pagina, program_shifts tabel, drivers koppeling |
+| 13 | Proactieve Alerts | OK | AlertsEscalations pagina + anomaly_events DB |
+| 14 | SLA Monitoring | OK | SystemHealth pagina via /enterprise/health, sidebar gefixt |
+| 15 | Debiteurenbeheer | OK | Receivables module, herinneringen, incasso tabs |
+| 16 | Inkoopfacturatie | OK | Batch purchase invoices, SEPA export, carrier portal |
+| 17 | Marge Analyse | OK | gross_profit en profit_margin_pct op trips, reporting |
+| 18 | Cashflow Dashboard | OK | CashflowCockpit met payments, goals, alerts uit DB |
+| 19 | Bank Reconciliatie | OK | BankReconciliation pagina + bank_transactions + AI matching |
+| 20 | Klanten Portaal | OK | B2B portaal met real-time tracking, facturen, submissions |
+| 21 | Tariefcontracten | OK | RateContracts met zones, lanes, accessorials — volledig DB |
+| 22 | Tendering / Charter | OK | Procurement + CarrierPools + CarrierScorecards — alle DB |
+| 23 | WhatsApp Chat | OK | WhatsApp links in driver assign + order form + B2C track |
+| 24 | Push Notificaties | OK | VAPID, service worker, send-push-notification edge function |
 
-## Kritieke Issues voor Launch
+### WERKEND MAAR GEEN EIGEN PAGINA (Ingebouwd in andere flows) — 4 functies
 
-### 1. Dode route in sidebar: `/sla` (SLA Monitoring)
-De sidebar linkt naar `/sla` maar er is **geen route in App.tsx** en **geen pagina-bestand**. Gebruikers zien een 404.
+| # | Functie | Status | Toelichting |
+|---|---------|--------|-------------|
+| 25 | UBL Export | INGEBOUWD | Zit in send-invoice-email als optionele bijlage — werkt |
+| 26 | Fleet Management | OK | FleetManagement pagina met vehicles + maintenance + APK uit DB |
+| 27 | Exception Management | OK | ExceptionsInbox pagina + anomaly_events DB |
+| 28 | Vervoerdersnetwerk | OK | Network pagina met company_connections, dispatch orders |
 
-**Fix**: Route toevoegen die verwijst naar bestaande SystemHealth of een nieuw SLA-component, OF sidebar-link verwijderen.
+### ONTBREEKT OF NIET FUNCTIONEEL — 8 functies
 
-### 2. Orphan page files zonder routes (17 bestanden)
-Pagina's die als bestanden bestaan maar NIET bereikbaar zijn via routing:
-
-| Categorie | Bestanden |
-|-----------|-----------|
-| CRM | AccountPolicies, DossierVault, LaneMap, SalesPipeline |
-| Enterprise | LiveBoard |
-| Finance | Collections, CreditDashboard |
-| Tendering | TenderDashboard, TenderHistory, TenderTemplates |
-| Carrier tabs | CarrierDocumentsTab, CarrierIncomingTab, CarrierInvoicesTab, CarrierProfileTab, CarrierTripsTab |
-| Admin | WorkflowAutomation |
-| Operations | AIDispatch (duplicate, maar referenced elders) |
-
-**Fix**: Verwijder de 14 volledig dode bestanden. Voeg routes toe voor WorkflowAutomation (sidebar-relevant) en AIDispatch (widget-relevant), of verwijs ze door.
-
-### 3. Volledig statische pagina's (geen DB-connectie)
-38 pagina's gebruiken geen database-calls. Veel zijn terecht statisch (legal, NotFound, onboarding wizards), maar sommige zouden live data moeten tonen:
-
-**Prioriteit hoog** (sidebar-zichtbaar, verwacht live data):
-- `CO2Reporting` — toont geen echte emissiedata
-- `FleetManagement` — geen voertuigdata uit DB (terwijl vehicles tabel bestaat)
-- `FuelStations` — statische kaart/lijst
-- `Network` — geen live netwerk data
-- `Reporting` — geen live rapportage
-- `PredictiveMaintenance` — geen echte onderhoudslogs
-- `SecurityCenter` — geen live security data
-- `SystemHealth` — geen live health checks
-
-**Prioriteit middel** (module-pagina's):
-- `WMS*` (8 pagina's) — volledig statisch, WMS tabellen bestaan mogelijk niet
-- `CarrierPools`, `CarrierScorecards` — statisch
-- `RateContracts`, `DynamicPricing` — statisch
-- `BankReconciliation` — geen live bank data
-
-**Prioriteit laag** (acceptabel statisch voor launch):
-- `DocumentTemplates`, `AIRecommendations`
-- `B2CBook`, `B2CHelp`, `B2CTrack`
-
-### 4. Ongebruikte Edge Functions
-5 edge functions worden nergens vanuit de frontend aangeroepen:
-- `exact-oauth-start` — Exact Online OAuth (integratie)
-- `execute-workflow` — aangestuurd via DB trigger, niet frontend (OK)
-- `kill-cron-jobs` — noodknop (OK, handmatig)
-- `rfq-parser` — niet gekoppeld aan UI
-- `smart-document-ocr` — niet gekoppeld aan UI
-
-**Fix**: `execute-workflow` en `kill-cron-jobs` zijn legitiem (trigger/admin). Verwijder of koppel de andere 3.
-
-### 5. Notifications directory is leeg
-`src/pages/notifications/` bestaat maar bevat geen bestanden.
-
-**Fix**: Verwijder lege directory.
+| # | Functie | Status | Probleem |
+|---|---------|--------|----------|
+| 29 | **Creditnota's** | ONTBREEKT | `credit_notes` tabel bestaat maar er is GEEN pagina, GEEN route, GEEN UI. Gebruikers kunnen geen creditnota's aanmaken of beheren. |
+| 30 | **Boekhouding Koppeling** | PLACEHOLDER | Geen functionele integratie. Exact Online OAuth edge function bestaat maar is niet gekoppeld aan UI. Vereist EXACT_CLIENT_ID/SECRET secrets. |
+| 31 | **Smart OCR** | ONTBREEKT | Edge function `smart-document-ocr` bestaat maar is nergens aangeroepen. Geen UI pagina, geen route. |
+| 32 | **WMS / Magazijn** | GEDEELTELIJK | 6 pagina's met volledige DB hooks, MAAR tabellen zijn leeg en er is geen onboarding/wizard om eerste warehouse aan te maken. Technisch werkend. |
+| 33 | **E-commerce** | ONTBREEKT | `ecommerce_connections` tabel bestaat maar er is GEEN pagina, GEEN route. |
+| 34 | **Multi-vestiging** | ONTBREEKT | Geen pagina, geen route, geen tabel. Feature is niet geïmplementeerd. |
+| 35 | **API Toegang** | ONTBREEKT | Geen API keys management pagina, geen route. |
+| 36 | **White Label** | INGEBOUWD | Branding via useCompany hook (logo, naam). Geen dedicated beheerpagina maar functionaliteit werkt in emails/portals. |
 
 ---
 
-## Aanbevolen Launch Plan (gefaseerd)
+## Fase 1 — Kritieke Fixes (MOET voor launch)
 
-### Fase 1 — Blokkerende fixes (MOET voor launch)
-1. **Fix `/sla` sidebar link** → verwijder uit sidebar of maak redirect naar `/enterprise/health`
-2. **Verwijder 14 dode page files** (CRM 4, Enterprise 1, Finance 2, Tendering 3, Carrier tabs 5) — vermindert bundle
-3. **Voeg `/admin/workflows` route toe** — WorkflowAutomation pagina bestaat, is sidebar-relevant
-4. **Verwijder lege directories** (`notifications/`)
+### 1. Creditnota's pagina bouwen
+- Nieuwe pagina `src/pages/finance/CreditNotes.tsx`
+- Route `/finance/credit-notes` in App.tsx
+- Sidebar link toevoegen
+- CRUD op `credit_notes` tabel (bestaat al met `generate_credit_note_number()` functie)
+- Koppeling aan bestaande facturen
+- Glassmorphism design consistent met Receivables module
 
-### Fase 2 — Data-integriteit (MOET voor productie)
-5. **FleetManagement → live data** — koppel aan `vehicles` tabel
-6. **CO2Reporting → live data** — bereken uit trips distance_km
-7. **Reporting → live data** — koppel aan trips/invoices aggregates
-8. **SecurityCenter/SystemHealth → live data** — koppel aan audit logs, edge function health
+### 2. Boekhouding Koppeling pagina bouwen
+- Nieuwe pagina `src/pages/integrations/AccountingIntegration.tsx`
+- Route `/integrations/accounting` in App.tsx
+- Sidebar link toevoegen
+- UI om accounting_integrations te beheren (tabel bestaat)
+- Toon verbindingsstatus, provider selectie, credential management via vault RPCs
+- Exact Online flow triggeren (edge function bestaat)
 
-### Fase 3 — Module-completering (KAN na launch)
-9. WMS module live-data koppeling
-10. Bank reconciliation live koppeling
-11. Rate contracts/dynamic pricing live koppeling
-12. RFQ parser en Smart OCR koppelen aan UI
+### 3. Smart OCR pagina bouwen
+- Nieuwe pagina `src/pages/ai/SmartOCR.tsx`
+- Route `/ai/ocr` in App.tsx
+- Document upload UI die `smart-document-ocr` edge function aanroept
+- Resultaat parsing en weergave
+- Koppeling aan order_documents
+
+### 4. E-commerce pagina bouwen
+- Nieuwe pagina `src/pages/integrations/EcommerceHub.tsx`
+- Route `/integrations/ecommerce` in App.tsx
+- CRUD op `ecommerce_connections` tabel
+- Status dashboard met verbindingen beheer
+
+### 5. Multi-vestiging pagina bouwen
+- Migratie: `multi_locations` tabel aanmaken
+- Nieuwe pagina met vestigingen overzicht
+- Route `/admin/locations` in App.tsx
+- Koppeling aan companies tabel
+
+### 6. API Toegang pagina bouwen
+- Nieuwe pagina `src/pages/admin/APIAccess.tsx`
+- Route `/admin/api-access` in App.tsx
+- API key generatie, beheer, documentatie
+- Koppeling aan bestaande api_keys mechanisme
+
+## Fase 2 — Optimalisaties
+
+### 7. WMS Onboarding verbeteren
+- Eerste-gebruik wizard als geen warehouses bestaan
+- Quick-start flow voor eerste warehouse + zone + locatie
+
+### 8. White Label beheerpagina
+- Dedicated pagina voor logo upload, kleuren, domein
+- Preview van branding op portals
 
 ---
 
 ## Technische Details
 
-### Stap 1-4 (Fase 1): Bestanden
-- **`src/components/layout/AppSidebar.tsx`**: Verwijder `/sla` item of redirect
-- **`src/App.tsx`**: Voeg route `/admin/workflows` toe
-- **Delete**: 14 orphan page files + lege `src/pages/notifications/`
-- **Delete**: 3 ongebruikte edge functions (optioneel)
+### Bestanden te maken (Fase 1)
+- `src/pages/finance/CreditNotes.tsx` — Creditnota CRUD
+- `src/pages/integrations/AccountingIntegration.tsx` — Boekhouding
+- `src/pages/ai/SmartOCR.tsx` — OCR upload + resultaten
+- `src/pages/integrations/EcommerceHub.tsx` — Webshop koppelingen
+- `src/pages/admin/MultiLocation.tsx` — Vestigingen
+- `src/pages/admin/APIAccess.tsx` — API sleutels
 
-### Geschatte impact
-- ~14 bestanden verwijderd
-- ~1 route toegevoegd
-- ~1 sidebar-link gefixt
-- 0 nieuwe dependencies
-- Build blijft foutloos (reeds gevalideerd: 0 TS errors)
+### App.tsx wijzigingen
+- 6 nieuwe lazy imports
+- 6 nieuwe routes
+
+### Sidebar wijzigingen
+- 6 nieuwe menu-items onder relevante secties
+
+### Database migratie
+- `multi_locations` tabel (voor multi-vestiging)
+- Eventueel `api_keys` tabel als die niet bestaat
+
+### Geschatte omvang
+- ~6 nieuwe pagina's, elk 200-400 regels
+- ~1 migratie
+- ~20 regels sidebar wijzigingen
+- ~12 regels App.tsx wijzigingen
+- 0 bestaande functionaliteit geraakt
 
