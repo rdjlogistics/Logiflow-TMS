@@ -50,9 +50,9 @@ export default function CreditNotes() {
       const { data, error } = await supabase
         .from("customers")
         .select("id, company_name")
-        .eq("company_id", tenantId!)
-        .eq("is_active", true)
-        .order("company_name");
+        .eq("company_id", tenantId!);
+      if (error) throw error;
+      const sorted = (data || []).filter((c: any) => c.is_active !== false).sort((a: any, b: any) => (a.company_name || "").localeCompare(b.company_name || ""));
       if (error) throw error;
       return data;
     },
