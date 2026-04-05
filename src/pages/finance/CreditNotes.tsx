@@ -46,9 +46,9 @@ export default function CreditNotes() {
   const { data: customers = [] } = useQuery({
     queryKey: ["customers-list", tenantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("customers")
-        .select("id, company_name")
+        .select("id, company_name") as any)
         .eq("company_id", tenantId!);
       if (error) throw error;
       return data || [];
