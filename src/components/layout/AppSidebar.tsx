@@ -105,6 +105,8 @@ const FEATURE_GATE_MAP: Record<string, FeatureKey> = {
   "/enterprise/rosters": "dienstplanning",
   "/finance/cashflow": "cashflow_dashboard",
   "/finance/fuel-cards": "fleet_advanced",
+  "/finance/diesel": "basic_invoicing",
+  "/sales/quotes": "basic_invoicing",
   "/enterprise/audit": "exception_management",
   "/enterprise/disputes": "exception_management",
   "/charter": "tendering",
@@ -161,6 +163,7 @@ const relatiesBaseItems = [
   { title: "Klanten", icon: Users, href: "/customers" },
   { title: "Adresboek", icon: Building2, href: "/address-book" },
   { title: "Producten", icon: Package, href: "/products" },
+  { title: "Offertes", icon: FileSignature, href: "/sales/quotes" },
   { title: "Charter Netwerk", icon: Network, href: "/network" },
 ];
 
@@ -177,6 +180,7 @@ const financieelItems = [
   { title: "Betalingen", icon: CreditCard, href: "/payments" },
   { title: "Cashflow", icon: Wallet, href: "/finance/cashflow" },
   { title: "Tankpassen", icon: Fuel, href: "/finance/fuel-cards" },
+  { title: "Diesel Staffels", icon: TrendingUp, href: "/finance/diesel" },
   { title: "Claims", icon: ClipboardCheck, href: "/claims" },
   { title: "Charter aanvragen", icon: ShoppingCart, href: "/charter" },
   { title: "Tariefcontracten", icon: Euro, href: "/pricing/contracts" },
