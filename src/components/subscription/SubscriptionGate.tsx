@@ -153,6 +153,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 3 && trialDaysLeft > 0 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3"
         >
           <Clock className="h-5 w-5 text-amber-600 shrink-0" />
