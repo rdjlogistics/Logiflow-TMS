@@ -103,6 +103,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isPastDue && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3"
         >
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
@@ -125,6 +126,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 16 && trialDaysLeft > 3 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3"
         >
           <Crown className="h-5 w-5 text-primary shrink-0" />
@@ -151,6 +153,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       {isTrialing && trialDaysLeft <= 3 && trialDaysLeft > 0 && !isSettingsPage && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           className="mx-4 mt-2 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3"
         >
           <Clock className="h-5 w-5 text-amber-600 shrink-0" />
