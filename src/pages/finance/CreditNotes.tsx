@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -79,8 +80,8 @@ export default function CreditNotes() {
       const { data: numData } = await supabase.rpc("generate_credit_note_number");
       const { error } = await supabase.from("credit_notes").insert({
         company_id: tenantId!,
-        customer_id: customerId,
-        invoice_id: invoiceId || null,
+        customer_id: customerId || null,
+        invoice_id: invoiceId && invoiceId !== "" ? invoiceId : null,
         credit_note_number: numData || `CN-${Date.now()}`,
         reason,
         subtotal: sub,
@@ -107,14 +108,22 @@ export default function CreditNotes() {
     return "secondary";
   };
 
-  const filtered = creditNotes.filter((cn: any) =>
-    cn.credit_note_number?.toLowerCase().includes(search.toLowerCase()) ||
-    cn.customers?.company_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const customerMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    customers.forEach((c: any) => { m[c.id] = c.company_name; });
+    return m;
+  }, [customers]);
+
+  const filtered = creditNotes.filter((cn: any) => {
+    const q = search.toLowerCase();
+    const custName = customerMap[cn.customer_id] || "";
+    return cn.credit_note_number?.toLowerCase().includes(q) || custName.toLowerCase().includes(q);
+  });
 
   const totalOpen = creditNotes.filter((cn: any) => cn.status !== "verwerkt").reduce((s: number, cn: any) => s + (cn.total_amount || 0), 0);
 
   return (
+    <DashboardLayout title="Creditnota's" description="Beheer creditnota's en terugbetalingen">
     <div className="space-y-6">
       <PageHeader
         title="Creditnota's"
@@ -225,7 +234,7 @@ export default function CreditNotes() {
                   <div className="min-w-0">
                     <p className="font-semibold truncate">{cn.credit_note_number}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {cn.customers?.company_name || "—"} • {format(new Date(cn.credit_date), "d MMM yyyy", { locale: nl })}
+                      {customerMap[cn.customer_id] || "—"} • {format(new Date(cn.credit_date), "d MMM yyyy", { locale: nl })}
                     </p>
                   </div>
                 </div>
@@ -239,5 +248,6 @@ export default function CreditNotes() {
         )}
       </div>
     </div>
+    </DashboardLayout>
   );
 }
