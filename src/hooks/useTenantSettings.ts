@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface TenantSettings {
   id: string;
@@ -31,9 +32,20 @@ export interface TenantSettings {
   driver_app_completed_stops_bottom: boolean;
 }
 
-export const useTenantSettings = () => {
+interface UseTenantSettingsOptions {
+  enabled?: boolean;
+}
+
+export const useTenantSettings = (options: UseTenantSettingsOptions = {}) => {
+  const { user, authReady } = useAuth();
+  const enabled = (options.enabled ?? true) && authReady && !!user;
+
   return useQuery({
-    queryKey: ['tenant-settings'],
+    queryKey: ['tenant-settings', user?.id],
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
     queryFn: async (): Promise<TenantSettings | null> => {
       const { data, error } = await supabase
         .from('tenant_settings')
