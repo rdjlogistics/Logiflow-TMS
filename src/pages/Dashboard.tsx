@@ -534,11 +534,9 @@ const Dashboard = () => {
               { label: "Planning", icon: Route, href: "/planning", color: "text-primary", bg: "bg-primary/8", border: "border-primary/15" },
             ].map((action) => (
               <Link key={action.href} to={action.href}>
-                <motion.div
-                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 400, damping: 20 } }}
-                  whileTap={{ scale: 0.97 }}
+                <div
                   className={cn(
-                    "action-card-3d",
+                    "action-card-3d hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.97] transition-all",
                     "relative flex flex-col items-center justify-center gap-3 p-5 cursor-pointer",
                     "group touch-manipulation min-h-[88px] sm:min-h-0",
                     action.border
