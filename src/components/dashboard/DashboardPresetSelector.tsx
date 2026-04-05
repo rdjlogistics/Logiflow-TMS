@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -166,25 +165,15 @@ export function DashboardPresetSelector({
   };
 
   return (
-    <AnimatePresence>
+    
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
+          <div onClick={onClose} className="animate-fade-in "fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
           />
 
           {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className="fixed inset-4 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl sm:max-h-[85vh] z-50 overflow-hidden"
+          <div className="animate-scale-in "fixed inset-4 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl sm:max-h-[85vh] z-50 overflow-hidden"
           >
             <div className="h-full flex flex-col bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden">
               {/* Header */}
@@ -218,12 +207,7 @@ export function DashboardPresetSelector({
                     const PresetIcon = preset.icon;
 
                     return (
-                      <motion.button
-                        key={preset.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        onClick={() => handleSelect(preset)}
+                      <button key={preset.id} onClick={() => handleSelect(preset)}
                         className={cn(
                           "group relative flex flex-col text-left p-4 rounded-xl border-2 transition-all duration-200",
                           "hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
@@ -269,7 +253,7 @@ export function DashboardPresetSelector({
                           </span>
                           <ChevronRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                         </div>
-                      </motion.button>
+                      </button>
                     );
                   })}
                 </div>
@@ -282,10 +266,10 @@ export function DashboardPresetSelector({
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    
   );
 }
 
