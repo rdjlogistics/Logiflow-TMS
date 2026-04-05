@@ -35,7 +35,7 @@ export default function CreditNotes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("credit_notes")
-        .select("*, customers(company_name), invoices(invoice_number)")
+        .select("*")
         .eq("company_id", tenantId!)
         .order("created_at", { ascending: false });
       if (error) throw error;

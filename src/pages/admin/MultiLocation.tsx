@@ -29,7 +29,7 @@ export default function MultiLocation() {
   const { data: locations = [], isLoading } = useQuery({
     queryKey: ["multi-locations", tenantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("company_locations")
         .select("*")
         .eq("tenant_id", tenantId!)
@@ -42,7 +42,7 @@ export default function MultiLocation() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("company_locations").insert({
+      const { error } = await (supabase as any).from("company_locations").insert({
         tenant_id: tenantId!,
         name,
         address,
