@@ -1,28 +1,39 @@
 
 
-# pg_cron + pg_net activeren en 3 cron jobs registreren
+# Elite Class Boot Splash — geen dubbele loginpagina meer
 
-## Stap 1: Extensies activeren via migratie
-SQL migratie aanmaken:
-```sql
-CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA pg_catalog;
-CREATE EXTENSION IF NOT EXISTS pg_net WITH SCHEMA extensions;
-```
+## Probleem
+De statische `boot-fallback` in `index.html` lijkt op een loginformulier (invoervelden-skeleton + knop-skeleton). Terwijl React laadt, zien gebruikers dit als een "eerste loginpagina", gevolgd door de echte Auth.tsx — vandaar de "dubbele login" illusie.
 
-## Stap 2: Cron jobs registreren via SQL insert (niet migratie)
-Drie jobs via `cron.schedule()` + `net.http_post()`:
+## Aanpak
 
-1. **Email queue** — elke 2 minuten
-2. **Overdue invoices** — dagelijks 07:00 UTC  
-3. **Diesel price update** — dagelijks 06:00 UTC
+### 1. `index.html` — Boot-fallback vervangen door Elite branded splash
+Verwijder de huidige form-skeleton en vervang door een minimale, premium laad-splash:
+- Gecentreerd LogiFlow logo-icoon (truck SVG) in een glassmorphism container
+- Subtiele CSS-only spin-ring animatie (geen JS nodig)
+- Tekst: "LogiFlow TMS" + "Bezig met laden…"
+- Geen fake invoervelden, geen fake knoppen — puur een branded loader
+- Zelfde donkere achtergrond als de app (`#0F172A`)
+- Het timeout-foutscherm (12s) blijft behouden
 
-Alle drie roepen de bestaande edge functions aan via `net.http_post()` met de project URL (`https://spycblsfcktsnepsdssv.supabase.co/functions/v1/{function}`) en de anon key als Bearer token.
+### 2. `src/App.tsx` — AuthLoader visueel afstemmen op splash
+De `AuthLoader` component (regel 276-282) updaten zodat deze visueel identiek is aan de boot-splash:
+- Zelfde truck-icoon + spin-ring als in index.html
+- Zelfde "LogiFlow TMS" branding
+- Hierdoor voelt de overgang van HTML-fallback → React-loader → Auth.tsx als één vloeiende flow
 
-## Technische details
-- Extensie-activering gaat via de migratie-tool (schema change)
-- Cron job registratie gaat via de SQL insert tool (bevat project-specifieke URLs/keys, mag niet in migraties)
-- Als de migratie opnieuw timeout geeft, proberen we de extensies via de insert tool als fallback
+### 3. Geen wijzigingen aan
+- Auth.tsx (loginlogica)
+- useAuth.tsx (sessie-management)
+- main.tsx (boot-sequentie werkt correct — verwijdert fallback bij React mount)
+- Routing of backend
 
-## Risico
-De vorige poging faalde door database timeouts. Dit is een infra-issue, niet een SQL-issue. De SQL zelf is correct.
+## Bestanden
+- `index.html` (boot-fallback sectie)
+- `src/App.tsx` (AuthLoader component, ~8 regels)
+
+## Resultaat
+- Gebruiker ziet één branded laad-splash → direct de echte loginpagina
+- Geen "dubbele login" meer
+- Elite Class uitstraling vanaf het eerste frame
 
