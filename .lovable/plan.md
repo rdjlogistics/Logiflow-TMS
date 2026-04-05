@@ -1,39 +1,30 @@
 
 
-# Elite Class Boot Splash — geen dubbele loginpagina meer
+# Fix: Witte auth-pagina → login werkt weer
 
 ## Probleem
-De statische `boot-fallback` in `index.html` lijkt op een loginformulier (invoervelden-skeleton + knop-skeleton). Terwijl React laadt, zien gebruikers dit als een "eerste loginpagina", gevolgd door de echte Auth.tsx — vandaar de "dubbele login" illusie.
+De `/auth` pagina is wit omdat:
+1. **AuthLoader** (regel 277) gebruikt `bg-background` — in light-theme wordt dit wit/lichtgrijs
+2. **Auth-routes zitten binnen `LazyCopilotProvider`** (regel 322-323) — als die Suspense `fallback={null}` hangt, rendert er niets
 
-## Aanpak
+## Oplossing (1 bestand: `src/App.tsx`)
 
-### 1. `index.html` — Boot-fallback vervangen door Elite branded splash
-Verwijder de huidige form-skeleton en vervang door een minimale, premium laad-splash:
-- Gecentreerd LogiFlow logo-icoon (truck SVG) in een glassmorphism container
-- Subtiele CSS-only spin-ring animatie (geen JS nodig)
-- Tekst: "LogiFlow TMS" + "Bezig met laden…"
-- Geen fake invoervelden, geen fake knoppen — puur een branded loader
-- Zelfde donkere achtergrond als de app (`#0F172A`)
-- Het timeout-foutscherm (12s) blijft behouden
+### Stap 1 — AuthLoader donker maken
+Regel 277: vervang `bg-background` door `bg-[#0F172A]` en pas tekstkleuren aan naar hardcoded lichte kleuren, zodat het altijd matcht met de boot-splash ongeacht het thema.
 
-### 2. `src/App.tsx` — AuthLoader visueel afstemmen op splash
-De `AuthLoader` component (regel 276-282) updaten zodat deze visueel identiek is aan de boot-splash:
-- Zelfde truck-icoon + spin-ring als in index.html
-- Zelfde "LogiFlow TMS" branding
-- Hierdoor voelt de overgang van HTML-fallback → React-loader → Auth.tsx als één vloeiende flow
+### Stap 2 — Auth-routes buiten CopilotProvider Suspense
+Verplaats de `BrowserRouter` + auth-routes (`/auth`, `/login`, `/demo`) naar **boven** de `LazyCopilotProvider` Suspense-boundary. De CopilotProvider wraps dan alleen de beschermde routes. Hierdoor kan de loginpagina altijd renderen, zelfs als Copilot niet laadt.
 
-### 3. Geen wijzigingen aan
-- Auth.tsx (loginlogica)
-- useAuth.tsx (sessie-management)
-- main.tsx (boot-sequentie werkt correct — verwijdert fallback bij React mount)
-- Routing of backend
+Concreet:
+- `BrowserRouter` verplaatsen naar net na `TooltipProvider`
+- Auth-routes direct in een eigen `Routes` blok, buiten `LazyCopilotProvider`
+- Beschermde routes blijven binnen `LazyCopilotProvider`
 
-## Bestanden
-- `index.html` (boot-fallback sectie)
-- `src/App.tsx` (AuthLoader component, ~8 regels)
+### Geen wijzigingen aan
+- Auth.tsx, useAuth.tsx, main.tsx, backend, edge functions
 
 ## Resultaat
-- Gebruiker ziet één branded laad-splash → direct de echte loginpagina
-- Geen "dubbele login" meer
-- Elite Class uitstraling vanaf het eerste frame
+- Loginpagina laadt altijd met donkere achtergrond — geen witte flits
+- CopilotProvider-problemen blokkeren login niet meer
+- Naadloze overgang: boot-splash → AuthLoader → loginformulier
 
