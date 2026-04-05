@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Truck, ArrowRight, ArrowLeft, Check, Sparkles,
   Building2, Package, Bot, LayoutDashboard, Rocket,
-  Sun, Moon, Monitor,
+  Sun, Moon, Monitor, Palette, Apple, Cpu, Leaf, Flame, Eye,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,8 +27,18 @@ const STEPS = [
   { label: 'TMS', icon: Package, gradient: 'from-emerald-500 to-teal-500' },
   { label: 'AI', icon: Bot, gradient: 'from-violet-500 to-purple-500' },
   { label: 'Dashboard', icon: LayoutDashboard, gradient: 'from-amber-500 to-orange-500' },
+  { label: 'Thema', icon: Palette, gradient: 'from-pink-500 to-rose-500' },
   { label: 'Start', icon: Rocket, gradient: 'from-emerald-500 to-green-400' },
 ];
+
+const THEME_PRESETS = [
+  { id: 'ios' as const, name: 'Apple iOS', description: 'Strak, minimalistisch en native — zoals je iPhone.', icon: Apple, color: 'text-gray-100', bg: 'bg-gradient-to-br from-gray-800 to-gray-900' },
+  { id: 'vision-pro' as const, name: 'Vision Pro', description: 'Ruimtelijk glasmorfisme met 3D diepte-effecten.', icon: Eye, color: 'text-violet-400', bg: 'bg-gradient-to-br from-violet-900/60 to-indigo-900/60' },
+  { id: 'imperial' as const, name: 'Imperial', description: 'Klassiek donker thema met krachtige accenten.', icon: Cpu, color: 'text-primary', bg: 'bg-gradient-to-br from-primary/20 to-primary/10' },
+  { id: 'horizon' as const, name: 'Horizon', description: 'Warme zonsondergang tinten met zachte gradients.', icon: Flame, color: 'text-orange-400', bg: 'bg-gradient-to-br from-orange-900/40 to-amber-900/40' },
+  { id: 'aurora' as const, name: 'Aurora', description: 'Noorderlicht-geïnspireerd met levendige kleuren.', icon: Leaf, color: 'text-emerald-400', bg: 'bg-gradient-to-br from-emerald-900/40 to-teal-900/40' },
+  { id: 'carbon' as const, name: 'Carbon', description: 'Industrieel en zakelijk — puur functioneel design.', icon: Cpu, color: 'text-zinc-400', bg: 'bg-gradient-to-br from-zinc-800 to-zinc-900' },
+] as const;
 
 const OnboardingWizard = () => {
   const navigate = useNavigate();
@@ -37,7 +47,7 @@ const OnboardingWizard = () => {
   const queryClient = useQueryClient();
   const { needsOnboarding, loading: onboardingLoading } = useOnboardingRequired();
   const { company } = useCompany();
-  const { setTheme: applyTheme } = useTheme();
+  const { setTheme: applyTheme, setThemePreset: applyPreset, themePreset: currentPreset } = useTheme();
   const { reorderWidgets, updatePreference } = useUserPreferences();
 
   const [step, setStep] = useState(0);
@@ -61,6 +71,7 @@ const OnboardingWizard = () => {
   // Dashboard preferences
   const [selectedPreset, setSelectedPreset] = useState<DashboardPreset | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [selectedThemePreset, setSelectedThemePreset] = useState<typeof THEME_PRESETS[number]['id']>('ios');
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'daar';
 
@@ -181,6 +192,7 @@ const OnboardingWizard = () => {
         reorderWidgets(selectedPreset.widgets);
       }
       applyTheme(theme);
+      applyPreset(selectedThemePreset);
       updatePreference('theme', theme as any);
 
       // Mark onboarding complete in tenant_settings
@@ -243,7 +255,7 @@ const OnboardingWizard = () => {
 
   const selectablePresets = DASHBOARD_PRESETS.filter(p => !p.isCustom);
 
-  // Hide bottom nav on step 0 (cinematic intro) and step 5 (launch has its own CTA)
+  // Hide bottom nav on step 0 (cinematic intro) and last step (launch has its own CTA)
   const showBottomNav = step > 0 && step < STEPS.length - 1;
 
   return (
@@ -376,7 +388,7 @@ const OnboardingWizard = () => {
                   <p
                     className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
                   >
-                    Stap 5 van 6
+                    Stap 5 van {STEPS.length}
                   </p>
 
                   <div
@@ -484,8 +496,78 @@ const OnboardingWizard = () => {
               </div>
             )}
 
-            {/* Step 5: Launch Sequence */}
+            {/* Step 5: Theme Preset Selection */}
             {step === 5 && (
+              <div className="max-w-3xl mx-auto py-6 sm:py-10 space-y-8">
+                <div className="text-center space-y-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium">
+                    Stap 6 van {STEPS.length}
+                  </p>
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 shadow-lg shadow-pink-500/20">
+                    <Palette className="h-7 w-7 text-white" />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-display font-light tracking-tight">
+                    Kies jouw <span className="font-semibold">stijl</span>
+                  </h2>
+                  <p className="text-sm text-muted-foreground/50 font-light">
+                    Personaliseer het uiterlijk van je platform
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {THEME_PRESETS.map((preset) => {
+                    const isSelected = selectedThemePreset === preset.id;
+                    const PresetIcon = preset.icon;
+                    return (
+                      <button
+                        key={preset.id}
+                        onClick={() => {
+                          setSelectedThemePreset(preset.id);
+                          applyPreset(preset.id);
+                        }}
+                        className={cn(
+                          'relative p-4 rounded-2xl text-left transition-all duration-300 backdrop-blur-xl border',
+                          'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]',
+                          'active:scale-[0.98]',
+                          isSelected
+                            ? 'bg-primary/[0.08] border-primary/30 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.25)] ring-1 ring-primary/20'
+                            : 'bg-white/[0.04] border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.05]',
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0', preset.bg)}>
+                            <PresetIcon className={cn('h-5 w-5', preset.color)} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-sm">{preset.name}</span>
+                              {preset.id === 'ios' && (
+                                <span className="text-[9px] uppercase tracking-widest bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
+                                  Standaard
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground/60 mt-0.5 line-clamp-2">{preset.description}</p>
+                          </div>
+                        </div>
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground/40">
+                  Je kunt je thema altijd later wijzigen via Instellingen
+                </p>
+              </div>
+            )}
+
+            {/* Step 6: Launch Sequence */}
+            {step === 6 && (
               <LaunchSequence
                 companyName={companyForm.name}
                 tmsPlan={selectedTMSSlug}
