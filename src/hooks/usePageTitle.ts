@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 const APP_NAME = 'LogiFlow TMS';
 const DEFAULT_TITLE = APP_NAME;
-const BASE_URL = 'https://logiflowtms.eu';
+const BASE_URL = 'https://rdjlogistics.lovable.app';
 
 function upsertMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
   let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
