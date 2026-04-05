@@ -38,7 +38,7 @@ const Invoices = lazyWithRetry(() => import("./pages/Invoices"));
 const InvoiceDetail = lazyWithRetry(() => import("./pages/InvoiceDetail"));
 const InvoicesNew = lazyWithRetry(() => import("./pages/InvoicesNew"));
 const InvoiceSend = lazyWithRetry(() => import("./pages/InvoiceSend"));
-const Payments = lazyWithRetry(() => import("./pages/Payments"));
+// Payments removed — merged into CashflowCockpit
 const RoutePlanning = lazyWithRetry(() => import("./pages/RoutePlanning"));
 const GPSTracking = lazyWithRetry(() => import("./pages/GPSTracking"));
 const InternalTrackTrace = lazyWithRetry(() => import("./pages/InternalTrackTrace"));
@@ -348,7 +348,7 @@ const App = () => (
                           <Route path="/purchase-invoices/new" element={<StaffPR><PurchaseInvoicesNew /></StaffPR>} />
                           <Route path="/purchase-invoices/:id" element={<StaffPR><PurchaseInvoiceDetail /></StaffPR>} />
                           <Route path="/purchase-invoices/:id/send" element={<StaffPR><PurchaseInvoiceSendPage /></StaffPR>} />
-                          <Route path="/payments" element={<AdminPR><Payments /></AdminPR>} />
+                          <Route path="/payments" element={<Navigate to="/finance/cashflow" replace />} />
                           <Route path="/track-chauffeurs" element={<PR><GPSTracking /></PR>} />
                           <Route path="/gps-tracking" element={<Navigate to="/track-chauffeurs" replace />} />
                           <Route path="/route-planning" element={<PR><RoutePlanning /></PR>} />
