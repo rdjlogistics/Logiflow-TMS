@@ -274,7 +274,7 @@ const PageLoader = () => <PageLoadingSkeleton />;
 
 // Auth-specific loader — matches boot-fallback splash for seamless handoff
 const AuthLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
+  <div className="min-h-screen flex items-center justify-center" style={{ background: '#0F172A' }}>
     <div className="text-center">
       <div className="relative inline-flex items-center justify-center w-20 h-20 mb-6">
         <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400/80 border-r-blue-400/25 animate-spin" style={{ animationDuration: '1.1s' }} />
@@ -282,8 +282,8 @@ const AuthLoader = () => (
           <Truck className="h-[22px] w-[22px] text-blue-400" strokeWidth={1.5} />
         </div>
       </div>
-      <h1 className="text-lg font-semibold text-foreground tracking-tight mb-1.5">LogiFlow TMS</h1>
-      <p className="text-[13px] text-muted-foreground/70">Bezig met laden…</p>
+      <h1 className="text-lg font-semibold tracking-tight mb-1.5" style={{ color: '#e2e8f0' }}>LogiFlow TMS</h1>
+      <p className="text-[13px]" style={{ color: '#64748b' }}>Bezig met laden…</p>
     </div>
   </div>
 );
@@ -319,23 +319,26 @@ const App = () => (
         <ThemeProvider defaultTheme="system" storageKey="nextgen-tms-theme">
           <NotificationProvider>
             <TooltipProvider>
-              <Suspense fallback={null}>
-                <LazyCopilotProvider>
-                  <Toaster />
-                  <Sonner />
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Auth routes — OUTSIDE CopilotProvider so they always render */}
+                  <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
                   
-                  <BrowserRouter>
-                    <GlobalUXProvider>
-                      <Suspense fallback={null}>
-                        <CommandPalette />
-                      </Suspense>
-                      <main role="main">
-                      <Suspense fallback={<PageLoader />}>
-                        <Routes>
-                          {/* Auth routes - public, own Suspense to avoid dashboard skeleton flash */}
-                          <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                          <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                          <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  {/* Everything else goes through CopilotProvider */}
+                  <Route path="*" element={
+                    <Suspense fallback={<AuthLoader />}>
+                      <LazyCopilotProvider>
+                        <GlobalUXProvider>
+                          <Suspense fallback={null}>
+                            <CommandPalette />
+                          </Suspense>
+                          <main role="main">
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
                           <Route path="/pricing" element={<PricingPage />} />
                           <Route path="/checkout/success" element={<CheckoutSuccess />} />
                           <Route path="/onboarding" element={<PR><OnboardingWizard /></PR>} />
@@ -560,14 +563,16 @@ const App = () => (
                           <Route path="/legal/terms" element={<TermsOfService />} />
                           
                           <Route path="*" element={<NotFound />} />
-                        </Routes>
-                        <LegalConsentBanner />
-                      </Suspense>
-                      </main>
-                    </GlobalUXProvider>
-                  </BrowserRouter>
-                </LazyCopilotProvider>
-              </Suspense>
+                            </Routes>
+                            <LegalConsentBanner />
+                          </Suspense>
+                          </main>
+                        </GlobalUXProvider>
+                      </LazyCopilotProvider>
+                    </Suspense>
+                  } />
+                </Routes>
+              </BrowserRouter>
             </TooltipProvider>
           </NotificationProvider>
         </ThemeProvider>
