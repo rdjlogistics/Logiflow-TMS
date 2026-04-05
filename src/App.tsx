@@ -65,6 +65,7 @@ const PurchaseInvoiceSendPage = lazyWithRetry(() => import("./pages/finance/Purc
 const Costs = lazyWithRetry(() => import("./pages/finance/Costs"));
 const BankPayments = lazyWithRetry(() => import("./pages/finance/BankReconciliation"));
 const DieselModule = lazyWithRetry(() => import("./pages/finance/DieselModule"));
+const CreditNotes = lazyWithRetry(() => import("./pages/finance/CreditNotes"));
 const Reporting = lazyWithRetry(() => import("./pages/Reporting"));
 
 // Charter (tendering)
@@ -104,10 +105,13 @@ const DocumentTemplates = lazyWithRetry(() => import("./pages/admin/DocumentTemp
 const HelpCenter = lazyWithRetry(() => import("./pages/admin/HelpCenter"));
 const AIUsage = lazyWithRetry(() => import("./pages/admin/AIUsage"));
 const WorkflowAutomation = lazyWithRetry(() => import("./pages/admin/WorkflowAutomation"));
+const MultiLocation = lazyWithRetry(() => import("./pages/admin/MultiLocation"));
+const APIAccess = lazyWithRetry(() => import("./pages/admin/APIAccess"));
 
 // AI
 const AutoDispatch = lazyWithRetry(() => import("./pages/ai/AutoDispatch"));
 const AnomalyDetection = lazyWithRetry(() => import("./pages/ai/AnomalyDetection"));
+const SmartOCR = lazyWithRetry(() => import("./pages/ai/SmartOCR"));
 
 // Operations & Maintenance
 const DigitalPOD = lazyWithRetry(() => import("./pages/operations/DigitalPOD"));
@@ -115,6 +119,8 @@ const PredictiveMaintenance = lazyWithRetry(() => import("./pages/maintenance/Pr
 
 // Integrations
 const EDIIntegration = lazyWithRetry(() => import("./pages/integrations/EDIIntegration"));
+const AccountingIntegration = lazyWithRetry(() => import("./pages/integrations/AccountingIntegration"));
+const EcommerceHub = lazyWithRetry(() => import("./pages/integrations/EcommerceHub"));
 
 // Portal Guard
 const PortalGuard = lazyWithRetry(() => import("@/components/portal/shared/PortalGuard"));
@@ -304,7 +310,8 @@ const App = () => (
                           <Route path="/admin/document-templates" element={<StaffPR><DocumentTemplates /></StaffPR>} />
                           <Route path="/admin/help" element={<PR><HelpCenter /></PR>} />
                           <Route path="/admin/workflows" element={<AdminPR><WorkflowAutomation /></AdminPR>} />
-                          <Route path="/admin/api" element={<AdminPR><AdminSettings /></AdminPR>} />
+                          <Route path="/admin/api" element={<AdminPR><APIAccess /></AdminPR>} />
+                          <Route path="/admin/locations" element={<AdminPR><MultiLocation /></AdminPR>} />
                           <Route path="/network" element={<PR><Network /></PR>} />
                           <Route path="/email" element={<PR><EmailInbox /></PR>} />
                           
@@ -315,6 +322,7 @@ const App = () => (
                           <Route path="/finance/costs" element={<AdminPR><Costs /></AdminPR>} />
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
                           <Route path="/finance/diesel" element={<AdminPR><DieselModule /></AdminPR>} />
+                          <Route path="/finance/credit-notes" element={<AdminPR><CreditNotes /></AdminPR>} />
                           <Route path="/reporting" element={<StaffPR><Reporting /></StaffPR>} />
                           
                           {/* Sales */}
@@ -347,10 +355,13 @@ const App = () => (
                           
                           {/* Integrations */}
                           <Route path="/integrations/edi" element={<AdminPR><EDIIntegration /></AdminPR>} />
+                          <Route path="/integrations/accounting" element={<AdminPR><AccountingIntegration /></AdminPR>} />
+                          <Route path="/integrations/ecommerce" element={<AdminPR><EcommerceHub /></AdminPR>} />
                           
                           {/* AI */}
                           <Route path="/ai/dispatch" element={<PR><AutoDispatch /></PR>} />
                           <Route path="/ai/anomaly" element={<PR><AnomalyDetection /></PR>} />
+                          <Route path="/ai/ocr" element={<PR><SmartOCR /></PR>} />
                           
                           {/* Operations */}
                           <Route path="/operations/pod" element={<PR><DigitalPOD /></PR>} />
