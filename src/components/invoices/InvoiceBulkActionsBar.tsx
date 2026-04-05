@@ -169,11 +169,8 @@ export function InvoiceBulkActionsBar({
   if (selectedInvoices.length === 0) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        exit={{ opacity: 0, y: 20 }}
-        className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
+      <div
+        className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl animate-fade-in"
       >
         <div className="flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-3 bg-card border border-border shadow-xl rounded-xl backdrop-blur-lg overflow-x-auto scrollbar-none">
           {/* Selection Info */}
@@ -282,7 +279,6 @@ export function InvoiceBulkActionsBar({
             <X className="h-4 w-4" />
           </Button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 }
