@@ -1,87 +1,58 @@
 
 
-# Concurrent-Audit Acties + Top 3 Features Bouwen
+# Nieuwe Modules Integreren in Sidebar + Console Fix
 
-## Huidige Status
+## Probleem
 
-Na grondige audit van Erniesoft e-Lips versus ons systeem:
+1. **Diesel Module** (`/finance/diesel`) — heeft route maar is **niet bereikbaar via sidebar**
+2. **Offertes Dashboard** (`/sales/quotes`) — heeft route maar is **niet bereikbaar via sidebar**
+3. **CO2 Rapportage** (`/co2`) — al in sidebar ✅
+4. **Console error** — `DialogFooter` in DieselModule krijgt een `ref` maar is geen `forwardRef` component
 
-**Wij winnen al op 20+ gebieden** — AI Dispatch, Smart OCR, iOS thema, B2B/Driver portals, Cashflow analytics, Route Optimalisatie, Exception Management, etc.
+## Oplossing
 
-**Erniesoft wint op 3 gebieden die we moeten toevoegen:**
+### 1. Sidebar: Diesel toevoegen aan Financieel sectie
+**Bestand:** `src/components/layout/AppSidebar.tsx`
 
----
+- Voeg toe aan `financieelItems` array (na "Tankpassen"):
+  ```
+  { title: "Diesel Staffels", icon: Fuel, href: "/finance/diesel" }
+  ```
+- Voeg toe aan `FEATURE_GATE_MAP`:
+  ```
+  "/finance/diesel": "basic_invoicing"
+  ```
 
-## Batch 1: Diesel Staffel Module (Prioriteit 1 — NL markt essentieel)
+### 2. Sidebar: Offertes toevoegen aan Relatiebeheer sectie
+- Voeg toe aan `relatiesBaseItems` array (na "Producten"):
+  ```
+  { title: "Offertes", icon: FileText, href: "/sales/quotes" }
+  ```
+  (Logische plek: offertes horen bij klantrelaties/CRM)
 
-We hebben al een `FuelIndexUpdateDialog` en brandstoftoeslag in RateManagement, maar missen de **staffel-structuur** die Erniesoft wel heeft (automatische berekening op basis van prijsstaffels).
+### 3. Console Error Fix: DialogFooter forwardRef
+**Bestand:** `src/components/ui/dialog.tsx`
 
-**Wat te bouwen:**
-- **Nieuwe pagina** `/finance/diesel-module` — Diesel Staffel Beheer
-- **DB migratie**: `diesel_staffels` tabel (referentieprijs, staffelstappen met percentages, geldigheidsperiode)
-- **Staffel Calculator**: Automatische berekening brandstoftoeslag per klant op basis van actuele dieselprijs vs referentieprijs met staffelstappen (bv. elke €0.05 stijging = +0.5%)
-- **Maandelijkse auto-update**: Edge function die CBS/marktprijzen checkt en staffels herberekent
-- **Koppeling aan facturatie**: Brandstoftoeslag automatisch toepassen op factuurregels
-- **Overzichtsdashboard**: Huidige dieselprijs, historische grafiek, impact op omzet
+- Wrap `DialogFooter` in `React.forwardRef` zodat het refs kan ontvangen:
+  ```typescript
+  const DialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+    ({ className, ...props }, ref) => (
+      <div ref={ref} className={cn(...)} {...props} />
+    )
+  );
+  ```
 
-**Bestanden:**
-- 1 migratie (diesel_staffels tabel)
-- 1 pagina (`src/pages/finance/DieselModule.tsx`)
-- 1 edge function (`diesel-price-update`)
-- Update `BatchInvoiceWizard` voor automatische staffel-toepassing
-- Route toevoegen in `App.tsx`
-
----
-
-## Batch 2: Proforma + Offerte Flow (Prioriteit 2)
-
-We hebben al `offerte` status in trips en `is_proforma` in facturatie, maar missen een **dedicated Offerte pagina** met volledige pipeline.
-
-**Wat te bouwen:**
-- **Nieuwe pagina** `/sales/quotes` — Offertes & Proforma Dashboard
-- Pipeline-view: Offerte → Akkoord → Order → Factuur
-- Offerte PDF genereren (edge function uitbreiding van `generate-document-pdf`)
-- Conversie-tracking: hoeveel offertes worden orders
-- Vervaldatum + automatische herinneringen
-- KPI cards: Open offertes, conversiepercentage, gemiddelde waarde
-
-**Bestanden:**
-- 1 pagina (`src/pages/sales/QuotesDashboard.tsx`)
-- Update `generate-document-pdf` edge function voor offerte template
-- Route toevoegen in `App.tsx`
-- Sidebar menu-item onder Sales/CRM
-
----
-
-## Batch 3: CO2 Rapportage Upgraden naar GLEC Framework (Prioriteit 3)
-
-We hebben al een werkende CO2 pagina (`/co2`) met STREAM emissiefactoren. Upgrade naar **GLEC Framework** (EU regelgeving 2026):
-
-**Wat te verbeteren:**
-- **GLEC compliance badges** op het dashboard
-- **Well-to-Wheel (WTW)** emissiefactoren toevoegen naast Tank-to-Wheel
-- **Scope 1/2/3 uitsplitsing** volgens GHG Protocol
-- **PDF rapport export** naast CSV (professioneel ESG rapport)
-- **Doelstellingen panel**: CO2 reductiedoelen instellen en voortgang tracken
-- **Vergelijking met vorig jaar**: Trendlijn en delta
-
-**Bestanden:**
-- Update `src/hooks/useCO2Data.ts` (WTW factoren, scope-uitsplitsing)
-- Update `src/pages/CO2Reporting.tsx` (GLEC badges, doelen, PDF export)
-- Optioneel: edge function voor PDF rapport generatie
-
----
+### 4. Browser Test
+- Na implementatie: navigeer naar sidebar, check of Diesel Staffels en Offertes zichtbaar en klikbaar zijn
+- Check console op 0 errors
 
 ## Technische Details
 
 ```text
-Batch 1 (Diesel):     1 migratie + 1 pagina + 1 edge function + 1 update
-Batch 2 (Offerte):    1 pagina + 1 edge function update + 2 updates
-Batch 3 (CO2 GLEC):   2 bestandsupdates + optioneel edge function
-
-Totaal: ~8-10 bestanden wijzigen/maken
-Volgorde: Batch 1 → 2 → 3 (prioriteit NL markt)
+Bestanden te wijzigen:  2
+  - src/components/layout/AppSidebar.tsx (2 items toevoegen)
+  - src/components/ui/dialog.tsx (forwardRef fix)
+Impact:                 Sidebar navigatie + console warning fix
+Risico:                 Laag — alleen menu items + ref wrapper
 ```
-
-Alle 3 batches vullen exact de gaten die Erniesoft wel heeft en wij nog niet. Na implementatie: **0 concurrentievoordeel voor Erniesoft, 20+ voordelen voor ons**.
 
