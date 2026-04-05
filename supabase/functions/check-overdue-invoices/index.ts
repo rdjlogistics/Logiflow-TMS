@@ -41,7 +41,6 @@ Deno.serve(async (req) => {
       .from("invoices")
       .select("id, invoice_number, due_date, total_amount, amount_paid, status, customer_id, company_id, customers(company_name, email, phone)")
       .not("status", "eq", "betaald")
-      .not("status", "eq", "geannuleerd")
       .lt("due_date", today);
 
     if (invError) {
