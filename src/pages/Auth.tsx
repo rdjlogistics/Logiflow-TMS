@@ -212,7 +212,7 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
       
 
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 

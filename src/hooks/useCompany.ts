@@ -60,26 +60,27 @@ async function fetchUserCompanyData(userId: string): Promise<CompanyData> {
       return { company, userCompanies };
     }
 
-    // No memberships found — retry (company might still be creating)
     if (attempt < maxRetries) {
       console.debug(`[useCompany] No company found for user ${userId}, retry ${attempt + 1}/${maxRetries}...`);
       await new Promise(r => setTimeout(r, retryDelay));
     }
   }
 
-  // All retries exhausted
   return { company: null, userCompanies: [] };
 }
 
 export const useCompany = () => {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const queryClient = useQueryClient();
   const queryKey = ['user-company', user?.id];
+
+  // Only query when auth is fully ready
+  const canQuery = !!user && authReady;
 
   const { data, isLoading, error } = useQuery({
     queryKey,
     queryFn: () => fetchUserCompanyData(user!.id),
-    enabled: !!user,
+    enabled: canQuery,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -164,7 +165,7 @@ export const useCompany = () => {
   return {
     company,
     userCompanies,
-    loading: isLoading,
+    loading: canQuery && isLoading,
     error: error instanceof Error ? error.message : null,
     createCompany,
     updateCompany,

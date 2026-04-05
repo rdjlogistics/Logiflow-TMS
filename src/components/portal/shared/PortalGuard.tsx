@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { usePortalAccess } from "@/hooks/usePortalAccess";
+import { Loader2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PortalGuardProps {
   children: React.ReactNode;
@@ -10,63 +10,12 @@ interface PortalGuardProps {
 }
 
 const PortalGuard = ({ children, skipOnboardingCheck = false }: PortalGuardProps) => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, authReady } = useAuth();
+  const { hasPortalAccess, needsOnboarding, loading: accessLoading, error, refetch } = usePortalAccess();
   const location = useLocation();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      setHasAccess(false);
-      setNeedsOnboarding(false);
-      return;
-    }
-
-    const check = async () => {
-      // 1. Role check
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .in("role", ["klant", "admin", "medewerker"])
-        .limit(1)
-        .maybeSingle();
-
-      if (!roleData) {
-        setHasAccess(false);
-        setNeedsOnboarding(false);
-        return;
-      }
-
-      setHasAccess(true);
-
-      // 2. Onboarding check — only for klant role, skip on onboarding page itself
-      if (skipOnboardingCheck) {
-        setNeedsOnboarding(false);
-        return;
-      }
-
-      // Only check onboarding for klant users
-      const isKlant = roleData.role === "klant";
-      if (!isKlant) {
-        setNeedsOnboarding(false);
-        return;
-      }
-
-      const { data: prefs } = await supabase
-        .from("portal_notification_preferences")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      setNeedsOnboarding(!prefs);
-    };
-
-    check();
-  }, [user, authLoading, skipOnboardingCheck]);
-
-  if (authLoading || hasAccess === null || (hasAccess && needsOnboarding === null)) {
+  // Still bootstrapping auth
+  if (authLoading || !authReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -74,15 +23,50 @@ const PortalGuard = ({ children, skipOnboardingCheck = false }: PortalGuardProps
     );
   }
 
+  // Not logged in
   if (!user) {
     return <Navigate to="/portal/login" replace />;
   }
 
-  if (!hasAccess) {
+  // Still checking portal access
+  if (accessLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Query error — show retry UI, don't kick user out
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 max-w-sm text-center p-6">
+          <AlertTriangle className="h-8 w-8 text-warning" />
+          <p className="text-sm text-muted-foreground">
+            Er is een tijdelijk probleem bij het controleren van je toegang. Probeer het opnieuw.
+          </p>
+          <Button variant="default" onClick={() => refetch()} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Opnieuw proberen
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Definitively no access
+  if (!hasPortalAccess) {
     return <Navigate to="/" replace />;
   }
 
-  if (needsOnboarding && location.pathname.startsWith("/portal/b2b") && location.pathname !== "/portal/b2b/onboarding") {
+  // Onboarding redirect (only for klant, skip on onboarding page itself)
+  if (
+    !skipOnboardingCheck &&
+    needsOnboarding &&
+    location.pathname.startsWith("/portal/b2b") &&
+    location.pathname !== "/portal/b2b/onboarding"
+  ) {
     return <Navigate to="/portal/b2b/onboarding" replace />;
   }
 

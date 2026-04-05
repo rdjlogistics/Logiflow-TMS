@@ -16,17 +16,18 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, redirectTo = "/auth", allowedRoles }: ProtectedRouteProps) => {
-  const { user, loading, authStalled } = useAuth();
+  const { user, loading, authStalled, authReady } = useAuth();
   const { role, loading: roleLoading, refetch, error: roleError } = usePermissions();
   const location = useLocation();
   const retryTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const [retryCount, setRetryCount] = useState(0);
   const MAX_AUTO_RETRIES = 2;
 
-  // Auto-retry when role is null but user is authenticated and we have allowedRoles
+  // Auto-retry when role is null but user is authenticated, auth is ready, and we have allowedRoles
   useEffect(() => {
     if (
       user &&
+      authReady &&
       !loading &&
       !roleLoading &&
       role === null &&
@@ -44,7 +45,7 @@ export const ProtectedRoute = ({ children, redirectTo = "/auth", allowedRoles }:
     return () => {
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
     };
-  }, [user, loading, roleLoading, role, allowedRoles, retryCount, refetch]);
+  }, [user, authReady, loading, roleLoading, role, allowedRoles, retryCount, refetch]);
 
   // Reset retry count when role is loaded
   useEffect(() => {
@@ -103,8 +104,8 @@ export const ProtectedRoute = ({ children, redirectTo = "/auth", allowedRoles }:
     );
   }
 
-  // Auth loading
-  if (loading) {
+  // Auth loading or not yet ready
+  if (loading || !authReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
