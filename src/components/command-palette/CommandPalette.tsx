@@ -78,13 +78,15 @@ export function CommandPalette() {
   const navigationItems: CommandItemType[] = [
     { id: 'dashboard', label: 'Dashboard', description: 'Hoofdoverzicht', icon: LayoutDashboard, action: () => navigateTo('/', 'dashboard'), keywords: ['home', 'overzicht'], group: 'navigation' },
     { id: 'orders', label: 'Orders', description: 'Beheer orders en zendingen', icon: Package, action: () => navigateTo('/orders', 'orders'), keywords: ['zendingen', 'shipments'], group: 'navigation' },
-    { id: 'trips', label: 'Ritten', description: 'Bekijk en plan ritten', icon: Truck, action: () => navigateTo('/trips', 'trips'), keywords: ['trips', 'routes'], group: 'navigation' },
+    { id: 'trips', label: 'Ritten', description: 'Bekijk en plan ritten', icon: Truck, action: () => navigateTo('/orders', 'trips'), keywords: ['trips', 'routes', 'ritten'], group: 'navigation' },
     { id: 'customers', label: 'Klanten', description: 'Klantenbeheer', icon: Users, action: () => navigateTo('/customers', 'customers'), keywords: ['customers', 'relaties'], group: 'navigation' },
      { id: 'carriers', label: 'Charters', description: 'Partner transporteurs', icon: Building2, action: () => navigateTo('/carriers', 'carriers'), keywords: ['carriers', 'partners', 'charters'], group: 'navigation' },
      { id: 'vehicles', label: 'Vlootbeheer', description: 'Wagenparkbeheer', icon: Truck, action: () => navigateTo('/fleet', 'vehicles'), keywords: ['fleet', 'wagenpark', 'voertuigen'], group: 'navigation' },
      { id: 'track-chauffeurs', label: 'Track Eigen Chauffeurs', description: 'Live tracking van eigen chauffeurs', icon: Map, action: () => navigateTo('/track-chauffeurs', 'track-chauffeurs'), keywords: ['tracking', 'chauffeurs', 'kaart', 'live'], group: 'navigation' },
     { id: 'invoices', label: 'Facturen', description: 'Factuuroverzicht', icon: FileText, action: () => navigateTo('/invoices', 'invoices'), keywords: ['invoices', 'billing'], group: 'navigation' },
-    { id: 'payments', label: 'Betalingen', description: 'Betalingsoverzicht', icon: CreditCard, action: () => navigateTo('/payments', 'payments'), keywords: ['payments', 'finance'], group: 'navigation' },
+    { id: 'cashflow', label: 'Cashflow', description: 'Cashflow cockpit', icon: CreditCard, action: () => navigateTo('/finance/cashflow', 'cashflow'), keywords: ['payments', 'finance', 'cashflow', 'betalingen'], group: 'navigation' },
+    { id: 'diesel', label: 'Diesel Staffels', description: 'Dieseltoeslag beheer', icon: FileText, action: () => navigateTo('/finance/diesel', 'diesel'), keywords: ['diesel', 'brandstof', 'toeslag'], group: 'navigation' },
+    { id: 'quotes', label: 'Offertes', description: 'Offertes en proforma', icon: FileText, action: () => navigateTo('/sales/quotes', 'quotes'), keywords: ['offerte', 'proforma', 'quote'], group: 'navigation' },
     { id: 'planning-program', label: 'Planning Programma', description: 'Diensten en roosters', icon: Calendar, action: () => navigateTo('/planning-program', 'planning-program'), keywords: ['shifts', 'rooster'], group: 'navigation' },
     { id: 'messenger', label: 'Messenger', description: 'Chat en communicatie', icon: MessageSquare, action: () => navigateTo('/messenger', 'messenger'), keywords: ['chat', 'berichten'], group: 'navigation' },
     { id: 'wms', label: 'Warehouse', description: 'Magazijnbeheer', icon: Warehouse, action: () => navigateTo('/wms', 'wms'), keywords: ['warehouse', 'magazijn'], group: 'navigation' },
@@ -93,7 +95,7 @@ export function CommandPalette() {
 
   const actionItems: CommandItemType[] = [
     { id: 'new-order', label: 'Nieuwe Order', description: 'Maak een nieuwe order aan', icon: Plus, action: () => navigateTo('/orders/edit', 'new-order'), keywords: ['create', 'nieuw', 'aanmaken'], group: 'actions' },
-    { id: 'new-trip', label: 'Nieuwe Rit', description: 'Plan een nieuwe rit', icon: Plus, action: () => navigateTo('/trips', 'new-trip'), keywords: ['create', 'nieuw', 'plannen'], group: 'actions' },
+    { id: 'new-trip', label: 'Nieuwe Rit', description: 'Plan een nieuwe rit', icon: Plus, action: () => navigateTo('/orders', 'new-trip'), keywords: ['create', 'nieuw', 'plannen'], group: 'actions' },
     { id: 'track-shipment', label: 'Zending Traceren', description: 'Volg een zending', icon: Search, action: () => navigateTo('/tracking', 'track-shipment'), keywords: ['track', 'trace', 'volgen'], group: 'actions' },
   ];
 
