@@ -271,6 +271,15 @@ const queryClient = new QueryClient({
 // Loading fallback component
 const PageLoader = () => <PageLoadingSkeleton />;
 
+// Auth-specific loader — simple spinner, no dashboard skeleton flash
+const AuthLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center animate-pulse">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  </div>
+);
+
 // Helper: wrap element in ProtectedRoute (no role restriction — any authenticated user)
 const PR = ({ children, redirectTo }: { children: ReactNode; redirectTo?: string }) => (
   <ProtectedRoute redirectTo={redirectTo}>{children}</ProtectedRoute>
