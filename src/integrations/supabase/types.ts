@@ -2840,6 +2840,59 @@ export type Database = {
           },
         ]
       }
+      company_locations: {
+        Row: {
+          address: string
+          city: string
+          contact_name: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          postal_code: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          postal_code?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          postal_code?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_locations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_alerts: {
         Row: {
           alert_type: string
