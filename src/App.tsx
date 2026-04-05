@@ -311,6 +311,7 @@ const App = () => (
                       <Suspense fallback={null}>
                         <CommandPalette />
                       </Suspense>
+                      <main role="main">
                       <Suspense fallback={<PageLoader />}>
                         <Routes>
                           {/* Auth routes - public */}
