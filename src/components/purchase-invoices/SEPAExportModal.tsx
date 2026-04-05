@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -404,7 +405,7 @@ export const SEPAExportModal = ({
                       <span className="font-mono font-medium">
                         {formatCurrency(payment.amount)}
                       </span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </ScrollArea>

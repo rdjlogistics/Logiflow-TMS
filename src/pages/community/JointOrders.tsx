@@ -10,6 +10,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Handshake, Search, Truck, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -49,7 +50,7 @@ const JointOrders = () => {
   return (
     <DashboardLayout title="Gezamenlijke Ritten">
       <FeatureGate feature="vervoerders_netwerk">
-        <div className="animate-fade-in "space-y-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card><CardContent className="pt-4 text-center">
               <div className="text-2xl font-bold">{trips.length}</div>
@@ -130,7 +131,7 @@ const JointOrders = () => {
               )}
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </FeatureGate>
     </DashboardLayout>
   );

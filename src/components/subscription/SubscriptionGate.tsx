@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Crown, ArrowRight, AlertTriangle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSubscriptionPlan } from "@/hooks/useSubscriptionPlan";
@@ -37,7 +38,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         </div>
 
         {/* Blocking overlay */}
-        
+        <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -50,7 +51,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
               <div className="flex flex-col items-center text-center space-y-6">
                 {/* Icon */}
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-primary/20"
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-primary/20"
                   />
                   <div className="relative h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25">
                     <Crown className="h-8 w-8 text-primary-foreground" />
@@ -88,9 +90,9 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
                   Je data blijft veilig bewaard. Na het kiezen van een pakket heb je direct weer volledige toegang.
                 </p>
               </div>
-            </div>
-          </div>
-        
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     );
   }
@@ -116,7 +118,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           >
             Bijwerken
           </Button>
-        </div>
+        </motion.div>
       )}
 
       {/* Payment method reminder when trial is between day 14 and 30 */}
@@ -142,7 +144,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           >
             Toevoegen
           </Button>
-        </div>
+        </motion.div>
       )}
 
       {/* Trial warning when < 3 days left */}
@@ -166,7 +168,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           >
             Upgrade
           </Button>
-        </div>
+        </motion.div>
       )}
 
       {children}

@@ -8,6 +8,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { BookOpen, Loader2, ArrowUpRight, ArrowDownLeft, DollarSign } from "lucide-react";
+import { motion } from "framer-motion";
 
 const CommunityLedger = () => {
   // Show finance_transactions as ledger entries for community
@@ -31,7 +32,7 @@ const CommunityLedger = () => {
   return (
     <DashboardLayout title="Grootboek">
       <FeatureGate feature="vervoerders_netwerk">
-        <div className="animate-fade-in "space-y-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card><CardContent className="pt-4 text-center">
               <ArrowUpRight className="h-5 w-5 mx-auto mb-1 text-emerald-500" />
@@ -104,7 +105,7 @@ const CommunityLedger = () => {
               )}
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </FeatureGate>
     </DashboardLayout>
   );

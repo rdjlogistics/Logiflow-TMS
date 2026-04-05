@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { hapticSelection, hapticSuccess, hapticError } from "@/lib/haptics";
 import { useTenantSettings } from "@/hooks/useTenantSettings";
@@ -272,7 +273,7 @@ ${company || "Uw transportbedrijf"}`
           <motion.div
           >
             <Mail className="h-5 w-5 text-primary" />
-          </div>
+          </motion.div>
           E-mail versturen
         </CardTitle>
       </CardHeader>
@@ -283,7 +284,7 @@ ${company || "Uw transportbedrijf"}`
           
           <div className="min-h-[44px] p-2 rounded-xl border-2 border-input bg-background/50 backdrop-blur-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div className="flex flex-wrap gap-2">
-              
+              <AnimatePresence mode="popLayout">
                 {recipients.map((email) => (
                   <motion.div
                     key={email}
@@ -304,9 +305,9 @@ ${company || "Uw transportbedrijf"}`
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
-                  </div>
+                  </motion.div>
                 ))}
-              
+              </AnimatePresence>
               
               {/* Add email input inline */}
               <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
@@ -327,7 +328,7 @@ ${company || "Uw transportbedrijf"}`
                     className="flex-shrink-0"
                   >
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  </div>
+                  </motion.div>
                 )}
                 <Button 
                   type="button" 
@@ -340,7 +341,7 @@ ${company || "Uw transportbedrijf"}`
                   <motion.div
                   >
                     <Plus className="h-4 w-4" />
-                  </div>
+                  </motion.div>
                 </Button>
               </div>
             </div>
@@ -425,7 +426,7 @@ ${company || "Uw transportbedrijf"}`
                 initial={{ scale: 0 }}
               >
                 <CheckCircle2 className="h-4 w-4 text-primary" />
-              </div>
+              </motion.div>
             )}
           </label>
 
@@ -485,7 +486,7 @@ ${company || "Uw transportbedrijf"}`
             onClick={() => sendEmailMutation.mutate()}
             disabled={sendEmailMutation.isPending || recipients.length === 0}
           >
-            
+            <AnimatePresence mode="wait">
               {sendEmailMutation.isPending ? (
                 <motion.div
                   key="loading"
@@ -493,7 +494,7 @@ ${company || "Uw transportbedrijf"}`
                   exit={{ opacity: 0, scale: 0.8 }}
                 >
                   <Loader2 className="h-5 w-5 animate-spin" />
-                </div>
+                </motion.div>
               ) : (
                 <motion.div
                   key="send"
@@ -501,9 +502,9 @@ ${company || "Uw transportbedrijf"}`
                   exit={{ opacity: 0, scale: 0.8 }}
                 >
                   <Send className="h-5 w-5" />
-                </div>
+                </motion.div>
               )}
-            
+            </AnimatePresence>
             Verstuur naar {recipients.length} ontvanger{recipients.length !== 1 ? "s" : ""}
           </Button>
           

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { usePODClaims } from "@/hooks/usePODClaims";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   AlertTriangle, Search, FileCheck, Camera, MessageSquare,
@@ -129,7 +130,7 @@ const ClaimCard = ({ claim, onSelect, getStatusBadge, getTypeBadge }: any) => {
           <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-2" />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -208,7 +209,7 @@ const PODCard = ({ pod }: any) => {
         }}><Download className="h-4 w-4" /></Button>
       </div>
     </div>
-  </div>
+  </motion.div>
   );
 };
 
@@ -394,7 +395,7 @@ const ClaimsInbox = () => {
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -431,10 +432,15 @@ const ClaimsInbox = () => {
           <Spinner size="lg" />
         </div>
       ) : (
-      
+      <AnimatePresence mode="wait">
         {activeTab === "claims" && (
-          <div
-            key="claims" className="animate-fade-in "space-y-2"
+          <motion.div
+            key="claims"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-2"
           >
             {filteredClaims.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
@@ -452,12 +458,17 @@ const ClaimsInbox = () => {
                 />
               ))
             )}
-          </div>
+          </motion.div>
         )}
 
         {activeTab === "pod" && (
-          <div
-            key="pod" className="animate-fade-in "space-y-2"
+          <motion.div
+            key="pod"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-2"
           >
             {pods.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
@@ -467,9 +478,9 @@ const ClaimsInbox = () => {
             ) : (
               pods.map((pod: any) => <PODCard key={pod.id} pod={pod} />)
             )}
-          </div>
+          </motion.div>
         )}
-      
+      </AnimatePresence>
       )}
 
       {/* ── Claim Detail: Sheet on mobile, Dialog on desktop ── */}

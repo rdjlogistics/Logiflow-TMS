@@ -15,6 +15,7 @@ import {
   ClipboardCheck, ChevronDown, ChevronUp, Search, Calendar,
   PenLine, Camera, Clock, MessageSquare, MapPin, Truck, X
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DeliveryProof {
   id: string;
@@ -207,7 +208,7 @@ const B2BDeliveries = () => {
 
   return (
     <B2BLayout companyName={customer?.companyName || "Mijn Bedrijf"}>
-      <div className="space-y-6" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="show">
+      <motion.div className="space-y-6" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="show">
         {/* Header */}
         <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25 } } }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -219,7 +220,7 @@ const B2BDeliveries = () => {
               Bekijk afmeldgegevens, handtekeningen en foto's van uw zendingen
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Filters */}
         <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 25, delay: 0.04 } } }} className="flex flex-wrap gap-3">
@@ -251,7 +252,7 @@ const B2BDeliveries = () => {
               )}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Content */}
         {loading ? (
@@ -322,9 +323,13 @@ const B2BDeliveries = () => {
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
-                    
+                    <AnimatePresence>
                       {isExpanded && (
-                        <div className="animate-fade-in "overflow-hidden"
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
                         >
                           <Card className="mt-1 border-primary/20 bg-card/60 backdrop-blur-sm">
                             <CardContent className="p-4 space-y-4">
@@ -434,21 +439,22 @@ const B2BDeliveries = () => {
                               )}
                             </CardContent>
                           </Card>
-                        </div>
+                        </motion.div>
                       )}
-                    
+                    </AnimatePresence>
                   </CollapsibleContent>
                 </Collapsible>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         )}
 
         {/* Lightbox */}
-        
+        <AnimatePresence>
           {lightboxUrl && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+            <motion.div
+              className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -470,10 +476,10 @@ const B2BDeliveries = () => {
               >
                 <X className="h-6 w-6" />
               </Button>
-            </div>
+            </motion.div>
           )}
-        
-      </div>
+        </AnimatePresence>
+      </motion.div>
     </B2BLayout>
   );
 };
