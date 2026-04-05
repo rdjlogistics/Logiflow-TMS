@@ -136,10 +136,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`[check-overdue-invoices] Done. Checked: ${invoices.length}, Triggered: ${triggered}`);
+    console.log(`[check-overdue-invoices] Done. Checked: ${invoices.length}, Triggered: ${triggered}, StatusUpdated: ${statusUpdated}`);
 
     return new Response(
-      JSON.stringify({ checked: invoices.length, triggered }),
+      JSON.stringify({ checked: invoices.length, triggered, statusUpdated }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
