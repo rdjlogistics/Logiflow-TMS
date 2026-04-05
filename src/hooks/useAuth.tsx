@@ -9,6 +9,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  /** True once the initial session hydration is complete — safe to run authenticated queries */
+  authReady: boolean;
   authStalled: boolean;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -20,18 +22,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
   const [authStalled, setAuthStalled] = useState(false);
 
   const ensuredCompanyRef = useRef(false);
-
-  // Promise-based deduplication: if a call is already in-flight, reuse it
   const ensureCompanyPromiseRef = useRef<Promise<void> | null>(null);
   const authBootResolvedRef = useRef(false);
 
   const ensureUserCompanyLink = useCallback(async (retries = 2) => {
     if (ensuredCompanyRef.current) return;
-
-    // If there's already a call in-flight, wait for it instead of starting a new one
     if (ensureCompanyPromiseRef.current) {
       await ensureCompanyPromiseRef.current;
       return;
@@ -41,7 +40,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
           let timeoutId: number | undefined;
-
           const { error } = await Promise.race([
             supabase.functions.invoke("ensure-user-company"),
             new Promise<{ data: null; error: Error }>((resolve) => {
@@ -50,9 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }, 6000);
             }),
           ]).finally(() => {
-            if (timeoutId) {
-              window.clearTimeout(timeoutId);
-            }
+            if (timeoutId) window.clearTimeout(timeoutId);
           });
 
           if (!error) {
@@ -68,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       }
-      // Mark as attempted even on failure to prevent infinite loops
       ensuredCompanyRef.current = true;
     };
 
@@ -86,8 +81,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(nextSession);
     setUser(nextSession?.user ?? null);
     setLoading(false);
+    // Mark auth as ready — queries can now safely run
+    setAuthReady(true);
 
     if (nextSession?.user) {
+      // Fire-and-forget: don't block auth readiness
       window.setTimeout(() => {
         void ensureUserCompanyLink();
       }, 0);
@@ -95,8 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [ensureUserCompanyLink]);
 
   const handleSignOut = useCallback(async () => {
-    // Always clear local auth storage as well; if the network signOut fails due to
-    // a corrupted token, the UI should still reliably log the user out.
     try {
       await supabase.auth.signOut();
     } catch (error) {
@@ -117,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.warn("[Auth] Initialization stalled; releasing loading state");
         setAuthStalled(true);
         setLoading(false);
+        setAuthReady(true); // Even on stall, mark ready so hooks don't hang forever
       }
     }, 8000);
 
@@ -125,14 +122,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       // IMPORTANT: keep this callback synchronous to avoid auth deadlocks.
 
-      // If refresh failed and we lost session, clear corrupted tokens and sign out cleanly (deferred).
-      // Note: supabase-js does not expose a TOKEN_REFRESH_FAILED event in its public types,
-      // so we handle the "lost session" case defensively here.
       if (event === "TOKEN_REFRESHED" && !session) {
         console.warn("[Auth] Token refresh resulted in empty session; clearing auth storage and signing out");
         authBootResolvedRef.current = true;
         setAuthStalled(false);
         setLoading(false);
+        setAuthReady(true);
         setTimeout(() => {
           clearAuthStorage();
           void handleSignOut();
@@ -154,7 +149,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.warn("Session retrieval error:", error.message);
-        // Clear potentially corrupted session (e.g. refresh_token_not_found)
         if (error.message?.toLowerCase().includes("refresh token") || error.message?.toLowerCase().includes("refresh_token")) {
           authBootResolvedRef.current = true;
           setTimeout(() => {
@@ -179,12 +173,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase.auth.refreshSession();
       if (error) {
         const msg = error.message?.toLowerCase() || '';
-        // Only sign out on definitive token errors
         if (msg.includes('refresh_token') || msg.includes('invalid') || msg.includes('not_found')) {
           console.warn('[Auth] Refresh token invalid, signing out');
           await handleSignOut();
         } else {
-          // Network or transient error — don't sign out, retry next cycle
           console.warn('[Auth] Transient refresh error, will retry:', error.message);
         }
         return;
@@ -205,7 +197,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!session) return;
 
-    // Periodic refresh every 10 minutes
     const interval = setInterval(() => {
       if (session) {
         console.debug('[Auth] Periodic session refresh');
@@ -213,7 +204,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }, 10 * 60 * 1000);
 
-    // Visibility change: refresh when app returns to foreground (debounced 30s)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && session) {
         const now = Date.now();
@@ -225,7 +215,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    // Focus event: also refresh on window focus (e.g. switching apps on mobile)
     const handleFocus = () => {
       if (session) {
         const now = Date.now();
@@ -247,11 +236,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [session, refreshSession]);
 
-
-
-
   return (
-    <AuthContext.Provider value={{ user, session, loading, authStalled, signOut: handleSignOut, refreshSession }}>
+    <AuthContext.Provider value={{ user, session, loading, authReady, authStalled, signOut: handleSignOut, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

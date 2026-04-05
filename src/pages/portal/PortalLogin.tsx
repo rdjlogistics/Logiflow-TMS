@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalAccess } from "@/hooks/usePortalAccess";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAuthStorage } from "@/lib/authStorage";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,8 @@ import { Truck, Loader2, AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-reac
 import { toast } from "sonner";
 
 const PortalLogin = () => {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const { user, loading: authLoading, authReady } = useAuth();
+  const { hasPortalAccess, loading: accessLoading } = usePortalAccess();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,24 +21,10 @@ const PortalLogin = () => {
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
 
-  // If already logged in, validate role and redirect
-  useEffect(() => {
-    if (authLoading || !user) return;
-
-    const checkRole = async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "klant")
-        .maybeSingle();
-
-      if (data) {
-        navigate("/portal/b2b", { replace: true });
-      }
-    };
-    checkRole();
-  }, [user, authLoading, navigate]);
+  // If already logged in with portal access, redirect directly
+  if (authReady && user && !accessLoading && hasPortalAccess) {
+    return <Navigate to="/portal/b2b" replace />;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +32,8 @@ const PortalLogin = () => {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -62,28 +49,9 @@ const PortalLogin = () => {
         return;
       }
 
-      if (!data.user) {
-        setError("Er ging iets mis. Probeer opnieuw.");
-        setLoading(false);
-        return;
-      }
-
-      // Validate klant role
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id)
-        .eq("role", "klant")
-        .maybeSingle();
-
-      if (!roleData) {
-        await supabase.auth.signOut();
-        setError("Dit account heeft geen toegang tot het klantenportaal.");
-        setLoading(false);
-        return;
-      }
-
-      navigate("/portal/b2b", { replace: true });
+      // Success! AuthProvider will set user → usePortalAccess will check role →
+      // the redirect at the top of this component will fire automatically.
+      // No manual role query needed here.
     } catch {
       setError("Er ging iets mis. Probeer opnieuw.");
     } finally {
@@ -100,7 +68,7 @@ const PortalLogin = () => {
     setLoading(true);
     setError(null);
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
@@ -118,7 +86,7 @@ const PortalLogin = () => {
     window.location.reload();
   };
 
-  if (authLoading) {
+  if (authLoading || !authReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -134,15 +102,11 @@ const PortalLogin = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <div
-        className="relative w-full max-w-md"
-      >
+      <div className="relative w-full max-w-md">
         <div className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl p-8 shadow-2xl">
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
-            <div
-              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg mb-4"
-            >
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg mb-4">
               <Truck className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">Klantenportaal</h1>
@@ -151,9 +115,7 @@ const PortalLogin = () => {
 
           {/* Error */}
           {error && (
-            <div
-              className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm"
-            >
+            <div className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>

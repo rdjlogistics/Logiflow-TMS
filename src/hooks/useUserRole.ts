@@ -24,30 +24,29 @@ async function fetchRoleFromDB(userId: string): Promise<AppRole | null> {
 
 /** Clear the entire role cache — call on signOut to prevent cross-user leaks. */
 export function clearAllRoleCache() {
-  // This is a standalone function that doesn't have access to queryClient.
-  // Components that need to clear should use the hook's clearCache/refetch.
-  // For signOut, the QueryClientProvider will unmount and reset automatically.
-  // As a safety net, we also clear via a custom event that the hook listens to.
   window.dispatchEvent(new CustomEvent("clear-role-cache"));
 }
 
 export const useUserRole = () => {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const userId = user?.id;
   const queryClient = useQueryClient();
+
+  // Only query when auth is fully ready AND we have a user
+  const canQuery = !!userId && authReady;
 
   const { data: role = null, isLoading, error: queryError } = useQuery<AppRole | null>({
     queryKey: ["user-role", userId],
     queryFn: () => fetchRoleFromDB(userId!),
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,    // 5 min — don't refetch if fresh
-    gcTime: 10 * 60 * 1000,      // 10 min — keep in cache
+    enabled: canQuery,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 3,
     retryDelay: 1500,
   });
 
-  // Loading is only true when we have a userId and data is still fetching
-  const loading = !!userId && isLoading;
+  // Loading is true when we have a userId, auth is ready, and data is still fetching
+  const loading = canQuery && isLoading;
   const error = queryError instanceof Error ? queryError : queryError ? new Error("Failed to fetch role") : null;
 
   const isAdmin = useMemo(() => role === "admin", [role]);

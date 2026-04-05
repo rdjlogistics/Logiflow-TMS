@@ -25,13 +25,16 @@ interface NotificationPreferences {
 }
 
 export function usePortalAuth() {
-  const { user, session } = useAuth();
+  const { user, session, authReady } = useAuth();
   const [customer, setCustomer] = useState<CustomerProfile | null>(null);
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isB2B, setIsB2B] = useState(false);
 
   useEffect(() => {
+    // Don't fetch until auth is fully ready
+    if (!authReady) return;
+
     const fetchCustomer = async () => {
       if (!user?.id) {
         setCustomer(null);
@@ -41,7 +44,6 @@ export function usePortalAuth() {
       }
 
       try {
-        // Fetch customer linked to this user
         const { data: customerData, error } = await supabase
           .from('customers')
           .select('*')
@@ -65,10 +67,8 @@ export function usePortalAuth() {
             vatNumber: customerData.vat_number || undefined,
           });
           setCustomerId(customerData.id);
-          // B2B if company has a VAT number or company name
           setIsB2B(!!customerData.vat_number || !!customerData.company_name);
         } else {
-          // No customer linked — no demo fallback
           setCustomer(null);
           setCustomerId(null);
         }
@@ -82,7 +82,7 @@ export function usePortalAuth() {
     };
 
     fetchCustomer();
-  }, [user?.id]);
+  }, [user?.id, authReady]);
 
   return {
     user,
@@ -96,7 +96,7 @@ export function usePortalAuth() {
 }
 
 export function useNotificationPreferences() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     emailShipmentUpdates: true,
     emailDeliveryConfirmation: true,
@@ -109,6 +109,8 @@ export function useNotificationPreferences() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!authReady) return;
+
     const fetchPreferences = async () => {
       if (!user?.id) {
         setLoading(false);
@@ -142,7 +144,7 @@ export function useNotificationPreferences() {
     };
 
     fetchPreferences();
-  }, [user?.id]);
+  }, [user?.id, authReady]);
 
   const savePreferences = async (newPrefs: Partial<NotificationPreferences>) => {
     if (!user?.id) return { error: 'Not authenticated' };

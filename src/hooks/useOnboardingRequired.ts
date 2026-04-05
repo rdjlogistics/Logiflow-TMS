@@ -37,7 +37,7 @@ async function waitForCompanyLink(userId: string): Promise<string | null> {
 }
 
 export const useOnboardingRequired = () => {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
 
   const query = useQuery({
     queryKey: ['onboarding-required', user?.id],
@@ -66,7 +66,8 @@ export const useOnboardingRequired = () => {
       if (completed) setLocalFlag(user!.id);
       return !completed;
     },
-    enabled: !!user,
+    // Only run when auth is fully ready
+    enabled: !!user && authReady,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
