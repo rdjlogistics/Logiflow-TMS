@@ -25,6 +25,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 // Lazy load ALL pages including Dashboard for better initial bundle
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 // ControlTower removed — consolidated into Dashboard (Command Center)
+// Procurement removed — consolidated into Charter section
 const Procurement = lazyWithRetry(() => import("./pages/Procurement"));
 
 const Customers = lazyWithRetry(() => import("./pages/Customers"));
