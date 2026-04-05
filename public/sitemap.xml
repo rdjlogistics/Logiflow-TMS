@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rdjlogistics.lovable.app/</loc>
+    <loc>https://rdjlogistics.nl/</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/login</loc>
+    <loc>https://rdjlogistics.nl/login</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/orders</loc>
+    <loc>https://rdjlogistics.nl/orders</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/customers</loc>
+    <loc>https://rdjlogistics.nl/customers</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/invoices</loc>
+    <loc>https://rdjlogistics.nl/invoices</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/route-planning</loc>
+    <loc>https://rdjlogistics.nl/route-planning</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/gps-tracking</loc>
+    <loc>https://rdjlogistics.nl/gps-tracking</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/carriers</loc>
+    <loc>https://rdjlogistics.nl/carriers</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://rdjlogistics.lovable.app/install</loc>
+    <loc>https://rdjlogistics.nl/install</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
