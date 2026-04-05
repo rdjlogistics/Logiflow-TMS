@@ -353,10 +353,13 @@ const App = () => (
                           
                           {/* Integrations */}
                           <Route path="/integrations/edi" element={<AdminPR><EDIIntegration /></AdminPR>} />
+                          <Route path="/integrations/accounting" element={<AdminPR><AccountingIntegration /></AdminPR>} />
+                          <Route path="/integrations/ecommerce" element={<AdminPR><EcommerceHub /></AdminPR>} />
                           
                           {/* AI */}
                           <Route path="/ai/dispatch" element={<PR><AutoDispatch /></PR>} />
                           <Route path="/ai/anomaly" element={<PR><AnomalyDetection /></PR>} />
+                          <Route path="/ai/ocr" element={<PR><SmartOCR /></PR>} />
                           
                           {/* Operations */}
                           <Route path="/operations/pod" element={<PR><DigitalPOD /></PR>} />
