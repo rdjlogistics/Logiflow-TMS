@@ -99,6 +99,7 @@ const ProfitMargin = lazyWithRetry(() => import("./pages/finance/MarginIntellige
 const Costs = lazyWithRetry(() => import("./pages/finance/Costs"));
 const BankPayments = lazyWithRetry(() => import("./pages/finance/BankReconciliation"));
 const Reports = lazyWithRetry(() => import("./pages/finance/Reports"));
+const DieselModule = lazyWithRetry(() => import("./pages/finance/DieselModule"));
 const Goals = lazyWithRetry(() => import("./pages/finance/Goals"));
 const Reporting = lazyWithRetry(() => import("./pages/Reporting"));
 
@@ -146,6 +147,7 @@ const OnboardingWizard = lazyWithRetry(() => import("./pages/OnboardingWizard"))
 const RateContracts = lazyWithRetry(() => import("./pages/pricing/RateContracts"));
 const DynamicPricing = lazyWithRetry(() => import("./pages/pricing/DynamicPricing"));
 const ClaimsInbox = lazyWithRetry(() => import("./pages/claims/ClaimsInbox"));
+const QuotesDashboard = lazyWithRetry(() => import("./pages/sales/QuotesDashboard"));
 
 // Migration & Admin
 const MigrationHub = lazyWithRetry(() => import("./pages/migration/MigrationHub"));
@@ -418,7 +420,11 @@ const App = () => (
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
                           <Route path="/finance/reports" element={<AdminPR><Reports /></AdminPR>} />
                           <Route path="/finance/goals" element={<AdminPR><Goals /></AdminPR>} />
+                          <Route path="/finance/diesel" element={<AdminPR><DieselModule /></AdminPR>} />
                           <Route path="/reporting" element={<StaffPR><Reporting /></StaffPR>} />
+                          
+                          {/* Sales */}
+                          <Route path="/sales/quotes" element={<PR><QuotesDashboard /></PR>} />
                           
                           {/* Tendering */}
                           {/* Charter sectie (vervoerderselectie & inkoop) */}

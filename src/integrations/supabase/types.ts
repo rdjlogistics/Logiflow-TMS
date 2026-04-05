@@ -5269,6 +5269,74 @@ export type Database = {
           },
         ]
       }
+      diesel_staffels: {
+        Row: {
+          created_at: string
+          current_market_price: number | null
+          id: string
+          is_active: boolean
+          last_updated_at: string | null
+          max_surcharge_pct: number | null
+          min_surcharge_pct: number | null
+          name: string
+          notes: string | null
+          price_history: Json | null
+          reference_price: number
+          step_percentage: number
+          step_size: number
+          tenant_id: string
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_market_price?: number | null
+          id?: string
+          is_active?: boolean
+          last_updated_at?: string | null
+          max_surcharge_pct?: number | null
+          min_surcharge_pct?: number | null
+          name?: string
+          notes?: string | null
+          price_history?: Json | null
+          reference_price?: number
+          step_percentage?: number
+          step_size?: number
+          tenant_id: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_market_price?: number | null
+          id?: string
+          is_active?: boolean
+          last_updated_at?: string | null
+          max_surcharge_pct?: number | null
+          min_surcharge_pct?: number | null
+          name?: string
+          notes?: string | null
+          price_history?: Json | null
+          reference_price?: number
+          step_percentage?: number
+          step_size?: number
+          tenant_id?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diesel_staffels_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digital_pods: {
         Row: {
           created_at: string | null
@@ -15037,6 +15105,132 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          btw_percentage: number | null
+          contact_email: string | null
+          contact_name: string | null
+          converted_invoice_id: string | null
+          converted_trip_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          delivery_address: string | null
+          delivery_city: string | null
+          description: string | null
+          distance_km: number | null
+          id: string
+          notes: string | null
+          pickup_address: string | null
+          pickup_city: string | null
+          price_excl_btw: number | null
+          quote_number: string
+          status: string
+          tenant_id: string
+          title: string | null
+          total_incl_btw: number | null
+          updated_at: string
+          valid_until: string | null
+          vehicle_type: string | null
+          weight_kg: number | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          btw_percentage?: number | null
+          contact_email?: string | null
+          contact_name?: string | null
+          converted_invoice_id?: string | null
+          converted_trip_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_city?: string | null
+          description?: string | null
+          distance_km?: number | null
+          id?: string
+          notes?: string | null
+          pickup_address?: string | null
+          pickup_city?: string | null
+          price_excl_btw?: number | null
+          quote_number: string
+          status?: string
+          tenant_id: string
+          title?: string | null
+          total_incl_btw?: number | null
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_type?: string | null
+          weight_kg?: number | null
+        }
+        Update: {
+          accepted_at?: string | null
+          btw_percentage?: number | null
+          contact_email?: string | null
+          contact_name?: string | null
+          converted_invoice_id?: string | null
+          converted_trip_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_city?: string | null
+          description?: string | null
+          distance_km?: number | null
+          id?: string
+          notes?: string | null
+          pickup_address?: string | null
+          pickup_city?: string | null
+          price_excl_btw?: number | null
+          quote_number?: string
+          status?: string
+          tenant_id?: string
+          title?: string | null
+          total_incl_btw?: number | null
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_type?: string | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_converted_invoice_id_fkey"
+            columns: ["converted_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_converted_trip_id_fkey"
+            columns: ["converted_trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_cards: {
         Row: {
