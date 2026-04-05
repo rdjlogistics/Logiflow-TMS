@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useCompany } from "@/hooks/useCompany";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
 export default function CreditNotes() {
-  const { profile } = useAuth();
+  const { company } = useCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function CreditNotes() {
   const [subtotal, setSubtotal] = useState("");
   const [vatPct, setVatPct] = useState("21");
 
-  const tenantId = profile?.company_id;
+  const tenantId = company?.id;
 
   const { data: creditNotes = [], isLoading } = useQuery({
     queryKey: ["credit-notes", tenantId],

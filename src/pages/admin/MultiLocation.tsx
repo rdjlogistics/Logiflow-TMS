@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useCompany } from "@/hooks/useCompany";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Building2, Plus, MapPin } from "lucide-react";
 
 export default function MultiLocation() {
-  const { profile } = useAuth();
+  const { company } = useCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -24,7 +24,7 @@ export default function MultiLocation() {
   const [country, setCountry] = useState("NL");
   const [contactName, setContactName] = useState("");
   const [contactPhone, setContactPhone] = useState("");
-  const tenantId = profile?.company_id;
+  const tenantId = company?.id;
 
   const { data: locations = [], isLoading } = useQuery({
     queryKey: ["multi-locations", tenantId],
