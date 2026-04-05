@@ -255,7 +255,7 @@ const OnboardingWizard = () => {
 
   const selectablePresets = DASHBOARD_PRESETS.filter(p => !p.isCustom);
 
-  // Hide bottom nav on step 0 (cinematic intro) and step 5 (launch has its own CTA)
+  // Hide bottom nav on step 0 (cinematic intro) and last step (launch has its own CTA)
   const showBottomNav = step > 0 && step < STEPS.length - 1;
 
   return (
@@ -388,7 +388,7 @@ const OnboardingWizard = () => {
                   <p
                     className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
                   >
-                    Stap 5 van 6
+                    Stap 5 van {STEPS.length}
                   </p>
 
                   <div
