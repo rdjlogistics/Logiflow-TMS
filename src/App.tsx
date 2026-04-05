@@ -362,7 +362,6 @@ const App = () => (
                           <Route path="/chatgpt" element={<PR><ChatGPT /></PR>} />
                           <Route path="/portal" element={<PR><CustomerPortalV2 /></PR>} />
                           <Route path="/planning/program" element={<PR><PlanningProgram /></PR>} />
-                          <Route path="/planning/program" element={<PR><PlanningProgram /></PR>} />
                           <Route path="/planning/applications" element={<PR><PlanningApplications /></PR>} />
                           <Route path="/planning/availability" element={<PR><PlanningAvailability /></PR>} />
                           <Route path="/planning/audit-log" element={<PR><PlanningAuditLog /></PR>} />
@@ -404,7 +403,6 @@ const App = () => (
                           <Route path="/finance/fuel-cards" element={<AdminPR><FuelCards /></AdminPR>} />
                           <Route path="/finance/ai-coach" element={<AdminPR><AIFinanceCoach /></AdminPR>} />
                           <Route path="/finance/receivables" element={<AdminPR><Receivables /></AdminPR>} />
-                          <Route path="/finance/margin" element={<AdminPR><ProfitMargin /></AdminPR>} />
                           <Route path="/finance/margin" element={<AdminPR><ProfitMargin /></AdminPR>} />
                           <Route path="/finance/costs" element={<AdminPR><Costs /></AdminPR>} />
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
