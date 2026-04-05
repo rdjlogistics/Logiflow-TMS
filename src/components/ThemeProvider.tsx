@@ -23,7 +23,7 @@ const initialState: ThemeProviderState = {
   theme: "dark",
   setTheme: () => null,
   resolvedTheme: "dark",
-  themePreset: "imperial",
+  themePreset: "ios",
   setThemePreset: () => null,
 };
 
@@ -63,7 +63,7 @@ export function ThemeProvider({
   const [themePreset, setThemePresetState] = useState<ThemePreset>(() => {
     const local = localStorage.getItem(PRESET_STORAGE_KEY);
     if (isValidPreset(local)) return local;
-    return "imperial";
+    return "ios";
   });
 
   const isUserTriggered = useRef(false);
