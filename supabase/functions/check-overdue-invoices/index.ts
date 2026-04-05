@@ -18,13 +18,31 @@ Deno.serve(async (req) => {
   try {
     console.log("[check-overdue-invoices] Starting daily overdue check");
 
-    // Get all unpaid invoices that are past due date
+    const today = new Date().toISOString().split("T")[0];
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
+
+    // Step 1: Auto-update overdue invoices to 'vervallen'
+    const { data: updatedRows, error: updateError } = await supabase
+      .from("invoices")
+      .update({ status: "vervallen" })
+      .in("status", ["verzonden", "concept"])
+      .lt("due_date", sevenDaysAgo)
+      .select("id");
+
+    const statusUpdated = updatedRows?.length ?? 0;
+    if (updateError) {
+      console.error("[check-overdue-invoices] Status update error:", updateError);
+    } else {
+      console.log(`[check-overdue-invoices] Auto-updated ${statusUpdated} invoices to 'vervallen'`);
+    }
+
+    // Step 2: Get all unpaid invoices that are past due date (for workflow triggers)
     const { data: invoices, error: invError } = await supabase
       .from("invoices")
       .select("id, invoice_number, due_date, total_amount, amount_paid, status, customer_id, company_id, customers(company_name, email, phone)")
       .not("status", "eq", "betaald")
       .not("status", "eq", "geannuleerd")
-      .lt("due_date", new Date().toISOString().split("T")[0]);
+      .lt("due_date", today);
 
     if (invError) {
       console.error("[check-overdue-invoices] Error fetching invoices:", invError);
@@ -36,7 +54,7 @@ Deno.serve(async (req) => {
 
     if (!invoices || invoices.length === 0) {
       console.log("[check-overdue-invoices] No overdue invoices found");
-      return new Response(JSON.stringify({ checked: 0, triggered: 0 }), {
+      return new Response(JSON.stringify({ checked: 0, triggered: 0, statusUpdated }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
