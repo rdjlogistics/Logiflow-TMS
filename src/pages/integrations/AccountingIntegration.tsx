@@ -1,6 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/hooks/useCompany";
+import { PageHeader } from "@/components/common/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowRightLeft, CheckCircle, XCircle, RefreshCw, ExternalLink } from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
 
 export default function AccountingIntegration() {
   const { company } = useCompany();
@@ -36,28 +44,24 @@ export default function AccountingIntegration() {
   };
 
   const providers = [
-    { id: "exact_online", name: "Exact Online", description: "Volledige boekhouding integratie met facturen, relaties en grootboek synchronisatie", color: "bg-blue-500" },
-    { id: "twinfield", name: "Twinfield", description: "Wolters Kluwer boekhoudpakket koppeling", color: "bg-emerald-500" },
-    { id: "xero", name: "Xero", description: "Cloud boekhoudsoftware integratie", color: "bg-cyan-500" },
-    { id: "quickbooks", name: "QuickBooks", description: "Intuit boekhouding en facturatie", color: "bg-green-500" },
+    { id: "exact_online", name: "Exact Online", description: "Volledige boekhouding integratie met facturen, relaties en grootboek synchronisatie", color: "bg-primary/20" },
+    { id: "twinfield", name: "Twinfield", description: "Wolters Kluwer boekhoudpakket koppeling", color: "bg-accent/20" },
+    { id: "xero", name: "Xero", description: "Cloud boekhoudsoftware integratie", color: "bg-secondary/20" },
+    { id: "quickbooks", name: "QuickBooks", description: "Intuit boekhouding en facturatie", color: "bg-muted/40" },
   ];
 
   const activeIntegration = integrations.find((i: any) => i.is_active);
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Boekhouding Koppeling"
-        description="Verbind je boekhoudpakket voor automatische synchronisatie"
-      />
+      <PageHeader title="Boekhouding Koppeling" description="Verbind je boekhoudpakket voor automatische synchronisatie" />
 
-      {/* Active integration status */}
       {activeIntegration && (
         <Card variant="glow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-500" />
+                <CheckCircle className="h-5 w-5 text-primary" />
                 <div>
                   <p className="font-semibold">Verbonden met {activeIntegration.provider}</p>
                   <p className="text-xs text-muted-foreground">
@@ -67,27 +71,24 @@ export default function AccountingIntegration() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={activeIntegration.sync_status === "success" ? "default" : "destructive"}>
-                  {activeIntegration.sync_status || "onbekend"}
-                </Badge>
-              </div>
+              <Badge variant={activeIntegration.sync_status === "success" ? "default" : "destructive"}>
+                {activeIntegration.sync_status || "onbekend"}
+              </Badge>
             </div>
             {activeIntegration.sync_error && (
               <p className="mt-3 text-sm text-destructive">{activeIntegration.sync_error}</p>
             )}
-
             <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                {activeIntegration.sync_invoices ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
+                {activeIntegration.sync_invoices ? <CheckCircle className="h-4 w-4 text-primary" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
                 <span>Facturen sync</span>
               </div>
               <div className="flex items-center gap-2">
-                {activeIntegration.sync_customers ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
+                {activeIntegration.sync_customers ? <CheckCircle className="h-4 w-4 text-primary" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
                 <span>Relaties sync</span>
               </div>
               <div className="flex items-center gap-2">
-                {activeIntegration.sync_payments ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
+                {activeIntegration.sync_payments ? <CheckCircle className="h-4 w-4 text-primary" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
                 <span>Betalingen sync</span>
               </div>
             </div>
@@ -95,7 +96,6 @@ export default function AccountingIntegration() {
         </Card>
       )}
 
-      {/* Provider cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {providers.map(p => {
           const connected = integrations.find((i: any) => i.provider === p.id && i.is_active);
@@ -105,7 +105,7 @@ export default function AccountingIntegration() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`h-10 w-10 rounded-xl ${p.color} flex items-center justify-center`}>
-                      <ArrowRightLeft className="h-5 w-5 text-white" />
+                      <ArrowRightLeft className="h-5 w-5 text-foreground" />
                     </div>
                     <div>
                       <CardTitle className="text-base">{p.name}</CardTitle>
@@ -122,9 +122,7 @@ export default function AccountingIntegration() {
                     {connected ? "Opnieuw verbinden" : "Verbinden"}
                   </Button>
                 ) : (
-                  <Button variant="outline" disabled className="w-full">
-                    Binnenkort beschikbaar
-                  </Button>
+                  <Button variant="outline" disabled className="w-full">Binnenkort beschikbaar</Button>
                 )}
               </CardContent>
             </Card>
@@ -132,7 +130,6 @@ export default function AccountingIntegration() {
         })}
       </div>
 
-      {/* Sync settings info */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Synchronisatie instellingen</CardTitle>
