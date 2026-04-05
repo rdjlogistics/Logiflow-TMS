@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles, AlertTriangle, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 import type { AutoPriceResult } from "@/hooks/useAutoPrice";
 
 interface AutoPriceIndicatorProps {
@@ -24,7 +25,7 @@ const AutoPriceIndicator = ({
   if (!isCalculating && !result) return null;
 
   return (
-    
+    <AnimatePresence mode="wait">
       <motion.div
         key={isCalculating ? 'loading' : result?.calculated ? 'result' : 'warning'}
         initial={{ opacity: 0, height: 0 }}
@@ -123,8 +124,8 @@ const AutoPriceIndicator = ({
             </div>
           </div>
         ) : null}
-      </div>
-    
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

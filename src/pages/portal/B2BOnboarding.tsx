@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { usePortalAuth } from "@/hooks/usePortalAuth";
 import { Button } from "@/components/ui/button";
@@ -153,7 +154,7 @@ export default function B2BOnboarding() {
           })}
         </div>
 
-        
+        <AnimatePresence mode="wait">
           <motion.div
             key={step}
             initial={{ opacity: 0, x: 20 }}
@@ -344,8 +345,8 @@ export default function B2BOnboarding() {
                 </CardContent>
               </Card>
             )}
-          </div>
-        
+          </motion.div>
+        </AnimatePresence>
 
         {/* Navigation buttons */}
         <div className="flex justify-between mt-6">

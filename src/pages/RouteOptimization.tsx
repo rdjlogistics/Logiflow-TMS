@@ -52,6 +52,7 @@ import {
   CalendarClock,
   LocateFixed,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { exportRoutePDF } from "@/utils/routePdfExport";
 import { exportRouteGPX } from "@/utils/routeGpxExport";
 import { useToast } from "@/hooks/use-toast";
@@ -805,12 +806,13 @@ const RouteOptimization = () => {
       title="Route Optimalisatie" 
       description="Optimaliseer multi-stop routes voor efficiëntie"
     >
-      <div className="space-y-6 overflow-x-hidden"
+      <motion.div 
+        className="space-y-6 overflow-x-hidden"
        
        
       >
         {/* Header with provider badge */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+        <motion.div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">
             {urlTripIds && (
               <Button
@@ -840,12 +842,13 @@ const RouteOptimization = () => {
               </Badge>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Savings Stats */}
-        
+        <AnimatePresence>
           {optimizationResult && (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
+            <motion.div 
+              className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -904,14 +907,14 @@ const RouteOptimization = () => {
                       <p className="text-xs text-muted-foreground mt-1">{stat.sub}</p>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
-        
+        </AnimatePresence>
 
         {/* Geocoding progress indicator */}
-        
+        <AnimatePresence>
           {geocodeProgress && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -934,12 +937,12 @@ const RouteOptimization = () => {
                   />
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           )}
-        
+        </AnimatePresence>
 
         {/* Map */}
-        <div>
+        <motion.div>
           <Card variant="ghost" className="overflow-hidden rounded-2xl">
             <CardContent className="p-0">
               <RouteOptimizationMap
@@ -950,11 +953,11 @@ const RouteOptimization = () => {
               />
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         <div className="flex flex-col md:grid md:grid-cols-3 gap-6">
           {/* Stops List */}
-          <div className="md:col-span-2 space-y-4 order-2 md:order-1">
+          <motion.div className="md:col-span-2 space-y-4 order-2 md:order-1">
             <Card variant="glass">
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
@@ -992,7 +995,7 @@ const RouteOptimization = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2" ref={stopListRef}>
-                  
+                  <AnimatePresence mode="popLayout">
                     {stops.map((stop: any, index) => (
                       <motion.div 
                         key={stop.id}
@@ -1083,9 +1086,14 @@ const RouteOptimization = () => {
                         </div>
 
                         {/* Expandable detail section */}
-                        
+                        <AnimatePresence>
                           {expandedStopId === stop.id && (
-                            <div className="animate-fade-in "overflow-hidden"
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
                             >
                               <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                                 {/* ETA */}
@@ -1164,18 +1172,19 @@ const RouteOptimization = () => {
                                   </div>
                                 )}
                               </div>
-                            </div>
+                            </motion.div>
                           )}
-                        
-                      </div>
+                        </AnimatePresence>
+                      </motion.div>
                     ))}
-                  
+                  </AnimatePresence>
                 </div>
 
                 {/* Route Summary */}
-                
+                <AnimatePresence>
                   {optimizationResult && (
-                    <div className="mt-6 space-y-4"
+                    <motion.div 
+                      className="mt-6 space-y-4"
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
@@ -1221,7 +1230,8 @@ const RouteOptimization = () => {
 
                       {/* AI Analysis Section */}
                       {optimizationResult.aiAnalysis && (
-                        <div className="p-4 rounded-xl backdrop-blur-xl bg-blue-500/5 border border-blue-500/20"
+                        <motion.div 
+                          className="p-4 rounded-xl backdrop-blur-xl bg-blue-500/5 border border-blue-500/20"
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 25 }}
@@ -1256,11 +1266,11 @@ const RouteOptimization = () => {
                               )}
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
-                    </div>
+                    </motion.div>
                   )}
-                
+                </AnimatePresence>
               </CardContent>
             </Card>
             {/* Toll Comparison Panel */}
@@ -1313,7 +1323,7 @@ const RouteOptimization = () => {
                 </Card>
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Optimization Controls - right sidebar (desktop) / Sheet (mobile) */}
           {(() => {
@@ -1393,7 +1403,7 @@ const RouteOptimization = () => {
 
                     {!isMobile && (
                       <div className="pt-2 space-y-2">
-                        <div>
+                        <motion.div>
                           <Button 
                             className="w-full relative overflow-hidden h-9 text-xs" 
                             onClick={handleOptimize}
@@ -1411,13 +1421,14 @@ const RouteOptimization = () => {
                               </>
                             )}
                             {isOptimizing && (
-                              <div className="absolute inset-0 bg-primary/20"
+                              <motion.div
+                                className="absolute inset-0 bg-primary/20"
                                 animate={{ x: ["-100%", "100%"] }}
                                 transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
                               />
                             )}
                           </Button>
-                        </div>
+                        </motion.div>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={handleReset}>
                             <RotateCcw className="h-3.5 w-3.5 mr-1" />
@@ -1579,9 +1590,9 @@ const RouteOptimization = () => {
             return (
               <>
                 {/* Desktop sidebar */}
-                <div className="hidden md:block space-y-4 order-2">
+                <motion.div className="hidden md:block space-y-4 order-2">
                   {settingsContent}
-                </div>
+                </motion.div>
 
                 {/* Mobile settings sheet */}
                 <Sheet open={settingsSheetOpen} onOpenChange={setSettingsSheetOpen}>
@@ -1628,7 +1639,8 @@ const RouteOptimization = () => {
                 </>
               )}
               {isOptimizing && (
-                <div className="absolute inset-0 bg-primary/20"
+                <motion.div
+                  className="absolute inset-0 bg-primary/20"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
                 />
@@ -1639,7 +1651,7 @@ const RouteOptimization = () => {
 
         {/* Spacer for sticky bottom bar on mobile */}
         <div className="h-20 md:hidden" />
-      </div>
+      </motion.div>
       
       <AddStopDialog
         open={isAddStopDialogOpen}

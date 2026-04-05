@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface StepConfig {
   id: string;
@@ -59,7 +60,8 @@ const OrderStepper = ({
                 {/* Left connector */}
                 {index > 0 && (
                   <div className="absolute left-0 right-1/2 h-0.5 -translate-y-1/2 top-1/2 bg-border">
-                    <div className="h-full bg-primary origin-left"
+                    <motion.div
+                      className="h-full bg-primary origin-left"
                       initial={{ scaleX: 0 }}
                     />
                   </div>
@@ -67,13 +69,15 @@ const OrderStepper = ({
                 {/* Right connector */}
                 {index < steps.length - 1 && (
                   <div className="absolute left-1/2 right-0 h-0.5 -translate-y-1/2 top-1/2 bg-border">
-                    <div className="h-full bg-primary origin-left"
+                    <motion.div
+                      className="h-full bg-primary origin-left"
                       initial={{ scaleX: 0 }}
                     />
                   </div>
                 )}
                 {/* Step circle */}
-                <div className={cn(
+                <motion.div
+                  className={cn(
                     "relative z-10 mx-auto flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-semibold",
                     isCompleted && "bg-primary border-primary text-primary-foreground",
                     isCurrent && "bg-primary border-primary text-primary-foreground shadow-md",
@@ -86,7 +90,7 @@ const OrderStepper = ({
                       className="absolute inset-0 rounded-full bg-primary/30"
                     />
                   )}
-                  
+                  <AnimatePresence mode="wait">
                     {isCompleted ? (
                       <motion.span
                         key="check"
@@ -106,8 +110,8 @@ const OrderStepper = ({
                         {index + 1}
                       </motion.span>
                     )}
-                  
-                </div>
+                  </AnimatePresence>
+                </motion.div>
               </div>
               <motion.span
                 className={cn(
@@ -143,7 +147,8 @@ const OrderStepper = ({
                 {/* Left connector */}
                 {index > 0 && (
                   <div className="absolute left-0 right-1/2 h-0.5 -translate-y-1/2 top-1/2 bg-border">
-                    <div className="h-full bg-primary origin-left"
+                    <motion.div
+                      className="h-full bg-primary origin-left"
                       initial={{ scaleX: 0 }}
                     />
                   </div>
@@ -151,13 +156,15 @@ const OrderStepper = ({
                 {/* Right connector */}
                 {index < steps.length - 1 && (
                   <div className="absolute left-1/2 right-0 h-0.5 -translate-y-1/2 top-1/2 bg-border">
-                    <div className="h-full bg-primary origin-left"
+                    <motion.div
+                      className="h-full bg-primary origin-left"
                       initial={{ scaleX: 0 }}
                     />
                   </div>
                 )}
                 {/* Step circle */}
-                <div className={cn(
+                <motion.div
+                  className={cn(
                     "relative z-10 mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold",
                     isCompleted && "bg-primary border-primary text-primary-foreground",
                     isCurrent && "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/30",
@@ -171,7 +178,7 @@ const OrderStepper = ({
                       className="absolute inset-0 rounded-full bg-primary/30"
                     />
                   )}
-                  
+                  <AnimatePresence mode="wait">
                     {isCompleted ? (
                       <motion.span
                         key="check"
@@ -191,8 +198,8 @@ const OrderStepper = ({
                         {index + 1}
                       </motion.span>
                     )}
-                  
-                </div>
+                  </AnimatePresence>
+                </motion.div>
               </div>
               <div className="text-center">
                 <motion.span

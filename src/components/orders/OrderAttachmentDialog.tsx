@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -251,7 +252,7 @@ const OrderAttachmentDialog = ({ open, onOpenChange, orderId }: OrderAttachmentD
               checked={isPublic}
               onCheckedChange={setIsPublic}
             />
-          </div>
+          </motion.div>
         </div>
 
         <DialogFooter>

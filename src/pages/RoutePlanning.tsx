@@ -68,6 +68,7 @@ import { nl } from "date-fns/locale";
 import PlanningTimeline from "@/components/planning/PlanningTimeline";
 import BackhaulSuggestionsPanel from "@/components/route/BackhaulSuggestionsPanel";
 import { useBackhaulSuggestions } from "@/hooks/useBackhaulSuggestions";
+import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface Trip {
@@ -462,20 +463,30 @@ const RoutePlanning = () => {
         </div>
 
         {/* Content area with AnimatePresence */}
-        
+        <AnimatePresence mode="wait">
           {/* Timeline View */}
           {viewMode === "timeline" && selectedDate !== "all" && (
-            <div
-              key="timeline" className="animate-fade-in "flex-1 min-h-0 p-3 md:p-4"
+            <motion.div
+              key="timeline"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="flex-1 min-h-0 p-3 md:p-4"
             >
               <PlanningTimeline selectedDate={parseISO(selectedDate)} />
-            </div>
+            </motion.div>
           )}
 
           {/* Live View */}
           {viewMode === "live" && (
-            <div
-              key="live" className="animate-fade-in "flex flex-col md:flex-row overflow-hidden h-full"
+            <motion.div
+              key="live"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex flex-col md:flex-row overflow-hidden h-full"
               style={{ height: 'calc(100vh - 200px)' }}
             >
               {/* Driver list panel */}
@@ -580,13 +591,18 @@ const RoutePlanning = () => {
                   className="h-full w-full"
                 />
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* List View */}
           {viewMode === "list" && (
-            <div
-              key="list" className="animate-fade-in "flex-1 min-h-0 flex flex-col md:flex-row"
+            <motion.div
+              key="list"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="flex-1 min-h-0 flex flex-col md:flex-row"
             >
               {/* Table section */}
               <div className={`flex-1 min-h-0 ${showMap && hasMapData ? 'md:w-[60%]' : 'w-full'}`}>
@@ -822,9 +838,9 @@ const RoutePlanning = () => {
                   )}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
-        
+        </AnimatePresence>
       </div>
 
       <AddStopDialog open={showAddStopDialog} onOpenChange={setShowAddStopDialog} onAddStop={async (stop) => {

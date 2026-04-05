@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useCallback, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -118,21 +119,36 @@ const PurchaseInvoiceSendPage = () => {
   return (
     <DashboardLayout title="Inkoopfactuur versturen">
       {/* Success Overlay */}
-      
+      <AnimatePresence>
         {showSuccess && (
-          <div className="animate-fade-in "fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
           >
-            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border shadow-2xl"
+            <motion.div
+             
+             
+              className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border shadow-2xl"
             >
               <div className="relative">
-                <div className="animate-fade-in "w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center"
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+                  className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center"
                 >
                   <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                </div>
-                <div className="animate-fade-in "absolute -top-1 -right-1"
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="absolute -top-1 -right-1"
                 >
                   <Sparkles className="w-6 h-6 text-amber-400" />
-                </div>
+                </motion.div>
               </div>
               <motion.p 
                 initial={{ opacity: 0, y: 10 }}
@@ -142,19 +158,23 @@ const PurchaseInvoiceSendPage = () => {
               >
                 E-mail succesvol verstuurd!
               </motion.p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
-      
+      </AnimatePresence>
 
-      <div className="space-y-6"
+      <motion.div
+       
+       
+        className="space-y-6"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         {/* Premium Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl shadow-primary/5"
+        <motion.div
+          className="relative overflow-hidden rounded-2xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl shadow-primary/5"
         >
           {/* Gradient highlight */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -232,10 +252,11 @@ const PurchaseInvoiceSendPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Status Timeline - Swipeable on mobile */}
-        <div className="relative w-full"
+        <motion.div
+          className="relative w-full"
         >
           {/* Fade edges on mobile */}
           <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none sm:hidden" />
@@ -259,7 +280,9 @@ const PurchaseInvoiceSendPage = () => {
               
               return (
                 <div key={status} className="flex items-center gap-2 flex-shrink-0">
-                  <div className={cn(
+                  <motion.div 
+
+                    className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap touch-manipulation",
                       isActive && "bg-primary text-primary-foreground shadow-lg shadow-primary/25",
                       isPast && "bg-emerald-500/10 text-emerald-600",
@@ -269,7 +292,7 @@ const PurchaseInvoiceSendPage = () => {
                     {isPast && <CheckCircle2 className="h-3 w-3 flex-shrink-0" />}
                     {isActive && <Sparkles className="h-3 w-3 flex-shrink-0" />}
                     <span className="capitalize">{status}</span>
-                  </div>
+                  </motion.div>
                   {idx < arr.length - 1 && (
                     <div className={cn(
                       "w-6 sm:w-8 h-0.5 rounded-full flex-shrink-0",
@@ -283,24 +306,24 @@ const PurchaseInvoiceSendPage = () => {
             {/* Spacer for mobile scroll padding */}
             <div className="flex-shrink-0 w-2 sm:hidden" />
           </div>
-        </div>
+        </motion.div>
 
         {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: Invoice Content Preview */}
-          <div>
+          <motion.div>
             <PurchaseInvoiceContentPreview invoiceId={id} />
-          </div>
+          </motion.div>
 
           {/* Right: Email Composer */}
-          <div>
+          <motion.div>
             <PurchaseInvoiceEmailComposer
               invoiceId={id}
               onSuccess={handleSuccess}
             />
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 };

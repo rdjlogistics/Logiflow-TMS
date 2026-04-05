@@ -91,7 +91,7 @@ import OrderMobileCard from "@/components/orders/OrderMobileCard";
 import EnhancedSearchBar from "@/components/orders/EnhancedSearchBar";
 import KeyboardShortcutsHelp from "@/components/orders/KeyboardShortcutsHelp";
 import PullToRefreshIndicator from "@/components/orders/PullToRefreshIndicator";
-
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { notifyCustomerStatusChange } from '@/lib/customerNotifications';
 import QuickStatsHeader from "@/components/orders/QuickStatsHeader";
@@ -1059,7 +1059,7 @@ const OrderOverview = () => {
           </div>
 
           {/* Location Map Toggle */}
-          
+          <AnimatePresence>
             {showLocationMap && trips.length > 0 && (
               <OrderLocationMap
                 orders={trips}
@@ -1074,7 +1074,7 @@ const OrderOverview = () => {
                 }}
               />
             )}
-          
+          </AnimatePresence>
 
           {/* Enhanced Bulk Actions Bar */}
           {canEdit && selectedOrders.size > 0 && (
@@ -1109,13 +1109,21 @@ const OrderOverview = () => {
                     isRefreshing={isRefreshing}
                     pullDistance={pullDistance}
                   />
-                  <div className="space-y-3 p-3" style={{ transform: `translateY(${pullDistance}px)` }}
+                  <motion.div
+                    className="space-y-3 p-3"
+                    style={{ transform: `translateY(${pullDistance}px)` }}
                   >
-                    
+                    <AnimatePresence mode="popLayout">
                       {trips.map((trip, index) => {
                         const stops = getStopsForTrip(trip.id);
                         return (
-                          <div key={trip.id} className="animate-fade-in">
+                          <motion.div
+                            key={trip.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ delay: index * 0.02 }}
+                          >
                             <OrderMobileCard
                               trip={trip}
                               stops={stops}
@@ -1135,11 +1143,11 @@ const OrderOverview = () => {
                                 setSelectedOrders(newSelected);
                               }}
                             />
-                          </div>
+                          </motion.div>
                         );
                       })}
-                    
-                  </div>
+                    </AnimatePresence>
+                  </motion.div>
                   
                   {/* Mobile pagination */}
                   <div className="flex items-center justify-between px-3 pt-3 pb-safe">
@@ -1446,7 +1454,11 @@ const OrderOverview = () => {
                             {/* Financial sub-row */}
                             <TableRow className="border-b border-border/30 group-hover:bg-muted/5 hover:bg-muted/5">
                               <TableCell colSpan={11} className="py-1.5 px-4">
-                                <div className="animate-fade-in "flex items-center justify-between bg-gradient-to-r from-muted/5 via-transparent to-muted/5 rounded-md px-4 py-1"
+                                <motion.div
+                                  initial={{ opacity: 0, y: -4 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: tripIndex * 0.02, ease: "easeOut" }}
+                                  className="flex items-center justify-between bg-gradient-to-r from-muted/5 via-transparent to-muted/5 rounded-md px-4 py-1"
                                 >
                                   <div className="flex items-center gap-6 text-[13px] antialiased" onClick={(e) => e.stopPropagation()}>
                                     <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -1483,7 +1495,7 @@ const OrderOverview = () => {
                                       </span>
                                     </div>
                                   </div>
-                                </div>
+                                </motion.div>
                               </TableCell>
                             </TableRow>
                           </Fragment>

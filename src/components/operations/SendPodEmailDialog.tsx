@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -184,7 +185,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
           </DialogTitle>
         </DialogHeader>
 
-        
+        <AnimatePresence mode="wait">
           {sent ? (
             <motion.div
               key="success"
@@ -197,10 +198,10 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                 className="inline-flex p-4 rounded-full bg-emerald-500/10 mb-4"
               >
                 <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-              </div>
+              </motion.div>
               <p className="font-semibold text-lg">Verstuurd!</p>
               <p className="text-sm text-muted-foreground mt-1">Document is verzonden naar {email}</p>
-            </div>
+            </motion.div>
           ) : (
             <motion.div
               key="form"
@@ -272,7 +273,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                               {doc.document_type}{doc.file_size ? ` · ${formatSize(doc.file_size)}` : ''}
                             </p>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -289,9 +290,9 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
                   className="rounded-xl border-border/50 bg-muted/20 focus:bg-background transition-colors resize-none"
                 />
               </div>
-            </div>
+            </motion.div>
           )}
-        
+        </AnimatePresence>
 
         {!sent && (
           <DialogFooter className="gap-2">

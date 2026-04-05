@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Layers, Fuel, Route, ParkingCircle, ChevronUp, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -66,9 +67,12 @@ export function LayerMenu({ layers, onLayersChange, className }: LayerMenuProps)
   return (
     <div className={cn("relative", className)}>
       {/* Layer Panel */}
-      
+      <AnimatePresence>
         {isOpen && (
-          <div className="animate-fade-in "absolute bottom-full mb-2 right-0 w-64 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl overflow-hidden z-50"
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            className="absolute bottom-full mb-2 right-0 w-64 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl overflow-hidden z-50"
           >
             <div className="p-3 border-b border-border/30">
               <div className="flex items-center justify-between">
@@ -142,9 +146,9 @@ export function LayerMenu({ layers, onLayersChange, className }: LayerMenuProps)
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
-      
+      </AnimatePresence>
 
       {/* Toggle Button */}
       <Button

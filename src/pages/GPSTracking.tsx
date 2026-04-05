@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
+import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -425,7 +426,7 @@ const StatItem = ({ label, value, suffix, icon: Icon, color, pulse, delay = 0, a
         )}
       </div>
     </div>
-  </button>
+  </motion.button>
 );
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -497,7 +498,11 @@ const GPSTracking = memo(function GPSTracking() {
 
   return (
     <DashboardLayout title="GPS Tracking">
-      <div className="animate-fade-in "flex flex-col h-full gap-3 md:gap-4"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col h-full gap-3 md:gap-4"
       >
         {/* ─── Stats Bar (Batch 1: Interactive) ──────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
@@ -578,7 +583,11 @@ const GPSTracking = memo(function GPSTracking() {
 
               {/* Active filter badge on map */}
               {activeFilter !== "all" && (
-                <div className="animate-fade-in "flex items-center gap-1.5 rounded-xl border border-primary/30 bg-background/70 backdrop-blur-xl px-3 py-1.5 shadow-lg"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex items-center gap-1.5 rounded-xl border border-primary/30 bg-background/70 backdrop-blur-xl px-3 py-1.5 shadow-lg"
                 >
                   <span className="text-xs font-medium text-primary">
                     {activeFilter === "moving" ? "Onderweg" : "Gestopt"}: {filteredLocations.length}
@@ -589,7 +598,7 @@ const GPSTracking = memo(function GPSTracking() {
                   >
                     <X className="h-3 w-3 text-muted-foreground" />
                   </button>
-                </div>
+                </motion.div>
               )}
 
               {alertCounts.total > 0 && activeFilter === "all" && (
@@ -715,11 +724,16 @@ const GPSTracking = memo(function GPSTracking() {
 
             {/* Tab content */}
             <div className="flex-1 overflow-auto min-h-0">
-              
+              <AnimatePresence mode="wait">
                 {/* ── Eigen Chauffeurs Tab ── */}
                 {selectedTab === "chauffeurs" && (
-                  <div
-                    key="chauffeurs" className="animate-fade-in "divide-y divide-border/20"
+                  <motion.div
+                    key="chauffeurs"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 8 }}
+                    transition={{ duration: 0.2 }}
+                    className="divide-y divide-border/20"
                   >
                     {locationsLoading && (
                       <div className="flex items-center justify-center p-8">
@@ -751,8 +765,11 @@ const GPSTracking = memo(function GPSTracking() {
                       const isSelected = loc.driver_id === selectedDriverId;
 
                       return (
-                        <button
-                          key={loc.driver_id} transition={{ delay: i * 0.03, duration: 0.25 }}
+                        <motion.button
+                          key={loc.driver_id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.03, duration: 0.25 }}
                           onClick={() => handleSelectDriver(loc.driver_id)}
                           className={cn(
                             "w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 touch-manipulation",
@@ -799,16 +816,21 @@ const GPSTracking = memo(function GPSTracking() {
                             </span>
                             <GPSQualityIndicator accuracy={loc.accuracy} lastUpdate={loc.recorded_at} />
                           </div>
-                        </button>
+                        </motion.button>
                       );
                     })}
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* ── Alerts Tab ── */}
                 {selectedTab === "alerts" && (
-                  <div
-                    key="alerts" className="animate-fade-in "divide-y divide-border/20"
+                  <motion.div
+                    key="alerts"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 8 }}
+                    transition={{ duration: 0.2 }}
+                    className="divide-y divide-border/20"
                   >
                     {alerts.length === 0 && (
                       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -850,15 +872,20 @@ const GPSTracking = memo(function GPSTracking() {
                             <X className="h-3.5 w-3.5 text-muted-foreground" />
                           </button>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* ── Live Status Tab ── */}
                 {selectedTab === "status" && (
-                  <div
-                    key="status" className="animate-fade-in "p-4 space-y-4"
+                  <motion.div
+                    key="status"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 8 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-4 space-y-4"
                   >
                     {!selectedLoc ? (
                       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -935,13 +962,13 @@ const GPSTracking = memo(function GPSTracking() {
                         )}
                       </>
                     )}
-                  </div>
+                  </motion.div>
                 )}
-              
+              </AnimatePresence>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import B2BLayout from "@/components/portal/b2b/B2BLayout";
 import { 
   MapPin, 
@@ -248,7 +249,11 @@ const B2BBook = () => {
         </div>
 
         {/* Progress — Premium Glassmorphism Stepper */}
-        <div className="animate-fade-in "relative mb-6 sm:mb-8 overflow-hidden rounded-2xl bg-card/40 backdrop-blur-xl border border-border/30 p-4 sm:p-6"
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="relative mb-6 sm:mb-8 overflow-hidden rounded-2xl bg-card/40 backdrop-blur-xl border border-border/30 p-4 sm:p-6"
         >
           {/* Mesh gradient overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.06),transparent)] pointer-events-none" />
@@ -271,7 +276,8 @@ const B2BBook = () => {
                     >
                       {/* Glow ring for active */}
                       {isActive && (
-                        <div className="absolute inset-0 rounded-full bg-primary/30"
+                        <motion.div
+                          className="absolute inset-0 rounded-full bg-primary/30"
                           animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
                           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         />
@@ -294,12 +300,12 @@ const B2BBook = () => {
                             transition={{ type: "spring", stiffness: 200, damping: 15 }}
                           >
                             <Check className="h-4 w-4 sm:h-5 sm:w-5" />
-                          </div>
+                          </motion.div>
                         ) : (
                           <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                         )}
                       </button>
-                    </div>
+                    </motion.div>
 
                     {/* Label */}
                     <motion.span
@@ -321,7 +327,11 @@ const B2BBook = () => {
                   {index < steps.length - 1 && (
                     <div className="relative flex-1 h-0.5 mx-2 sm:w-16 sm:mx-4 mb-5 sm:mb-6 sm:flex-none">
                       <div className="absolute inset-0 bg-border/60 rounded-full" />
-                      <div className="animate-fade-in {cn(
+                      <motion.div
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: isCompleted ? 1 : isActive ? 0.5 : 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className={cn(
                           "absolute inset-0 origin-left rounded-full",
                           isCompleted ? "bg-gradient-to-r from-emerald-500 to-emerald-400" : "bg-gradient-to-r from-primary to-primary/60"
                         )}
@@ -332,10 +342,10 @@ const B2BBook = () => {
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* Step Content */}
-        
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
             initial={{ opacity: 0, x: 20 }}
@@ -375,7 +385,7 @@ const B2BBook = () => {
                     </div>
                   </div>
 
-                  
+                  <AnimatePresence>
                     {formData.stops.map((stop, index) => (
                       <StopCard
                         key={stop.id}
@@ -407,7 +417,7 @@ const B2BBook = () => {
                         } : undefined}
                       />
                     ))}
-                  
+                  </AnimatePresence>
                 </div>
 
                 {/* Capacity Sidebar */}
@@ -468,8 +478,8 @@ const B2BBook = () => {
                 />
               </div>
             )}
-          </div>
-        
+          </motion.div>
+        </AnimatePresence>
 
         {/* Navigation */}
         <div className="fixed bottom-0 left-0 right-0 lg:relative lg:mt-8 p-4 bg-background/95 backdrop-blur-md border-t border-border/50 lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:p-0 flex justify-between gap-3 z-20">

@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ArrowDownToLine,
@@ -127,7 +128,7 @@ export function WMSQuickActions({
               {action.shortcut}
             </Badge>
           )}
-        </button>
+        </motion.button>
       ))}
     </div>
   );
@@ -193,7 +194,7 @@ export function WMSCommandPalette() {
             </div>
           </div>
           <div className="max-h-[300px] overflow-y-auto p-2">
-            
+            <AnimatePresence mode="popLayout">
               {filtered.map((cmd, i) => (
                 <motion.button
                   key={cmd.href}
@@ -210,9 +211,9 @@ export function WMSCommandPalette() {
                     {cmd.icon}
                   </div>
                   <span className="font-medium">{cmd.label}</span>
-                </button>
+                </motion.button>
               ))}
-            
+            </AnimatePresence>
           </div>
           <div className="flex items-center justify-between px-4 py-3 border-t border-border/50 bg-muted/30 text-xs text-muted-foreground">
             <div className="flex items-center gap-4">

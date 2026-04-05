@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -269,8 +270,11 @@ export const PurchaseInvoiceBulkActions = ({
 
   return (
     <>
-      
-        <div className="animate-fade-in "fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          exit={{ opacity: 0, y: 50 }}
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[calc(100vw-1.5rem)] md:max-w-2xl"
         >
           <div
             className={cn(
@@ -401,8 +405,8 @@ export const PurchaseInvoiceBulkActions = ({
               <X className="h-4 w-4" />
             </Button>
           </div>
-        </div>
-      
+        </motion.div>
+      </AnimatePresence>
 
       {/* Bulk Payment Modal */}
       <PaymentRegistrationModal

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, 
   Truck, 
@@ -524,20 +525,33 @@ const DriverAssignment = () => {
           </div>
         </div>
 
-        
+        <AnimatePresence mode="wait">
           {showSuccessScreen && lastAssignment ? (
             /* Success Screen */
-            <div
-              key="success" className="animate-fade-in "text-center py-8"
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+              className="text-center py-8"
             >
               {/* Success Animation */}
-              <div className="animate-fade-in "w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-success/20 to-emerald-500/20 flex items-center justify-center"
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 15 }}
+                className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-success/20 to-emerald-500/20 flex items-center justify-center"
               >
-                <div className="animate-fade-in "w-16 h-16 rounded-full bg-success flex items-center justify-center"
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="w-16 h-16 rounded-full bg-success flex items-center justify-center"
                 >
                   <Check className="h-8 w-8 text-white" />
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -555,11 +569,15 @@ const DriverAssignment = () => {
                   <User className="h-5 w-5" />
                   {lastAssignment.driverName}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Assignment Details */}
               {lastAssignment.tripCount > 1 && (
-                <div className="animate-fade-in "mb-6 p-4 rounded-xl bg-muted/50 max-w-sm mx-auto"
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="mb-6 p-4 rounded-xl bg-muted/50 max-w-sm mx-auto"
                 >
                   <p className="text-sm text-muted-foreground mb-2">Toegewezen ritten:</p>
                   <div className="flex flex-wrap gap-2 justify-center">
@@ -569,11 +587,15 @@ const DriverAssignment = () => {
                       </Badge>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Status & Next Actions */}
-              <div className="animate-fade-in "space-y-3"
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-3"
               >
                 {remainingTripsCount > 0 && (
                   <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-4">
@@ -607,17 +629,21 @@ const DriverAssignment = () => {
                   </Button>
 
                   {remainingTripsCount === 0 && (
-                    <div className="animate-fade-in "p-4 rounded-xl bg-success/10 border border-success/20 mt-2"
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="p-4 rounded-xl bg-success/10 border border-success/20 mt-2"
                     >
                       <div className="flex items-center justify-center gap-2 text-success">
                         <Sparkles className="h-5 w-5" />
                         <span className="font-medium">Alle ritten zijn toegewezen!</span>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ) : selectedTrips.length === 0 ? (
             /* Step 1: Select Trip(s) */
             <motion.div
@@ -662,7 +688,11 @@ const DriverAssignment = () => {
 
               {/* Bulk Mode Controls */}
               {bulkMode && (
-                <div className="animate-fade-in "mb-4 flex items-center gap-2"
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-4 flex items-center gap-2"
                 >
                   <Button variant="outline" size="sm" onClick={selectAllTrips}>
                     Alles selecteren
@@ -682,7 +712,7 @@ const DriverAssignment = () => {
                       Ga naar chauffeurs →
                     </Button>
                   )}
-                </div>
+                </motion.div>
               )}
 
               {/* Trip List */}
@@ -698,8 +728,11 @@ const DriverAssignment = () => {
                   </div>
                 ) : (
                   filteredTrips.map((trip, index) => (
-                    <button
-                      key={trip.id} transition={{ delay: Math.min(index * 0.02, 0.2) }}
+                    <motion.button
+                      key={trip.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.2) }}
                       onClick={() => toggleTripSelection(trip.id)}
                       className={cn(
                         "w-full p-4 rounded-2xl text-left transition-all touch-manipulation",
@@ -749,11 +782,11 @@ const DriverAssignment = () => {
                           <ChevronRight className="h-6 w-6 text-muted-foreground group-active:text-primary transition-colors" />
                         )}
                       </div>
-                    </button>
+                    </motion.button>
                   ))
                 )}
               </div>
-            </div>
+            </motion.div>
           ) : (
             /* Step 2: Select Driver with AI Scores */
             <motion.div
@@ -928,8 +961,12 @@ const DriverAssignment = () => {
                   </div>
                 ) : (
                   filteredDrivers.map((driver, index) => (
-                    <div
-                      key={driver.id} className="animate-fade-in {cn(
+                    <motion.div
+                      key={driver.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.2) }}
+                      className={cn(
                         "p-4 rounded-2xl transition-all touch-manipulation",
                         "bg-card border",
                         getScoreBg(driver.matchScore),
@@ -1038,13 +1075,13 @@ const DriverAssignment = () => {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
-        
+        </AnimatePresence>
       </div>
     </div>
   );
