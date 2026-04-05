@@ -186,6 +186,15 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
     category: 'analytics',
     minHeight: 240,
   },
+  'batch-status': {
+    id: 'batch-status',
+    name: 'Dagelijkse Batches',
+    description: 'Status en handmatige uitvoering van batch-processen',
+    icon: Activity,
+    defaultSize: 'small',
+    category: 'operations',
+    minHeight: 260,
+  },
 };
 
 export const DEFAULT_WIDGET_ORDER = [
