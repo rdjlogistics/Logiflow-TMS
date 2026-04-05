@@ -36,10 +36,9 @@ export default function CreditNotes() {
       const { data, error } = await supabase
         .from("credit_notes")
         .select("*")
-        .eq("company_id", tenantId!)
-        .order("created_at", { ascending: false });
+        .eq("company_id", tenantId!);
       if (error) throw error;
-      return data;
+      return (data || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     },
     enabled: !!tenantId,
   });
@@ -52,9 +51,7 @@ export default function CreditNotes() {
         .select("id, company_name")
         .eq("company_id", tenantId!);
       if (error) throw error;
-      const sorted = (data || []).filter((c: any) => c.is_active !== false).sort((a: any, b: any) => (a.company_name || "").localeCompare(b.company_name || ""));
-      if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: !!tenantId,
   });
