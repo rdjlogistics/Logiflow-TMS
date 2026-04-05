@@ -1,34 +1,115 @@
 
 
-# Fix: Overdue facturen batch-update
+# Launch Audit — LogiFlow TMS
 
-## Probleem
-9 facturen met status 'verzonden' hebben een `due_date` die al maanden verstreken is (jan-feb 2026, het is nu april 2026). De cron job `check-overdue-invoices` triggert alleen workflow-acties maar **update de status niet** naar 'vervallen'. Dit is een gap in de edge function.
+## Status Batches Vandaag
+- **Email queue**: 0 items — schoon
+- **Workflow runs**: 0 incomplete — schoon
+- **Overdue facturen**: Reeds gepatcht (vorige sessie) — 17 vervallen, 7 betaald, 2 gedeeltelijk betaald, 1 concept — correct
+- **Factureerbare ritten (verkoop)**: 14 wachten op handmatige batch — geen actie (by design)
+- **Factureerbare ritten (inkoop)**: 2 wachten op handmatige batch — geen actie (by design)
+- **Cron jobs**: Niet geregistreerd (pg_cron schema ontoegankelijk) — eerdere sessie meldde database-timeouts
 
-## Wat is schoon (geen actie nodig)
-- Email queue: leeg, 0 items
-- Workflow runs: 0 incomplete
-- Factureerbare ritten (15): wachten terecht op handmatige batch-wizard — geen automatische actie
-- Inkoopfactureerbare ritten (2): idem
+**Conclusie batches**: Alles schoon, geen dubbel werk nodig.
 
-## Oplossing (1 bestand)
+---
 
-### `supabase/functions/check-overdue-invoices/index.ts`
-Voeg een automatische status-update toe: facturen die 7+ dagen voorbij due_date zijn EN status 'verzonden' of 'concept' hebben → status wordt 'vervallen'.
+## Kritieke Issues voor Launch
 
-Concreet:
-- Na het ophalen van overdue facturen, batch-update alle facturen met `due_date < today - 7 dagen` naar status `'vervallen'`
-- Log het aantal bijgewerkte facturen
-- De workflow-trigger logica (herinneringen) blijft intact
+### 1. Dode route in sidebar: `/sla` (SLA Monitoring)
+De sidebar linkt naar `/sla` maar er is **geen route in App.tsx** en **geen pagina-bestand**. Gebruikers zien een 404.
 
-### Resultaat na uitvoering
-- 9 facturen automatisch gemarkeerd als 'vervallen'
-- Dashboard KPI's tonen correcte aantallen
-- Toekomstige cron-runs houden dit automatisch bij
+**Fix**: Route toevoegen die verwijst naar bestaande SystemHealth of een nieuw SLA-component, OF sidebar-link verwijderen.
 
-### Geen wijzigingen aan
-- Handmatige batch-facturatie flows
-- Email queue processing
-- Andere edge functions
-- Frontend code
+### 2. Orphan page files zonder routes (17 bestanden)
+Pagina's die als bestanden bestaan maar NIET bereikbaar zijn via routing:
+
+| Categorie | Bestanden |
+|-----------|-----------|
+| CRM | AccountPolicies, DossierVault, LaneMap, SalesPipeline |
+| Enterprise | LiveBoard |
+| Finance | Collections, CreditDashboard |
+| Tendering | TenderDashboard, TenderHistory, TenderTemplates |
+| Carrier tabs | CarrierDocumentsTab, CarrierIncomingTab, CarrierInvoicesTab, CarrierProfileTab, CarrierTripsTab |
+| Admin | WorkflowAutomation |
+| Operations | AIDispatch (duplicate, maar referenced elders) |
+
+**Fix**: Verwijder de 14 volledig dode bestanden. Voeg routes toe voor WorkflowAutomation (sidebar-relevant) en AIDispatch (widget-relevant), of verwijs ze door.
+
+### 3. Volledig statische pagina's (geen DB-connectie)
+38 pagina's gebruiken geen database-calls. Veel zijn terecht statisch (legal, NotFound, onboarding wizards), maar sommige zouden live data moeten tonen:
+
+**Prioriteit hoog** (sidebar-zichtbaar, verwacht live data):
+- `CO2Reporting` — toont geen echte emissiedata
+- `FleetManagement` — geen voertuigdata uit DB (terwijl vehicles tabel bestaat)
+- `FuelStations` — statische kaart/lijst
+- `Network` — geen live netwerk data
+- `Reporting` — geen live rapportage
+- `PredictiveMaintenance` — geen echte onderhoudslogs
+- `SecurityCenter` — geen live security data
+- `SystemHealth` — geen live health checks
+
+**Prioriteit middel** (module-pagina's):
+- `WMS*` (8 pagina's) — volledig statisch, WMS tabellen bestaan mogelijk niet
+- `CarrierPools`, `CarrierScorecards` — statisch
+- `RateContracts`, `DynamicPricing` — statisch
+- `BankReconciliation` — geen live bank data
+
+**Prioriteit laag** (acceptabel statisch voor launch):
+- `DocumentTemplates`, `AIRecommendations`
+- `B2CBook`, `B2CHelp`, `B2CTrack`
+
+### 4. Ongebruikte Edge Functions
+5 edge functions worden nergens vanuit de frontend aangeroepen:
+- `exact-oauth-start` — Exact Online OAuth (integratie)
+- `execute-workflow` — aangestuurd via DB trigger, niet frontend (OK)
+- `kill-cron-jobs` — noodknop (OK, handmatig)
+- `rfq-parser` — niet gekoppeld aan UI
+- `smart-document-ocr` — niet gekoppeld aan UI
+
+**Fix**: `execute-workflow` en `kill-cron-jobs` zijn legitiem (trigger/admin). Verwijder of koppel de andere 3.
+
+### 5. Notifications directory is leeg
+`src/pages/notifications/` bestaat maar bevat geen bestanden.
+
+**Fix**: Verwijder lege directory.
+
+---
+
+## Aanbevolen Launch Plan (gefaseerd)
+
+### Fase 1 — Blokkerende fixes (MOET voor launch)
+1. **Fix `/sla` sidebar link** → verwijder uit sidebar of maak redirect naar `/enterprise/health`
+2. **Verwijder 14 dode page files** (CRM 4, Enterprise 1, Finance 2, Tendering 3, Carrier tabs 5) — vermindert bundle
+3. **Voeg `/admin/workflows` route toe** — WorkflowAutomation pagina bestaat, is sidebar-relevant
+4. **Verwijder lege directories** (`notifications/`)
+
+### Fase 2 — Data-integriteit (MOET voor productie)
+5. **FleetManagement → live data** — koppel aan `vehicles` tabel
+6. **CO2Reporting → live data** — bereken uit trips distance_km
+7. **Reporting → live data** — koppel aan trips/invoices aggregates
+8. **SecurityCenter/SystemHealth → live data** — koppel aan audit logs, edge function health
+
+### Fase 3 — Module-completering (KAN na launch)
+9. WMS module live-data koppeling
+10. Bank reconciliation live koppeling
+11. Rate contracts/dynamic pricing live koppeling
+12. RFQ parser en Smart OCR koppelen aan UI
+
+---
+
+## Technische Details
+
+### Stap 1-4 (Fase 1): Bestanden
+- **`src/components/layout/AppSidebar.tsx`**: Verwijder `/sla` item of redirect
+- **`src/App.tsx`**: Voeg route `/admin/workflows` toe
+- **Delete**: 14 orphan page files + lege `src/pages/notifications/`
+- **Delete**: 3 ongebruikte edge functions (optioneel)
+
+### Geschatte impact
+- ~14 bestanden verwijderd
+- ~1 route toegevoegd
+- ~1 sidebar-link gefixt
+- 0 nieuwe dependencies
+- Build blijft foutloos (reeds gevalideerd: 0 TS errors)
 
