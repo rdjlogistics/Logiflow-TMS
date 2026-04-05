@@ -192,6 +192,7 @@ const OnboardingWizard = () => {
         reorderWidgets(selectedPreset.widgets);
       }
       applyTheme(theme);
+      applyPreset(selectedThemePreset);
       updatePreference('theme', theme as any);
 
       // Mark onboarding complete in tenant_settings
