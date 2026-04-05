@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Truck, ArrowRight, ArrowLeft, Check, Sparkles,
   Building2, Package, Bot, LayoutDashboard, Rocket,
-  Sun, Moon, Monitor,
+  Sun, Moon, Monitor, Palette, Apple, Cpu, Leaf, Flame, Eye,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
