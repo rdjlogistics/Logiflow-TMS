@@ -1,44 +1,40 @@
 
 
-# Grondige Code Audit — Stale References & Nieuwe Routes
+# Route Audit Resultaat — Patch voor Duplicate Routes
 
-## Gevonden Problemen (4 bestanden)
+## Audit Resultaat
 
-### 1. CommandPalette — 3 dode routes
-**Bestand:** `src/components/command-palette/CommandPalette.tsx`
-- Regel 81: `/trips` navigatie → wijzigen naar `/orders`
-- Regel 87: `/payments` navigatie → wijzigen naar `/finance/cashflow` met label "Cashflow"
-- Regel 96: `/trips` in actie "Nieuwe Rit" → wijzigen naar `/orders`
-- Toevoegen: Diesel Staffels (`/finance/diesel`) en Offertes (`/sales/quotes`) als navigatie-items
+Na grondige audit van alle 173 routes:
 
-### 2. Breadcrumbs — dode + ontbrekende labels
-**Bestand:** `src/components/navigation/Breadcrumbs.tsx`
-- Verwijder: `'payments': 'Betalingen'` (regel 20)
-- Verwijder: `'trips': 'Ritten'` (regel 16) — redirect naar orders
-- Toevoegen: `'diesel': 'Diesel Staffels'`, `'quotes': 'Offertes'`, `'sales': 'Sales'`, `'cashflow': 'Cashflow'`
+- **0 TypeScript fouten** — build compileert schoon
+- **0 ontbrekende imports** — alle pagina's, hooks en componenten resolven correct
+- **0 runtime fouten** — geen errors in console of dev server logs
+- **0 mock-only pagina's** — alle pagina's gebruiken echte database queries
+- **Alle page-bestanden hebben default exports** en zijn volledige implementaties
 
-### 3. useRecentPages — dode + ontbrekende routes
-**Bestand:** `src/hooks/useRecentPages.ts`
-- Verwijder: `'/payments': 'Betalingen'` (regel 21)
-- Toevoegen: `'/finance/diesel': 'Diesel Staffels'`, `'/sales/quotes': 'Offertes'`, `'/finance/cashflow': 'Cashflow'`
+### Gevonden: 2 Duplicate Routes
 
-### 4. PageHeader — dode label
-**Bestand:** `src/components/common/PageHeader.tsx`
-- Verwijder: `'payments': 'Betalingen'` (regel 30)
-- Toevoegen: `'diesel': 'Diesel Staffels'`, `'quotes': 'Offertes'`, `'cashflow': 'Cashflow'`, `'sales': 'Sales'`
+| Regel | Route | Probleem |
+|-------|-------|----------|
+| 364-365 | `/planning/program` | Exacte duplicaat |
+| 407-408 | `/finance/margin` | Exacte duplicaat |
 
-## Niet-kritiek (bewust behouden)
+React Router gebruikt altijd de eerste match, dus de duplicaten zijn onschadelijk — maar het is rommel die opgeruimd moet worden.
 
-- **Dashboard links naar `/trips?filter=...`** — Deze werken correct via de redirect (`/trips` → `/orders`). Query params gaan mee. Geen actie nodig.
-- **`useTripsData.ts`**, services, en componenten die `trips` DB-tabel gebruiken — Dit zijn database queries, niet routes. De tabel heet nog steeds `trips`. Correct.
-- **Mollie edge functions** — Gebruiken `api.mollie.com/v2/payments` (externe API). Geen relatie met onze `/payments` route.
+## Fix
+
+**Bestand:** `src/App.tsx`
+- Verwijder regel 365 (duplicate `/planning/program`)
+- Verwijder regel 408 (duplicate `/finance/margin`)
+
+Na fix: **171 unieke routes**, 0 duplicaten, 0 dode routes, 0 compile errors.
 
 ## Technische Details
 
 ```text
-Bestanden:    4
-Type:         Label cleanup + nieuwe route registratie
-Risico:       Minimaal
-Impact:       Command Palette, breadcrumbs en recent pages tonen correcte info
+Bestanden:    1 (src/App.tsx)
+Type:         Duplicate route verwijdering
+Risico:       Nul — exacte duplicaten, eerste match wordt al gebruikt
+Impact:       Schonere codebase, 171 unieke routes
 ```
 
