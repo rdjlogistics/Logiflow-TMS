@@ -160,9 +160,6 @@ verify_jwt = false
 [functions.convert-ecommerce-order]
 verify_jwt = false
 
-[functions.process-email-queue]
-verify_jwt = false
-
 [functions.execute-workflow]
 verify_jwt = false
 
