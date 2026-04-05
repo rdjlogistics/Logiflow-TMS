@@ -71,6 +71,7 @@ const OnboardingWizard = () => {
   // Dashboard preferences
   const [selectedPreset, setSelectedPreset] = useState<DashboardPreset | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [selectedThemePreset, setSelectedThemePreset] = useState<typeof THEME_PRESETS[number]['id']>('ios');
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'daar';
 
