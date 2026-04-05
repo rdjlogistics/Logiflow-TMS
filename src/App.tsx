@@ -88,8 +88,7 @@ const RFQInbox = lazyWithRetry(() => import("./pages/crm/RFQInbox"));
 const CashflowCockpit = lazyWithRetry(() => import("./pages/finance/CashflowCockpit"));
 const FuelCards = lazyWithRetry(() => import("./pages/finance/FuelCards"));
 const AIFinanceCoach = lazyWithRetry(() => import("./pages/finance/AIFinanceCoach"));
-const Collections = lazyWithRetry(() => import("./pages/finance/Collections"));
-const CreditDashboard = lazyWithRetry(() => import("./pages/finance/CreditDashboard"));
+// Collections & CreditDashboard removed — consolidated into Receivables
 const Receivables = lazyWithRetry(() => import("./pages/finance/Receivables"));
 const PurchaseInvoices = lazyWithRetry(() => import("./pages/finance/PurchaseInvoices"));
 const PurchaseInvoicesNew = lazyWithRetry(() => import("./pages/finance/PurchaseInvoicesNew"));
@@ -330,12 +329,7 @@ const App = () => (
                           
                           {/* Protected routes */}
                           <Route path="/" element={<PR><Dashboard /></PR>} />
-                          <Route path="/control-tower" element={<Navigate to="/" replace />} />
-                          <Route path="/procurement" element={<Navigate to="/charter" replace />} />
-                          <Route path="/customers" element={<PR><Customers /></PR>} />
-                          <Route path="/drivers" element={<Navigate to="/carriers?tab=chauffeurs" replace />} />
-                          <Route path="/vehicles" element={<Navigate to="/fleet" replace />} />
-                          <Route path="/trips" element={<Navigate to="/orders" replace />} />
+                          {/* Legacy redirects removed — routes consolidated */}
                           <Route path="/orders" element={<PR><OrderOverview /></PR>} />
                           <Route path="/orders/edit/:orderId" element={<PR><OrderForm /></PR>} />
                           <Route path="/orders/edit" element={<PR><OrderForm /></PR>} />
@@ -348,9 +342,7 @@ const App = () => (
                           <Route path="/purchase-invoices/new" element={<StaffPR><PurchaseInvoicesNew /></StaffPR>} />
                           <Route path="/purchase-invoices/:id" element={<StaffPR><PurchaseInvoiceDetail /></StaffPR>} />
                           <Route path="/purchase-invoices/:id/send" element={<StaffPR><PurchaseInvoiceSendPage /></StaffPR>} />
-                          <Route path="/payments" element={<Navigate to="/finance/cashflow" replace />} />
                           <Route path="/track-chauffeurs" element={<PR><GPSTracking /></PR>} />
-                          <Route path="/gps-tracking" element={<Navigate to="/track-chauffeurs" replace />} />
                           <Route path="/route-planning" element={<PR><RoutePlanning /></PR>} />
                           <Route path="/tracking" element={<PR><InternalTrackTrace /></PR>} />
                           <Route path="/messenger" element={<PR><Messenger /></PR>} />
@@ -367,10 +359,8 @@ const App = () => (
                           <Route path="/driver/assign" element={<DriverPR redirectTo="/driver/login"><DriverAssignment /></DriverPR>} />
                           <Route path="/install" element={<InstallApp />} />
                           <Route path="/chatgpt" element={<PR><ChatGPT /></PR>} />
-                          <Route path="/portal-v2" element={<PR><CustomerPortalV2 /></PR>} />
                           <Route path="/portal" element={<PR><CustomerPortalV2 /></PR>} />
-                          <Route path="/customer" element={<PR><CustomerPortalV2 /></PR>} />
-                          <Route path="/planning" element={<Navigate to="/planning/program" replace />} />
+                          <Route path="/planning/program" element={<PR><PlanningProgram /></PR>} />
                           <Route path="/planning/program" element={<PR><PlanningProgram /></PR>} />
                           <Route path="/planning/applications" element={<PR><PlanningApplications /></PR>} />
                           <Route path="/planning/availability" element={<PR><PlanningAvailability /></PR>} />
@@ -413,8 +403,7 @@ const App = () => (
                           <Route path="/finance/fuel-cards" element={<AdminPR><FuelCards /></AdminPR>} />
                           <Route path="/finance/ai-coach" element={<AdminPR><AIFinanceCoach /></AdminPR>} />
                           <Route path="/finance/receivables" element={<AdminPR><Receivables /></AdminPR>} />
-                          <Route path="/finance/collections" element={<Navigate to="/finance/receivables" replace />} />
-                          <Route path="/finance/credit-dashboard" element={<Navigate to="/finance/receivables" replace />} />
+                          <Route path="/finance/margin" element={<AdminPR><ProfitMargin /></AdminPR>} />
                           <Route path="/finance/margin" element={<AdminPR><ProfitMargin /></AdminPR>} />
                           <Route path="/finance/costs" element={<AdminPR><Costs /></AdminPR>} />
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
@@ -431,12 +420,7 @@ const App = () => (
                           <Route path="/charter" element={<StaffPR><Procurement /></StaffPR>} />
                           <Route path="/charter/pools" element={<PR><CarrierPools /></PR>} />
                           <Route path="/charter/scorecards" element={<PR><CarrierScorecards /></PR>} />
-                          {/* Legacy tendering routes → redirect naar charter */}
-                          <Route path="/tendering" element={<Navigate to="/charter" replace />} />
-                          <Route path="/tendering/templates" element={<Navigate to="/charter" replace />} />
-                          <Route path="/tendering/pools" element={<Navigate to="/charter/pools" replace />} />
-                          <Route path="/tendering/scorecards" element={<Navigate to="/charter/scorecards" replace />} />
-                          <Route path="/tendering/history" element={<Navigate to="/charter" replace />} />
+                          {/* Legacy tendering redirects removed — use /charter */}
                           
                           {/* Enterprise — admin-only for system config, staff for operations */}
                           <Route path="/enterprise/simulator" element={<AdminPR><AutomationSimulator /></AdminPR>} />
@@ -481,7 +465,7 @@ const App = () => (
                           <Route path="/integrations/ecommerce" element={<AdminPR><EcommerceIntegrations /></AdminPR>} />
                           <Route path="/integrations/accounting" element={<AdminPR><AccountingIntegrations /></AdminPR>} />
                           <Route path="/integrations/api" element={<AdminPR><PublicAPI /></AdminPR>} />
-                          <Route path="/admin/api" element={<AdminPR><PublicAPI /></AdminPR>} />
+                          
                           
                           {/* AI */}
                           <Route path="/ai/dispatch" element={<PR><AutoDispatch /></PR>} />
@@ -491,7 +475,7 @@ const App = () => (
                           
                           {/* Operations */}
                           <Route path="/operations/pod" element={<PR><DigitalPOD /></PR>} />
-                          <Route path="/operations/dispatch" element={<PR><AutoDispatch /></PR>} />
+                          
                           
                           {/* Maintenance */}
                           <Route path="/maintenance/predictive" element={<PR><PredictiveMaintenance /></PR>} />
@@ -545,7 +529,7 @@ const App = () => (
                           <Route path="/rates" element={<PR><RateManagement /></PR>} />
                           <Route path="/co2" element={<PR><CO2Reporting /></PR>} />
                           <Route path="/kpi" element={<PR><KPIDashboard /></PR>} />
-                          <Route path="/sla" element={<PR><SLAMonitoring /></PR>} />
+                          
                           
                           {/* Route Optimization */}
                           <Route path="/route-optimization" element={<PR><RouteOptimization /></PR>} />
