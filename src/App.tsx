@@ -545,6 +545,7 @@ const App = () => (
                         </Routes>
                         <LegalConsentBanner />
                       </Suspense>
+                      </main>
                     </GlobalUXProvider>
                   </BrowserRouter>
               </LazyCopilotProvider></Suspense>
