@@ -27,8 +27,18 @@ const STEPS = [
   { label: 'TMS', icon: Package, gradient: 'from-emerald-500 to-teal-500' },
   { label: 'AI', icon: Bot, gradient: 'from-violet-500 to-purple-500' },
   { label: 'Dashboard', icon: LayoutDashboard, gradient: 'from-amber-500 to-orange-500' },
+  { label: 'Thema', icon: Palette, gradient: 'from-pink-500 to-rose-500' },
   { label: 'Start', icon: Rocket, gradient: 'from-emerald-500 to-green-400' },
 ];
+
+const THEME_PRESETS = [
+  { id: 'ios' as const, name: 'Apple iOS', description: 'Strak, minimalistisch en native — zoals je iPhone.', icon: Apple, color: 'text-gray-100', bg: 'bg-gradient-to-br from-gray-800 to-gray-900' },
+  { id: 'vision-pro' as const, name: 'Vision Pro', description: 'Ruimtelijk glasmorfisme met 3D diepte-effecten.', icon: Eye, color: 'text-violet-400', bg: 'bg-gradient-to-br from-violet-900/60 to-indigo-900/60' },
+  { id: 'imperial' as const, name: 'Imperial', description: 'Klassiek donker thema met krachtige accenten.', icon: Cpu, color: 'text-primary', bg: 'bg-gradient-to-br from-primary/20 to-primary/10' },
+  { id: 'horizon' as const, name: 'Horizon', description: 'Warme zonsondergang tinten met zachte gradients.', icon: Flame, color: 'text-orange-400', bg: 'bg-gradient-to-br from-orange-900/40 to-amber-900/40' },
+  { id: 'aurora' as const, name: 'Aurora', description: 'Noorderlicht-geïnspireerd met levendige kleuren.', icon: Leaf, color: 'text-emerald-400', bg: 'bg-gradient-to-br from-emerald-900/40 to-teal-900/40' },
+  { id: 'carbon' as const, name: 'Carbon', description: 'Industrieel en zakelijk — puur functioneel design.', icon: Cpu, color: 'text-zinc-400', bg: 'bg-gradient-to-br from-zinc-800 to-zinc-900' },
+] as const;
 
 const OnboardingWizard = () => {
   const navigate = useNavigate();
