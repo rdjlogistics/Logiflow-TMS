@@ -105,9 +105,7 @@ function useDriverPerformance(companyId: string | undefined, days: number) {
       const since = new Date();
       since.setDate(since.getDate() - days);
 
-      const query = supabase.from("drivers").select("id, name").eq("company_id", companyId!);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const driversResult = await (query as any).is("deleted_at", null).limit(50);
+      const driversResult = await (supabase.from("drivers") as any).select("id, name").eq("company_id", companyId!).is("deleted_at", null).limit(50);
       if (driversResult.error) throw driversResult.error;
       const data = (driversResult.data ?? []) as { id: string; name: string }[];
 
