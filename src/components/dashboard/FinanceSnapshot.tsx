@@ -21,9 +21,9 @@ const FinanceSnapshot = ({
     `€${value.toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
   const metrics = [
-    { label: "Openstaand", value: formatCurrency(openstaand), icon: CreditCard, colorClass: openstaand > 0 ? "text-warning" : "text-muted-foreground", bgClass: openstaand > 0 ? "bg-warning/10" : "bg-muted/30", href: "/payments" },
+    { label: "Openstaand", value: formatCurrency(openstaand), icon: CreditCard, colorClass: openstaand > 0 ? "text-warning" : "text-muted-foreground", bgClass: openstaand > 0 ? "bg-warning/10" : "bg-muted/30", href: "/finance/cashflow" },
     { label: "Open facturen", value: openFacturen.toString(), icon: FileText, colorClass: "text-primary", bgClass: "bg-primary/10", href: "/invoices?filter=open" },
-    { label: "Payouts gepland", value: formatCurrency(payoutsGepland), sublabel: "deze week", icon: Wallet, colorClass: "text-success", bgClass: "bg-success/10", href: "/payments?filter=scheduled" },
+    { label: "Payouts gepland", value: formatCurrency(payoutsGepland), sublabel: "deze week", icon: Wallet, colorClass: "text-success", bgClass: "bg-success/10", href: "/finance/cashflow" },
     { label: "Cash runway", value: `${cashRunway}d`, icon: TrendingUp, colorClass: cashRunway < 30 ? "text-destructive" : cashRunway < 60 ? "text-warning" : "text-success", bgClass: cashRunway < 30 ? "bg-destructive/10" : cashRunway < 60 ? "bg-warning/10" : "bg-success/10", href: "/finance/cashflow" },
   ];
 
