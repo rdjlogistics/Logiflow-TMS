@@ -426,7 +426,7 @@ const Dashboard = () => {
               <div className="space-y-1.5">
                 {opsStats.chauffeurNodig > 0 && (
                   <Link to="/driver/assign" className="block">
-                    <div className="active:scale-[0.98] transition-transform "flex items-center justify-between p-3 rounded-xl bg-destructive/10 border border-destructive/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-destructive/10 border border-destructive/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-destructive/15">
@@ -442,7 +442,7 @@ const Dashboard = () => {
                 )}
                 {opsStats.atRisk > 0 && (
                   <Link to="/trips?filter=at-risk" className="block">
-                    <div className="active:scale-[0.98] transition-transform "flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-warning/15">
@@ -458,7 +458,7 @@ const Dashboard = () => {
                 )}
                 {opsStats.podMissing > 0 && (
                   <Link to="/claims?filter=pod-missing" className="block">
-                    <div className="active:scale-[0.98] transition-transform "flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20"
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-primary/15">
