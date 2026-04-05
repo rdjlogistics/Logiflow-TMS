@@ -1,5 +1,5 @@
 import { Suspense, ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Truck } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -272,11 +272,18 @@ const queryClient = new QueryClient({
 // Loading fallback component
 const PageLoader = () => <PageLoadingSkeleton />;
 
-// Auth-specific loader — simple spinner, no dashboard skeleton flash
+// Auth-specific loader — matches boot-fallback splash for seamless handoff
 const AuthLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center animate-pulse">
-      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    <div className="text-center">
+      <div className="relative inline-flex items-center justify-center w-20 h-20 mb-6">
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400/80 border-r-blue-400/25 animate-spin" style={{ animationDuration: '1.1s' }} />
+        <div className="w-12 h-12 rounded-[14px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.12] flex items-center justify-center shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4),0_0_24px_-6px_rgba(59,130,246,0.2)]">
+          <Truck className="h-[22px] w-[22px] text-blue-400" strokeWidth={1.5} />
+        </div>
+      </div>
+      <h1 className="text-lg font-semibold text-foreground tracking-tight mb-1.5">LogiFlow TMS</h1>
+      <p className="text-[13px] text-muted-foreground/70">Bezig met laden…</p>
     </div>
   </div>
 );
