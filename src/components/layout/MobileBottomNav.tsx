@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, FileText, Plus, Settings, LucideIcon } from "lucide-react";
+import { Home, FileText, Plus, Euro, Settings, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
