@@ -104,14 +104,12 @@ function useDriverPerformance(companyId: string | undefined, days: number) {
     queryFn: async () => {
       const since = new Date();
       since.setDate(since.getDate() - days);
-      const result = await supabase
-        .from("drivers")
-        .select("id, name, deleted_at")
-        .eq("company_id", companyId!)
-        .is("deleted_at", null)
-        .limit(50);
-      if (result.error) throw result.error;
-      const data = result.data as unknown as { id: string; name: string; deleted_at: string | null }[];
+
+      // Use explicit type to avoid TS2589 deep instantiation
+      const driversResult: { data: { id: string; name: string }[] | null; error: any } =
+        await (supabase.from("drivers").select("id, name").eq("company_id", companyId!).is("deleted_at", null).limit(50) as any);
+      if (driversResult.error) throw driversResult.error;
+      const data = driversResult.data ?? [];
 
       // Get trips per driver
       const { data: trips } = await supabase
