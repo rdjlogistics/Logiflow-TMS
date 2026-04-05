@@ -1,4 +1,5 @@
 import { Suspense, ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -271,6 +272,15 @@ const queryClient = new QueryClient({
 // Loading fallback component
 const PageLoader = () => <PageLoadingSkeleton />;
 
+// Auth-specific loader — simple spinner, no dashboard skeleton flash
+const AuthLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center animate-pulse">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  </div>
+);
+
 // Helper: wrap element in ProtectedRoute (no role restriction — any authenticated user)
 const PR = ({ children, redirectTo }: { children: ReactNode; redirectTo?: string }) => (
   <ProtectedRoute redirectTo={redirectTo}>{children}</ProtectedRoute>
@@ -314,10 +324,10 @@ const App = () => (
                       <main role="main">
                       <Suspense fallback={<PageLoader />}>
                         <Routes>
-                          {/* Auth routes - public */}
-                          <Route path="/auth" element={<Auth />} />
-                          <Route path="/login" element={<Auth />} />
-                          <Route path="/demo" element={<Auth />} />
+                          {/* Auth routes - public, own Suspense to avoid dashboard skeleton flash */}
+                          <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                          <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                          <Route path="/demo" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
                           <Route path="/pricing" element={<PricingPage />} />
                           <Route path="/checkout/success" element={<CheckoutSuccess />} />
                           <Route path="/onboarding" element={<PR><OnboardingWizard /></PR>} />
