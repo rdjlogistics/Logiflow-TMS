@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useSystemJobs, useSystemIncidents, useAcknowledgeIncident } from '@/hooks/useEnterpriseData';
 import { useClientErrorLogs, useClientErrorSummary } from '@/hooks/useClientErrorLogs';
+import { useCompany } from '@/hooks/useCompany';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Activity, 
   CheckCircle2, 
@@ -35,6 +38,27 @@ const SystemHealth = () => {
   const acknowledgeIncident = useAcknowledgeIncident();
   const { data: errorLogs, isLoading: loadingErrors } = useClientErrorLogs(100);
   const { data: errorSummary } = useClientErrorSummary();
+  const { company } = useCompany();
+  const [retryingIntegrationId, setRetryingIntegrationId] = useState<string | null>(null);
+  const { data: integrations = [], isLoading: loadingIntegrations, refetch: refetchIntegrations } = useQuery({
+    queryKey: ['system-health-integrations', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+
+      const { data, error } = await supabase
+        .from('accounting_integrations')
+        .select('id, provider, sync_status, sync_error, last_sync_at, updated_at, is_active')
+        .eq('tenant_id', company.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).filter((integration) =>
+        Boolean(integration.sync_error) || ['pending', 'syncing', 'failed', 'error'].includes(integration.sync_status ?? '')
+      );
+    },
+    enabled: !!company?.id,
+  });
 
   const displayJobs = jobs || [];
   const displayIncidents = incidents || [];
@@ -101,6 +125,50 @@ const SystemHealth = () => {
     : 100;
   const avgDuration = jobsLast24h.filter(j => j.duration_ms).reduce((acc, j) => acc + (j.duration_ms || 0), 0) / (jobsLast24h.filter(j => j.duration_ms).length || 1);
   const openIncidents = displayIncidents.filter(i => i.status === 'open').length;
+  const failedIntegrations = integrations.filter((integration) => Boolean(integration.sync_error));
+  const pendingIntegrations = integrations.filter((integration) => ['pending', 'syncing'].includes(integration.sync_status ?? ''));
+  const deadLetterIntegrations = integrations.filter((integration) => (integration.sync_status ?? '') === 'failed');
+
+  const getIntegrationName = (provider: string) => {
+    switch (provider) {
+      case 'exact_online':
+        return 'Exact Online';
+      case 'quickbooks':
+        return 'QuickBooks';
+      default:
+        return provider.replace(/_/g, ' ').replace(/\w/g, (char) => char.toUpperCase());
+    }
+  };
+
+  const handleIntegrationRetry = async (integration: { id: string; provider: string }) => {
+    try {
+      setRetryingIntegrationId(integration.id);
+
+      if (integration.provider === 'exact_online') {
+        const { data, error } = await supabase.functions.invoke('exact-oauth-start');
+        if (error) throw error;
+
+        if (data?.auth_url) {
+          window.open(data.auth_url, '_blank', 'noopener,noreferrer');
+        }
+
+        toast.success('Herstel gestart', {
+          description: 'Voltooi de herverbinding in het geopende venster.',
+        });
+      } else {
+        window.location.assign('/integrations/accounting');
+        return;
+      }
+
+      await refetchIntegrations();
+    } catch (error) {
+      toast.error('Herstel mislukt', {
+        description: error instanceof Error ? error.message : 'Kon de integratie niet herstellen.',
+      });
+    } finally {
+      setRetryingIntegrationId(null);
+    }
+  };
 
   return (
     <DashboardLayout 
@@ -166,16 +234,16 @@ const SystemHealth = () => {
         </div>
 
         <Tabs defaultValue="jobs">
-          <TabsList>
-            <TabsTrigger value="jobs">Job Monitor</TabsTrigger>
-            <TabsTrigger value="incidents">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-4">
+            <TabsTrigger value="jobs" className="px-3 py-2 text-xs sm:text-sm">Job Monitor</TabsTrigger>
+            <TabsTrigger value="incidents" className="px-3 py-2 text-xs sm:text-sm">
               Incidents
               {openIncidents > 0 && (
                 <Badge variant="destructive" className="ml-2 h-5 px-1.5">{openIncidents}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="integrations">Integration Errors</TabsTrigger>
-            <TabsTrigger value="client-errors">
+            <TabsTrigger value="integrations" className="px-3 py-2 text-xs sm:text-sm">Integraties</TabsTrigger>
+            <TabsTrigger value="client-errors" className="px-3 py-2 text-xs sm:text-sm">
               Client Errors
               {(errorSummary?.length ?? 0) > 0 && (
                 <Badge variant="outline" className="ml-2 h-5 px-1.5 bg-destructive/10 text-destructive border-destructive/30">
@@ -320,70 +388,110 @@ const SystemHealth = () => {
           <TabsContent value="integrations" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Integration Errors</CardTitle>
-                <CardDescription>Webhook failures, retries en dead-letter queue</CardDescription>
+                <CardTitle>Integratiegezondheid</CardTitle>
+                <CardDescription>Live status van je boekhoudkoppelingen en synchronisatiefouten</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <Card>
                     <CardContent className="pt-4">
                       <div className="flex items-center gap-2">
                         <Webhook className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm font-medium">Webhook Failures</span>
+                        <span className="text-sm font-medium">Actuele fouten</span>
                       </div>
-                      <p className="text-2xl font-bold mt-2">3</p>
-                      <p className="text-xs text-muted-foreground">Laatste 24u</p>
+                      <p className="mt-2 text-2xl font-bold">{failedIntegrations.length}</p>
+                      <p className="text-xs text-muted-foreground">Integraties met sync_error</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-4">
                       <div className="flex items-center gap-2">
                         <RefreshCw className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm font-medium">Pending Retries</span>
+                        <span className="text-sm font-medium">Wachtende retries</span>
                       </div>
-                      <p className="text-2xl font-bold mt-2">1</p>
-                      <p className="text-xs text-muted-foreground">In queue</p>
+                      <p className="mt-2 text-2xl font-bold">{pendingIntegrations.length}</p>
+                      <p className="text-xs text-muted-foreground">Status pending of syncing</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-4">
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4 text-red-500" />
-                        <span className="text-sm font-medium">Dead Letter</span>
+                        <span className="text-sm font-medium">Gefaalde syncs</span>
                       </div>
-                      <p className="text-2xl font-bold mt-2">0</p>
-                      <p className="text-xs text-muted-foreground">Gefaalde items</p>
+                      <p className="mt-2 text-2xl font-bold">{deadLetterIntegrations.length}</p>
+                      <p className="text-xs text-muted-foreground">Status failed</p>
                     </CardContent>
                   </Card>
                 </div>
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Integration</TableHead>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Retries</TableHead>
-                      <TableHead>Laatste Poging</TableHead>
-                      <TableHead>Fout</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Exact Online Webhook</TableCell>
-                      <TableCell>invoice.created</TableCell>
-                      <TableCell>3/5</TableCell>
-                      <TableCell className="text-muted-foreground">10 min geleden</TableCell>
-                      <TableCell className="text-red-600 text-sm">Connection timeout</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="outline" size="sm" onClick={() => toast.info('Webhook retry verstuurd — controleer de integratie-instellingen')}>
-                          <RefreshCw className="h-3 w-3 mr-1" />
-                          Retry
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                {loadingIntegrations ? (
+                  <div className="flex justify-center py-8">
+                    <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : integrations.length === 0 ? (
+                  <div className="rounded-xl border border-border/50 bg-muted/20 px-4 py-8 text-center">
+                    <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-emerald-500" />
+                    <p className="text-sm font-medium">Geen actieve integratiefouten gevonden</p>
+                    <p className="text-xs text-muted-foreground">Je boekhoudkoppelingen melden momenteel geen open sync-problemen.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Integratie</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Queue</TableHead>
+                          <TableHead>Laatste poging</TableHead>
+                          <TableHead>Fout</TableHead>
+                          <TableHead className="text-right">Acties</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {integrations.map((integration) => {
+                          const lastAttempt = integration.last_sync_at || integration.updated_at;
+                          const isRetrying = retryingIntegrationId === integration.id;
+
+                          return (
+                            <TableRow key={integration.id}>
+                              <TableCell className="font-medium">{getIntegrationName(integration.provider)}</TableCell>
+                              <TableCell>
+                                <Badge variant={integration.sync_error ? 'destructive' : 'outline'}>
+                                  {integration.sync_status || 'onbekend'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-sm text-muted-foreground">
+                                {integration.sync_status === 'syncing'
+                                  ? 'Bezig'
+                                  : integration.sync_status === 'pending'
+                                  ? 'Wachtend'
+                                  : '—'}
+                              </TableCell>
+                              <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                                {lastAttempt ? format(new Date(lastAttempt), 'dd MMM HH:mm', { locale: nl }) : '—'}
+                              </TableCell>
+                              <TableCell className="max-w-[240px] text-sm text-destructive">
+                                <span className="line-clamp-2">{integration.sync_error || 'Geen foutdetails beschikbaar'}</span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={isRetrying}
+                                  onClick={() => handleIntegrationRetry(integration)}
+                                >
+                                  <RefreshCw className={isRetrying ? 'mr-1 h-3 w-3 animate-spin' : 'mr-1 h-3 w-3'} />
+                                  {integration.provider === 'exact_online' ? 'Herverbinden' : 'Beheer'}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
