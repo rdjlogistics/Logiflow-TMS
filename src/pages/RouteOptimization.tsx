@@ -818,7 +818,7 @@ const RouteOptimization = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate("/planning")}
+                onClick={() => navigate("/planning/program")}
                 className="h-8 gap-1.5 text-xs"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />

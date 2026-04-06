@@ -533,7 +533,7 @@ const Dashboard = () => {
               { label: "Nieuwe order", icon: Plus, href: "/orders/edit", color: "text-primary", bg: "bg-primary/8", border: "border-primary/15" },
               { label: "Nieuwe factuur", icon: FileText, href: "/invoices/new", color: "text-success", bg: "bg-success/8", border: "border-success/15" },
               { label: "Chauffeurs", icon: Truck, href: "/drivers", color: "text-warning", bg: "bg-warning/8", border: "border-warning/15" },
-              { label: "Planning", icon: Route, href: "/planning", color: "text-primary", bg: "bg-primary/8", border: "border-primary/15" },
+              { label: "Planning", icon: Route, href: "/planning/program", color: "text-primary", bg: "bg-primary/8", border: "border-primary/15" },
             ].map((action) => (
               <Link key={action.href} to={action.href}>
                 <div

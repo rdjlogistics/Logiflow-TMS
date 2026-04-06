@@ -231,13 +231,13 @@ const ExpiryAlerts = () => {
                 </p>
                 <div className="flex justify-center gap-2">
                   <Button variant="outline" asChild>
-                    <Link to="/compliance/driver-docs">
+                    <Link to="/enterprise/driver-docs">
                       <User className="h-4 w-4 mr-2" />
                       Chauffeur Docs
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link to="/compliance/vehicle-docs">
+                    <Link to="/enterprise/vehicle-docs">
                       <Car className="h-4 w-4 mr-2" />
                       Voertuig Docs
                     </Link>
