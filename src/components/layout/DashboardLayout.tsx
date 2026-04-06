@@ -82,7 +82,7 @@ function DashboardLayout({ children, title, description }: DashboardLayoutProps)
   }
 
   if (!user) {
-    return null;
+    return <Navigate to="/auth" replace />;
   }
 
   // Redirect to onboarding if not completed
