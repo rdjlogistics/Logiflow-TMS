@@ -242,8 +242,8 @@ const App = () => (
               <BrowserRouter>
                 <Routes>
                   {/* Auth routes — OUTSIDE CopilotProvider */}
-                  <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                  <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/login" element={<Auth />} />
                   
                   {/* Everything else */}
                   <Route path="*" element={
