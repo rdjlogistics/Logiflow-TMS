@@ -65,6 +65,7 @@ const PurchaseInvoiceSendPage = lazyWithRetry(() => import("./pages/finance/Purc
 const Costs = lazyWithRetry(() => import("./pages/finance/Costs"));
 const BankPayments = lazyWithRetry(() => import("./pages/finance/BankReconciliation"));
 const DieselModule = lazyWithRetry(() => import("./pages/finance/DieselModule"));
+const MarginAnalysis = lazyWithRetry(() => import("./pages/finance/MarginAnalysis"));
 const CreditNotes = lazyWithRetry(() => import("./pages/finance/CreditNotes"));
 const Reporting = lazyWithRetry(() => import("./pages/Reporting"));
 
@@ -322,6 +323,7 @@ const App = () => (
                           <Route path="/finance/costs" element={<AdminPR><Costs /></AdminPR>} />
                           <Route path="/finance/bank" element={<AdminPR><BankPayments /></AdminPR>} />
                           <Route path="/finance/diesel" element={<AdminPR><DieselModule /></AdminPR>} />
+                          <Route path="/finance/margin" element={<AdminPR><MarginAnalysis /></AdminPR>} />
                           <Route path="/finance/credit-notes" element={<AdminPR><CreditNotes /></AdminPR>} />
                           <Route path="/reporting" element={<StaffPR><Reporting /></StaffPR>} />
                           
