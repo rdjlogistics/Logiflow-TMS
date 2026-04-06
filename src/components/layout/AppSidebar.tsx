@@ -186,6 +186,9 @@ const financieelItems = [
   { title: "Cashflow", icon: Wallet, href: "/finance/cashflow" },
   { title: "Tankpassen", icon: Fuel, href: "/finance/fuel-cards" },
   { title: "Diesel Staffels", icon: TrendingUp, href: "/finance/diesel" },
+  { title: "Kosten", icon: Coins, href: "/finance/costs" },
+  { title: "Bank Reconciliatie", icon: Landmark, href: "/finance/bank" },
+  { title: "Marge Analyse", icon: PieChart, href: "/finance/margin" },
   { title: "Claims", icon: ClipboardCheck, href: "/claims" },
   { title: "Charter aanvragen", icon: ShoppingCart, href: "/charter" },
   { title: "Tariefcontracten", icon: Euro, href: "/pricing/contracts" },
@@ -218,6 +221,7 @@ const beheerItems = [
   { title: "EDI Integraties", icon: ArrowRightLeft, href: "/integrations/edi" },
   { title: "Multi-vestiging", icon: Building2, href: "/admin/locations" },
   { title: "Migratie Hub", icon: Database, href: "/admin/migration" },
+  { title: "White Label / Branding", icon: Paintbrush, href: "/admin/settings" },
 ];
 
 // WMS items kept as sub-section inside Beheer
