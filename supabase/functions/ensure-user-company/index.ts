@@ -36,9 +36,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Service role client for inserts
-    const admin = createClient(supabaseUrl, serviceRoleKey);
-
     // Check if user already has a company link
     const { data: existing } = await admin
       .from("user_companies")
