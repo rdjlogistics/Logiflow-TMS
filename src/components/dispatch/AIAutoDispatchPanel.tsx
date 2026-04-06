@@ -485,8 +485,22 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                                   <Button
                                     size="sm"
                                     className="h-8 bg-green-600 hover:bg-green-700"
-                                    onClick={() => {
-                                      // Direct assign for highly recommended
+                                    onClick={async () => {
+                                      if (!selectedTripId) return;
+                                      try {
+                                        const { error } = await supabase
+                                          .from('trips')
+                                          .update({ driver_id: candidate.driver.id, status: 'gepland' satisfies TripStatus })
+                                          .eq('id', selectedTripId);
+                                        if (error) throw error;
+                                        toast({ title: '✅ Direct Toegewezen', description: `${candidate.driver.name} is toegewezen.` });
+                                        onAssigned?.();
+                                        setShowAnalysis(false);
+                                        setSelectedTripId(null);
+                                        refetchTrips();
+                                      } catch (e: any) {
+                                        toast({ title: 'Toewijzing mislukt', description: e.message, variant: 'destructive' });
+                                      }
                                     }}
                                   >
                                     <Zap className="h-3 w-3 mr-1" />
