@@ -196,35 +196,45 @@ Deno.serve(async (req) => {
     const messageIds: string[] = [];
 
     for (const email of validRecipients) {
-      const resp = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: email,
-          subject,
-          html,
-        }),
-      });
+      let messageId: string | null = null;
+      let errorMsg: string | null = null;
 
-      if (resp.ok) {
-        const result = await resp.json();
-        if (result?.id) messageIds.push(result.id);
-      } else {
-        const errText = await resp.text();
-        console.error(`[send-transactional-email] Resend error for ${email}:`, errText);
+      try {
+        const resp = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: email,
+            subject,
+            html,
+          }),
+        });
+
+        if (resp.ok) {
+          const result = await resp.json();
+          messageId = result?.id || null;
+          if (messageId) messageIds.push(messageId);
+        } else {
+          errorMsg = await resp.text();
+          console.error(`[send-transactional-email] Resend error for ${email}:`, errorMsg);
+        }
+      } catch (sendErr: any) {
+        errorMsg = sendErr?.message || "Send failed";
+        console.error(`[send-transactional-email] Send exception for ${email}:`, errorMsg);
       }
-    }
 
-    for (const email of validRecipients) {
+      // Log per recipient with correct message_id
       await supabaseAdmin.from("email_send_log").insert({
         template_name: tplName,
         recipient_email: email,
-        status: messageIds.length > 0 ? "sent" : "failed",
-        error_message: messageIds.length > 0 ? null : "Delivery failed",
+        status: messageId ? "sent" : "failed",
+        message_id: messageId,
+        error_message: messageId ? null : (errorMsg || "Delivery failed"),
+        metadata: { tenant_id: tenantId, sent_by: userId, subject },
         tenant_id: tenantId,
         sent_by: userId,
       }).then(() => {}, () => {});

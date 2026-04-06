@@ -111,24 +111,26 @@ Deno.serve(async (req) => {
         }
       }
 
-      // 3. Expiring driver documents (within 14 days) — filter via profiles for tenant
+      // 3. Expiring driver documents (within 14 days) — filter via drivers table for tenant
       const { data: tenantDrivers } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("company_id", tenantId)
-        .eq("role", "driver");
+        .from("drivers")
+        .select("id, user_id")
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null);
 
       if (tenantDrivers && tenantDrivers.length > 0) {
-        const driverIds = tenantDrivers.map(d => d.id);
+        const driverUserIds = tenantDrivers.map(d => d.user_id).filter(Boolean);
         const fourteenDaysFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-        const { data: expiringDocs } = await supabase
-          .from("driver_documents")
-          .select("id, user_id, document_type, expiry_date")
-          .in("user_id", driverIds)
-          .lt("expiry_date", fourteenDaysFromNow)
-          .gt("expiry_date", now.toISOString())
-          .limit(10);
+        const { data: expiringDocs } = driverUserIds.length > 0
+          ? await supabase
+              .from("driver_documents")
+              .select("id, user_id, document_type, expiry_date")
+              .in("user_id", driverUserIds)
+              .lt("expiry_date", fourteenDaysFromNow)
+              .gt("expiry_date", now.toISOString())
+              .limit(10)
+          : { data: [] };
 
         if (expiringDocs) {
           for (const doc of expiringDocs) {
