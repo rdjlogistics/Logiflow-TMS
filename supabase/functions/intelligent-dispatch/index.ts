@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     // Get available drivers with their workload
     const today = new Date().toISOString().split("T")[0];
     const [{ data: drivers }, { data: todayTrips }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("user_id, full_name, phone").limit(50),
+      supabaseAdmin.from("drivers").select("id, name, phone, rating, status, current_city, driver_category").eq("status", "active").limit(50),
       supabaseAdmin.from("trips").select("driver_id").eq("company_id", uc.company_id).gte("trip_date", today).lte("trip_date", today + "T23:59:59"),
     ]);
 
@@ -49,10 +49,11 @@ Deno.serve(async (req) => {
 
     if (LOVABLE_API_KEY) {
       try {
-        const driverSummary = drivers.slice(0, 20).map((d, i) => ({
-          id: d.user_id,
-          name: d.full_name || "Onbekend",
-          workload: workloadMap.get(d.user_id) || 0,
+        const driverSummary = drivers.slice(0, 20).map((d: any, i: number) => ({
+          id: d.id,
+          name: d.name || "Onbekend",
+          workload: workloadMap.get(d.id) || 0,
+          rating: d.rating || 3,
         }));
 
         const model = "google/gemini-2.5-flash-lite";
@@ -77,11 +78,11 @@ Deno.serve(async (req) => {
           if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
             recommendations = parsed.map((r: any, i: number) => {
-              const driver = drivers.find(d => d.user_id === r.driverId);
+              const driver = drivers.find((d: any) => d.id === r.driverId);
               const wl = workloadMap.get(r.driverId) || 0;
               return {
                 driverId: r.driverId,
-                driverName: driver?.full_name || "Onbekend",
+                driverName: driver?.name || "Onbekend",
                 score: r.score || (90 - i * 10),
                 factors: [
                   { name: "AI Score", score: r.score || 80, weight: 0.6, description: r.reason || "AI analyse" },
@@ -109,13 +110,13 @@ Deno.serve(async (req) => {
     // Fallback: local workload-based scoring
     if (recommendations.length === 0) {
       recommendations = drivers
-        .sort((a, b) => (workloadMap.get(a.user_id) || 0) - (workloadMap.get(b.user_id) || 0))
+        .sort((a: any, b: any) => (workloadMap.get(a.id) || 0) - (workloadMap.get(b.id) || 0))
         .slice(0, 5)
-        .map((d, i) => {
-          const wl = workloadMap.get(d.user_id) || 0;
+        .map((d: any, i: number) => {
+          const wl = workloadMap.get(d.id) || 0;
           return {
-            driverId: d.user_id,
-            driverName: d.full_name || "Onbekend",
+            driverId: d.id,
+            driverName: d.name || "Onbekend",
             score: Math.max(50, 95 - i * 10 - wl * 5),
             factors: [{ name: "Werkdruk", score: Math.max(20, 100 - wl * 15), weight: 1.0, description: `${wl} ritten vandaag` }],
             estimatedArrival: pickupTime,

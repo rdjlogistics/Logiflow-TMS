@@ -17,24 +17,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    // Validate caller
+    const authClient = createClient(supabaseUrl, anonKey);
     const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: ce,
-    } = await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!).auth.getUser(token);
-
+    const { data: { user }, error: ce } = await authClient.auth.getUser(token);
     if (ce || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     const body = await req.json().catch(() => ({}));
     const driverId = body.driverId || body.driver_id;
@@ -51,31 +49,44 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { data, error } = await supabase.functions.invoke("send-push-notification", {
-      body: {
-        driver_id: driverId,
-        title: type === "unassign" ? "Rit verwijderd" : "Nieuwe rit toegewezen",
-        body:
-          message ||
-          (type === "unassign"
-            ? "Een rit is van je planning verwijderd."
-            : "Er is een nieuwe rit aan je toegewezen."),
-        data: {
-          tripId,
-          orderId: tripId,
-          type,
-        },
-      },
-    });
+    // Resolve driver's user_id
+    let targetUserId = driverId;
+    const { data: driver } = await supabaseAdmin
+      .from("drivers")
+      .select("user_id, name")
+      .eq("id", driverId)
+      .single();
 
-    if (error) {
-      console.error("[dispatch-notify] Push failed:", error);
-      return new Response(JSON.stringify({ success: false, error: "Push notificatie mislukt" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (driver?.user_id) {
+      targetUserId = driver.user_id;
     }
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    const title = type === "unassign" ? "Rit verwijderd" : "Nieuwe rit toegewezen";
+    const notifBody = message || (type === "unassign"
+      ? "Een rit is van je planning verwijderd."
+      : "Er is een nieuwe rit aan je toegewezen.");
+
+    // Create in-app notification directly (no sub-function call needed)
+    const { error: insertErr } = await supabaseAdmin.from("notifications").insert({
+      user_id: targetUserId,
+      title,
+      message: notifBody,
+      type: "dispatch",
+      channel: "in_app",
+      status: "pending",
+      entity_type: "trip",
+      entity_id: tripId || null,
+      metadata: { tripId, orderId: tripId, notifyType: type },
+    });
+
+    if (insertErr) {
+      console.error("[dispatch-notify] Notification insert error:", insertErr);
+      // Don't fail — notification is non-critical
+    }
+
+    console.log(`[dispatch-notify] Notification sent to ${targetUserId} (driver: ${driverId})`);
+
+    return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err: any) {

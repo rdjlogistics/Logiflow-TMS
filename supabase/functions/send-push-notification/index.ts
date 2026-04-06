@@ -52,8 +52,9 @@ Deno.serve(async (req) => {
       title: title,
       message: notifBody,
       type: data.type || "push",
-      data: data,
-      is_read: false,
+      channel: "in_app",
+      status: "pending",
+      metadata: data,
     });
 
     if (insertErr) {

@@ -49,7 +49,8 @@ Deno.serve(async (req) => {
           title: "Nieuwe inzending ontvangen",
           message: `Er is een nieuwe ${type || "document"} inzending (${submissionId}) binnengekomen die beoordeeld moet worden.`,
           type: "submission",
-          is_read: false,
+          channel: "in_app",
+          status: "pending",
           tenant_id: tenantId,
         }));
 

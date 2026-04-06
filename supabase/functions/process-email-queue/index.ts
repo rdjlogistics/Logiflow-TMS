@@ -72,13 +72,11 @@ Deno.serve(async (req) => {
 
           // Log success
           await supabaseAdmin.from("email_send_log").insert({
-            tenant_id: email.tenant_id,
-            to_address: Array.isArray(email.to) ? email.to[0] : email.to,
-            subject: email.subject,
+            recipient_email: Array.isArray(email.to) ? email.to[0] : email.to,
             status: "sent",
-            provider: "resend",
-            provider_message_id: resendData.id,
+            message_id: resendData.id,
             template_name: email.template_name || null,
+            metadata: { subject: email.subject, provider: "resend", tenant_id: email.tenant_id },
           }).then(() => {});
 
           // Delete from queue

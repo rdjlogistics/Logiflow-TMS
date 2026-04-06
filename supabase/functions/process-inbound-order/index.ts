@@ -495,12 +495,13 @@ Zorg dat datums in YYYY-MM-DD formaat zijn (EU standaard: dag-maand-jaar). Wees 
     try {
       await sb.from("notifications").insert({
         tenant_id: tenantId,
-        notification_type: "email_order_intake",
+        type: "email_order_intake",
         title: `Nieuwe transportopdracht via e-mail`,
-        body: `${email.from_name || email.from_email}: ${finalData.pickup_city || '?'} → ${finalData.delivery_city || '?'} (${Math.round(finalConfidence * 100)}% zekerheid)`,
+        message: `${email.from_name || email.from_email}: ${finalData.pickup_city || '?'} → ${finalData.delivery_city || '?'} (${Math.round(finalConfidence * 100)}% zekerheid)`,
         entity_type: "trip",
         entity_id: tripId,
-        is_read: false,
+        channel: "in_app",
+        status: "pending",
       });
     } catch (notifErr) {
       console.error("[process-inbound-order] Notification insert failed:", notifErr);
