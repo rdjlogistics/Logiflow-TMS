@@ -7374,6 +7374,93 @@ export type Database = {
           },
         ]
       }
+      email_order_intake: {
+        Row: {
+          ai_confidence: number | null
+          ai_extracted_data: Json | null
+          assigned_driver_id: string | null
+          auto_reply_sent: boolean
+          company_id: string
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_trip_id: string | null
+          error_message: string | null
+          id: string
+          inbound_email_id: string | null
+          processed_at: string | null
+          status: string
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_extracted_data?: Json | null
+          assigned_driver_id?: string | null
+          auto_reply_sent?: boolean
+          company_id: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_trip_id?: string | null
+          error_message?: string | null
+          id?: string
+          inbound_email_id?: string | null
+          processed_at?: string | null
+          status?: string
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_extracted_data?: Json | null
+          assigned_driver_id?: string | null
+          auto_reply_sent?: boolean
+          company_id?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_trip_id?: string | null
+          error_message?: string | null
+          id?: string
+          inbound_email_id?: string | null
+          processed_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_order_intake_assigned_driver_id_fkey"
+            columns: ["assigned_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_order_intake_assigned_driver_id_fkey"
+            columns: ["assigned_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_order_intake_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_order_intake_created_trip_id_fkey"
+            columns: ["created_trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_order_intake_inbound_email_id_fkey"
+            columns: ["inbound_email_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_emails"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -9836,6 +9923,7 @@ export type Database = {
           from_name: string | null
           html_body: string | null
           id: string
+          processing_status: string
           read: boolean | null
           received_at: string | null
           reply_to_message_id: string | null
@@ -9851,6 +9939,7 @@ export type Database = {
           from_name?: string | null
           html_body?: string | null
           id?: string
+          processing_status?: string
           read?: boolean | null
           received_at?: string | null
           reply_to_message_id?: string | null
@@ -9866,6 +9955,7 @@ export type Database = {
           from_name?: string | null
           html_body?: string | null
           id?: string
+          processing_status?: string
           read?: boolean | null
           received_at?: string | null
           reply_to_message_id?: string | null
