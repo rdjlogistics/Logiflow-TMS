@@ -2,8 +2,11 @@ import { useState, useEffect, createContext, useContext, ReactNode, useCallback,
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAuthStorage } from "@/lib/authStorage";
+import { stabilizeSupabaseAuthClient } from "@/lib/stabilizeSupabaseAuth";
 import { clearAllRoleCache } from "./useUserRole";
 import { clearOnboardingCache } from "./useOnboardingRequired";
+
+stabilizeSupabaseAuthClient(supabase);
 
 interface AuthContextType {
   user: User | null;
