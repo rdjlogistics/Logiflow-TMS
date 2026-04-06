@@ -109,6 +109,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
     setSending(true);
     try {
       let documentUrl = '';
+      let documentHtml = '';
       try {
         if (documentType === 'pod' && stopProofId) {
           const { data: podData, error: podError } = await supabase.functions.invoke('generate-pod-pdf', {
@@ -116,13 +117,8 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
           });
           if (podError) {
             console.warn('POD PDF generatie mislukt:', podError);
-          } else {
-          // generate-pod-pdf returns { html, fileName, success }
-          // Create a blob URL from HTML for the email function
-          if (podData?.html) {
-            const blob = new Blob([podData.html], { type: 'text/html' });
-            documentUrl = URL.createObjectURL(blob);
-          }
+          } else if (podData?.html) {
+            documentHtml = podData.html;
           }
         } else {
           const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
@@ -131,6 +127,7 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
           if (genError) {
             console.warn('Document generatie mislukt:', genError);
           } else {
+            documentHtml = genData?.html || '';
             documentUrl = genData?.url || '';
           }
         }
@@ -154,12 +151,12 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
         }
       }
 
-      if (!documentUrl && attachmentUrls.length === 0) {
+      if (!documentUrl && !documentHtml && attachmentUrls.length === 0) {
         toast.warning('Document kon niet worden gegenereerd. E-mail wordt zonder documentlink verstuurd.');
       }
 
       const { error: sendError } = await supabase.functions.invoke('send-document-email', {
-        body: { to: email, documentUrl, documentType, orderNumber, recipientType: 'customer', attachmentUrls, message: message || undefined },
+        body: { to: email, documentUrl, documentHtml, documentType, orderNumber, recipientType: 'customer', attachmentUrls, message: message || undefined },
       });
       if (sendError) throw sendError;
 
