@@ -1,44 +1,72 @@
 
 
-# Fix: "Welkom" bericht alleen voor nieuwe accounts
+# Launch Audit — Missende Features & Fixes
 
-## Probleem
-Het "Welkom bij je Command Center" blok verschijnt bij bestaande accounts omdat het **alleen kijkt naar data-aantallen** (`< 5 trips` en `€0 revenue`), niet naar of het account nieuw is. Een 3 maanden oud account met weinig activiteit ziet dus steeds de welkomstbanner.
+## Bevindingen uit de code-inspectie
 
-Er zijn twee losse componenten die dit veroorzaken:
+### 0 TypeScript errors — de codebase compileert schoon
 
-1. **`DashboardEmptyState`** — toont setup-stappen op basis van `hasEnoughData` (puur data-count)
-2. **`OnboardingChecklist`** — checkt `tenant_settings.onboarding_completed_at`, maar oude accounts hebben dit veld als `null` omdat ze vóór het onboarding-systeem zijn aangemaakt
+### Kritieke missende navigatie (niet bereikbaar via sidebar)
+Van de 36 Scale-features zijn deze **4 niet in de sidebar** terwijl ze wel routes/pagina's hebben:
 
-## Oplossing
+1. **Bank Reconciliatie** — pagina bestaat (`/finance/bank`, 446 regels, met hooks), maar geen sidebar-link
+2. **Marge Analyse** — **geen pagina, geen route** — alleen fragmenten in KPI/OrderOverview
+3. **Kosten** — pagina bestaat (`/finance/costs`-achtig, met supabase hooks), maar geen sidebar-link en geen route in App.tsx
+4. **White Label** — branding-settings zitten verspreid in AdminSettings en Auth, maar geen dedicated feature-pagina of sidebar-link
 
-### 1. DashboardEmptyState koppelen aan onboarding-status
-**Bestand:** `src/pages/Dashboard.tsx`
+### Stub-pagina's (leeg, geen DashboardLayout)
+- `Collections.tsx` — 14 regels placeholder, geen sidebar-link (niet launch-kritiek)
+- `CreditDashboard.tsx` — 14 regels placeholder, geen sidebar-link (niet launch-kritiek)
 
-- Importeer `useOnboardingChecklist`
-- Toon `DashboardEmptyState` alleen als `show === true` (= onboarding nog niet afgerond) EN `!hasEnoughData`
-- Bestaande accounts waar `onboarding_completed_at` al is gezet zien het nooit meer
+### WhatsApp Chat
+- Geen sidebar-link naar WhatsApp/Messenger specifiek als "WhatsApp Chat" — Messenger bestaat wel op `/messenger`
 
-### 2. Migratie: bestaande accounts markeren als onboarding-voltooid
-**Database migratie:**
+### Push Notificaties
+- Edge function en subscription-logica bestaan, maar geen beheerpagina in sidebar
 
-```sql
-UPDATE tenant_settings 
-SET onboarding_completed_at = created_at 
-WHERE onboarding_completed_at IS NULL 
-  AND created_at < NOW() - INTERVAL '7 days';
-```
+## Uitvoeringsplan
 
-Dit markeert alle accounts ouder dan 7 dagen als "onboarding voltooid", zodat alleen echte nieuwe registraties de welkomstflow zien.
+### Fase 1 — Sidebar navigatie completeren
+**Bestand:** `src/components/layout/AppSidebar.tsx`
 
-### 3. Fallback in useOnboardingChecklist
-**Bestand:** `src/hooks/useOnboardingChecklist.ts`
+Toevoegen aan `financieelItems`:
+- "Bank Reconciliatie" → `/finance/bank`
+- "Marge Analyse" → `/finance/margin` (nieuw)
+- "Kosten" → `/finance/costs` (route toevoegen)
 
-- Als er geen `tenant_settings` rij bestaat voor een company, behandel dit als "al voltooid" (bestaand account zonder settings-rij)
-- Nu returnt het `null` → `show` wordt `false` → correct gedrag
+### Fase 2 — Route registratie
+**Bestand:** `src/App.tsx`
+
+- Route `/finance/costs` toevoegen → `Costs` component (bestaat al)
+- Route `/finance/margin` toevoegen → nieuw `MarginAnalysis` component
+
+### Fase 3 — Marge Analyse pagina bouwen
+**Nieuw bestand:** `src/pages/finance/MarginAnalysis.tsx`
+
+Transportlogistiek marge-analyse dashboard:
+- Omzet vs. kosten per order/klant/periode
+- Marge% berekening uit bestaande `trips` (revenue/cost velden) en `invoices`
+- Gebruik bestaande data — geen nieuwe tabellen nodig
+- DashboardLayout wrapper
+
+### Fase 4 — Kosten route fixen
+**Bestand:** `src/App.tsx`
+
+- De `Costs` pagina bestaat al (190 regels, met supabase hooks via `useFinanceTransactions`)
+- Alleen route-registratie + sidebar-link ontbreekt
+
+### Fase 5 — White Label als admin-feature zichtbaar maken
+White Label branding zit al in `AdminSettings` en de `company_branding` tabel. Alleen een duidelijke sidebar-link toevoegen naar `/admin/settings` met label "White Label / Branding" in de beheer-sectie.
+
+## Wat NIET verandert
+- Alle 122 bestaande routes — ongemoeid
+- Bestaande edge functions — ongemoeid
+- Database schema — geen migraties nodig
+- Collections/CreditDashboard stubs — niet in sidebar, niet launch-kritiek
 
 ## Resultaat
-- Nieuwe registraties → zien welkomstbanner + onboarding checklist
-- Bestaande accounts (> 7 dagen) → zien nooit meer de welkomstbanner
-- Geen impact op andere features
+- Alle 36 Scale-features bereikbaar via sidebar
+- Marge Analyse als nieuw dashboard met live data uit trips/invoices
+- Bank Reconciliatie en Kosten nu ontdekbaar
+- White Label branding herkenbaar in navigatie
 
