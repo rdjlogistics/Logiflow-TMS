@@ -25,8 +25,12 @@ import { Truck, Loader2, Sparkles, Zap, Shield, User, Users, LogIn, ChevronDown,
 
 
 // Detailed error message mapping
-const getErrorMessage = (error: { message: string }) => {
-  const msg = error.message.toLowerCase();
+const getErrorMessage = (error: { message?: string; status?: number } | any) => {
+  const msg = (error?.message || "").toLowerCase();
+  
+  if (!msg || msg === "{}") {
+    return "Serverfout. De backend reageert niet. Probeer het over een paar seconden opnieuw.";
+  }
   
   if (msg.includes("invalid login credentials") || msg.includes("invalid_credentials")) {
     return "Ongeldige inloggegevens. Controleer je email en wachtwoord.";
@@ -49,8 +53,10 @@ const getErrorMessage = (error: { message: string }) => {
   if (msg.includes("password") && msg.includes("weak")) {
     return "Wachtwoord is te zwak. Gebruik minimaal 6 tekens.";
   }
+  if (msg.includes("504") || msg.includes("gateway") || msg.includes("timeout")) {
+    return "Serverfout (timeout). De backend is tijdelijk niet beschikbaar. Probeer het opnieuw.";
+  }
   
-  // Include original message for debugging
   console.warn("Auth error:", error.message);
   return `Er is een fout opgetreden: ${error.message}`;
 };
