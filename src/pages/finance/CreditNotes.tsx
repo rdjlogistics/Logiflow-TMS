@@ -149,10 +149,10 @@ export default function CreditNotes() {
                 </div>
                 <div>
                   <Label>Gekoppelde factuur (optioneel)</Label>
-                  <Select value={invoiceId} onValueChange={setInvoiceId}>
+                  <Select value={invoiceId || "__none__"} onValueChange={(v) => setInvoiceId(v === "__none__" ? "" : v)}>
                     <SelectTrigger><SelectValue placeholder="Geen factuur" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Geen</SelectItem>
+                      <SelectItem value="__none__">Geen</SelectItem>
                       {invoices.map((inv: any) => (
                         <SelectItem key={inv.id} value={inv.id}>{inv.invoice_number} — €{inv.total_amount?.toFixed(2)}</SelectItem>
                       ))}
