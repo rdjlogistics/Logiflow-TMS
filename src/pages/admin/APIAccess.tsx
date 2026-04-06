@@ -133,10 +133,22 @@ export default function APIAccess() {
           <CardDescription>Gebruik je API key als Bearer token in de Authorization header</CardDescription>
         </CardHeader>
         <CardContent>
-          <pre className="text-xs bg-muted/30 p-4 rounded-lg overflow-auto">
-{`curl -X GET https://api.logiflow.nl/v1/orders \\
-  -H "Authorization: Bearer lf_jouw_api_key" \\
-  -H "Content-Type: application/json"`}
+          <pre className="text-xs bg-muted/30 p-4 rounded-lg overflow-x-auto">
+{`# Orders ophalen
+curl -X GET ${window.location.origin.replace('://', '://api.')}/v1/orders \\
+  -H "Authorization: Bearer lf_jouw_api_key"
+
+# Facturen ophalen
+curl -X GET ${window.location.origin.replace('://', '://api.')}/v1/invoices \\
+  -H "Authorization: Bearer lf_jouw_api_key"
+
+# Klanten ophalen
+curl -X GET ${window.location.origin.replace('://', '://api.')}/v1/customers \\
+  -H "Authorization: Bearer lf_jouw_api_key"
+
+# Status check
+curl -X GET ${window.location.origin.replace('://', '://api.')}/v1/status \\
+  -H "Authorization: Bearer lf_jouw_api_key"`}
           </pre>
         </CardContent>
       </Card>
