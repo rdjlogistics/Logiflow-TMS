@@ -24,8 +24,8 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).single();
-    const tenantId = profile?.company_id;
+    const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();
+    const tenantId = uc?.company_id;
     if (!tenantId) {
       return new Response(JSON.stringify({ error: "Geen bedrijf gekoppeld" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
