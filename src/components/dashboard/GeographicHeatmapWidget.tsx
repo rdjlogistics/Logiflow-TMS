@@ -146,7 +146,7 @@ const GeographicHeatmapWidget = ({
             </div>
           </div>
           <Button variant="ghost" size="sm" asChild className="h-8">
-            <Link to="/crm/lane-map">
+            <Link to="/orders">
               <span className="text-xs">Details</span>
               <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
             </Link>

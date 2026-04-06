@@ -589,7 +589,7 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
                     />
                     <div className="flex justify-end mt-1">
                       <Link
-                        to="/reset-password"
+                        to="/driver/reset-password"
                         className="text-xs text-primary hover:underline"
                       >
                         Wachtwoord vergeten?

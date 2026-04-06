@@ -418,6 +418,15 @@ const App = () => (
                           {/* Legal */}
                           <Route path="/legal/privacy" element={<PrivacyPolicy />} />
                           <Route path="/legal/terms" element={<TermsOfService />} />
+
+                          {/* Legacy redirects */}
+                          <Route path="/planning" element={<Navigate to="/planning/program" replace />} />
+                          <Route path="/trips" element={<Navigate to="/orders" replace />} />
+                          <Route path="/compliance/driver-docs" element={<Navigate to="/enterprise/driver-docs" replace />} />
+                          <Route path="/compliance/vehicle-docs" element={<Navigate to="/enterprise/vehicle-docs" replace />} />
+                          <Route path="/reset-password" element={<Navigate to="/driver/reset-password" replace />} />
+                          <Route path="/drivers" element={<Navigate to="/carriers?tab=drivers" replace />} />
+                          <Route path="/sla" element={<Navigate to="/enterprise/health" replace />} />
                           
                           <Route path="*" element={<NotFound />} />
                             </Routes>
