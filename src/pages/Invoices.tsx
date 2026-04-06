@@ -74,7 +74,7 @@ import { InvoiceStatusBadge } from "@/components/invoices/InvoiceStatusBadge";
 import { InvoiceAgingBadge } from "@/components/invoices/InvoiceAgingBadge";
 import { PaymentRegistrationModal } from "@/components/invoices/PaymentRegistrationModal";
 import { SendReminderDialog } from "@/components/invoices/SendReminderDialog";
-import { ExactOnlineSyncButton } from "@/components/invoices/ExactOnlineSyncButton";
+
 import { InvoiceBulkActionsBar } from "@/components/invoices/InvoiceBulkActionsBar";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
