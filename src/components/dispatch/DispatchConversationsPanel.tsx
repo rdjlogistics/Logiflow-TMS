@@ -285,16 +285,16 @@ export function DispatchConversationsPanel() {
                 </div>
               </ScrollArea>
 
-              {/* Simulate Response (for testing) */}
+              {/* Response input — for processing incoming driver replies */}
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground">
-                  🔧 Simuleer chauffeur-antwoord (voor testing)
+                  📱 Verwerk chauffeur-antwoord
                 </p>
                 <div className="flex gap-2">
                   <Input
                     value={mockResponse}
                     onChange={(e) => setMockResponse(e.target.value)}
-                    placeholder="Bijv: Ja, kan ik doen"
+                    placeholder="Plak het antwoord van de chauffeur hier"
                     className="flex-1"
                     onKeyDown={(e) => e.key === 'Enter' && handleSimulateResponse()}
                   />
