@@ -243,11 +243,10 @@ Deno.serve(async (req) => {
     // Log the send
     await supabaseAdmin.from("email_send_log").insert({
       template_name: "invoice_email",
-      to_email: Array.isArray(to) ? to[0] : to,
-      subject,
+      recipient_email: Array.isArray(to) ? to[0] : to,
       status: "sent",
       message_id: resendData.id,
-      metadata: { invoice_id: invoiceId, invoice_number: invoice.invoice_number, include_ubl: includeUbl },
+      metadata: { invoice_id: invoiceId, invoice_number: invoice.invoice_number, subject, include_ubl: includeUbl },
     }).then(() => {}).catch(() => {});
 
     // Update invoice email status

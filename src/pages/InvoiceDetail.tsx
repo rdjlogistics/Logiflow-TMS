@@ -212,15 +212,30 @@ const InvoiceDetail = () => {
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
-      const blob = new Blob([bytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Factuur-${invoice.invoice_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      
+      // The edge function returns HTML, not a real PDF binary.
+      // Open in a new window for browser-native print-to-PDF.
+      const isHtml = data.html === true;
+      if (isHtml) {
+        const htmlString = new TextDecoder().decode(bytes);
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlString);
+          printWindow.document.close();
+          // Auto-trigger print dialog after a brief delay
+          setTimeout(() => printWindow.print(), 500);
+        }
+      } else {
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Factuur-${invoice.invoice_number}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
     } catch (error: any) {
       console.error("PDF error:", error);
       const isNetwork = error?.message?.includes("Failed to fetch") || error?.message?.includes("NetworkError");
