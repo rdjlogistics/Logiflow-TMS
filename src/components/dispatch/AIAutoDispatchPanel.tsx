@@ -70,7 +70,6 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
   const { toast } = useToast();
   const [selectedTripId, setSelectedTripId] = useState<string | null>(tripId || null);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [mockResponse, setMockResponse] = useState('');
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isBatchProcessing, setIsBatchProcessing] = useState(false);
   const [batchResults, setBatchResults] = useState<Array<{ tripId: string; pickup: string; delivery: string; driverName: string; score: number }> | null>(null);
@@ -114,13 +113,6 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
     if (result) {
       setSelectedConversation(result.conversationId);
     }
-  };
-
-  const handleProcessResponse = async () => {
-    if (!selectedConversation || !mockResponse.trim()) return;
-    
-    await processResponse(selectedConversation, mockResponse);
-    setMockResponse('');
   };
 
   const handleConfirmAssign = async () => {
@@ -169,9 +161,17 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
     
     for (const result of batchResults) {
       try {
+        // Find the driver_id from analysis candidates for this trip
+        const analysisData = await analyzeTrip(result.tripId);
+        const topDriver = analysisData?.candidates?.[0];
+        if (!topDriver) continue;
+        
         const { error } = await supabase
           .from('trips')
-          .update({ status: 'gepland' satisfies TripStatus })
+          .update({ 
+            driver_id: topDriver.driver.id,
+            status: 'gepland' satisfies TripStatus,
+          })
           .eq('id', result.tripId);
         if (!error) successCount++;
       } catch (e) { console.error('Trip update failed:', e); }
@@ -593,22 +593,6 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
                     ))}
                   </div>
                 </ScrollArea>
-
-                {/* Mock response input (for testing) */}
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Simuleer chauffeur antwoord..."
-                    value={mockResponse}
-                    onChange={(e) => setMockResponse(e.target.value)}
-                    className="h-8 text-xs"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleProcessResponse();
-                    }}
-                  />
-                  <Button size="sm" className="h-8" onClick={handleProcessResponse}>
-                    <Send className="h-3 w-3" />
-                  </Button>
-                </div>
 
                 {/* Confirm Assignment */}
                 <Button 

@@ -76,24 +76,19 @@ function PODDetailContent({ pod, getCachedSignedUrl }: { pod: StopProofRecord; g
       const payload = { stop_proof_id: pod.id };
       const { data, error } = await supabase.functions.invoke('generate-pod-pdf', { body: payload });
       if (error) throw error;
-      if (!data?.pdf) throw new Error('Geen PDF data ontvangen');
+      if (!data?.html) throw new Error('Geen document data ontvangen');
 
-      // Decode base64 PDF (consistent with invoice/purchase-invoice pattern)
-      const binaryString = atob(data.pdf);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const blob = new Blob([bytes], { type: 'application/pdf' });
+      // Download as HTML file
+      const blob = new Blob([data.html], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = data.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}.pdf`;
+      a.download = data.fileName || `POD-${pod.order_number || pod.id.slice(0, 8)}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success('PDF gedownload');
+      toast.success('POD gedownload');
     } catch (err: any) {
       console.error('PDF download error:', err);
       toast.error('PDF download mislukt', { description: err.message });
