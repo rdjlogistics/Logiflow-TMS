@@ -62,7 +62,7 @@ const getErrorMessage = (error: { message?: string; status?: number } | any) => 
 };
 
 const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, authReady } = useAuth();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -192,8 +192,8 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
   };
 
 
-   // Already logged in → redirect to dashboard (DashboardLayout handles onboarding redirect)
-  if (!authLoading && user) {
+   // Already logged in → redirect to dashboard once auth hydration is complete
+  if (authReady && user) {
     return <Navigate to="/" replace />;
   }
 
@@ -388,28 +388,6 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
     }
     setLoading(false);
   };
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background mesh-bg">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="floating-orb w-96 h-96 -top-48 -left-48"
-            style={{ animationDelay: "0s" }}
-          />
-          <div
-            className="floating-orb w-72 h-72 top-1/2 -right-36 bg-accent/20"
-            style={{ animationDelay: "2s" }}
-          />
-        </div>
-        <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse-glow">
-            <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background mesh-bg p-4">
