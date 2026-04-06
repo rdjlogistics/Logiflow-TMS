@@ -256,12 +256,10 @@ async function executeAction(
 
       // Always log to email_send_log for audit trail
       await supabase.from("email_send_log").insert({
-        company_id: tenantId,
         recipient_email: to,
-        subject,
         template_name: "workflow_email",
         status: resendApiKey ? "sent" : "pending",
-        metadata: { body, source: "workflow_automation" },
+        metadata: { body, source: "workflow_automation", subject, tenant_id: tenantId },
       });
 
       return { to, subject };
@@ -328,12 +326,10 @@ async function executeAction(
 
       // Log to email_send_log as audit trail (reuse existing table)
       await supabase.from("email_send_log").insert({
-        company_id: tenantId,
         recipient_email: "system@workflow",
-        subject: title,
         template_name: "workflow_log_event",
         status: "sent",
-        metadata: { details, severity, trigger_data: triggerData, source: "workflow_automation" },
+        metadata: { title, details, severity, trigger_data: triggerData, source: "workflow_automation", tenant_id: tenantId },
       });
 
       console.log(`[workflow] Event logged: "${title}" severity=${severity}`);
