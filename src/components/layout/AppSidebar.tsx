@@ -202,7 +202,7 @@ const analyticsItems = [
   { title: "Rapportage", icon: TrendingUp, href: "/reporting" },
   { title: "Exceptions", icon: AlertCircle, href: "/enterprise/exceptions" },
   { title: "Alerts", icon: Bell, href: "/enterprise/alerts" },
-  { title: "System Health", icon: HeartPulse, href: "/enterprise/health" },
+  
   { title: "Anomaly Detection", icon: Radar, href: "/ai/anomaly" },
 ];
 
