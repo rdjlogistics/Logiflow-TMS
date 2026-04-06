@@ -50,6 +50,7 @@ import { nl } from "date-fns/locale";
 
 const Dashboard = () => {
   const { isAdmin } = useUserRole();
+  const { show: showOnboarding } = useOnboardingChecklist();
   const { user } = useAuth();
   const { 
     stats, 
@@ -556,7 +557,7 @@ const Dashboard = () => {
 
 
         {/* Empty State / Setup Guide */}
-        {!hasEnoughData && !loading && (
+        {showOnboarding && !hasEnoughData && !loading && (
           <div className="animate-scale-in">
             <DashboardEmptyState
               hasOrders={stats.tripsThisMonth > 0}

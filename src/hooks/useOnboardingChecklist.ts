@@ -47,7 +47,8 @@ export const useOnboardingChecklist = () => {
         .eq('company_id', companyId)
         .maybeSingle();
 
-      if ((settings as Record<string, unknown>)?.onboarding_completed_at) {
+      // No settings row or already completed → treat as done (legacy account)
+      if (!settings || (settings as Record<string, unknown>)?.onboarding_completed_at) {
         return { alreadyCompleted: true, steps: [], companyId };
       }
 
