@@ -313,7 +313,6 @@ export function DispatchConversationsPanel() {
                   <CheckCircle2 className="h-4 w-4 mr-2" />
                   Bevestig Toewijzing
                 </Button>
-                <Button variant="outline" className="flex-1">
                 <Button variant="outline" className="flex-1" onClick={handleCancelConversation}>
                   <XCircle className="h-4 w-4 mr-2" />
                   Annuleer
