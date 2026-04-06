@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     // Get available drivers with their workload
     const today = new Date().toISOString().split("T")[0];
     const [{ data: drivers }, { data: todayTrips }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("user_id, full_name, phone").limit(50),
+      supabaseAdmin.from("drivers").select("id, name, phone, rating, status, current_city, driver_category").eq("status", "active").limit(50),
       supabaseAdmin.from("trips").select("driver_id").eq("company_id", uc.company_id).gte("trip_date", today).lte("trip_date", today + "T23:59:59"),
     ]);
 
