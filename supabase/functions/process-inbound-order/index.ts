@@ -534,11 +534,14 @@ Zorg dat datums in YYYY-MM-DD formaat zijn (EU standaard: dag-maand-jaar). Wees 
           body: JSON.stringify({
             recipientEmail: email.from_email,
             templateName: "order-confirmation-auto",
+            tenantId,
             idempotencyKey: `order-confirm-${intake.id}`,
-            templateData: {
+            data: {
               name: finalData.contact_name || email.from_name || "klant",
               orderNumber: trip.order_number,
+              pickupAddress: finalData.pickup_address || "",
               pickupCity: finalData.pickup_city || "",
+              deliveryAddress: finalData.delivery_address || "",
               deliveryCity: finalData.delivery_city || "",
               date: finalData.date || "",
               goods: finalData.goods_description || "",
