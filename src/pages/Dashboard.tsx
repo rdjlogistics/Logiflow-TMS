@@ -40,6 +40,7 @@ import DraggableWidgetGrid from "@/components/dashboard/DraggableWidgetGrid";
 import WidgetCustomizer from "@/components/dashboard/WidgetCustomizer";
 import { DASHBOARD_PRESETS, DashboardPreset } from "@/components/dashboard/DashboardPresetSelector";
 import { ModuleOnboarding } from "@/components/onboarding/ModuleOnboarding";
+import { useOnboardingChecklist } from "@/hooks/useOnboardingChecklist";
 
 import { useUserRole } from "@/hooks/useUserRole";
 import { format } from "date-fns";
@@ -49,6 +50,7 @@ import { nl } from "date-fns/locale";
 
 const Dashboard = () => {
   const { isAdmin } = useUserRole();
+  const { show: showOnboarding } = useOnboardingChecklist();
   const { user } = useAuth();
   const { 
     stats, 
@@ -555,7 +557,7 @@ const Dashboard = () => {
 
 
         {/* Empty State / Setup Guide */}
-        {!hasEnoughData && !loading && (
+        {showOnboarding && !hasEnoughData && !loading && (
           <div className="animate-scale-in">
             <DashboardEmptyState
               hasOrders={stats.tripsThisMonth > 0}
