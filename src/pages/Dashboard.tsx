@@ -148,7 +148,7 @@ const Dashboard = () => {
       icon: Truck, 
       color: "text-primary", 
       bg: "bg-primary/10",
-      href: "/trips?filter=onderweg",
+      href: "/orders?filter=onderweg",
       showPulse: false,
     },
     { 
@@ -157,7 +157,7 @@ const Dashboard = () => {
       icon: TrendingUp, 
       color: "text-success", 
       bg: "bg-success/10",
-      href: "/trips?filter=afgerond",
+      href: "/orders?filter=afgerond",
       showPulse: false,
     },
     { 
@@ -166,7 +166,7 @@ const Dashboard = () => {
       icon: AlertTriangle, 
       color: attentionCount > 0 ? "text-warning" : "text-muted-foreground", 
       bg: attentionCount > 0 ? "bg-warning/10" : "bg-muted/10",
-      href: "/trips?filter=at-risk",
+      href: "/orders?filter=at-risk",
       showPulse: attentionCount > 0,
     },
     { 
@@ -443,7 +443,7 @@ const Dashboard = () => {
                   </Link>
                 )}
                 {opsStats.atRisk > 0 && (
-                  <Link to="/trips?filter=at-risk" className="block">
+                  <Link to="/orders?filter=at-risk" className="block">
                     <div className="flex items-center justify-between p-3 rounded-xl bg-warning/10 border border-warning/20 active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-2.5">

@@ -23,16 +23,16 @@ const OpsSnapshot = ({
 }: OpsSnapshotProps) => {
   const kpiTiles = [
     { label: "Chauffeur nodig", value: chauffeurNodig, icon: UserPlus, colorClass: "text-destructive", bgClass: "bg-destructive/8", borderClass: "border-destructive/20", glowClass: "hover:shadow-destructive/10", href: "/driver/assign", pulse: chauffeurNodig > 0 },
-    { label: "Onderweg", value: onderweg, icon: Truck, colorClass: "text-primary", bgClass: "bg-primary/8", borderClass: "border-primary/20", glowClass: "hover:shadow-primary/10", href: "/trips?filter=onderweg", pulse: false },
-    { label: "Afgeleverd", value: afgeleverd, icon: CheckCircle2, colorClass: "text-success", bgClass: "bg-success/8", borderClass: "border-success/20", glowClass: "hover:shadow-success/10", href: "/trips?filter=afgerond", pulse: false },
-    { label: "Risico", value: atRisk, icon: AlertTriangle, colorClass: "text-warning", bgClass: "bg-warning/8", borderClass: "border-warning/20", glowClass: "hover:shadow-warning/10", href: "/trips?filter=at-risk", pulse: false },
+    { label: "Onderweg", value: onderweg, icon: Truck, colorClass: "text-primary", bgClass: "bg-primary/8", borderClass: "border-primary/20", glowClass: "hover:shadow-primary/10", href: "/orders?filter=onderweg", pulse: false },
+    { label: "Afgeleverd", value: afgeleverd, icon: CheckCircle2, colorClass: "text-success", bgClass: "bg-success/8", borderClass: "border-success/20", glowClass: "hover:shadow-success/10", href: "/orders?filter=afgerond", pulse: false },
+    { label: "Risico", value: atRisk, icon: AlertTriangle, colorClass: "text-warning", bgClass: "bg-warning/8", borderClass: "border-warning/20", glowClass: "hover:shadow-warning/10", href: "/orders?filter=at-risk", pulse: false },
   ];
 
   const riskChips = [
     { label: "POD ontbreekt", count: podMissing, icon: FileX, href: "/operations/pod?tab=pending" },
-    { label: "Wachttijd loopt", count: waitingTime, icon: Clock, href: "/trips?filter=waiting" },
-    { label: "GPS uit", count: gpsOff, icon: Navigation, href: "/trips?filter=gps-off" },
-    { label: "ETA risico", count: etaRisk, icon: Timer, href: "/trips?filter=eta-risk" },
+    { label: "Wachttijd loopt", count: waitingTime, icon: Clock, href: "/orders?filter=waiting" },
+    { label: "GPS uit", count: gpsOff, icon: Navigation, href: "/orders?filter=gps-off" },
+    { label: "ETA risico", count: etaRisk, icon: Timer, href: "/orders?filter=eta-risk" },
     { label: "Hold", count: hold, icon: Hand, href: "/enterprise/holds" },
   ];
 
