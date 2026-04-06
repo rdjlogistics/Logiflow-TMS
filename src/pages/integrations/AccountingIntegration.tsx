@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRightLeft, CheckCircle, XCircle, RefreshCw, ExternalLink } from "lucide-react";
+import { ArrowRightLeft, CheckCircle, XCircle, RefreshCw, ExternalLink, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -45,10 +45,10 @@ export default function AccountingIntegration() {
   };
 
   const providers = [
-    { id: "exact_online", name: "Exact Online", description: "Volledige boekhouding integratie met facturen, relaties en grootboek synchronisatie", color: "bg-primary/20" },
-    { id: "twinfield", name: "Twinfield", description: "Wolters Kluwer boekhoudpakket koppeling", color: "bg-accent/20" },
-    { id: "xero", name: "Xero", description: "Cloud boekhoudsoftware integratie", color: "bg-secondary/20" },
-    { id: "quickbooks", name: "QuickBooks", description: "Intuit boekhouding en facturatie", color: "bg-muted/40" },
+    { id: "exact_online", name: "Exact Online", description: "Volledige boekhouding integratie met facturen, relaties en grootboek synchronisatie", color: "bg-primary/20", supported: true },
+    { id: "twinfield", name: "Twinfield", description: "Wolters Kluwer boekhoudpakket koppeling", color: "bg-accent/20", supported: false },
+    { id: "xero", name: "Xero", description: "Cloud boekhoudsoftware integratie", color: "bg-secondary/20", supported: false },
+    { id: "quickbooks", name: "QuickBooks", description: "Intuit boekhouding en facturatie", color: "bg-muted/40", supported: false },
   ];
 
   const activeIntegration = integrations.find((i: any) => i.is_active);
@@ -115,6 +115,12 @@ export default function AccountingIntegration() {
                     </div>
                   </div>
                   {connected && <Badge variant="default">Verbonden</Badge>}
+                  {!p.supported && !connected && (
+                    <Badge variant="secondary" className="text-xs gap-1">
+                      <Lock className="h-3 w-3" />
+                      Binnenkort
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -124,9 +130,9 @@ export default function AccountingIntegration() {
                     {connected ? "Opnieuw verbinden" : "Verbinden"}
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full gap-2" onClick={() => window.open('mailto:support@rdjlogistics.nl?subject=Interesse%20' + p.name, '_blank')}>
-                    <ExternalLink className="h-4 w-4" />
-                    Contact voor {p.name}
+                  <Button variant="outline" className="w-full gap-2" disabled>
+                    <Lock className="h-4 w-4" />
+                    Binnenkort beschikbaar
                   </Button>
                 )}
               </CardContent>

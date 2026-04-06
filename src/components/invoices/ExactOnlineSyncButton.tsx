@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, Loader2, CheckCircle } from "lucide-react";
+import { Calculator, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ExactOnlineSyncButtonProps {
   invoiceId: string;
@@ -24,7 +25,7 @@ export function ExactOnlineSyncButton({
   const syncMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke("exact-sync-invoices", {
-        body: {},
+        body: { invoiceId },
       });
       if (error) throw error;
       return data;
@@ -42,19 +43,29 @@ export function ExactOnlineSyncButton({
           description: data.errors[0],
           variant: "destructive",
         });
+      } else if (data?.integration_ready) {
+        toast({
+          title: "Koppeling gereed",
+          description: "Exact Online is verbonden. Configureer API-credentials om facturen te exporteren.",
+        });
       } else {
         toast({
-          title: "Al gesynchroniseerd",
-          description: "Geen nieuwe facturen om te synchroniseren.",
+          title: "Niet geconfigureerd",
+          description: "Configureer eerst de Exact Online koppeling via Instellingen.",
         });
       }
     },
     onError: (error: Error) => {
       const isMissingKeys = error.message?.includes("API keys");
+      const isNotActive = error.message?.includes("niet actief");
       toast({
-        title: isMissingKeys ? "Exact Online niet geconfigureerd" : "Sync mislukt",
+        title: isMissingKeys
+          ? "Exact Online niet geconfigureerd"
+          : isNotActive
+          ? "Koppeling niet actief"
+          : "Sync mislukt",
         description: isMissingKeys
-          ? "Stel EXACT_CLIENT_ID en EXACT_CLIENT_SECRET in via Supabase Dashboard."
+          ? "Activeer de Exact Online koppeling via Instellingen > Boekhouding."
           : error.message,
         variant: "destructive",
       });

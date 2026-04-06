@@ -6,26 +6,49 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
-    const { data: { user: _u }, error: ce } = await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!).auth.getUser(authHeader.replace("Bearer ", ""));
-    if (ce || !_u) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    const cd = { claims: { sub: _u.id } };
-    const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Validate caller
+    const authClient = createClient(supabaseUrl, anonKey);
+    const { data: { user: callerUser }, error: ce } = await authClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (ce || !callerUser) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     const body = await req.json();
     // Accept both userId and driver_id
-    const userId = body.userId || body.driver_id;
+    let targetUserId = body.userId;
+    const driverId = body.driver_id;
     const title = body.title || "Notificatie";
     const notifBody = body.body || body.message || "";
     const data = body.data || {};
 
-    console.log(`[send-push-notification] To user ${userId}: ${title}`);
+    // If driver_id is provided instead of userId, resolve to the driver's user_id
+    if (!targetUserId && driverId) {
+      const { data: driver } = await supabaseAdmin
+        .from("drivers")
+        .select("user_id")
+        .eq("id", driverId)
+        .single();
+      
+      if (driver?.user_id) {
+        targetUserId = driver.user_id;
+      } else {
+        console.warn(`[send-push-notification] Driver ${driverId} has no linked user_id, storing notification with driver_id as fallback`);
+        targetUserId = driverId; // fallback for legacy data
+      }
+    }
 
-    if (!userId) return new Response(JSON.stringify({ error: "userId of driver_id verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    console.log(`[send-push-notification] To user ${targetUserId}: ${title}`);
+
+    if (!targetUserId) return new Response(JSON.stringify({ error: "userId of driver_id verplicht" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
     // Create in-app notification
     const { error: insertErr } = await supabaseAdmin.from("notifications").insert({
-      user_id: userId,
+      user_id: targetUserId,
       title: title,
       message: notifBody,
       type: data.type || "push",
@@ -39,7 +62,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, message: "Notificatie verzonden" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[send-push-notification] Error:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }

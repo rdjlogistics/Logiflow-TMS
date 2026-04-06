@@ -12,6 +12,46 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth validation
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Validate user
+    const authClient = createClient(supabaseUrl, anonKey);
+    const { data: { user }, error: authError } = await authClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const admin = createClient(supabaseUrl, serviceKey);
+
+    // Validate tenant
+    const { data: uc } = await admin
+      .from("user_companies")
+      .select("company_id")
+      .eq("user_id", user.id)
+      .eq("is_primary", true)
+      .single();
+
+    if (!uc?.company_id) {
+      return new Response(JSON.stringify({ error: "Geen bedrijf gekoppeld" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { stop_proof_id } = await req.json();
     if (!stop_proof_id) {
       return new Response(JSON.stringify({ error: "stop_proof_id is required" }), {
@@ -20,12 +60,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceKey);
-
     // Fetch stop proof
-    const { data: proof, error: proofErr } = await supabase
+    const { data: proof, error: proofErr } = await admin
       .from("stop_proofs")
       .select("*")
       .eq("id", stop_proof_id)
@@ -38,11 +74,25 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Validate tenant ownership via trip
+    const { data: tripCheck } = await admin
+      .from("trips")
+      .select("company_id")
+      .eq("id", proof.trip_id)
+      .single();
+
+    if (!tripCheck || tripCheck.company_id !== uc.company_id) {
+      return new Response(JSON.stringify({ error: "Toegang geweigerd" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Fetch related data
     const [tripRes, stopRes, driverRes] = await Promise.all([
-      supabase.from("trips").select("id, order_number, trip_date, customer_id, customers:customer_id (company_name, contact_name, address, city, postal_code)").eq("id", proof.trip_id).single(),
-      supabase.from("route_stops").select("id, company_name, address, city, postal_code, contact_name").eq("id", proof.stop_id).single(),
-      supabase.from("drivers").select("id, name").eq("id", proof.driver_id).single(),
+      admin.from("trips").select("id, order_number, trip_date, customer_id, customers:customer_id (company_name, contact_name, address, city, postal_code)").eq("id", proof.trip_id).single(),
+      admin.from("route_stops").select("id, company_name, address, city, postal_code, contact_name").eq("id", proof.stop_id).single(),
+      admin.from("drivers").select("id, name").eq("id", proof.driver_id).single(),
     ]);
 
     const trip = tripRes.data as any;
@@ -52,7 +102,7 @@ Deno.serve(async (req) => {
     // Generate signed URLs for signature and photos
     let signatureDataUrl = "";
     if (proof.signature_url) {
-      const { data: sigSigned } = await supabase.storage
+      const { data: sigSigned } = await admin.storage
         .from("pod-files")
         .createSignedUrl(proof.signature_url, 600);
       if (sigSigned?.signedUrl) {
@@ -71,7 +121,7 @@ Deno.serve(async (req) => {
     const photoDataUrls: string[] = [];
     if (proof.photo_urls && proof.photo_urls.length > 0) {
       for (const photoPath of proof.photo_urls.slice(0, 4)) {
-        const { data: photoSigned } = await supabase.storage
+        const { data: photoSigned } = await admin.storage
           .from("pod-files")
           .createSignedUrl(photoPath, 600);
         if (photoSigned?.signedUrl) {
@@ -214,6 +264,8 @@ Deno.serve(async (req) => {
 
     const fileName = `POD-${orderNumber}.html`;
 
+    // Return consistent contract: html + fileName + success
+    // Callers can use `html` to render/download/print
     return new Response(
       JSON.stringify({ html, fileName, success: true }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

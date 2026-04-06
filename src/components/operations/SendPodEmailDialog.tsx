@@ -117,7 +117,12 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
           if (podError) {
             console.warn('POD PDF generatie mislukt:', podError);
           } else {
-            documentUrl = podData?.url || '';
+          // generate-pod-pdf returns { html, fileName, success }
+          // Create a blob URL from HTML for the email function
+          if (podData?.html) {
+            const blob = new Blob([podData.html], { type: 'text/html' });
+            documentUrl = URL.createObjectURL(blob);
+          }
           }
         } else {
           const { data: genData, error: genError } = await supabase.functions.invoke('generate-document-pdf', {
