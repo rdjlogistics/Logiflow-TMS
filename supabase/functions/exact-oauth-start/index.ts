@@ -143,13 +143,15 @@ Deno.serve(async (req) => {
         const { data: { user } } = await supabaseAnon.auth.getUser(authHeader.replace("Bearer ", ""));
         if (user) {
           // Look up user's company
-          const { data: profile } = await supabaseAnon
-            .from("profiles")
+          const { data: uc } = await supabaseAnon
+            .from("user_companies")
             .select("company_id")
-            .eq("id", user.id)
-            .single();
-          if (profile?.company_id) {
-            stateParam = `&state=${btoa(JSON.stringify({ tenant_id: profile.company_id }))}`;
+            .eq("user_id", user.id)
+            .eq("is_primary", true)
+            .limit(1)
+            .maybeSingle();
+          if (uc?.company_id) {
+            stateParam = `&state=${btoa(JSON.stringify({ tenant_id: uc.company_id }))}`;
           }
         }
       }

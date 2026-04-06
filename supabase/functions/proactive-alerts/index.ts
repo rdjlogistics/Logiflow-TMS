@@ -24,8 +24,8 @@ Deno.serve(async (req) => {
 
     const { action, alertId, notes, actionName, params } = await req.json();
 
-    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle();
-    const tenantId = profile?.company_id;
+    const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();
+    const tenantId = uc?.company_id;
 
     if (action === "dismiss" || action === "resolve" || action === "execute") {
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
