@@ -260,11 +260,11 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
         toast({
           title: "Onverwachte fout",
           description: "Er is iets misgegaan. Vernieuw de pagina en probeer opnieuw.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+          variant: "destructive",
+        });
+      }
     }
+    setLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
