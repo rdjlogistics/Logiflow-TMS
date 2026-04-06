@@ -307,7 +307,7 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
         delivery_postal_code: finalData.delivery_postal_code || null,
         trip_date: tripDate,
         cargo_description: finalData.goods_description || null,
-        weight: finalData.weight ? parseFloat(finalData.weight) : null,
+        weight_kg: finalData.weight ? parseFloat(finalData.weight) : null,
         customer_reference: finalData.reference || null,
         notes: `Auto-import uit e-mail van ${email.from_name || email.from_email} (${email.subject || 'geen onderwerp'}). AI confidence: ${Math.round(finalConfidence * 100)}%`,
       })
