@@ -37,48 +37,105 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const doEnsure = async () => {
+      const hasCompanyLink = async (userId: string) => {
+        try {
+          const { data, error } = await supabase
+            .from("user_companies")
+            .select("company_id")
+            .eq("user_id", userId)
+            .limit(1)
+            .maybeSingle();
+
+          return !error && !!data?.company_id;
+        } catch {
+          return false;
+        }
+      };
+
+      const invokeEnsureFunction = async (accessToken: string) => {
+        let timeoutId: number | undefined;
+
+        const fetchPromise = fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ensure-user-company`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+          }
+        ).then(async (res) => {
+          const body = await res.json().catch(() => ({}));
+
+          return {
+            data: res.ok ? body : null,
+            error: res.ok ? null : new Error(body?.error || `HTTP ${res.status}`),
+            status: res.status,
+          };
+        });
+
+        return Promise.race([
+          fetchPromise,
+          new Promise<{ data: null; error: Error; status: number }>((resolve) => {
+            timeoutId = window.setTimeout(() => {
+              resolve({ data: null, error: new Error("ensure-user-company timeout"), status: 408 });
+            }, 6000);
+          }),
+        ]).finally(() => {
+          if (timeoutId) window.clearTimeout(timeoutId);
+        });
+      };
+
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
           const { data: sessionData } = await supabase.auth.getSession();
-          const accessToken = sessionData?.session?.access_token;
-          if (!accessToken) {
-            console.warn("[ensure-user-company] No access token available, skipping");
+          const activeSession = sessionData?.session;
+          const userId = activeSession?.user?.id;
+          let accessToken = activeSession?.access_token;
+
+          if (!userId) {
+            console.warn("[ensure-user-company] No authenticated user available yet, skipping for now");
+            return;
+          }
+
+          if (await hasCompanyLink(userId)) {
             ensuredCompanyRef.current = true;
             return;
           }
 
-          let timeoutId: number | undefined;
-          const fetchPromise = fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ensure-user-company`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              },
+          if (!accessToken) {
+            const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+            if (!refreshError) {
+              accessToken = refreshed.session?.access_token;
             }
-          ).then(async (res) => {
-            const body = await res.json().catch(() => ({}));
-            if (!res.ok) return { data: null, error: new Error(body?.error || `HTTP ${res.status}`) };
-            return { data: body, error: null };
-          });
+          }
 
-          const { error } = await Promise.race([
-            fetchPromise,
-            new Promise<{ data: null; error: Error }>((resolve) => {
-              timeoutId = window.setTimeout(() => {
-                resolve({ data: null, error: new Error("ensure-user-company timeout") });
-              }, 6000);
-            }),
-          ]).finally(() => {
-            if (timeoutId) window.clearTimeout(timeoutId);
-          });
+          if (!accessToken) {
+            if (attempt < retries) {
+              await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+            }
+            continue;
+          }
+
+          const { error, status } = await invokeEnsureFunction(accessToken);
 
           if (!error) {
             ensuredCompanyRef.current = true;
             return;
           }
+
+          if (await hasCompanyLink(userId)) {
+            ensuredCompanyRef.current = true;
+            return;
+          }
+
+          if (status === 401) {
+            console.warn("[ensure-user-company] Unauthorized during bootstrap, refreshing session and retrying");
+            const { data: refreshed } = await supabase.auth.refreshSession();
+            accessToken = refreshed.session?.access_token;
+          }
+
           if (attempt < retries) {
             await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
           }
@@ -88,7 +145,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       }
-      ensuredCompanyRef.current = true;
+
+      console.warn("[ensure-user-company] Failed after retries; will retry on next auth refresh");
     };
 
     ensureCompanyPromiseRef.current = doEnsure();
