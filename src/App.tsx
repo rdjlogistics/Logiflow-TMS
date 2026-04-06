@@ -18,8 +18,8 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { NotificationProvider } from "@/components/notifications/NotificationCenter";
 import { LegalConsentBanner } from "@/components/legal/LegalConsentBanner";
 
-// Auth page - lazy loaded
-const Auth = lazyWithRetry(() => import("./pages/Auth"));
+// Auth page - eagerly loaded to prevent loading spinner blocking interaction
+import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Lazy load ALL pages
