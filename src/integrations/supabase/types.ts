@@ -7469,8 +7469,10 @@ export type Database = {
           message_id: string | null
           metadata: Json | null
           recipient_email: string
+          sent_by: string | null
           status: string
           template_name: string
+          tenant_id: string | null
         }
         Insert: {
           created_at?: string
@@ -7479,8 +7481,10 @@ export type Database = {
           message_id?: string | null
           metadata?: Json | null
           recipient_email: string
+          sent_by?: string | null
           status: string
           template_name: string
+          tenant_id?: string | null
         }
         Update: {
           created_at?: string
@@ -7489,10 +7493,20 @@ export type Database = {
           message_id?: string | null
           metadata?: Json | null
           recipient_email?: string
+          sent_by?: string | null
           status?: string
           template_name?: string
+          tenant_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "email_send_log_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_state: {
         Row: {
