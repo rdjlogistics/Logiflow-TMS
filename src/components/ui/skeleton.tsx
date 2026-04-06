@@ -1,29 +1,28 @@
-/**
- * Batch T1: Glassmorphism Loading Skeleton Components
- * Enhanced skeletons with backdrop-blur and bg-white/10 for glassmorphism design system.
- */
+import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SkeletonProps {
   className?: string;
 }
 
-// Base skeleton — drop-in replacement, backward-compatible
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
+const Skeleton = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
     <div
-      className={cn('animate-pulse rounded-md bg-white/10', className)}
+      ref={ref}
+      className={cn('animate-pulse rounded-md bg-muted/50', className)}
       {...props}
     />
-  );
-}
+  )
+);
+
+Skeleton.displayName = 'Skeleton';
 
 // Glassmorphism pulse skeleton
 export function GlassSkeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-md bg-white/10 backdrop-blur-sm',
+        'animate-pulse rounded-md bg-muted/40 backdrop-blur-sm',
         className
       )}
     />
