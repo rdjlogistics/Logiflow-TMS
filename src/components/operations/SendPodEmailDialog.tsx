@@ -151,12 +151,12 @@ export function SendPodEmailDialog({ open, onOpenChange, tripId, orderNumber, cu
         }
       }
 
-      if (!documentUrl && attachmentUrls.length === 0) {
+      if (!documentUrl && !documentHtml && attachmentUrls.length === 0) {
         toast.warning('Document kon niet worden gegenereerd. E-mail wordt zonder documentlink verstuurd.');
       }
 
       const { error: sendError } = await supabase.functions.invoke('send-document-email', {
-        body: { to: email, documentUrl, documentType, orderNumber, recipientType: 'customer', attachmentUrls, message: message || undefined },
+        body: { to: email, documentUrl, documentHtml, documentType, orderNumber, recipientType: 'customer', attachmentUrls, message: message || undefined },
       });
       if (sendError) throw sendError;
 
