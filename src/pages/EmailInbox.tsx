@@ -152,7 +152,18 @@ export default function EmailInbox() {
           </div>
 
           {/* Tabs */}
-          <Tabs value={tab} onValueChange={(v) => { setTab(v as any); setSelected(null); }}>
+          <Tabs
+            value={tab}
+            onValueChange={(value) => {
+              const nextTab = value as "inbox" | "sent" | "ai-intake";
+              setTab(nextTab);
+              setSelected(null);
+
+              if (nextTab === "inbox") refetchInbox();
+              if (nextTab === "sent") refetchSent();
+              if (nextTab === "ai-intake") refetchIntake();
+            }}
+          >
             <TabsList className="w-full rounded-none border-b border-border bg-transparent h-10">
               <TabsTrigger value="inbox" className="flex-1 gap-1">
                 <Inbox className="h-3.5 w-3.5" />
