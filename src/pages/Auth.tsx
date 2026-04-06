@@ -214,45 +214,57 @@ const Auth = React.forwardRef<HTMLDivElement>(function Auth(_props, _ref) {
 
     setLoading(true);
 
-    try {
-      
+    const maxRetries = 2;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+        if (error) {
+          const msg = (error.message || "").toLowerCase();
+          const isRetryable = !msg || msg === "{}" || msg.includes("504") || msg.includes("gateway") || msg.includes("timeout") || msg.includes("fetch");
 
-      
+          if (isRetryable && attempt < maxRetries) {
+            console.warn(`[Auth] Retryable error (attempt ${attempt + 1}/${maxRetries + 1}):`, error.message);
+            await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+            continue;
+          }
 
-      if (error) {
-        const message = getErrorMessage(error);
-        setInlineError(message);
-        setDebugDetails(
-          `Login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${error.message}`
-        );
+          const message = getErrorMessage(error);
+          setInlineError(message);
+          setDebugDetails(
+            `Login error (attempt ${attempt + 1})\n- navigator.onLine: ${navigator.onLine}\n- message: ${error.message}`
+          );
+          toast({
+            title: "Inloggen mislukt",
+            description: message,
+            variant: "destructive",
+          });
+        } else {
+          setInlineError(null);
+          setDebugDetails(null);
+        }
+        break; // Success or non-retryable error — stop loop
+      } catch (unexpectedError) {
+        if (attempt < maxRetries) {
+          console.warn(`[Auth] Unexpected error, retrying (${attempt + 1}/${maxRetries + 1})`);
+          await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+          continue;
+        }
+        const msg = unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError);
+        console.error('[Auth] Unexpected login error after retries:', unexpectedError);
+        setInlineError("Onverwachte fout. Zie debug details hieronder.");
+        setDebugDetails(`Unexpected login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${msg}`);
         toast({
-          title: "Inloggen mislukt",
-          description: message,
+          title: "Onverwachte fout",
+          description: "Er is iets misgegaan. Vernieuw de pagina en probeer opnieuw.",
           variant: "destructive",
         });
-      } else {
-        setInlineError(null);
-        setDebugDetails(null);
-        // AuthProvider's onAuthStateChange will set user → triggers Navigate redirect
       }
-    } catch (unexpectedError) {
-      const msg = unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError);
-      console.error('[Auth] Unexpected login error:', unexpectedError);
-      setInlineError("Onverwachte fout. Zie debug details hieronder.");
-      setDebugDetails(`Unexpected login error\n- navigator.onLine: ${navigator.onLine}\n- message: ${msg}`);
-      toast({
-        title: "Onverwachte fout",
-        description: "Er is iets misgegaan. Vernieuw de pagina en probeer opnieuw.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
