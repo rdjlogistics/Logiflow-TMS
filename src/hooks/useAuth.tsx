@@ -39,9 +39,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const doEnsure = async () => {
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const accessToken = sessionData?.session?.access_token;
+          if (!accessToken) {
+            console.warn("[ensure-user-company] No access token available, skipping");
+            ensuredCompanyRef.current = true;
+            return;
+          }
+
           let timeoutId: number | undefined;
+          const fetchPromise = fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ensure-user-company`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+            }
+          ).then(async (res) => {
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) return { data: null, error: new Error(body?.error || `HTTP ${res.status}`) };
+            return { data: body, error: null };
+          });
+
           const { error } = await Promise.race([
-            supabase.functions.invoke("ensure-user-company"),
+            fetchPromise,
             new Promise<{ data: null; error: Error }>((resolve) => {
               timeoutId = window.setTimeout(() => {
                 resolve({ data: null, error: new Error("ensure-user-company timeout") });
