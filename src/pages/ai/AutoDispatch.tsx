@@ -61,10 +61,25 @@ export default function AutoDispatch() {
           .eq('id', stats.configId);
         if (error) throw error;
       } else {
-        // Create config if it doesn't exist
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
+        const userId = userData.user?.id;
+        if (!userId) throw new Error('Geen gebruiker gevonden');
+
+        const { data: membership, error: membershipError } = await supabase
+          .from('user_companies')
+          .select('company_id')
+          .eq('user_id', userId)
+          .eq('is_primary', true)
+          .single();
+
+        if (membershipError) throw membershipError;
+        if (!membership?.company_id) throw new Error('Geen bedrijf gekoppeld');
+
         const { error } = await supabase
           .from('dispatch_automation_config')
-          .insert({ is_active: activate } as any);
+          .insert({ tenant_id: membership.company_id, is_active: activate } as any);
         if (error) throw error;
       }
     },

@@ -160,6 +160,23 @@ export function DispatchConversationsPanel() {
     }
   };
 
+  const handleCancelConversation = async () => {
+    if (!selectedConversation) return;
+
+    try {
+      await supabase.functions.invoke('ai-dispatch-engine', {
+        body: {
+          action: 'cancel',
+          conversationId: selectedConversation,
+        },
+      });
+      refetch();
+      setSelectedConversation(null);
+    } catch (error) {
+      console.error('Cancel conversation error:', error);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -297,6 +314,7 @@ export function DispatchConversationsPanel() {
                   Bevestig Toewijzing
                 </Button>
                 <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1" onClick={handleCancelConversation}>
                   <XCircle className="h-4 w-4 mr-2" />
                   Annuleer
                 </Button>

@@ -20,6 +20,9 @@ Deno.serve(async (req) => {
     const orderNumber = reqBody.orderNumber || "";
     const documentUrl = reqBody.documentUrl || "";
     const message = reqBody.message || reqBody.body || "";
+    const attachmentUrls = Array.isArray(reqBody.attachmentUrls)
+      ? reqBody.attachmentUrls.filter((url: unknown) => typeof url === "string" && url.length > 0).slice(0, 10)
+      : [];
 
     // Auto-generate subject if not provided
     const docTypeLabels: Record<string, string> = {
@@ -43,6 +46,11 @@ Deno.serve(async (req) => {
     let htmlBody = message || `<p>Bijgaand het gevraagde document.</p>`;
     if (documentUrl && !htmlBody.includes(documentUrl)) {
       htmlBody += `<p style="margin-top:16px;"><a href="${documentUrl}" style="background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Document bekijken</a></p>`;
+    }
+    if (attachmentUrls.length > 0) {
+      htmlBody += `<div style="margin-top:16px;"><p><strong>Extra documenten</strong></p><ul style="padding-left:18px;">${attachmentUrls
+        .map((url: string, index: number) => `<li><a href="${url}">Bijlage ${index + 1}</a></li>`)
+        .join("")}</ul></div>`;
     }
 
     const emailHtml = `
