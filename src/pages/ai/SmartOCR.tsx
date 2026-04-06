@@ -8,12 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEmailOrderIntake } from "@/hooks/useEmailOrderIntake";
 import { 
   Upload, FileText, Loader2, CheckCircle, Eye, 
   MapPin, Building2, User, Package, Hash, Calendar,
-  Truck, ClipboardCheck, Scale, ChevronDown, ChevronUp
+  Truck, ClipboardCheck, Scale, ChevronDown, ChevronUp,
+  Mail, ArrowRight, Bot, Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
 
 interface OCRResult {
   documentType: string;
@@ -26,20 +31,15 @@ interface OCRResult {
 function SmartField({ label, value, icon: Icon }: { label: string; value: any; icon?: any }) {
   const [expanded, setExpanded] = useState(false);
 
-  // Parse stringified JSON
   let parsed = value;
   if (typeof value === "string") {
     try { parsed = JSON.parse(value); } catch { /* keep as string */ }
   }
 
-  // Render array of objects (e.g. goederen)
   if (Array.isArray(parsed)) {
     return (
       <div className="col-span-1 sm:col-span-2">
-        <button 
-          onClick={() => setExpanded(!expanded)}
-          className="w-full text-left"
-        >
+        <button onClick={() => setExpanded(!expanded)} className="w-full text-left">
           <div className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm hover:bg-muted/30 transition-colors">
             <div className="flex items-center gap-2.5">
               {Icon && <Icon className="h-4 w-4 text-primary/70 shrink-0" />}
@@ -51,13 +51,7 @@ function SmartField({ label, value, icon: Icon }: { label: string; value: any; i
         </button>
         <AnimatePresence>
           {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
               <div className="mt-2 space-y-2">
                 {parsed.map((item: any, i: number) => (
                   <div key={i} className="p-3 rounded-xl bg-muted/10 border border-border/30 space-y-1.5">
@@ -81,7 +75,6 @@ function SmartField({ label, value, icon: Icon }: { label: string; value: any; i
     );
   }
 
-  // Render nested object (e.g. afzender, ontvanger)
   if (typeof parsed === "object" && parsed !== null) {
     return (
       <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm space-y-2">
@@ -101,7 +94,6 @@ function SmartField({ label, value, icon: Icon }: { label: string; value: any; i
     );
   }
 
-  // Simple value
   return (
     <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-1">
@@ -114,13 +106,9 @@ function SmartField({ label, value, icon: Icon }: { label: string; value: any; i
 }
 
 function formatLabel(key: string): string {
-  return key
-    .replace(/_/g, " ")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return key.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Map known field keys to icons
 function getFieldIcon(key: string) {
   const k = key.toLowerCase();
   if (k.includes("afzender") || k.includes("sender")) return Building2;
@@ -141,6 +129,11 @@ export default function SmartOCR() {
   const [result, setResult] = useState<OCRResult | null>(null);
   const [fileName, setFileName] = useState("");
   const [showRawText, setShowRawText] = useState(false);
+  const [showEmailImport, setShowEmailImport] = useState(false);
+  const { intakes, isLoading: loadingIntakes } = useEmailOrderIntake();
+
+  // Recent email intakes (last 5 with extracted data)
+  const recentIntakes = intakes.filter(i => i.status === "order_created" && i.ai_extracted_data && Object.keys(i.ai_extracted_data).length > 0).slice(0, 5);
 
   const onDrop = useCallback(async (files: File[]) => {
     const file = files[0];
@@ -152,10 +145,7 @@ export default function SmartOCR() {
     try {
       const reader = new FileReader();
       const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const b64 = (reader.result as string).split(",")[1];
-          resolve(b64);
-        };
+        reader.onload = () => resolve((reader.result as string).split(",")[1]);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
@@ -166,12 +156,7 @@ export default function SmartOCR() {
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || "OCR mislukt");
 
-      setResult({
-        documentType: data.documentType,
-        confidence: data.confidence,
-        extractedData: data.extractedData,
-        rawText: data.rawText,
-      });
+      setResult({ documentType: data.documentType, confidence: data.confidence, extractedData: data.extractedData, rawText: data.rawText });
       toast({ title: "Document geanalyseerd", description: `Type: ${data.documentType}` });
     } catch (e: any) {
       toast({ title: "OCR fout", description: e.message, variant: "destructive" });
@@ -188,9 +173,7 @@ export default function SmartOCR() {
   });
 
   const confidenceColor = result
-    ? result.confidence >= 0.85 ? "text-emerald-400" 
-    : result.confidence >= 0.6 ? "text-amber-400" 
-    : "text-red-400"
+    ? result.confidence >= 0.85 ? "text-emerald-400" : result.confidence >= 0.6 ? "text-amber-400" : "text-red-400"
     : "";
 
   return (
@@ -204,19 +187,10 @@ export default function SmartOCR() {
             <CardContent className="p-0">
               <div
                 {...getRootProps()}
-                className={`relative p-10 sm:p-16 text-center cursor-pointer transition-all duration-300 ${
-                  isDragActive 
-                    ? "bg-primary/5 ring-2 ring-primary/30 ring-inset" 
-                    : "hover:bg-muted/10"
-                } ${processing ? "opacity-50 pointer-events-none" : ""}`}
+                className={`relative p-10 sm:p-16 text-center cursor-pointer transition-all duration-300 ${isDragActive ? "bg-primary/5 ring-2 ring-primary/30 ring-inset" : "hover:bg-muted/10"} ${processing ? "opacity-50 pointer-events-none" : ""}`}
               >
                 <input {...getInputProps()} />
-                {/* Subtle grid pattern */}
-                <div className="absolute inset-0 opacity-[0.03]" style={{
-                  backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
-                  backgroundSize: "24px 24px"
-                }} />
-                
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
                 {processing ? (
                   <div className="relative flex flex-col items-center gap-4">
                     <div className="relative">
@@ -244,17 +218,78 @@ export default function SmartOCR() {
           </Card>
         </motion.div>
 
+        {/* Email Import Section */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
+          <Card className="border-border/50">
+            <button onClick={() => setShowEmailImport(!showEmailImport)} className="w-full">
+              <CardHeader className="pb-0">
+                <CardTitle className="text-base flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded-lg bg-primary/10">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    Email Import
+                    {recentIntakes.length > 0 && (
+                      <Badge className="bg-primary/15 text-primary border-primary/30 text-[10px]">{recentIntakes.length} recent</Badge>
+                    )}
+                  </div>
+                  {showEmailImport ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                </CardTitle>
+              </CardHeader>
+            </button>
+            <AnimatePresence>
+              {showEmailImport && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                  <CardContent className="pt-4">
+                    {loadingIntakes ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">Laden...</p>
+                    ) : recentIntakes.length === 0 ? (
+                      <div className="text-center py-6">
+                        <Bot className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">Nog geen e-mail imports verwerkt</p>
+                        <p className="text-xs text-muted-foreground mt-1">Transportopdrachten uit e-mails verschijnen hier automatisch</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {recentIntakes.map((intake) => (
+                          <div key={intake.id} className="p-3.5 rounded-xl bg-muted/10 border border-border/40 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Zap className="h-3.5 w-3.5 text-primary" />
+                                <span className="text-sm font-medium truncate">
+                                  {intake.inbound_emails?.from_name || intake.inbound_emails?.from_email || "E-mail"}
+                                </span>
+                              </div>
+                              <span className={cn("text-[10px] font-mono font-bold", (intake.ai_confidence ?? 0) >= 0.8 ? "text-emerald-500" : "text-amber-500")}>
+                                {Math.round((intake.ai_confidence ?? 0) * 100)}%
+                              </span>
+                            </div>
+                            {intake.ai_extracted_data?.pickup_city && intake.ai_extracted_data?.delivery_city && (
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <MapPin className="h-3 w-3" />
+                                {intake.ai_extracted_data.pickup_city}
+                                <ArrowRight className="h-2.5 w-2.5" />
+                                {intake.ai_extracted_data.delivery_city}
+                              </div>
+                            )}
+                            {intake.trips?.order_number && (
+                              <Badge variant="outline" className="text-[10px]">Order {intake.trips.order_number}</Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+        </motion.div>
+
         {/* Results */}
         <AnimatePresence>
           {result && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="space-y-5"
-            >
-              {/* Stats row */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="space-y-5">
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm text-center">
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1">Type</p>
@@ -262,9 +297,7 @@ export default function SmartOCR() {
                 </div>
                 <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm text-center">
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1">Betrouwbaarheid</p>
-                  <p className={`text-sm sm:text-base font-bold ${confidenceColor}`}>
-                    {Math.round(result.confidence * 100)}%
-                  </p>
+                  <p className={`text-sm sm:text-base font-bold ${confidenceColor}`}>{Math.round(result.confidence * 100)}%</p>
                 </div>
                 <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50 backdrop-blur-sm text-center">
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1">Velden</p>
@@ -272,7 +305,6 @@ export default function SmartOCR() {
                 </div>
               </div>
 
-              {/* Extracted fields — Elite Class */}
               <Card className="overflow-hidden border-border/50">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2.5">
@@ -288,49 +320,29 @@ export default function SmartOCR() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Object.entries(result.extractedData).map(([key, value]) => (
-                        <SmartField
-                          key={key}
-                          label={formatLabel(key)}
-                          value={value}
-                          icon={getFieldIcon(key)}
-                        />
+                        <SmartField key={key} label={formatLabel(key)} value={value} icon={getFieldIcon(key)} />
                       ))}
                     </div>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Raw text — collapsible */}
               {result.rawText && (
                 <Card className="border-border/50">
-                  <button
-                    onClick={() => setShowRawText(!showRawText)}
-                    className="w-full"
-                  >
+                  <button onClick={() => setShowRawText(!showRawText)} className="w-full">
                     <CardHeader className="pb-0">
                       <CardTitle className="text-base flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <div className="p-1 rounded-md bg-muted/30">
-                            <Eye className="h-4 w-4 text-muted-foreground" />
-                          </div>
+                          <div className="p-1 rounded-md bg-muted/30"><Eye className="h-4 w-4 text-muted-foreground" /></div>
                           Ruwe tekst
                         </div>
-                        {showRawText 
-                          ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> 
-                          : <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        }
+                        {showRawText ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                       </CardTitle>
                     </CardHeader>
                   </button>
                   <AnimatePresence>
                     {showRawText && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
                         <CardContent className="pt-3">
                           <ScrollArea className="h-48">
                             <pre className="text-xs bg-muted/10 p-4 rounded-xl whitespace-pre-wrap font-mono leading-relaxed">{result.rawText}</pre>
