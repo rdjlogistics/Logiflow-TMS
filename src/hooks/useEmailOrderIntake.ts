@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompany } from "@/hooks/useCompany";
 
 export interface EmailOrderIntake {
   id: string;
@@ -17,7 +19,6 @@ export interface EmailOrderIntake {
   confirmed_at: string | null;
   processed_at: string | null;
   created_at: string;
-  // Joined
   inbound_emails?: {
     from_email: string;
     from_name: string | null;
@@ -35,9 +36,12 @@ export interface EmailOrderIntake {
 export function useEmailOrderIntake() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { company, loading: companyLoading } = useCompany();
+  const currentCompanyId = company?.id ?? null;
 
   const { data: intakes = [], isLoading, refetch } = useQuery({
-    queryKey: ["email-order-intake"],
+    queryKey: ["email-order-intake", currentCompanyId],
+    enabled: !!currentCompanyId,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("email_order_intake")
@@ -46,12 +50,49 @@ export function useEmailOrderIntake() {
           inbound_emails(from_email, from_name, subject, received_at),
           trips(order_number, status, pickup_city, delivery_city)
         `)
+        .eq("company_id", currentCompanyId)
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
       return (data || []) as EmailOrderIntake[];
     },
   });
+
+  useEffect(() => {
+    if (!currentCompanyId) return;
+
+    const invalidateIntake = () => {
+      queryClient.invalidateQueries({ queryKey: ["email-order-intake", currentCompanyId] });
+    };
+
+    const channel = supabase
+      .channel(`email-order-intake:${currentCompanyId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "email_order_intake",
+          filter: `company_id=eq.${currentCompanyId}`,
+        },
+        invalidateIntake
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "inbound_emails",
+          filter: `company_id=eq.${currentCompanyId}`,
+        },
+        invalidateIntake
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [currentCompanyId, queryClient]);
 
   const confirmMutation = useMutation({
     mutationFn: async (intakeId: string) => {
@@ -65,7 +106,7 @@ export function useEmailOrderIntake() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["email-order-intake"] });
+      queryClient.invalidateQueries({ queryKey: ["email-order-intake", currentCompanyId] });
       toast({ title: "Order bevestigd", description: "De order is goedgekeurd voor dispatch." });
     },
     onError: (e: any) => {
@@ -82,7 +123,7 @@ export function useEmailOrderIntake() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["email-order-intake"] });
+      queryClient.invalidateQueries({ queryKey: ["email-order-intake", currentCompanyId] });
       toast({ title: "Afgewezen", description: "De intake is gemarkeerd als genegeerd." });
     },
     onError: (e: any) => {
@@ -102,5 +143,12 @@ export function useEmailOrderIntake() {
       : 0,
   };
 
-  return { intakes, isLoading, refetch, stats, confirmMutation, rejectMutation };
+  return {
+    intakes,
+    isLoading: companyLoading || isLoading,
+    refetch,
+    stats,
+    confirmMutation,
+    rejectMutation,
+  };
 }
