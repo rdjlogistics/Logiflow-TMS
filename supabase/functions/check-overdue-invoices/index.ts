@@ -13,7 +13,21 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const supabase = createClient(supabaseUrl, serviceKey);
+
+  // Validate auth: accept both service-role (cron) and user JWT (dashboard widget)
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader) {
+    const token = authHeader.replace("Bearer ", "");
+    if (token !== serviceKey) {
+      // Validate user JWT
+      const { data: { user }, error: authErr } = await createClient(supabaseUrl, anonKey).auth.getUser(token);
+      if (authErr || !user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+  }
 
   try {
     console.log("[check-overdue-invoices] Starting daily overdue check");

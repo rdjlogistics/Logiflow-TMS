@@ -12,10 +12,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    // Validate auth: accept both service-role (cron) and user JWT (dashboard widget)
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      if (token !== serviceKey) {
+        const { data: { user }, error: authErr } = await createClient(supabaseUrl, anonKey).auth.getUser(token);
+        if (authErr || !user) {
+          return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     // Get all active diesel staffels
     const { data: staffels, error } = await supabaseAdmin
