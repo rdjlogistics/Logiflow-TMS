@@ -70,10 +70,13 @@ Deno.serve(async (req) => {
     const { error: insertErr } = await supabaseAdmin.from("notifications").insert({
       user_id: targetUserId,
       title,
-      body: notifBody,
+      message: notifBody,
       type: "dispatch",
-      data: { tripId, orderId: tripId, type },
-      is_read: false,
+      channel: "in_app",
+      status: "pending",
+      entity_type: "trip",
+      entity_id: tripId || null,
+      metadata: { tripId, orderId: tripId, notifyType: type },
     });
 
     if (insertErr) {
