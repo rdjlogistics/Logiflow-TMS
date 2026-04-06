@@ -1,11 +1,32 @@
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { backendAnonKey, edgeFunctionUrl } from "@/lib/backendConfig";
 
 const LS_KEY = "mapbox_token_cache";
 
-// Singleton cache to prevent multiple API calls across components
 let cachedToken: string | null = null;
 let tokenPromise: Promise<string | null> | null = null;
+
+type MapboxTokenResponse = {
+  token?: string;
+  error?: string;
+};
+
+const readStoredToken = () => {
+  try {
+    const stored = localStorage.getItem(LS_KEY);
+    if (stored) {
+      cachedToken = stored;
+      return stored;
+    }
+  } catch {
+    // Ignore storage access errors.
+  }
+
+  return null;
+};
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error && error.message ? error.message : "Token ophalen mislukt";
 
 async function fetchMapboxToken(): Promise<string | null> {
   if (cachedToken) return cachedToken;
@@ -13,28 +34,42 @@ async function fetchMapboxToken(): Promise<string | null> {
 
   tokenPromise = (async () => {
     try {
-      const { data, error } = await supabase.functions.invoke("get-mapbox-token");
-      if (error) throw error;
-      if (data?.token) {
-        cachedToken = data.token;
-        try { localStorage.setItem(LS_KEY, cachedToken); } catch {}
-        return cachedToken;
+      const response = await fetch(edgeFunctionUrl("get-mapbox-token"), {
+        method: "GET",
+        headers: {
+          apikey: backendAnonKey,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = (await response.json().catch(() => ({}))) as MapboxTokenResponse;
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}`);
       }
-      throw new Error("No token received");
-    } catch (err) {
-      console.error("Error fetching Mapbox token:", err);
+
+      if (!data.token) {
+        throw new Error("No token received");
+      }
+
+      cachedToken = data.token;
+      try {
+        localStorage.setItem(LS_KEY, cachedToken);
+      } catch {
+        // Ignore storage access errors.
+      }
+
+      return cachedToken;
+    } catch (error) {
+      console.error("Error fetching Mapbox token:", error);
       tokenPromise = null;
 
-      // Fallback to localStorage cache
-      try {
-        const stored = localStorage.getItem(LS_KEY);
-        if (stored) {
-          cachedToken = stored;
-          return cachedToken;
-        }
-      } catch {}
+      const storedToken = readStoredToken();
+      if (storedToken) {
+        return storedToken;
+      }
 
-      throw err;
+      throw error instanceof Error ? error : new Error("Token ophalen mislukt");
     }
   })();
 
@@ -42,90 +77,53 @@ async function fetchMapboxToken(): Promise<string | null> {
 }
 
 export const useMapboxToken = () => {
-  const [token, setToken] = useState<string | null>(cachedToken);
-  const [loading, setLoading] = useState(!cachedToken);
-  const [error, setError] = useState<string | null>(null);
+  const initialTokenRef = useRef<string | null>(cachedToken ?? readStoredToken());
   const mounted = useRef(true);
+  const [token, setToken] = useState<string | null>(initialTokenRef.current);
+  const [loading, setLoading] = useState(!initialTokenRef.current);
+  const [error, setError] = useState<string | null>(null);
 
-  const refetch = () => {
-    clearMapboxTokenCache();
+  const runFetch = useCallback(() => {
     setLoading(true);
     setError(null);
 
     fetchMapboxToken()
       .then((fetchedToken) => {
-        if (mounted.current) {
-          setToken(fetchedToken);
-          setLoading(false);
-        }
+        if (!mounted.current) return;
+        setToken(fetchedToken);
+        setLoading(false);
       })
-      .catch((err: any) => {
-        if (mounted.current) {
-          setError(err.message || "Token ophalen mislukt");
-          setLoading(false);
-        }
+      .catch((fetchError) => {
+        if (!mounted.current) return;
+        setError(getErrorMessage(fetchError));
+        setLoading(false);
       });
-  };
+  }, []);
+
+  const refetch = useCallback(() => {
+    clearMapboxTokenCache();
+    setToken(null);
+    runFetch();
+  }, [runFetch]);
 
   useEffect(() => {
     mounted.current = true;
 
-    if (cachedToken) {
+    if (cachedToken ?? readStoredToken()) {
       setToken(cachedToken);
       setLoading(false);
-      return;
+      setError(null);
+      return () => {
+        mounted.current = false;
+      };
     }
 
-    let didRetryAfterAuth = false;
-
-    const tryFetch = () => {
-      fetchMapboxToken()
-        .then((fetchedToken) => {
-          if (mounted.current) {
-            setToken(fetchedToken);
-            setLoading(false);
-          }
-        })
-        .catch(async (err: any) => {
-          const status = err?.status ?? err?.context?.status;
-          if (!didRetryAfterAuth && status === 401) {
-            didRetryAfterAuth = true;
-            const { data } = await supabase.auth.getSession();
-            if (data.session) {
-              tryFetch();
-              return;
-            }
-            return;
-          }
-
-          if (mounted.current) {
-            setError(err.message || "Token ophalen mislukt");
-            setLoading(false);
-          }
-        });
-    };
-
-    tryFetch();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted.current) return;
-      if (!didRetryAfterAuth) return;
-      if (cachedToken) return;
-      if (token) return;
-      if (!session) return;
-
-      setLoading(true);
-      tryFetch();
-    });
+    runFetch();
 
     return () => {
       mounted.current = false;
-      subscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [runFetch]);
 
   return { token, loading, error, refetch };
 };
@@ -133,4 +131,10 @@ export const useMapboxToken = () => {
 export const clearMapboxTokenCache = () => {
   cachedToken = null;
   tokenPromise = null;
+
+  try {
+    localStorage.removeItem(LS_KEY);
+  } catch {
+    // Ignore storage access errors.
+  }
 };
