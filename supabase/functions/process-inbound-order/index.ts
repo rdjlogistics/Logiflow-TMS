@@ -79,10 +79,37 @@ function extractRFQFields(text: string) {
 function parseDate(dateStr: string | null): string | null {
   if (!dateStr) return null;
   try {
-    const m = dateStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
-    if (m) {
-      const year = m[3].length === 2 ? '20' + m[3] : m[3];
-      return `${year}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+    // Already ISO format (YYYY-MM-DD) from AI
+    const iso = dateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (iso) {
+      return `${iso[1]}-${iso[2].padStart(2, '0')}-${iso[3].padStart(2, '0')}`;
+    }
+
+    // EU/NL format: DD-MM-YYYY or DD/MM/YYYY
+    const eu = dateStr.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/);
+    if (eu) {
+      const day = eu[1].padStart(2, '0');
+      const month = eu[2].padStart(2, '0');
+      const year = eu[3].length === 2 ? '20' + eu[3] : eu[3];
+      return `${year}-${month}-${day}`;
+    }
+
+    // Dutch month names: "8 april 2026", "08 apr 2026"
+    const nlMonths: Record<string, string> = {
+      jan: '01', feb: '02', mrt: '03', mar: '03', apr: '04', mei: '05', may: '05',
+      jun: '06', jul: '07', aug: '08', sep: '09', okt: '10', oct: '10', nov: '11', dec: '12',
+      januari: '01', februari: '02', maart: '03', april: '04',
+      juni: '06', juli: '07', augustus: '08', september: '09',
+      oktober: '10', november: '11', december: '12',
+    };
+    const nlMatch = dateStr.match(/(\d{1,2})\s+([\wà-ÿ]+)\s+(\d{2,4})/i);
+    if (nlMatch) {
+      const monthStr = nlMatch[2].toLowerCase();
+      const month = nlMonths[monthStr];
+      if (month) {
+        const year = nlMatch[3].length === 2 ? '20' + nlMatch[3] : nlMatch[3];
+        return `${year}-${month}-${nlMatch[1].padStart(2, '0')}`;
+      }
     }
   } catch { /* ignore */ }
   return null;
