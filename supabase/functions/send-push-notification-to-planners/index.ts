@@ -67,20 +67,20 @@ Deno.serve(async (req) => {
 
     const userIds = roleUsers.map((r: any) => r.user_id);
 
-    // Filter by tenant: check profiles
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, company_id")
-      .in("id", userIds)
+    // Filter by tenant: check user_companies
+    const { data: ucRecords } = await supabase
+      .from("user_companies")
+      .select("user_id")
+      .in("user_id", userIds)
       .eq("company_id", tenantId);
 
-    if (!profiles || profiles.length === 0) {
+    if (!ucRecords || ucRecords.length === 0) {
       return new Response(JSON.stringify({ sent: 0, reason: "No planners in tenant" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const tenantUserIds = profiles.map((p: any) => p.id);
+    const tenantUserIds = ucRecords.map((uc: any) => uc.user_id);
 
     // Get push subscriptions
     const { data: subs } = await supabase
