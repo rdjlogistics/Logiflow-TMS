@@ -18,8 +18,8 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { NotificationProvider } from "@/components/notifications/NotificationCenter";
 import { LegalConsentBanner } from "@/components/legal/LegalConsentBanner";
 
-// Auth page - lazy loaded
-const Auth = lazyWithRetry(() => import("./pages/Auth"));
+// Auth page - eagerly loaded to prevent loading spinner blocking interaction
+import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Lazy load ALL pages
@@ -242,8 +242,8 @@ const App = () => (
               <BrowserRouter>
                 <Routes>
                   {/* Auth routes — OUTSIDE CopilotProvider */}
-                  <Route path="/auth" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
-                  <Route path="/login" element={<Suspense fallback={<AuthLoader />}><Auth /></Suspense>} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/login" element={<Auth />} />
                   
                   {/* Everything else */}
                   <Route path="*" element={

@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "user_roles_read" ON public.user_roles;
