@@ -190,6 +190,116 @@ Deno.serve(async (req) => {
     const { fields: regexFields, confidence: regexConfidence } = extractRFQFields(emailText);
     console.log(`[process-inbound-order] Regex extraction: confidence=${regexConfidence}`);
 
+    // 3b. Attachment scanning — extract text/images from PDFs, images, etc.
+    let attachmentTexts: string[] = [];
+    const attachmentImages: Array<{ mimeType: string; base64: string; fileName: string }> = [];
+    const attachments: any[] = Array.isArray(email.attachments) ? email.attachments : [];
+
+    if (attachments.length > 0 && LOVABLE_API_KEY) {
+      console.log(`[process-inbound-order] Scanning ${attachments.length} attachment(s)`);
+
+      for (const att of attachments) {
+        try {
+          const mime = (att.content_type || att.mimeType || "").toLowerCase();
+          const name = att.filename || att.fileName || "bijlage";
+
+          // If attachment has base64 data inline
+          let base64Data = att.base64 || att.content || att.data || null;
+
+          // If attachment is stored in Supabase Storage, download it
+          if (!base64Data && att.storage_path) {
+            const { data: fileData, error: dlErr } = await sb.storage
+              .from(att.bucket || "email-attachments")
+              .download(att.storage_path);
+            if (!dlErr && fileData) {
+              const arrayBuf = await fileData.arrayBuffer();
+              const bytes = new Uint8Array(arrayBuf);
+              let binary = "";
+              for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+              }
+              base64Data = btoa(binary);
+            } else {
+              console.warn(`[process-inbound-order] Could not download attachment ${name}:`, dlErr?.message);
+            }
+          }
+
+          if (!base64Data) {
+            console.warn(`[process-inbound-order] No data for attachment ${name}, skipping`);
+            continue;
+          }
+
+          const isImage = mime.startsWith("image/");
+          const isPdf = mime === "application/pdf" || name.toLowerCase().endsWith(".pdf");
+
+          if (isImage) {
+            // Store for multimodal AI processing
+            attachmentImages.push({ mimeType: mime || "image/jpeg", base64: base64Data, fileName: name });
+            console.log(`[process-inbound-order] Image attachment queued: ${name}`);
+          } else if (isPdf) {
+            // For PDFs: use AI to OCR/extract via a separate quick call
+            console.log(`[process-inbound-order] OCR scanning PDF: ${name}`);
+            const ocrResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "google/gemini-2.5-flash",
+                messages: [
+                  {
+                    role: "system",
+                    content: "Je bent een document-scanner. Extraheer ALLE tekst uit dit PDF-document. Geef de volledige inhoud als platte tekst terug, inclusief adressen, data, bedragen, referenties en alle andere gegevens.",
+                  },
+                  {
+                    role: "user",
+                    content: [
+                      { type: "text", text: `Scan deze PDF bijlage (${name}) en geef alle tekst terug:` },
+                      { type: "image_url", image_url: { url: `data:application/pdf;base64,${base64Data}` } },
+                    ],
+                  },
+                ],
+              }),
+            });
+
+            if (ocrResp.ok) {
+              const ocrData = await ocrResp.json();
+              const extractedText = ocrData.choices?.[0]?.message?.content || "";
+              if (extractedText) {
+                attachmentTexts.push(`\n--- BIJLAGE: ${name} ---\n${extractedText}`);
+                // Also run regex extraction on attachment text
+                const { fields: attFields } = extractRFQFields(extractedText);
+                for (const [key, val] of Object.entries(attFields)) {
+                  if (val && !regexFields[key]) regexFields[key] = val;
+                }
+                console.log(`[process-inbound-order] PDF OCR extracted ${extractedText.length} chars from ${name}`);
+              }
+            } else {
+              console.warn(`[process-inbound-order] PDF OCR failed for ${name}: ${ocrResp.status}`);
+            }
+          } else {
+            // Text-based attachments (txt, csv, etc.)
+            try {
+              const textContent = atob(base64Data);
+              if (textContent.length > 0 && textContent.length < 50000) {
+                attachmentTexts.push(`\n--- BIJLAGE: ${name} ---\n${textContent.substring(0, 10000)}`);
+                const { fields: attFields } = extractRFQFields(textContent);
+                for (const [key, val] of Object.entries(attFields)) {
+                  if (val && !regexFields[key]) regexFields[key] = val;
+                }
+              }
+            } catch { /* binary file, skip */ }
+          }
+        } catch (attErr) {
+          console.error(`[process-inbound-order] Attachment scan error:`, attErr);
+        }
+      }
+    }
+
+    // Combine email text with attachment texts for AI
+    const combinedText = emailText + attachmentTexts.join("");
+
     // 4. AI Classification + Enrichment
     let aiResult: any = null;
     let finalConfidence = regexConfidence;
@@ -197,6 +307,19 @@ Deno.serve(async (req) => {
 
     if (LOVABLE_API_KEY) {
       try {
+        // Build multimodal user message content
+        const userContent: any[] = [
+          { type: "text", text: `Analyseer deze e-mail${attachments.length > 0 ? ` (inclusief ${attachments.length} bijlage(n))` : ""}:\n\nOnderwerp: ${email.subject || "(geen)"}\n\n${combinedText.substring(0, 12000)}` },
+        ];
+
+        // Add image attachments for multimodal analysis
+        for (const img of attachmentImages) {
+          userContent.push({
+            type: "image_url",
+            image_url: { url: `data:${img.mimeType};base64,${img.base64}` },
+          });
+        }
+
         const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -242,12 +365,13 @@ Deno.serve(async (req) => {
             messages: [
               {
                 role: "system",
-                content: `Je bent een specialist in het herkennen van transportopdrachten uit e-mails. 
-Analyseer de e-mail en bepaal of het een transportopdracht is. Extraheer alle relevante velden.
+                content: `Je bent een specialist in het herkennen van transportopdrachten uit e-mails en bijlagen.
+Analyseer de e-mail tekst EN eventuele bijlagen (PDF vrachtbrieven, afbeeldingen van documenten, etc.).
+Extraheer alle relevante velden uit ALLE bronnen en combineer ze tot het meest complete resultaat.
 Als het GEEN transportopdracht is, zet is_transport_order op false en confidence op 0.
-Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
+Zorg dat datums in YYYY-MM-DD formaat zijn (EU standaard: dag-maand-jaar). Wees zo nauwkeurig mogelijk.`,
               },
-              { role: "user", content: `Analyseer deze e-mail:\n\nOnderwerp: ${email.subject || "(geen)"}\n\n${emailText.substring(0, 8000)}` },
+              { role: "user", content: userContent },
             ],
           }),
         });
