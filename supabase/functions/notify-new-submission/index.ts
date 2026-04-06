@@ -32,20 +32,20 @@ Deno.serve(async (req) => {
     console.log(`[notify-new-submission] Processing submission ${submissionId}, type: ${type}`);
 
     // Get user's company
-    const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).single();
-    const tenantId = profile?.company_id;
+    const { data: ucRow } = await supabase.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();
+    const tenantId = ucRow?.company_id;
 
     if (tenantId) {
-      // Create a notification for planners
-      const { data: planners } = await supabase
-        .from("profiles")
-        .select("id")
+      // Create a notification for all users in the same company
+      const { data: companyUsers } = await supabase
+        .from("user_companies")
+        .select("user_id")
         .eq("company_id", tenantId);
 
-      // Insert notifications for each planner
-      if (planners && planners.length > 0) {
-        const notifications = planners.map((p: any) => ({
-          user_id: p.id,
+      // Insert notifications for each user
+      if (companyUsers && companyUsers.length > 0) {
+        const notifications = companyUsers.map((u: any) => ({
+          user_id: u.user_id,
           title: "Nieuwe inzending ontvangen",
           message: `Er is een nieuwe ${type || "document"} inzending (${submissionId}) binnengekomen die beoordeeld moet worden.`,
           type: "submission",
