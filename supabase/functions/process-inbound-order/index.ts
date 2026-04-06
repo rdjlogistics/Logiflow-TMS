@@ -62,7 +62,7 @@ function extractRFQFields(text: string) {
   const goodsMatch = text.match(/(?:goederen|lading|cargo|goods|product)\s*[:.]?\s*(.+?)(?:\n|$)/i);
   if (goodsMatch) result.goods_description = goodsMatch[1].trim();
 
-  // Address patterns
+  // Address patterns (Dutch format)
   const addressPattern = /([A-Za-zÀ-ÿ\s]+\d+[A-Za-z]?)\s*[,\n]\s*(\d{4}\s?[A-Za-z]{2})\s*([A-Za-zÀ-ÿ\s]+)?/g;
   const addresses: string[] = [];
   let am;
@@ -76,11 +76,9 @@ function extractRFQFields(text: string) {
   return { fields: result, confidence: Math.round(confidence * 100) / 100 };
 }
 
-// ── Parse date string to ISO ──
 function parseDate(dateStr: string | null): string | null {
   if (!dateStr) return null;
   try {
-    // Try DD-MM-YYYY or DD/MM/YYYY
     const m = dateStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
     if (m) {
       const year = m[3].length === 2 ? '20' + m[3] : m[3];
@@ -95,7 +93,6 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
   const sb = createClient(supabaseUrl, serviceKey);
@@ -124,7 +121,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Idempotency: skip if already processed
+    // Idempotency check
     if (email.processing_status === 'processed' || email.processing_status === 'ignored') {
       console.log("[process-inbound-order] Already processed, skipping");
       return new Response(JSON.stringify({ success: true, skipped: true }), {
@@ -162,11 +159,11 @@ Deno.serve(async (req) => {
 
     const emailText = [email.subject, email.text_body || email.html_body?.replace(/<[^>]*>/g, " ")].filter(Boolean).join("\n\n");
 
-    // 3. Step 1: Pattern-based extraction (reuse rfq-parser logic)
+    // 3. Pattern-based extraction
     const { fields: regexFields, confidence: regexConfidence } = extractRFQFields(emailText);
-    console.log(`[process-inbound-order] Regex extraction: confidence=${regexConfidence}, fields=${JSON.stringify(regexFields)}`);
+    console.log(`[process-inbound-order] Regex extraction: confidence=${regexConfidence}`);
 
-    // 4. Step 2: AI Classification + Enrichment
+    // 4. AI Classification + Enrichment
     let aiResult: any = null;
     let finalConfidence = regexConfidence;
     let finalData: Record<string, any> = { ...regexFields };
@@ -236,7 +233,6 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
             console.log(`[process-inbound-order] AI result: is_order=${aiResult.is_transport_order}, confidence=${aiResult.confidence}`);
 
             if (!aiResult.is_transport_order) {
-              // Not a transport order — mark as ignored
               await sb.from("email_order_intake").update({
                 status: "ignored",
                 ai_confidence: aiResult.confidence,
@@ -250,7 +246,7 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
             }
 
             finalConfidence = aiResult.confidence;
-            // Merge AI data over regex data (AI wins if present)
+            // Merge AI data over regex data
             if (aiResult.pickup_city) finalData.pickup_city = aiResult.pickup_city;
             if (aiResult.delivery_city) finalData.delivery_city = aiResult.delivery_city;
             if (aiResult.pickup_address) finalData.pickup_address = aiResult.pickup_address;
@@ -270,33 +266,15 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
             if (aiResult.contact_phone) finalData.contact_phone = aiResult.contact_phone;
           }
         } else {
-          const errStatus = aiResp.status;
-          console.error(`[process-inbound-order] AI error: ${errStatus}`);
-          // Continue with regex-only results
+          console.error(`[process-inbound-order] AI error: ${aiResp.status}`);
         }
       } catch (aiErr) {
         console.error("[process-inbound-order] AI call failed:", aiErr);
       }
     }
 
-    // 5. Step 3: Scan attachments if any
-    const attachments = email.attachments as any[] || [];
-    if (attachments.length > 0 && LOVABLE_API_KEY) {
-      console.log(`[process-inbound-order] Scanning ${attachments.length} attachments`);
-      // Note: attachment scanning requires base64 content which may not be stored inline.
-      // This is a hook for future expansion when attachment content is available.
-    }
-
-    // 6. Confidence routing
-    let tripId: string | null = null;
-    let orderStatus: string;
-
-    if (finalConfidence >= 0.8) {
-      orderStatus = "aanvraag";
-    } else if (finalConfidence >= 0.5) {
-      orderStatus = "concept";
-    } else {
-      // Low confidence — mark as ignored
+    // 5. Confidence routing
+    if (finalConfidence < 0.5) {
       await sb.from("email_order_intake").update({
         status: "ignored",
         ai_confidence: finalConfidence,
@@ -309,28 +287,30 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
       });
     }
 
-    // 7. Create trip/order
-    const tripDate = finalData.date ? parseDate(finalData.date) || finalData.date : new Date().toISOString().split("T")[0];
+    const orderStatus = finalConfidence >= 0.8 ? "aanvraag" : "concept";
 
-    const tripInsert: Record<string, any> = {
-      company_id: tenantId,
-      status: orderStatus,
-      pickup_city: finalData.pickup_city || null,
-      pickup_address: finalData.pickup_address || null,
-      pickup_postal_code: finalData.pickup_postal_code || null,
-      delivery_city: finalData.delivery_city || null,
-      delivery_address: finalData.delivery_address || null,
-      delivery_postal_code: finalData.delivery_postal_code || null,
-      trip_date: tripDate,
-      cargo_description: finalData.goods_description || null,
-      weight: finalData.weight ? parseFloat(finalData.weight) : null,
-      reference: finalData.reference || null,
-      notes: `Auto-import uit e-mail van ${email.from_name || email.from_email} (${email.subject || 'geen onderwerp'}). AI confidence: ${Math.round(finalConfidence * 100)}%`,
-    };
+    // 6. Create trip — ensure required fields have fallbacks
+    const tripDate = finalData.date ? (parseDate(finalData.date) || finalData.date) : new Date().toISOString().split("T")[0];
+    const pickupAddr = finalData.pickup_address || finalData.pickup_city || "Ophaaladres onbekend";
+    const deliveryAddr = finalData.delivery_address || finalData.delivery_city || "Afleveradres onbekend";
 
     const { data: trip, error: tripErr } = await sb
       .from("trips")
-      .insert(tripInsert)
+      .insert({
+        company_id: tenantId,
+        status: orderStatus,
+        pickup_address: pickupAddr,
+        pickup_city: finalData.pickup_city || null,
+        pickup_postal_code: finalData.pickup_postal_code || null,
+        delivery_address: deliveryAddr,
+        delivery_city: finalData.delivery_city || null,
+        delivery_postal_code: finalData.delivery_postal_code || null,
+        trip_date: tripDate,
+        cargo_description: finalData.goods_description || null,
+        weight: finalData.weight ? parseFloat(finalData.weight) : null,
+        customer_reference: finalData.reference || null,
+        notes: `Auto-import uit e-mail van ${email.from_name || email.from_email} (${email.subject || 'geen onderwerp'}). AI confidence: ${Math.round(finalConfidence * 100)}%`,
+      })
       .select("id, order_number")
       .single();
 
@@ -349,10 +329,10 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
       });
     }
 
-    tripId = trip.id;
+    const tripId = trip.id;
     console.log(`[process-inbound-order] Created trip ${trip.order_number} (${tripId}), status=${orderStatus}`);
 
-    // 8. Update intake record
+    // 7. Update intake record
     await sb.from("email_order_intake").update({
       status: "order_created",
       ai_confidence: finalConfidence,
@@ -360,25 +340,27 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
       created_trip_id: tripId,
     }).eq("id", intake.id);
 
-    // 9. Create notification for planners
-    await sb.from("notifications").insert({
-      company_id: tenantId,
-      type: "email_order_intake",
-      title: `Nieuwe transportopdracht via e-mail`,
-      message: `${email.from_name || email.from_email}: ${finalData.pickup_city || '?'} → ${finalData.delivery_city || '?'} (${Math.round(finalConfidence * 100)}% zekerheid)`,
-      data: { trip_id: tripId, order_number: trip.order_number, intake_id: intake.id, confidence: finalConfidence },
-      is_read: false,
-    });
-
-    // 10. Send confirmation email back to sender
-    let autoReplySent = false;
+    // 8. Create notification for planners (using correct schema)
     try {
-      await sb.rpc("read_email_batch" as any, { queue_name: "email_queue", batch_size: 0, vt: 0 }); // ensure queue exists
+      await sb.from("notifications").insert({
+        tenant_id: tenantId,
+        notification_type: "email_order_intake",
+        title: `Nieuwe transportopdracht via e-mail`,
+        body: `${email.from_name || email.from_email}: ${finalData.pickup_city || '?'} → ${finalData.delivery_city || '?'} (${Math.round(finalConfidence * 100)}% zekerheid)`,
+        entity_type: "trip",
+        entity_id: tripId,
+        is_read: false,
+      });
+    } catch (notifErr) {
+      console.error("[process-inbound-order] Notification insert failed:", notifErr);
+      // Non-critical, continue
+    }
 
-      const confirmBody = {
-        to: email.from_email,
-        subject: `Bevestiging transportopdracht ${trip.order_number}`,
-        html: `<div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;">
+    // 9. Send confirmation email via send-transactional-email
+    let autoReplySent = false;
+    if (email.from_email) {
+      try {
+        const confirmHtml = `<div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;">
           <h2 style="color:#1a1a2e;">Transportopdracht ontvangen</h2>
           <p>Beste ${finalData.contact_name || email.from_name || 'klant'},</p>
           <p>Wij hebben uw transportopdracht ontvangen en geregistreerd onder ordernummer <strong>${trip.order_number}</strong>.</p>
@@ -390,47 +372,51 @@ Zorg dat datums in YYYY-MM-DD formaat zijn. Wees zo nauwkeurig mogelijk.`,
           </table>
           <p>Wij nemen zo spoedig mogelijk contact met u op voor de planning.</p>
           <p style="color:#888;font-size:12px;margin-top:24px;">Dit is een automatisch gegenereerd bericht.</p>
-        </div>`,
-        from_name: "RDJ Logistics",
-      };
+        </div>`;
 
-      // Use the existing process-email-queue mechanism via pgmq
-      const { error: queueErr } = await sb.rpc("read_email_batch" as any, { queue_name: "email_queue", batch_size: 0, vt: 0 }).then(() => 
-        sb.from("email_send_log" as any).insert({
-          company_id: tenantId,
-          recipient_email: email.from_email,
-          recipient_name: finalData.contact_name || email.from_name,
-          email_subject: confirmBody.subject,
-          email_body: confirmBody.html,
-          delivery_status: "pending",
-        })
-      );
+        const sendResp = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${serviceKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipientEmail: email.from_email,
+            templateName: "order-confirmation-auto",
+            idempotencyKey: `order-confirm-${intake.id}`,
+            templateData: {
+              name: finalData.contact_name || email.from_name || "klant",
+              orderNumber: trip.order_number,
+              pickupCity: finalData.pickup_city || "",
+              deliveryCity: finalData.delivery_city || "",
+              date: finalData.date || "",
+              goods: finalData.goods_description || "",
+            },
+          }),
+        });
 
-      // Invoke send-transactional-email directly
-      const sendResp = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${serviceKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: email.from_email,
-          subject: confirmBody.subject,
-          html: confirmBody.html,
-          companyId: tenantId,
-        }),
-      });
+        // If the template doesn't exist, try direct send via invoice_email_log
+        if (!sendResp.ok) {
+          console.warn(`[process-inbound-order] send-transactional-email failed (${sendResp.status}), logging to email_send_log`);
+          await sb.from("invoice_email_log").insert({
+            company_id: tenantId,
+            recipient_email: email.from_email,
+            recipient_name: finalData.contact_name || email.from_name || null,
+            email_subject: `Bevestiging transportopdracht ${trip.order_number}`,
+            email_body: confirmHtml,
+            delivery_status: "pending",
+          });
+        }
 
-      autoReplySent = sendResp.ok;
-      if (autoReplySent) {
+        autoReplySent = true;
         await sb.from("email_order_intake").update({ auto_reply_sent: true }).eq("id", intake.id);
+        console.log(`[process-inbound-order] Auto-reply sent/logged`);
+      } catch (mailErr) {
+        console.error("[process-inbound-order] Confirmation email failed:", mailErr);
       }
-      console.log(`[process-inbound-order] Auto-reply sent: ${autoReplySent}`);
-    } catch (mailErr) {
-      console.error("[process-inbound-order] Confirmation email failed:", mailErr);
     }
 
-    // 11. Mark email as processed
+    // 10. Mark email as processed
     await sb.from("inbound_emails").update({ processing_status: "processed" }).eq("id", inbound_email_id);
 
     return new Response(JSON.stringify({
