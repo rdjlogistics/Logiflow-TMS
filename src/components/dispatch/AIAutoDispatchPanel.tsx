@@ -128,61 +128,42 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
     setIsBatchProcessing(true);
     setBatchResults(null);
     const results: Array<{ tripId: string; pickup: string; delivery: string; driverName: string; score: number }> = [];
+    let successCount = 0;
 
     try {
       for (const trip of unassignedTrips.slice(0, 10)) {
         const data = await analyzeTrip(trip.id);
         if (data?.candidates?.length > 0) {
           const top = data.candidates[0];
-          results.push({
-            tripId: trip.id,
-            pickup: dedupCity(trip.pickup_city),
-            delivery: dedupCity(trip.delivery_city),
-            driverName: top.driver.name,
-            score: top.overallScore,
-          });
+          // Direct assign — no review step
+          const { error } = await supabase
+            .from('trips')
+            .update({ driver_id: top.driver.id, status: 'gepland' satisfies TripStatus })
+            .eq('id', trip.id);
+          
+          if (!error) {
+            successCount++;
+            results.push({
+              tripId: trip.id,
+              pickup: dedupCity(trip.pickup_city),
+              delivery: dedupCity(trip.delivery_city),
+              driverName: top.driver.name,
+              score: top.overallScore,
+            });
+          }
         }
       }
       setBatchResults(results);
       toast({
-        title: `🤖 ${results.length} ritten geanalyseerd`,
-        description: 'Bekijk de suggesties hieronder en bevestig.',
+        title: `✅ ${successCount} ritten automatisch toegewezen`,
+        description: 'AI heeft de beste chauffeurs direct gekoppeld.',
       });
+      refetchTrips();
     } catch (err) {
-      toast({ title: 'Batch analyse mislukt', variant: 'destructive' });
+      toast({ title: 'Batch toewijzing mislukt', variant: 'destructive' });
     } finally {
       setIsBatchProcessing(false);
     }
-  };
-
-  const handleConfirmBatch = async () => {
-    if (!batchResults) return;
-    let successCount = 0;
-    
-    for (const result of batchResults) {
-      try {
-        // Find the driver_id from analysis candidates for this trip
-        const analysisData = await analyzeTrip(result.tripId);
-        const topDriver = analysisData?.candidates?.[0];
-        if (!topDriver) continue;
-        
-        const { error } = await supabase
-          .from('trips')
-          .update({ 
-            driver_id: topDriver.driver.id,
-            status: 'gepland' satisfies TripStatus,
-          })
-          .eq('id', result.tripId);
-        if (!error) successCount++;
-      } catch (e) { console.error('Trip update failed:', e); }
-    }
-    
-    toast({
-      title: `✅ ${successCount}/${batchResults.length} ritten verwerkt`,
-      description: 'De chauffeurs zijn genotificeerd.',
-    });
-    setBatchResults(null);
-    refetchTrips();
   };
 
   const getScoreColor = (score: number) => {
