@@ -146,9 +146,7 @@ const Rosters = () => {
         if (error) throw error;
         toast({ title: "Dienst bijgewerkt" });
       } else {
-        const { error } = await supabase
-          .from("program_shifts")
-          .insert({
+        const insertData: any = {
             assigned_driver_id: form.assigned_driver_id,
             trip_date: form.trip_date,
             start_time: form.start_time,
@@ -157,9 +155,12 @@ const Rosters = () => {
             notes: form.notes || null,
             pickup_address: form.pickup_address || "-",
             delivery_address: form.delivery_address || "-",
-            status: "open",
+            status: "open" as const,
             created_by: user?.id,
-          });
+          };
+        const { error } = await supabase
+          .from("program_shifts")
+          .insert(insertData);
         if (error) throw error;
         toast({ title: "Dienst aangemaakt" });
       }

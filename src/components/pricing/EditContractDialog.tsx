@@ -171,7 +171,11 @@ export const EditContractDialog: React.FC<EditContractDialogProps> = ({
                 id="effective_to"
                 type="date"
                 {...register("effective_to")}
+                error={!!errors.effective_to}
               />
+              {errors.effective_to && (
+                <p className="text-sm text-destructive">{errors.effective_to.message}</p>
+              )}
             </div>
           </div>
 
