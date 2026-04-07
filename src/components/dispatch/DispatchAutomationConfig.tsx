@@ -39,16 +39,16 @@ interface AutomationConfig {
 
 const defaultConfig: AutomationConfig = {
   id: '',
-  is_active: false,
-  min_confidence_auto_send: 70,
-  min_confidence_auto_assign: 90,
-  double_check_enabled: true,
-  max_drivers_per_trip: 3,
-  response_timeout_minutes: 30,
-  fallback_to_manual: true,
-  notification_channels: ['email', 'push'],
-  working_hours_start: '07:00',
-  working_hours_end: '19:00',
+  is_active: true,
+  min_confidence_auto_send: 0,
+  min_confidence_auto_assign: 0,
+  double_check_enabled: false,
+  max_drivers_per_trip: 1,
+  response_timeout_minutes: 5,
+  fallback_to_manual: false,
+  notification_channels: ['push'],
+  working_hours_start: '00:00',
+  working_hours_end: '23:59',
 };
 
 export function DispatchAutomationConfig() {

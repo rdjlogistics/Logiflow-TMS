@@ -65,12 +65,97 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const user = await getUser(authHeader);
-    const supabase = makeSupabase(authHeader);
     const body = await req.json();
-    const { action, tripId, driverId, conversationId, responseText } = body;
+    const { action, tripId, driverId, conversationId, responseText, tenantId: bodyTenantId } = body;
 
     console.log(`[ai-dispatch-engine] action=${action} tripId=${tripId}`);
+
+    // Auto-assign path: called by DB trigger with service_role key — no user context needed
+    if (action === "auto_assign") {
+      const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const tId = bodyTenantId;
+      if (!tId || !tripId) {
+        return new Response(JSON.stringify({ error: "tenantId and tripId required", success: false }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Fetch trip
+      const { data: trip } = await supabaseAdmin.from("trips").select("*").eq("id", tripId).single();
+      if (!trip) {
+        return new Response(JSON.stringify({ error: "Trip niet gevonden", success: false }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      // Already assigned? Skip
+      if (trip.driver_id) {
+        return new Response(JSON.stringify({ success: true, message: "Al toegewezen", skipped: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Fetch active drivers for this tenant
+      const { data: drivers } = await supabaseAdmin
+        .from("drivers")
+        .select("id, name, phone, current_city, rating, driver_category, is_active")
+        .eq("tenant_id", tId)
+        .eq("is_active", true);
+
+      if (!drivers || drivers.length === 0) {
+        console.log("[ai-dispatch-engine] auto_assign: no active drivers");
+        return new Response(JSON.stringify({ success: false, error: "Geen actieve chauffeurs" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Count active trips per driver
+      const { data: activeTripCounts } = await supabaseAdmin
+        .from("trips")
+        .select("driver_id")
+        .eq("company_id", tId)
+        .in("status", ["gepland", "onderweg", "laden"])
+        .not("driver_id", "is", null);
+
+      const tripCountMap: Record<string, number> = {};
+      (activeTripCounts || []).forEach((t: any) => {
+        tripCountMap[t.driver_id] = (tripCountMap[t.driver_id] || 0) + 1;
+      });
+
+      // Score and pick best
+      const scored = drivers.map((d: any) => {
+        const driverWithCount = { ...d, active_trip_count: tripCountMap[d.id] || 0 };
+        const { score, reasoning } = scoreDriver(driverWithCount, trip);
+        return { driver: d, score, reasoning };
+      }).sort((a, b) => b.score - a.score);
+
+      const best = scored[0];
+      console.log(`[ai-dispatch-engine] auto_assign: best=${best.driver.name} score=${best.score}`);
+
+      // Direct assign
+      const { error: updateErr } = await supabaseAdmin.from("trips").update({
+        driver_id: best.driver.id,
+        status: "gepland",
+      }).eq("id", tripId);
+
+      if (updateErr) {
+        console.error("[ai-dispatch-engine] auto_assign update error:", updateErr);
+        return new Response(JSON.stringify({ success: false, error: updateErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Log to auto_dispatch_logs
+      await supabaseAdmin.from("auto_dispatch_logs").insert({
+        tenant_id: tId,
+        order_id: tripId,
+        selected_driver_id: best.driver.id,
+        selection_reason: `AI score ${best.score}/100: ${best.reasoning.join(", ")}`,
+        was_auto_assigned: true,
+        candidates_json: scored.slice(0, 5).map((s) => ({ driverId: s.driver.id, name: s.driver.name, score: s.score })),
+      } as any);
+
+      return new Response(JSON.stringify({
+        success: true,
+        driverId: best.driver.id,
+        driverName: best.driver.name,
+        score: best.score,
+        message: `${best.driver.name} automatisch toegewezen (score: ${best.score})`,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // All other actions require user auth
+    const user = await getUser(authHeader);
+    const supabase = makeSupabase(authHeader);
 
     // Get user's company
     const { data: uc } = await supabase.from("user_companies").select("company_id").eq("user_id", user.id).eq("is_primary", true).limit(1).maybeSingle();

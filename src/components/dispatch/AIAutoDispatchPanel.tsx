@@ -128,61 +128,42 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
     setIsBatchProcessing(true);
     setBatchResults(null);
     const results: Array<{ tripId: string; pickup: string; delivery: string; driverName: string; score: number }> = [];
+    let successCount = 0;
 
     try {
       for (const trip of unassignedTrips.slice(0, 10)) {
         const data = await analyzeTrip(trip.id);
         if (data?.candidates?.length > 0) {
           const top = data.candidates[0];
-          results.push({
-            tripId: trip.id,
-            pickup: dedupCity(trip.pickup_city),
-            delivery: dedupCity(trip.delivery_city),
-            driverName: top.driver.name,
-            score: top.overallScore,
-          });
+          // Direct assign — no review step
+          const { error } = await supabase
+            .from('trips')
+            .update({ driver_id: top.driver.id, status: 'gepland' satisfies TripStatus })
+            .eq('id', trip.id);
+          
+          if (!error) {
+            successCount++;
+            results.push({
+              tripId: trip.id,
+              pickup: dedupCity(trip.pickup_city),
+              delivery: dedupCity(trip.delivery_city),
+              driverName: top.driver.name,
+              score: top.overallScore,
+            });
+          }
         }
       }
       setBatchResults(results);
       toast({
-        title: `🤖 ${results.length} ritten geanalyseerd`,
-        description: 'Bekijk de suggesties hieronder en bevestig.',
+        title: `✅ ${successCount} ritten automatisch toegewezen`,
+        description: 'AI heeft de beste chauffeurs direct gekoppeld.',
       });
+      refetchTrips();
     } catch (err) {
-      toast({ title: 'Batch analyse mislukt', variant: 'destructive' });
+      toast({ title: 'Batch toewijzing mislukt', variant: 'destructive' });
     } finally {
       setIsBatchProcessing(false);
     }
-  };
-
-  const handleConfirmBatch = async () => {
-    if (!batchResults) return;
-    let successCount = 0;
-    
-    for (const result of batchResults) {
-      try {
-        // Find the driver_id from analysis candidates for this trip
-        const analysisData = await analyzeTrip(result.tripId);
-        const topDriver = analysisData?.candidates?.[0];
-        if (!topDriver) continue;
-        
-        const { error } = await supabase
-          .from('trips')
-          .update({ 
-            driver_id: topDriver.driver.id,
-            status: 'gepland' satisfies TripStatus,
-          })
-          .eq('id', result.tripId);
-        if (!error) successCount++;
-      } catch (e) { console.error('Trip update failed:', e); }
-    }
-    
-    toast({
-      title: `✅ ${successCount}/${batchResults.length} ritten verwerkt`,
-      description: 'De chauffeurs zijn genotificeerd.',
-    });
-    setBatchResults(null);
-    refetchTrips();
   };
 
   const getScoreColor = (score: number) => {
@@ -228,17 +209,11 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" />
-                  AI Suggesties — {batchResults.length} ritten
+                  ✅ {batchResults.length} ritten automatisch toegewezen
                 </h4>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setBatchResults(null)}>
-                    Annuleer
-                  </Button>
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={handleConfirmBatch}>
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Bevestig Alle
-                  </Button>
-                </div>
+                <Button size="sm" variant="ghost" onClick={() => setBatchResults(null)}>
+                  Sluiten
+                </Button>
               </div>
               <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                 {batchResults.map((r, i) => (
