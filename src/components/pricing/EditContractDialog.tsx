@@ -18,6 +18,14 @@ const contractSchema = z.object({
   effective_to: z.string().nullable().optional(),
   currency: z.string().default("EUR"),
   status: z.enum(["draft", "active", "expired", "archived"]),
+}).refine((data) => {
+  if (data.effective_to && data.effective_from) {
+    return data.effective_to >= data.effective_from;
+  }
+  return true;
+}, {
+  message: "Einddatum moet na de startdatum liggen",
+  path: ["effective_to"],
 });
 
 type ContractFormData = z.infer<typeof contractSchema>;
