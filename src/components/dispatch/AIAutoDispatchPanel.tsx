@@ -209,17 +209,11 @@ export function AIAutoDispatchPanel({ tripId, onAssigned }: AIAutoDispatchPanelP
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" />
-                  AI Suggesties — {batchResults.length} ritten
+                  ✅ {batchResults.length} ritten automatisch toegewezen
                 </h4>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setBatchResults(null)}>
-                    Annuleer
-                  </Button>
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={handleConfirmBatch}>
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Bevestig Alle
-                  </Button>
-                </div>
+                <Button size="sm" variant="ghost" onClick={() => setBatchResults(null)}>
+                  Sluiten
+                </Button>
               </div>
               <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                 {batchResults.map((r, i) => (
