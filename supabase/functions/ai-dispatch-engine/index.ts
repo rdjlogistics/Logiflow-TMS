@@ -175,7 +175,7 @@ Deno.serve(async (req) => {
       const { data: drivers } = await supabase
         .from("drivers")
         .select("id, name, phone, current_city, rating, driver_category, is_active")
-        .eq("company_id", tenantId)
+        .eq("tenant_id", tenantId)
         .eq("is_active", true);
 
       if (!drivers || drivers.length === 0) {
