@@ -18,6 +18,14 @@ const contractSchema = z.object({
   effective_to: z.string().nullable().optional(),
   currency: z.string().default("EUR"),
   status: z.enum(["draft", "active", "expired", "archived"]),
+}).refine((data) => {
+  if (data.effective_to && data.effective_from) {
+    return data.effective_to >= data.effective_from;
+  }
+  return true;
+}, {
+  message: "Einddatum moet na de startdatum liggen",
+  path: ["effective_to"],
 });
 
 type ContractFormData = z.infer<typeof contractSchema>;
@@ -163,7 +171,11 @@ export const EditContractDialog: React.FC<EditContractDialogProps> = ({
                 id="effective_to"
                 type="date"
                 {...register("effective_to")}
+                error={!!errors.effective_to}
               />
+              {errors.effective_to && (
+                <p className="text-sm text-destructive">{errors.effective_to.message}</p>
+              )}
             </div>
           </div>
 
