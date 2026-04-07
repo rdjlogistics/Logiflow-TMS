@@ -1,8 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,11 +9,9 @@ import {
   Wrench,
   Truck,
   AlertTriangle,
-  Calendar,
-  TrendingUp,
-  TrendingDown,
   Gauge,
-  Loader2,
+  TrendingDown,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FuelManagement from '@/components/fleet/FuelManagement';
@@ -26,177 +22,107 @@ import { useFleetManagement } from '@/hooks/useFleetManagement';
 
 const FleetManagement = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  // navigate removed — all CRUD is now in VehicleOverview
   const { vehicles, vehiclesLoading, alerts, stats } = useFleetManagement();
+
+  const statItems = [
+    { label: 'Totaal', value: stats.totalVehicles, icon: Truck, accent: 'text-primary' },
+    { label: 'Actief', value: stats.activeVehicles, icon: Truck, accent: 'text-emerald-500' },
+    { label: 'Inactief', value: stats.totalVehicles - stats.activeVehicles, icon: AlertTriangle, accent: 'text-amber-500' },
+    { label: 'Kritiek', value: stats.criticalAlerts, icon: AlertTriangle, accent: 'text-destructive' },
+    { label: 'APK aandacht', value: stats.apkExpiringSoon, icon: Gauge, accent: 'text-orange-500' },
+    { label: 'Onderhoud', value: stats.serviceDue, icon: Calendar, accent: 'text-purple-500' },
+  ];
+
+  const criticalAlerts = alerts.filter(a => a.severity === 'critical');
 
   return (
     <DashboardLayout title="Vlootbeheer" description="Voertuigen, brandstof en onderhoud">
-      <div className="space-y-6">
+      <div className="space-y-5">
 
-        {/* Elite Stat Cards */}
+        {/* Stat Strip */}
         {vehiclesLoading ? (
           <LoadingState message="Vlootgegevens laden..." />
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[
-              { label: 'Totaal', value: stats.totalVehicles, icon: Truck, color: 'text-blue-500', glow: 'hsl(217 91% 60% / 0.12)' },
-              { label: 'Actief', value: stats.activeVehicles, icon: TrendingUp, color: 'text-green-500', glow: 'hsl(142 71% 45% / 0.12)' },
-              { label: 'Inactief', value: stats.totalVehicles - stats.activeVehicles, icon: AlertTriangle, color: 'text-yellow-500', glow: 'hsl(45 93% 47% / 0.12)' },
-              { label: 'Kritiek', value: stats.criticalAlerts, icon: AlertTriangle, color: 'text-destructive', glow: 'hsl(var(--destructive) / 0.12)' },
-              { label: 'APK aandacht', value: stats.apkExpiringSoon, icon: Gauge, color: 'text-orange-500', glow: 'hsl(25 95% 53% / 0.12)' },
-              { label: 'Onderhoud', value: stats.serviceDue, icon: Calendar, color: 'text-purple-500', glow: 'hsl(271 91% 65% / 0.12)' },
-            ].map((stat, i) => (
-              <EliteStatCard key={stat.label} stat={stat} index={i} />
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+            {statItems.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-xl border border-border/20 bg-card/60 backdrop-blur-sm px-3 py-3 flex items-center gap-2.5"
+              >
+                <s.icon className={cn('h-4 w-4 shrink-0', s.accent)} />
+                <div className="min-w-0">
+                  <p className="text-lg font-semibold tabular-nums leading-none">{s.value}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{s.label}</p>
+                </div>
+              </div>
             ))}
           </div>
         )}
 
         {/* Critical alert banner */}
-        {alerts.filter(a => a.severity === 'critical').length > 0 && (
-            <div
-              className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/8 border border-destructive/15 backdrop-blur-xl text-sm animate-fade-in-blur"
+        {criticalAlerts.length > 0 && (
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-destructive/8 border border-destructive/15 text-sm">
+            <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+            <span className="text-destructive font-medium">
+              {criticalAlerts.length} kritieke melding(en) — directe actie vereist
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 h-7 text-xs"
+              onClick={() => setActiveTab('maintenance')}
             >
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-destructive/12">
-                <AlertTriangle className="h-4 w-4 text-destructive" />
-              </div>
-              <span className="font-medium text-destructive">
-                {alerts.filter(a => a.severity === 'critical').length} kritieke melding(en) — directe actie vereist
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => setActiveTab('maintenance')}
-              >
-                Bekijk
-              </Button>
-            </div>
+              Bekijk
+            </Button>
+          </div>
         )}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-card/70 backdrop-blur-xl border border-border/30">
-            <TabsTrigger value="overview" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
-              <Truck className="h-4 w-4" />
-              Overzicht
-            </TabsTrigger>
-            <TabsTrigger value="fuel" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
-              <Fuel className="h-4 w-4" />
-              Brandstof
-            </TabsTrigger>
-            <TabsTrigger value="maintenance" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
-              <Wrench className="h-4 w-4" />
-              Onderhoud
-              {stats.serviceDue > 0 && (
-                <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-                  {stats.serviceDue}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="valuation" className="gap-2 data-[state=active]:bg-background/80 data-[state=active]:backdrop-blur-sm">
-              <TrendingDown className="h-4 w-4" />
-              Waarde
-            </TabsTrigger>
-          </TabsList>
+          {/* Scrollable tab bar on mobile */}
+          <div className="overflow-x-auto scrollbar-none -mx-1 px-1">
+            <TabsList className="bg-card/60 backdrop-blur-sm border border-border/20 inline-flex w-auto min-w-full md:min-w-0">
+              <TabsTrigger value="overview" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-background/80">
+                <Truck className="h-3.5 w-3.5" />
+                <span className="hidden xs:inline">Overzicht</span>
+                <span className="xs:hidden">Vloot</span>
+              </TabsTrigger>
+              <TabsTrigger value="fuel" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-background/80">
+                <Fuel className="h-3.5 w-3.5" />
+                Brandstof
+              </TabsTrigger>
+              <TabsTrigger value="maintenance" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-background/80">
+                <Wrench className="h-3.5 w-3.5" />
+                Onderhoud
+                {stats.serviceDue > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
+                    {stats.serviceDue}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="valuation" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-background/80">
+                <TrendingDown className="h-3.5 w-3.5" />
+                Waarde
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-            <div
-              key={activeTab}
-              className="animate-fade-in-blur"
-            >
-              <TabsContent value="overview" className="mt-0" forceMount={activeTab === 'overview' ? true : undefined}>
-                {activeTab === 'overview' && <VehicleOverview />}
-              </TabsContent>
-              <TabsContent value="fuel" className="mt-0" forceMount={activeTab === 'fuel' ? true : undefined}>
-                {activeTab === 'fuel' && <FuelManagement />}
-              </TabsContent>
-              <TabsContent value="maintenance" className="mt-0" forceMount={activeTab === 'maintenance' ? true : undefined}>
-                {activeTab === 'maintenance' && <MaintenanceManagement />}
-              </TabsContent>
-              <TabsContent value="valuation" className="mt-0" forceMount={activeTab === 'valuation' ? true : undefined}>
-                {activeTab === 'valuation' && <VehicleValuation />}
-              </TabsContent>
-            </div>
+          <TabsContent value="overview" className="mt-0">
+            <VehicleOverview />
+          </TabsContent>
+          <TabsContent value="fuel" className="mt-0">
+            <FuelManagement />
+          </TabsContent>
+          <TabsContent value="maintenance" className="mt-0">
+            <MaintenanceManagement />
+          </TabsContent>
+          <TabsContent value="valuation" className="mt-0">
+            <VehicleValuation />
+          </TabsContent>
         </Tabs>
       </div>
     </DashboardLayout>
   );
 };
-
-/* ─── Elite Stat Card with 3D Perspective ─── */
-
-interface EliteStatProps {
-  stat: {
-    label: string;
-    value: number;
-    icon: React.ElementType;
-    color: string;
-    glow: string;
-  };
-  index: number;
-}
-
-function EliteStatCard({ stat, index }: EliteStatProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [transform, setTransform] = useState('perspective(600px) rotateX(0deg) rotateY(0deg)');
-  const Icon = stat.icon;
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTransform(`perspective(600px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setTransform('perspective(600px) rotateX(0deg) rotateY(0deg)');
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ transform, animationDelay: `${index * 60}ms` }}
-      className="rounded-2xl border border-border/30 bg-card/70 backdrop-blur-xl p-4 transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.15)] active:scale-[0.97] animate-fade-in-blur"
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: stat.glow }}
-        >
-          <Icon className={cn('h-5 w-5', stat.color)} />
-        </div>
-        <div className="min-w-0">
-          <AnimatedCounter value={stat.value} />
-          <p className="text-xs text-muted-foreground truncate mt-0.5">{stat.label}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Animated Counter ─── */
-
-function AnimatedCounter({ value }: { value: number }) {
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    if (value === 0) { setDisplay(0); return; }
-    const duration = 500;
-    const start = performance.now();
-    const startVal = display;
-    const step = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(startVal + (value - startVal) * eased));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return <p className="text-2xl font-bold text-foreground tabular-nums">{display}</p>;
-}
 
 export default FleetManagement;

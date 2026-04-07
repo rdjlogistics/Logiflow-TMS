@@ -7,46 +7,22 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  Popover, PopoverContent, PopoverTrigger,
 } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Wrench,
-  Plus,
-  Search,
-  Calendar as CalendarIcon,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  XCircle,
-  Euro,
-  Settings,
-  Loader2,
+  Wrench, Plus, Search, Calendar as CalendarIcon,
+  AlertTriangle, CheckCircle, Clock, XCircle, Euro, Settings, Loader2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -75,18 +51,11 @@ const MaintenanceManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [formData, setFormData] = useState({
-    vehicleId: '',
-    maintenanceType: '',
-    title: '',
-    vendorName: '',
-    estimatedCost: '',
-    notes: '',
+    vehicleId: '', maintenanceType: '', title: '', vendorName: '', estimatedCost: '', notes: '',
   });
 
-  // Fetch real vehicles for dropdown
   const { vehicles, vehiclesLoading } = useFleetManagement();
 
-  // Fetch real maintenance_orders from Supabase
   const { data: records = [], isLoading: recordsLoading } = useQuery({
     queryKey: ['maintenance-orders'],
     queryFn: async () => {
@@ -100,17 +69,11 @@ const MaintenanceManagement = () => {
     },
   });
 
-  // Insert new maintenance_order
   const addMutation = useMutation({
     mutationFn: async (payload: {
-      vehicle_id: string;
-      maintenance_type: string;
-      title: string;
-      vendor_name: string | null;
-      cost: number | null;
-      notes: string | null;
-      scheduled_date: string;
-      status: string;
+      vehicle_id: string; maintenance_type: string; title: string;
+      vendor_name: string | null; cost: number | null; notes: string | null;
+      scheduled_date: string; status: string;
     }) => {
       const { error } = await (supabase as any).from('maintenance_orders').insert(payload);
       if (error) throw error;
@@ -120,7 +83,7 @@ const MaintenanceManagement = () => {
       setIsAddDialogOpen(false);
       setFormData({ vehicleId: '', maintenanceType: '', title: '', vendorName: '', estimatedCost: '', notes: '' });
       setSelectedDate(undefined);
-      toast({ title: 'Onderhoud gepland', description: 'Het onderhoud is succesvol ingepland.' });
+      toast({ title: 'Onderhoud gepland' });
     },
     onError: (err: any) => {
       toast({ title: 'Fout bij opslaan', description: err.message, variant: 'destructive' });
@@ -145,63 +108,33 @@ const MaintenanceManagement = () => {
   };
 
   const getStatusBadge = (status: string | null) => {
-    switch (status) {
-      case 'scheduled':
-        return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-            <Clock className="h-3 w-3 mr-1" />
-            Gepland
-          </Badge>
-        );
-      case 'in_progress':
-        return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
-            <Settings className="h-3 w-3 mr-1 animate-spin" />
-            In behandeling
-          </Badge>
-        );
-      case 'completed':
-        return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Afgerond
-          </Badge>
-        );
-      case 'overdue':
-        return (
-          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
-            <AlertTriangle className="h-3 w-3 mr-1" />
-            Achterstallig
-          </Badge>
-        );
-      case 'cancelled':
-        return (
-          <Badge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
-            <XCircle className="h-3 w-3 mr-1" />
-            Geannuleerd
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status || '–'}</Badge>;
-    }
+    const map: Record<string, { icon: React.ElementType; label: string; cls: string }> = {
+      scheduled: { icon: Clock, label: 'Gepland', cls: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+      in_progress: { icon: Settings, label: 'In behandeling', cls: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
+      completed: { icon: CheckCircle, label: 'Afgerond', cls: 'bg-green-500/10 text-green-500 border-green-500/20' },
+      overdue: { icon: AlertTriangle, label: 'Achterstallig', cls: 'bg-red-500/10 text-red-500 border-red-500/20' },
+      cancelled: { icon: XCircle, label: 'Geannuleerd', cls: 'bg-muted text-muted-foreground border-border/20' },
+    };
+    const cfg = map[status || ''] || { icon: Clock, label: status || '–', cls: 'bg-muted text-muted-foreground' };
+    const Icon = cfg.icon;
+    return <Badge className={cfg.cls}><Icon className={cn('h-3 w-3 mr-1', status === 'in_progress' && 'animate-spin')} />{cfg.label}</Badge>;
   };
 
   const getTypeBadge = (type: string | null) => {
-    const typeLabels: Record<string, { label: string; color: string }> = {
-      apk: { label: 'APK', color: 'bg-purple-500/10 text-purple-500' },
-      preventive: { label: 'Preventief', color: 'bg-blue-500/10 text-blue-500' },
-      corrective: { label: 'Correctief', color: 'bg-orange-500/10 text-orange-500' },
-      inspection: { label: 'Inspectie', color: 'bg-cyan-500/10 text-cyan-500' },
-      oil_change: { label: 'Olie', color: 'bg-amber-500/10 text-amber-500' },
-      tire: { label: 'Banden', color: 'bg-slate-500/10 text-slate-500' },
-      brake: { label: 'Remmen', color: 'bg-red-500/10 text-red-500' },
-      other: { label: 'Overig', color: 'bg-gray-500/10 text-gray-500' },
+    const labels: Record<string, { label: string; cls: string }> = {
+      apk: { label: 'APK', cls: 'bg-purple-500/10 text-purple-500' },
+      preventive: { label: 'Preventief', cls: 'bg-blue-500/10 text-blue-500' },
+      corrective: { label: 'Correctief', cls: 'bg-orange-500/10 text-orange-500' },
+      inspection: { label: 'Inspectie', cls: 'bg-cyan-500/10 text-cyan-500' },
+      oil_change: { label: 'Olie', cls: 'bg-amber-500/10 text-amber-500' },
+      tire: { label: 'Banden', cls: 'bg-slate-500/10 text-slate-500' },
+      brake: { label: 'Remmen', cls: 'bg-red-500/10 text-red-500' },
+      other: { label: 'Overig', cls: 'bg-muted text-muted-foreground' },
     };
-    const config = typeLabels[type || 'other'] || typeLabels.other;
-    return <Badge className={cn(config.color, 'border-current/20')}>{config.label}</Badge>;
+    const cfg = labels[type || 'other'] || labels.other;
+    return <Badge className={cfg.cls}>{cfg.label}</Badge>;
   };
 
-  // Computed stats from real data
   const statsScheduled = records.filter(r => r.status === 'scheduled').length;
   const statsInProgress = records.filter(r => r.status === 'in_progress').length;
   const statsCompleted = records.filter(r => r.status === 'completed').length;
@@ -217,44 +150,44 @@ const MaintenanceManagement = () => {
     );
   });
 
+  const statItems = [
+    { label: 'Gepland', value: statsScheduled, accent: 'text-blue-500' },
+    { label: 'In behandeling', value: statsInProgress, accent: 'text-yellow-500' },
+    { label: 'Afgerond', value: statsCompleted, accent: 'text-emerald-500' },
+    { label: 'Achterstallig', value: statsOverdue, accent: 'text-red-500' },
+    { label: 'Totale kosten', value: `€${(statsCost / 1000).toFixed(1)}k`, accent: 'text-purple-500' },
+  ];
+
   return (
     <div className="space-y-4">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <StatCard label="Gepland" value={statsScheduled} color="blue" />
-        <StatCard label="In behandeling" value={statsInProgress} color="yellow" />
-        <StatCard label="Afgerond" value={statsCompleted} color="green" />
-        <StatCard label="Achterstallig" value={statsOverdue} color="red" />
-        <StatCard
-          label="Totale kosten"
-          value={`€${(statsCost / 1000).toFixed(1)}k`}
-          color="purple"
-        />
+      {/* Compact Stats */}
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+        {statItems.map((s) => (
+          <div key={s.label} className="rounded-xl border border-border/20 bg-card/60 backdrop-blur-sm px-3 py-2.5">
+            <p className={cn('text-lg font-semibold tabular-nums leading-none', s.accent)}>{s.value}</p>
+            <p className="text-[10px] text-muted-foreground mt-1 truncate">{s.label}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Records Table */}
-      <Card className="border-border/50">
+      {/* Records */}
+      <Card className="border-border/20 bg-card/60 backdrop-blur-sm">
         <CardHeader className="pb-3">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle className="flex items-center gap-2">
-              <Wrench className="h-5 w-5" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
               Onderhoudsregistraties
             </CardTitle>
             <div className="flex gap-2">
-              <div className="relative flex-1 md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Zoek onderhoud..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+              <div className="relative flex-1 sm:w-56">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <Input placeholder="Zoek..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9 text-sm" />
               </div>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nieuw onderhoud
+                  <Button size="sm" className="h-9 gap-1.5">
+                    <Plus className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Nieuw</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-lg">
@@ -264,14 +197,8 @@ const MaintenanceManagement = () => {
                   <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
                       <Label>Voertuig *</Label>
-                      <Select
-                        value={formData.vehicleId}
-                        onValueChange={(v) => setFormData(prev => ({ ...prev, vehicleId: v }))}
-                        disabled={vehiclesLoading}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={vehiclesLoading ? 'Laden...' : 'Selecteer voertuig'} />
-                        </SelectTrigger>
+                      <Select value={formData.vehicleId} onValueChange={(v) => setFormData(prev => ({ ...prev, vehicleId: v }))} disabled={vehiclesLoading}>
+                        <SelectTrigger><SelectValue placeholder={vehiclesLoading ? 'Laden...' : 'Selecteer voertuig'} /></SelectTrigger>
                         <SelectContent>
                           {vehicles.map(v => (
                             <SelectItem key={v.id} value={v.id}>
@@ -283,19 +210,14 @@ const MaintenanceManagement = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
-                        <Label>Type onderhoud</Label>
-                        <Select
-                          value={formData.maintenanceType}
-                          onValueChange={(v) => setFormData(prev => ({ ...prev, maintenanceType: v }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
+                        <Label>Type</Label>
+                        <Select value={formData.maintenanceType} onValueChange={(v) => setFormData(prev => ({ ...prev, maintenanceType: v }))}>
+                          <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="apk">APK Keuring</SelectItem>
-                            <SelectItem value="preventive">Preventief onderhoud</SelectItem>
-                            <SelectItem value="corrective">Correctief onderhoud</SelectItem>
-                            <SelectItem value="oil_change">Olie verversen</SelectItem>
+                            <SelectItem value="apk">APK</SelectItem>
+                            <SelectItem value="preventive">Preventief</SelectItem>
+                            <SelectItem value="corrective">Correctief</SelectItem>
+                            <SelectItem value="oil_change">Olie</SelectItem>
                             <SelectItem value="tire">Banden</SelectItem>
                             <SelectItem value="brake">Remmen</SelectItem>
                             <SelectItem value="inspection">Inspectie</SelectItem>
@@ -307,71 +229,37 @@ const MaintenanceManagement = () => {
                         <Label>Datum</Label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" className="justify-start text-left font-normal">
+                            <Button variant="outline" className="justify-start text-left font-normal h-10">
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {selectedDate ? format(selectedDate, 'PPP', { locale: nl }) : 'Selecteer datum'}
+                              {selectedDate ? format(selectedDate, 'PPP', { locale: nl }) : 'Datum'}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={selectedDate}
-                              onSelect={setSelectedDate}
-                              initialFocus
-                            />
+                            <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
                           </PopoverContent>
                         </Popover>
                       </div>
                     </div>
                     <div className="grid gap-2">
                       <Label>Titel *</Label>
-                      <Input
-                        placeholder="Beschrijf het onderhoud..."
-                        value={formData.title}
-                        onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      />
+                      <Input placeholder="Beschrijf het onderhoud..." value={formData.title} onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label>Leverancier</Label>
-                        <Input
-                          placeholder="Naam garage/dealer"
-                          value={formData.vendorName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, vendorName: e.target.value }))}
-                        />
+                        <Input placeholder="Garage/dealer" value={formData.vendorName} onChange={(e) => setFormData(prev => ({ ...prev, vendorName: e.target.value }))} />
                       </div>
                       <div className="grid gap-2">
-                        <Label>Geschatte kosten (€)</Label>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          value={formData.estimatedCost}
-                          onChange={(e) => setFormData(prev => ({ ...prev, estimatedCost: e.target.value }))}
-                        />
+                        <Label>Kosten (€)</Label>
+                        <Input type="number" placeholder="0" value={formData.estimatedCost} onChange={(e) => setFormData(prev => ({ ...prev, estimatedCost: e.target.value }))} />
                       </div>
                     </div>
                     <div className="grid gap-2">
                       <Label>Notities</Label>
-                      <Textarea
-                        placeholder="Extra opmerkingen..."
-                        rows={3}
-                        value={formData.notes}
-                        onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                      />
+                      <Textarea placeholder="Extra opmerkingen..." rows={2} value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} />
                     </div>
-                    <Button
-                      className="w-full mt-2"
-                      onClick={handleSubmit}
-                      disabled={addMutation.isPending}
-                    >
-                      {addMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Opslaan...
-                        </>
-                      ) : (
-                        'Onderhoud plannen'
-                      )}
+                    <Button className="w-full" onClick={handleSubmit} disabled={addMutation.isPending}>
+                      {addMutation.isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opslaan...</> : 'Onderhoud plannen'}
                     </Button>
                   </div>
                 </DialogContent>
@@ -382,105 +270,89 @@ const MaintenanceManagement = () => {
         <CardContent>
           {recordsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : filteredRecords.length === 0 ? (
             <div className="text-center py-12">
-              <Wrench className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">
-                {searchQuery ? 'Geen onderhoud gevonden' : 'Nog geen onderhoudsregistraties'}
-              </p>
+              <Wrench className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">{searchQuery ? 'Geen resultaten' : 'Nog geen onderhoud'}</p>
             </div>
           ) : (
-            <div className="rounded-lg border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>Voertuig</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Omschrijving</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Datum</TableHead>
-                    <TableHead className="text-right">Kosten</TableHead>
-                    <TableHead>Leverancier</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRecords.map((record, index) => (
-                    <tr
-                      key={record.id}
-                      className="group hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <TableCell>
-                        {record.vehicle ? (
-                          <div>
-                            <span className="font-mono font-semibold">{record.vehicle.license_plate}</span>
-                            <div className="text-xs text-muted-foreground">
-                              {[record.vehicle.brand, record.vehicle.model].filter(Boolean).join(' ')}
+            <>
+              {/* Desktop Table */}
+              <div className="hidden md:block rounded-xl border border-border/20 overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/20">
+                      <TableHead>Voertuig</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Omschrijving</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Datum</TableHead>
+                      <TableHead className="text-right">Kosten</TableHead>
+                      <TableHead>Leverancier</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredRecords.map((record) => (
+                      <tr key={record.id} className="group hover:bg-muted/20 transition-colors">
+                        <TableCell>
+                          {record.vehicle ? (
+                            <div>
+                              <span className="font-mono font-semibold text-sm">{record.vehicle.license_plate}</span>
+                              <div className="text-[11px] text-muted-foreground">{[record.vehicle.brand, record.vehicle.model].filter(Boolean).join(' ')}</div>
                             </div>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">–</span>
+                          ) : <span className="text-muted-foreground">–</span>}
+                        </TableCell>
+                        <TableCell>{getTypeBadge(record.maintenance_type)}</TableCell>
+                        <TableCell className="font-medium text-sm">{record.title || '–'}</TableCell>
+                        <TableCell>{getStatusBadge(record.status)}</TableCell>
+                        <TableCell className="text-sm">
+                          {record.scheduled_date ? format(new Date(record.scheduled_date), 'd MMM yyyy', { locale: nl }) : '–'}
+                        </TableCell>
+                        <TableCell className="text-right font-mono text-sm">
+                          {record.cost != null ? <span className="flex items-center justify-end gap-1"><Euro className="h-3 w-3" />{record.cost.toLocaleString('nl-NL')}</span> : <span className="text-muted-foreground">–</span>}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{record.vendor_name || '–'}</TableCell>
+                      </tr>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="md:hidden space-y-2">
+                {filteredRecords.map((record) => (
+                  <div key={record.id} className="rounded-xl border border-border/20 bg-card/40 p-3.5 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{record.title || 'Onderhoud'}</p>
+                        {record.vehicle && (
+                          <p className="text-xs text-muted-foreground font-mono">{record.vehicle.license_plate} · {[record.vehicle.brand, record.vehicle.model].filter(Boolean).join(' ')}</p>
                         )}
-                      </TableCell>
-                      <TableCell>{getTypeBadge(record.maintenance_type)}</TableCell>
-                      <TableCell className="font-medium">{record.title || '–'}</TableCell>
-                      <TableCell>{getStatusBadge(record.status)}</TableCell>
-                      <TableCell>
-                        {record.scheduled_date
-                          ? format(new Date(record.scheduled_date), 'd MMM yyyy', { locale: nl })
-                          : '–'}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {record.cost != null ? (
-                          <span className="flex items-center justify-end gap-1">
-                            <Euro className="h-3 w-3" />
-                            {record.cost.toLocaleString('nl-NL')}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">–</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {record.vendor_name || '–'}
-                      </TableCell>
-                    </tr>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                      </div>
+                      {getStatusBadge(record.status)}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      {getTypeBadge(record.maintenance_type)}
+                      {record.scheduled_date && (
+                        <span className="flex items-center gap-1">
+                          <CalendarIcon className="h-3 w-3" />
+                          {format(new Date(record.scheduled_date), 'd MMM', { locale: nl })}
+                        </span>
+                      )}
+                      {record.cost != null && (
+                        <span className="ml-auto font-mono font-semibold text-foreground">€{record.cost.toLocaleString('nl-NL')}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
     </div>
-  );
-};
-
-const StatCard = ({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  color: 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'orange';
-}) => {
-  const colorMap = {
-    blue: 'border-blue-500/20 bg-blue-500/5',
-    green: 'border-green-500/20 bg-green-500/5',
-    yellow: 'border-yellow-500/20 bg-yellow-500/5',
-    red: 'border-red-500/20 bg-red-500/5',
-    purple: 'border-purple-500/20 bg-purple-500/5',
-    orange: 'border-orange-500/20 bg-orange-500/5',
-  };
-
-  return (
-    <Card className={cn('border', colorMap[color])}>
-      <CardContent className="p-3">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <div className="text-xl font-bold mt-1">{value}</div>
-      </CardContent>
-    </Card>
   );
 };
 
