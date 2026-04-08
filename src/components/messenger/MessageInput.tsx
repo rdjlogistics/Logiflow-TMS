@@ -75,7 +75,7 @@ export const MessageInput = forwardRef<HTMLDivElement, MessageInputProps>(({
       try {
         const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${Date.now()}/${fileName}`;
+        const filePath = `${channelId || 'unknown'}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('chat-attachments')
