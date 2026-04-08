@@ -34,6 +34,10 @@ export const MessageInput = forwardRef<HTMLDivElement, MessageInputProps>(({
   disabled = false,
   placeholder = 'Typ een bericht...',
   onAttachment,
+  channelId,
+}, ref) => {
+  placeholder = 'Typ een bericht...',
+  onAttachment,
 }, ref) => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
