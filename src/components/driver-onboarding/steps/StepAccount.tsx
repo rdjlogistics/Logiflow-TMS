@@ -78,6 +78,8 @@ export const StepAccount = () => {
           logger.error('Driver record creation error:', driverError);
         }
 
+        let roleAssignmentDeferred = false;
+
         try {
           const { data: session } = await supabase.auth.getSession();
           if (session?.session?.access_token) {
@@ -85,16 +87,22 @@ export const StepAccount = () => {
               headers: { Authorization: `Bearer ${session.session.access_token}` },
             });
             if (response.error) {
-              logger.error('assign-driver-role error:', response.error);
+              roleAssignmentDeferred = true;
+              logger.log('assign-driver-role deferred during signup:', response.error);
             } else {
               logger.log('Driver role assigned successfully:', response.data);
             }
           }
         } catch (roleErr) {
-          logger.error('Role assignment failed:', roleErr);
+          roleAssignmentDeferred = true;
+          logger.log('Role assignment deferred during signup:', roleErr);
         }
 
-        toast.success('Account aangemaakt!', { description: 'Je account is succesvol aangemaakt.' });
+        toast.success('Account aangemaakt!', {
+          description: roleAssignmentDeferred
+            ? 'Je account is aangemaakt. Toegang wordt actief zodra je aan een bedrijf bent gekoppeld.'
+            : 'Je account is succesvol aangemaakt.'
+        });
         setTimeout(() => setCurrentStep(currentStep + 1), 100);
       }
     } catch (err) {
