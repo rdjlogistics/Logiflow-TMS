@@ -25,7 +25,7 @@ export const MessengerPanel = ({
   className,
 }: MessengerPanelProps) => {
   const { user } = useAuth();
-  const { messages, loading, sendMessage } = useMessenger(tripId);
+  const { channel, messages, loading, sendMessage } = useMessenger(tripId);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -124,6 +124,7 @@ export const MessengerPanel = ({
       <MessageInput
         onSend={(content) => sendMessage(content, 'planner')}
         disabled={loading}
+        channelId={channel?.id}
       />
     </Card>
   );

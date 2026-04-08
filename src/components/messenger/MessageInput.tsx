@@ -16,6 +16,7 @@ interface MessageInputProps {
   disabled?: boolean;
   placeholder?: string;
   onAttachment?: (file: File) => void;
+  channelId?: string;
 }
 
 // Common emoji categories
@@ -33,6 +34,7 @@ export const MessageInput = forwardRef<HTMLDivElement, MessageInputProps>(({
   disabled = false,
   placeholder = 'Typ een bericht...',
   onAttachment,
+  channelId,
 }, ref) => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -73,7 +75,7 @@ export const MessageInput = forwardRef<HTMLDivElement, MessageInputProps>(({
       try {
         const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${Date.now()}/${fileName}`;
+        const filePath = `${channelId || 'unknown'}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('chat-attachments')
