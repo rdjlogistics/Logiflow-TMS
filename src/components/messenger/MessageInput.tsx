@@ -16,6 +16,7 @@ interface MessageInputProps {
   disabled?: boolean;
   placeholder?: string;
   onAttachment?: (file: File) => void;
+  channelId?: string;
 }
 
 // Common emoji categories

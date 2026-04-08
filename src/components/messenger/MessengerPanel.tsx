@@ -124,6 +124,7 @@ export const MessengerPanel = ({
       <MessageInput
         onSend={(content) => sendMessage(content, 'planner')}
         disabled={loading}
+        channelId={channel?.id}
       />
     </Card>
   );
