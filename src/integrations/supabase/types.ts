@@ -20778,6 +20778,10 @@ export type Database = {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
       }
+      user_has_chat_channel_access: {
+        Args: { p_channel_id: string }
+        Returns: boolean
+      }
       user_in_same_tenant: { Args: { p_user_id: string }; Returns: boolean }
       validate_tracking_token: { Args: { p_token: string }; Returns: boolean }
       verify_signature_otp: {
