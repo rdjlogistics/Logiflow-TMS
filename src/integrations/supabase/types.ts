@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -7374,93 +7374,6 @@ export type Database = {
           },
         ]
       }
-      email_order_intake: {
-        Row: {
-          ai_confidence: number | null
-          ai_extracted_data: Json | null
-          assigned_driver_id: string | null
-          auto_reply_sent: boolean
-          company_id: string
-          confirmed_at: string | null
-          confirmed_by: string | null
-          created_at: string
-          created_trip_id: string | null
-          error_message: string | null
-          id: string
-          inbound_email_id: string | null
-          processed_at: string | null
-          status: string
-        }
-        Insert: {
-          ai_confidence?: number | null
-          ai_extracted_data?: Json | null
-          assigned_driver_id?: string | null
-          auto_reply_sent?: boolean
-          company_id: string
-          confirmed_at?: string | null
-          confirmed_by?: string | null
-          created_at?: string
-          created_trip_id?: string | null
-          error_message?: string | null
-          id?: string
-          inbound_email_id?: string | null
-          processed_at?: string | null
-          status?: string
-        }
-        Update: {
-          ai_confidence?: number | null
-          ai_extracted_data?: Json | null
-          assigned_driver_id?: string | null
-          auto_reply_sent?: boolean
-          company_id?: string
-          confirmed_at?: string | null
-          confirmed_by?: string | null
-          created_at?: string
-          created_trip_id?: string | null
-          error_message?: string | null
-          id?: string
-          inbound_email_id?: string | null
-          processed_at?: string | null
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "email_order_intake_assigned_driver_id_fkey"
-            columns: ["assigned_driver_id"]
-            isOneToOne: false
-            referencedRelation: "drivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_order_intake_assigned_driver_id_fkey"
-            columns: ["assigned_driver_id"]
-            isOneToOne: false
-            referencedRelation: "drivers_masked"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_order_intake_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_order_intake_created_trip_id_fkey"
-            columns: ["created_trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_order_intake_inbound_email_id_fkey"
-            columns: ["inbound_email_id"]
-            isOneToOne: false
-            referencedRelation: "inbound_emails"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       email_send_log: {
         Row: {
           created_at: string
@@ -7469,10 +7382,8 @@ export type Database = {
           message_id: string | null
           metadata: Json | null
           recipient_email: string
-          sent_by: string | null
           status: string
           template_name: string
-          tenant_id: string | null
         }
         Insert: {
           created_at?: string
@@ -7481,10 +7392,8 @@ export type Database = {
           message_id?: string | null
           metadata?: Json | null
           recipient_email: string
-          sent_by?: string | null
           status: string
           template_name: string
-          tenant_id?: string | null
         }
         Update: {
           created_at?: string
@@ -7493,20 +7402,10 @@ export type Database = {
           message_id?: string | null
           metadata?: Json | null
           recipient_email?: string
-          sent_by?: string | null
           status?: string
           template_name?: string
-          tenant_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "email_send_log_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       email_send_state: {
         Row: {
@@ -9937,7 +9836,6 @@ export type Database = {
           from_name: string | null
           html_body: string | null
           id: string
-          processing_status: string
           read: boolean | null
           received_at: string | null
           reply_to_message_id: string | null
@@ -9953,7 +9851,6 @@ export type Database = {
           from_name?: string | null
           html_body?: string | null
           id?: string
-          processing_status?: string
           read?: boolean | null
           received_at?: string | null
           reply_to_message_id?: string | null
@@ -9969,7 +9866,6 @@ export type Database = {
           from_name?: string | null
           html_body?: string | null
           id?: string
-          processing_status?: string
           read?: boolean | null
           received_at?: string | null
           reply_to_message_id?: string | null
@@ -20778,10 +20674,6 @@ export type Database = {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
       }
-      user_has_chat_channel_access: {
-        Args: { p_channel_id: string }
-        Returns: boolean
-      }
       user_in_same_tenant: { Args: { p_user_id: string }; Returns: boolean }
       validate_tracking_token: { Args: { p_token: string }; Returns: boolean }
       verify_signature_otp: {
@@ -21015,21 +20907,21 @@ export type Database = {
         | "EASYTRANS"
         | "CUSTOM"
         | "OTHER"
-        | "TRANSPOREON"
-        | "WICS"
-        | "BOLTRICS"
-        | "CARGON"
-        | "KOOPMAN"
-        | "PRINCETON_TMX"
-        | "GOCOMET"
-        | "ORACLE_TMS"
-        | "SAP_TM"
-        | "BLUEROCK"
-        | "CARGOWISE"
-        | "DESCARTES"
-        | "TRIMBLE"
-        | "MERCURIUS"
         | "YELLOWSTAR"
+        | "MERCURIUS"
+        | "TRIMBLE"
+        | "DESCARTES"
+        | "CARGOWISE"
+        | "BLUEROCK"
+        | "SAP_TM"
+        | "ORACLE_TMS"
+        | "GOCOMET"
+        | "PRINCETON_TMX"
+        | "KOOPMAN"
+        | "CARGON"
+        | "BOLTRICS"
+        | "WICS"
+        | "TRANSPOREON"
       payment_status:
         | "open"
         | "pending"
@@ -21147,12 +21039,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -21176,11 +21068,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -21201,11 +21093,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -21226,11 +21118,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -21243,11 +21135,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -21504,21 +21396,21 @@ export const Constants = {
         "EASYTRANS",
         "CUSTOM",
         "OTHER",
-        "TRANSPOREON",
-        "WICS",
-        "BOLTRICS",
-        "CARGON",
-        "KOOPMAN",
-        "PRINCETON_TMX",
-        "GOCOMET",
-        "ORACLE_TMS",
-        "SAP_TM",
-        "BLUEROCK",
-        "CARGOWISE",
-        "DESCARTES",
-        "TRIMBLE",
-        "MERCURIUS",
         "YELLOWSTAR",
+        "MERCURIUS",
+        "TRIMBLE",
+        "DESCARTES",
+        "CARGOWISE",
+        "BLUEROCK",
+        "SAP_TM",
+        "ORACLE_TMS",
+        "GOCOMET",
+        "PRINCETON_TMX",
+        "KOOPMAN",
+        "CARGON",
+        "BOLTRICS",
+        "WICS",
+        "TRANSPOREON",
       ],
       payment_status: [
         "open",
