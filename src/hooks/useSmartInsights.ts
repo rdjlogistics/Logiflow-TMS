@@ -88,7 +88,7 @@ export function useSmartInsights() {
           .select('user_id, full_name'),
         supabase
           .from('customers')
-          .select('id, company_name, payment_terms'),
+          .select('id, company_name, payment_terms_days'),
         supabase
           .from('invoices')
           .select('id, status, total_amount, due_date, customer_id') as any,
