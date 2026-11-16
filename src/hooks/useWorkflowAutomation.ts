@@ -105,6 +105,12 @@ export const WORKFLOW_TRIGGERS: WorkflowTrigger[] = [
     ],
   },
   {
+    type: 'system_accounting',
+    label: 'Boekhouding (automatisch)',
+    description: 'Ingebouwde boekhoudregel: verwachte omzet, conceptfactuur, factuur afsluiten en bankmatching',
+    icon: 'FileText',
+  },
+  {
     type: 'custom_webhook',
     label: 'Custom Webhook',
     description: 'Trigger via externe webhook call',
