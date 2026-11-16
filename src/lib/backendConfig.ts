@@ -7,8 +7,8 @@
  * Import this instead of reading `import.meta.env.VITE_SUPABASE_*` directly.
  */
 
-const FALLBACK_URL = "https://spycblsfcktsnepsdssv.supabase.co";
-const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNweWNibHNmY2t0c25lcHNkc3N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk1MjcsImV4cCI6MjA4OTEwNTUyN30.OKjnyYH-JTyDQySFitR8j-jVc0yMBp-feCA3dzN-Jls";
+const FALLBACK_URL = "https://mlhcjccvgsexkwryfcnp.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGNqY2N2Z3NleGt3cnlmY25wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNjM5NzcsImV4cCI6MjA4MjYzOTk3N30.vi8ip9bI_xTQc_O3w5xL4kwSIb1cRyz5tF1V7g4XLjw";
 
 export const backendUrl: string =
   import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
