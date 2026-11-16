@@ -20424,6 +20424,14 @@ export type Database = {
       }
     }
     Functions: {
+      accounting_enabled: {
+        Args: { p_key: string; p_tenant: string }
+        Returns: boolean
+      }
+      apply_bank_payment: {
+        Args: { p_invoice: string; p_tx_amount: number }
+        Returns: undefined
+      }
       are_companies_connected: {
         Args: { company_a: string; company_b: string }
         Returns: boolean
@@ -20438,6 +20446,7 @@ export type Database = {
         Args: { p_resource: string; p_tenant_id: string }
         Returns: boolean
       }
+      create_trip_invoice: { Args: { p_trip: string }; Returns: string }
       deduct_ai_credits: {
         Args: {
           p_action_type?: string
@@ -20623,6 +20632,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      log_accounting_run: {
+        Args: {
+          p_error?: string
+          p_event: Json
+          p_key: string
+          p_status: string
+          p_tenant: string
+        }
+        Returns: undefined
+      }
+      match_bank_transaction: {
+        Args: { p_invoice: string; p_tx: string }
+        Returns: Json
+      }
       move_to_dlq: {
         Args: {
           dlq_queue: string
@@ -20650,6 +20673,10 @@ export type Database = {
         }
         Returns: Json
       }
+      seed_accounting_automations: {
+        Args: { p_tenant: string }
+        Returns: undefined
+      }
       set_signature_otp: {
         Args: { p_otp: string; p_request_id: string }
         Returns: boolean
@@ -20666,10 +20693,18 @@ export type Database = {
         Args: { p_connection_id: string; p_credentials: Json }
         Returns: string
       }
+      sync_trip_accounting: {
+        Args: {
+          p_finalize: boolean
+          p_trip: Database["public"]["Tables"]["trips"]["Row"]
+        }
+        Returns: undefined
+      }
       tenant_has_active_subscription: {
         Args: { p_tenant_id: string }
         Returns: boolean
       }
+      trip_invoice_id: { Args: { p_trip: string }; Returns: string }
       user_belongs_to_company: {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
