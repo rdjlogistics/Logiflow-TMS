@@ -15,6 +15,13 @@
       "when": 1794853392928,
       "tag": "0001_accounting_automation",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794854405164,
+      "tag": "0002_fix_accounting_status_cast",
+      "breakpoints": true
     }
   ]
 }
