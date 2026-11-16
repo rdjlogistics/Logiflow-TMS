@@ -104,6 +104,12 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
         >
           Alle pakketten inclusief 14 dagen gratis trial
         </p>
+        <p className="text-xs text-muted-foreground/70">
+          Je proefperiode start direct en loopt t/m{' '}
+          <span className="font-medium text-foreground/80">
+            {new Date(Date.now() + 14 * 86400000).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
