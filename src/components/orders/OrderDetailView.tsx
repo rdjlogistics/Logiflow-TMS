@@ -19,6 +19,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import DeliveryConfirmationHeader from "@/components/orders/DeliveryConfirmationHeader";
 import ProofSummaryCard from "@/components/orders/ProofSummaryCard";
+import OrderFinancePanel from "@/components/orders/OrderFinancePanel";
 interface StopWithProof {
   id: string;
   stop_type: string;
@@ -669,6 +670,9 @@ const OrderDetailView = ({ tripId }: OrderDetailViewProps) => {
           })}
         </div>
       </div>
+
+      {/* Finance: invoice, IBAN, bank matching */}
+      <OrderFinancePanel tripId={tripId} />
 
       {/* Section 3: Location Map (desktop only - mobile shown above) */}
       {!isMobile && (

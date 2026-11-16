@@ -164,7 +164,7 @@ const OnboardingWizard = () => {
       // Save AI plan
       if (selectedAIPlanId && companyId) {
         const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 30);
+        trialEnd.setDate(trialEnd.getDate() + 14);
 
         const { data: aiPlan } = await supabase
           .from('ai_plans')

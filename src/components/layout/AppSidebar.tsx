@@ -187,6 +187,7 @@ const financieelItems = [
   { title: "Tankpassen", icon: Fuel, href: "/finance/fuel-cards" },
   { title: "Diesel Staffels", icon: TrendingUp, href: "/finance/diesel" },
   { title: "Kosten", icon: Coins, href: "/finance/costs" },
+  { title: "Boekhouding", icon: Landmark, href: "/finance/boekhouding" },
   { title: "Bank Reconciliatie", icon: Landmark, href: "/finance/bank" },
   { title: "Marge Analyse", icon: PieChart, href: "/finance/margin" },
   { title: "Claims", icon: ClipboardCheck, href: "/claims" },
