@@ -9,3 +9,4 @@
 - [x] Accounting page: income, expenses, balance, updated by the automations
 - [ ] Clean, modern design refresh across the whole app (waiting on the user: where to start)
 - [ ] Go-live plan in batches: list everything that still needs fixing, then fix it
+- [ ] Daily AI morning briefing by email: yesterday's sales, bookings and open tasks (batch 3, needs email domain)
