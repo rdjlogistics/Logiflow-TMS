@@ -102,7 +102,7 @@ export const TMSPlanSelector = ({ selectedPlanId, onSelect }: TMSPlanSelectorPro
         <p
           className="text-sm text-muted-foreground/50 font-light"
         >
-          Alle pakketten inclusief 30 dagen gratis trial
+          Alle pakketten inclusief 14 dagen gratis trial
         </p>
       </div>
 

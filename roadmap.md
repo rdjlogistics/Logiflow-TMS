@@ -7,3 +7,4 @@
 - [ ] Trial text set to 14 days
 - [ ] 14-day trial switched on automatically with an end date (wizard + automations)
 - [ ] Accounting page: income, expenses, balance, updated by the automations
+- [ ] Clean, modern design refresh across the whole app (waiting on the user: where to start)

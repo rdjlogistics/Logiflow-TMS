@@ -28,7 +28,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
     const title = isCancelled ? "Abonnement geannuleerd" : "Je proefperiode is verlopen";
     const desc = isCancelled
       ? "Je abonnement is geannuleerd. Kies een nieuw pakket om verder te gaan."
-      : "Je gratis proefperiode van 30 dagen is afgelopen. Kies een pakket om door te gaan met LogiFlow.";
+      : "Je gratis proefperiode van 14 dagen is afgelopen. Kies een pakket om door te gaan met LogiFlow.";
 
     return (
       <div className="relative">
