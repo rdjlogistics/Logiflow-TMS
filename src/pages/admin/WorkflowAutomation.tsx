@@ -51,6 +51,7 @@ import {
 } from "lucide-react";
 import { useWorkflowAutomation, WORKFLOW_TRIGGERS, WORKFLOW_ACTIONS, WORKFLOW_TEMPLATES, type WorkflowAction } from "@/hooks/useWorkflowAutomation";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSubscriptionPlan } from "@/hooks/useSubscriptionPlan";
 import { Separator } from "@/components/ui/separator";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -174,12 +175,26 @@ const WorkflowAutomation = () => {
     }
   };
 
+  const { isTrialing, trialDaysLeft, subscription } = useSubscriptionPlan();
+
   return (
     <DashboardLayout
       title="Workflow Automation"
       description="No-code automatiseringen voor je transportprocessen"
     >
       <div className="space-y-6">
+        {isTrialing && subscription?.trial_ends_at && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-muted/30 px-4 py-3 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary" />
+              <span>
+                Proefperiode actief — nog <strong>{trialDaysLeft}</strong> {trialDaysLeft === 1 ? 'dag' : 'dagen'}, loopt t/m{' '}
+                <strong>{new Date(subscription.trial_ends_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground">Alle automatiseringen draaien volledig tijdens je trial</span>
+          </div>
+        )}
         {/* Header Actions */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
