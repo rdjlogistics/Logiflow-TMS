@@ -5,8 +5,8 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // Hardcoded public fallbacks — these are publishable/anon values, safe in frontend code.
-const FALLBACK_SUPABASE_URL = "https://spycblsfcktsnepsdssv.supabase.co";
-const FALLBACK_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNweWNibHNmY2t0c25lcHNkc3N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk1MjcsImV4cCI6MjA4OTEwNTUyN30.OKjnyYH-JTyDQySFitR8j-jVc0yMBp-feCA3dzN-Jls";
+const FALLBACK_SUPABASE_URL = "https://mlhcjccvgsexkwryfcnp.supabase.co";
+const FALLBACK_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGNqY2N2Z3NleGt3cnlmY25wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNjM5NzcsImV4cCI6MjA4MjYzOTk3N30.vi8ip9bI_xTQc_O3w5xL4kwSIb1cRyz5tF1V7g4XLjw";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
