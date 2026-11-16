@@ -1,81 +1,38 @@
+# Workflows that update the books + consistent trial length
 
+## Goal
+When an order is created or its status changes, the workflow system should do real accounting work, not just send signals. The onboarding steps should also say 14 days of free trial everywhere.
 
-# Auto-Dispatch Altijd Aan — Zonder Review Stap
+## What gets built
 
-## Huidige Situatie
+### 1. New workflow actions
+- **Create draft invoice:** when an order reaches "afgeleverd" (delivered) or "afgerond" (completed), a draft sales invoice is made for that order's customer. It uses the order's agreed price and 21% VAT, and is linked to the order. If the order already has an invoice, nothing new is made.
+- **Record expected revenue:** when a new order is created, a "planned revenue" entry is added to the finance overview, so the cashflow shows it.
+- **Mark ready for invoicing:** when an order reaches "gecontroleerd" (checked), it is marked "gefactureerd" (invoiced) once its draft invoice exists.
 
-Nu werkt dispatch in 3 handmatige stappen:
-1. Gebruiker selecteert een rit in de UI
-2. AI analyseert chauffeurs en toont kandidaten
-3. Gebruiker klikt "Toewijzen" of "Bevestig Alle"
+### 2. Two ready-made automations for your company
+- "Nieuwe order → verwachte omzet boeken"
+- "Order afgeleverd → conceptfactuur maken"
 
-Er is al een database trigger (`trg_workflow_trip_events`) die bij elke nieuwe trip `execute-workflow` aanroept met `trigger_type = 'order_created'` — maar die roept **niet** de dispatch engine aan.
+Both are on by default and can be switched off or changed on the automations page.
 
-## Wat er moet gebeuren
+### 3. Safety
+- Automations only ever touch your own company's data.
+- A failed automation never blocks saving an order. The error is logged and visible in the run history.
+- Draft invoices are never sent automatically. You review them first.
 
-### Stap 1: Database trigger voor automatische dispatch
+### 4. Trial length
+The onboarding steps and the "trial ended" message say 14 days instead of 30, matching the package list.
 
-Maak een nieuwe trigger functie `trigger_auto_dispatch_on_new_trip()` die bij elke INSERT op `trips` (waar `driver_id IS NULL`) de `ai-dispatch-engine` edge function aanroept met `action: "auto_assign"`.
+## How I'll check it
+Using your account, I'll create a test order, which should add a planned-revenue entry. Then I'll set it to "afgeleverd", which should create a draft invoice, and set it again to confirm no second invoice appears. Afterwards I'll remove the test data.
 
-```sql
-CREATE OR REPLACE FUNCTION public.trigger_auto_dispatch_on_new_trip()
-RETURNS trigger AS $$
-BEGIN
-  IF NEW.driver_id IS NULL AND NEW.company_id IS NOT NULL THEN
-    PERFORM net.http_post(
-      url := 'https://spycblsfcktsnepsdssv.supabase.co/functions/v1/ai-dispatch-engine',
-      headers := '{"Content-Type":"application/json","Authorization":"Bearer SERVICE_KEY"}'::jsonb,
-      body := jsonb_build_object(
-        'action', 'auto_assign',
-        'tripId', NEW.id,
-        'tenantId', NEW.company_id
-      )
-    );
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+## Technical details
+- `execute-workflow`: add `create_draft_invoice`, `record_planned_revenue` and `mark_invoiced` actions. They run with the service role, scope everything by `tenant_id`, and check for an existing invoice per `trip_id` before creating one.
+- Seed two `workflow_automations` and their `workflow_actions` for tenant a1b2c3d4 (data insert), with `trigger_config` filtering on `new_status`.
+- Check the `invoices`, `invoice_lines` and `finance_transactions` columns before writing.
+- Text changes in `TMSPlanSelector.tsx`, `SubscriptionGate.tsx` and any other onboarding trial mentions.
+- Add roadmap entries for both tasks.
 
-### Stap 2: Nieuwe `auto_assign` action in `ai-dispatch-engine`
-
-Voeg een nieuw action-pad toe dat:
-1. Trip ophaalt
-2. Drivers scoort (bestaande `scoreDriver` functie)
-3. De top-chauffeur **direct toewijst** (`trips.driver_id = top.id, status = 'gepland'`) — geen conversatie, geen review
-4. Logt in `auto_dispatch_logs`
-
-Dit pad accepteert service-role auth (voor de trigger) naast user JWT.
-
-### Stap 3: Config defaults aanpassen
-
-In `DispatchAutomationConfig.tsx`:
-- `is_active` default → `true`
-- `min_confidence_auto_assign` default → `0` (altijd toewijzen)
-- `double_check_enabled` default → `false`
-
-### Stap 4: UI vereenvoudigen
-
-In `AIAutoDispatchPanel.tsx`:
-- Verwijder de handmatige "Bevestig" stap uit batch assign — direct toewijzen
-- Toon een "Auto-dispatch is actief" status banner
-- Batch-knop wijst direct toe zonder preview/bevestiging
-
-### Stap 5: Memory bijwerken
-
-Update `.lovable/memory/features/planning/ai-dispatch-logic-nl.md` met de nieuwe always-on logica.
-
-## Bestanden die wijzigen
-
-| Bestand | Wijziging |
-|---------|-----------|
-| `supabase/functions/ai-dispatch-engine/index.ts` | Nieuw `auto_assign` action pad met service-role auth |
-| Database migratie | Nieuwe trigger `trg_auto_dispatch_new_trip` |
-| `src/components/dispatch/DispatchAutomationConfig.tsx` | Defaults naar always-on |
-| `src/components/dispatch/AIAutoDispatchPanel.tsx` | Direct toewijzen zonder bevestiging |
-| `.lovable/memory/` | Update dispatch memory |
-
-## Resultaat
-
-Elke nieuwe order/trip zonder chauffeur wordt **automatisch** door AI gescored en de beste chauffeur wordt **direct** toegewezen. Geen klikken, geen review, geen wachten.
-
+## Open question
+Should a draft invoice be made when an order is "afgeleverd" (delivered) or only once it's "gecontroleerd" (checked)? The plan uses "afgeleverd". Tell me if you want "gecontroleerd" instead.
