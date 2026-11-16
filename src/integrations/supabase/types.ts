@@ -20441,6 +20441,7 @@ export type Database = {
         Args: { p_stop_id: string }
         Returns: number
       }
+      can_access_chat_channel: { Args: { p_channel: string }; Returns: boolean }
       can_view_customer_contact_details: { Args: never; Returns: boolean }
       check_plan_limit: {
         Args: { p_resource: string; p_tenant_id: string }
@@ -20473,6 +20474,7 @@ export type Database = {
         Args: { p_driver_id: string }
         Returns: boolean
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number

@@ -8,4 +8,7 @@
 - [x] 14-day trial switched on automatically with an end date (wizard + automations)
 - [x] Accounting page: income, expenses, balance, updated by the automations
 - [ ] Clean, modern design refresh across the whole app (waiting on the user: where to start)
-- [ ] Go-live plan in batches: list everything that still needs fixing, then fix it
+- [x] Go-live plan written; batch 1 (security) done
+- [ ] Go-live batch 2: core flows end to end
+- [ ] Go-live batches 3-6 (payments/email, accounting polish, speed, design)
+- [ ] Daily AI morning briefing by email: yesterday's sales, bookings and open tasks (batch 3, needs email domain)

@@ -22,6 +22,20 @@
       "when": 1794854405164,
       "tag": "0002_fix_accounting_status_cast",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794854645939,
+      "tag": "0003_lock_down_security_definer_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794854795189,
+      "tag": "0004_harden_storage_and_roles",
+      "breakpoints": true
     }
   ]
 }
