@@ -32,6 +32,7 @@ import { DispatchOrderDialog } from "@/components/orders/DispatchOrderDialog";
 import { SendTransportOrderDialog } from "@/components/orders/SendTransportOrderDialog";
 import { CreditWarningBanner } from "@/components/orders/CreditWarningBanner";
 import OrderDetailView from "@/components/orders/OrderDetailView";
+import OrderFinancePanel from "@/components/orders/OrderFinancePanel";
 import OrderGoodsDialog from "@/components/orders/OrderGoodsDialog";
 import { capitalizeCity } from "@/lib/date-utils";
 
@@ -1284,6 +1285,9 @@ const OrderForm = () => {
               />
             </motion.div>
           )}
+
+          {/* Finance: invoice, IBAN, bank matching */}
+          {orderId && <OrderFinancePanel tripId={orderId} />}
         </div>
       </div>
 
