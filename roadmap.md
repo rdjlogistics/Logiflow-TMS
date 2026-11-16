@@ -1,4 +1,9 @@
 # Roadmap
 
-- [x] Herstel lege pakketlijst in onboarding (stap 3)
-- [x] Test met echt account: trip opslaan en workflows controleren
+- [x] Restore empty package list in onboarding (step 3)
+- [x] Test with a real account: save a trip and check the workflows
+- [ ] Order automations: expected revenue, draft invoice, invoiced status, bank matching
+- [ ] Finance section on each order (invoice, IBAN, bank matching)
+- [ ] Trial text set to 14 days
+- [ ] 14-day trial switched on automatically with an end date (wizard + automations)
+- [ ] Accounting page: income, expenses, balance, updated by the automations
